@@ -1,0 +1,18 @@
+commands.hordes.SpawnHordeWave.usage=/spawnHordeWave <number of mobs to spawn>
+commands.hordes.SpawnHordeWave.success=Succesfully summoned horde wave;
+commands.hordes.SpawnHordeWave.invalidValue=%1$s is not a valid argument for <number of mobs to spawn>
+commands.hordes.SpawnHordeWave.wrongArgCount=Wrong number of arguments supplied for /spawnHordeWave
+commands.hordes.StartHorde.usage=/startHordeEvent <length of event>
+commands.hordes.StartHorde.success=Succesfully started horde event for %1$s ticks
+commands.hordes.StartHorde.invalidValue=%1$s is not a valid argument for <length of event>;
+commands.hordes.StartHorde.wrongArgCount=Wrong number of arguments supplied for /startHordeEvent
+commands.hordes.StopHorde.usage=/stopHordeEvent
+commands.hordes.StopHorde.success=Stopped active horde event
+message.hordes.EventStart=You hear the howl of an approaching horde
+message.hordes.EventEnd=The sounds of the horde begin to die down
+message.hordes.TrySleep=You many not rest now, a horde is approaching
+hordes.subtitle.hordeHowls=Zombie Howls
+
+effect.hordes.Infected=Infected
+text.hordes.DeathMessage=%1$s succumbed to their infection.
+text.hordes.DeathMessage=%1$s succumbed to their infection while fighting %2$s.
