@@ -3,7 +3,7 @@
   "modid": "hordes",
   "name": "The Hordes",
   "description": "",
-  "version": "alpha 0.1.3a",
+  "version": "alpha 0.1.3b",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
