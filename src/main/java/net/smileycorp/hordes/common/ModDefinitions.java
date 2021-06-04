@@ -6,7 +6,7 @@ public class ModDefinitions {
 
 	public static final String modid = "hordes";
 	public static final String name = "The Hordes";
-	public static final String version = "alpha 0.1.3b";
+	public static final String version = "alpha 0.1.3c";
 	public static final String dependencies = "required-after:atlaslib;";
 	public static final String location = "net.smileycorp.hordes.";
 	public static final String client = location + "client.ClientProxy";
