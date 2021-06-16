@@ -29,7 +29,7 @@ public class HordeEventPacketHandler {
 				Minecraft mc = Minecraft.getMinecraft();
 				
 				mc.addScheduledTask(() -> {
-					ClientHandler.playHordeSound();
+					ClientHandler.playHordeSound(message.getDirection());
 				
 				});
 			}

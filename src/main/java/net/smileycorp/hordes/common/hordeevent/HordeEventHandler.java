@@ -15,16 +15,19 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent;
 import net.smileycorp.atlas.api.entity.ai.EntityAIFindNearestTargetPredicate;
-import net.smileycorp.atlas.api.entity.ai.EntityAIGoToPos;
+import net.smileycorp.atlas.api.entity.ai.EntityAIGoToEntityPos;
+import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.ModDefinitions;
 
@@ -61,13 +64,32 @@ public class HordeEventHandler {
 	}
 	
 	@SubscribeEvent(priority=EventPriority.LOWEST)
+	public void tryDespawn(LivingSpawnEvent.AllowDespawn event) {
+		World world = event.getWorld();
+		EntityLivingBase entity = event.getEntityLiving();
+		if (entity.hasCapability(HordeSpawnProvider.HORDESPAWN, null)) {
+			IHordeSpawn cap = entity.getCapability(HordeSpawnProvider.HORDESPAWN, null);
+			if (cap.isHordeSpawned()) {
+				String uuid = cap.getPlayerUUID();
+				if (DataUtils.isValidUUID(uuid)) {
+					WorldSaveHordeEvent data = WorldSaveHordeEvent.get(world);
+					OngoingHordeEvent hordeevent = data.getEventForPlayer(uuid);
+					if (hordeevent.isActive(world)) {
+						event.setResult(Result.DENY);
+					}
+				}
+			}
+		}
+	}
+	
+	@SubscribeEvent(priority=EventPriority.LOWEST)
 	public void onJoin(EntityJoinWorldEvent event) {
 		World world = event.getWorld();
 		if (!world.isRemote && event.getEntity() instanceof EntityLiving) {
 			EntityLiving entity = (EntityLiving) event.getEntity();
 			if (entity.hasCapability(HordeSpawnProvider.HORDESPAWN, null)) {
 				IHordeSpawn cap = entity.getCapability(HordeSpawnProvider.HORDESPAWN, null);
-				if (cap.isHordeSpawned()) {
+				if (cap.isHordeSpawned() && DataUtils.isValidUUID(cap.getPlayerUUID())) {
 					entity.targetTasks.taskEntries.clear();
 					if (entity instanceof EntityCreature) {
 						entity.targetTasks.addTask(1, new EntityAIHurtByTarget((EntityCreature) entity, true));
@@ -84,7 +106,7 @@ public class HordeEventHandler {
 					WorldSaveHordeEvent data = WorldSaveHordeEvent.get(world);
 					OngoingHordeEvent hordeevent = data.getEventForPlayer(uuid);
 					if (player!=null) {
-						entity.tasks.addTask(6, new EntityAIGoToPos(entity, player.getPosition()));
+						entity.tasks.addTask(6, new EntityAIGoToEntityPos(entity, player));
 					}
 					hordeevent.registerEntity(entity);
 				}

@@ -18,7 +18,7 @@ import net.smileycorp.hordes.common.ModDefinitions;
 import com.mojang.authlib.GameProfile;
 
 public class WorldSaveHordeEvent extends WorldSavedData {
-	
+
 	public static final String DATA = ModDefinitions.modid + "_HordeEvent";
 	
 	private Map<String, OngoingHordeEvent> ongoingEvents =  new HashMap<String, OngoingHordeEvent>();

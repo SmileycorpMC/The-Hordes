@@ -36,6 +36,7 @@ public class ConfigHandler {
 		} finally {
 	    	if (config.hasChanged()) config.save();
 		}
+		
 	}
 
 }

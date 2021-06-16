@@ -25,7 +25,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.smileycorp.atlas.api.IOngoingEvent;
 import net.smileycorp.atlas.api.entity.ai.EntityAIFindNearestTargetPredicate;
-import net.smileycorp.atlas.api.entity.ai.EntityAIGoToPos;
+import net.smileycorp.atlas.api.entity.ai.EntityAIGoToEntityPos;
 import net.smileycorp.atlas.api.recipe.WeightedOutputs;
 import net.smileycorp.atlas.api.util.DirectionUtils;
 import net.smileycorp.hordes.common.ConfigHandler;
@@ -106,7 +106,7 @@ public class OngoingHordeEvent implements IOngoingEvent {
 			return;
 		}
 		if (count > 0 && player instanceof EntityPlayerMP) {
-			HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new HordeSoundMessage(), (EntityPlayerMP) player);
+			HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new HordeSoundMessage(basedir), (EntityPlayerMP) player);
 		}
 		for (int n = 0; n<count; n++) {
 			if (entitiesSpawned.size()  > ConfigHandler.hordeSpawnMax) {
@@ -140,7 +140,7 @@ public class OngoingHordeEvent implements IOngoingEvent {
 								return entity instanceof EntityPlayer;
 							}}));
 					}
-					entity.tasks.addTask(6, new EntityAIGoToPos(entity, player.getPosition()));
+					entity.tasks.addTask(6, new EntityAIGoToEntityPos(entity, player));
 				}
 			} catch (Exception e) {
 				e.printStackTrace();

@@ -13,6 +13,9 @@ message.hordes.EventEnd=The sounds of the horde begin to die down
 message.hordes.TrySleep=You many not rest now, a horde is approaching
 hordes.subtitle.hordeHowls=Zombie Howls
 
+entity.hordes.ZombiePlayer.chat=%1$s's Zombie
+entity.hordes.ZombiePlayer.name=Player Zombie
+
 effect.hordes.Infected=Infected
 text.hordes.DeathMessage=%1$s succumbed to their infection.
 text.hordes.DeathMessage=%1$s succumbed to their infection while fighting %2$s.

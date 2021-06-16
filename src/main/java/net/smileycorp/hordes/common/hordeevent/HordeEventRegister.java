@@ -25,15 +25,13 @@ public class HordeEventRegister {
 			else if (ConfigHandler.hordeSpawnList.length<=0) {
 				throw new Exception("Spawn table in config is empty");
 			}
-			
 			for (String name : ConfigHandler.hordeSpawnList) {
-				//if we haven't already got all entity names stored get them to check against
 				try {
 					Class clazz = null;
 					int weight=0;
 					int minDay=0;
 					int maxDay=0;
-					//check if it matches they syntax for a registry name
+					//check if it matches the syntax for a registry name
 					if (name.contains(":")) {
 						String[] nameSplit = name.split("-");
 						if (nameSplit.length>1) {

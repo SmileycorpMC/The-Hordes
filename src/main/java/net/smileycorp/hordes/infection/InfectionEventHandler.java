@@ -21,6 +21,7 @@ import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.smileycorp.hordes.common.ModDefinitions;
 import net.smileycorp.hordes.common.event.InfectionDeathEvent;
+import net.smileycorp.hordes.infection.entities.EntityZombiePlayer;
 
 @EventBusSubscriber(modid=ModDefinitions.modid)
 public class InfectionEventHandler {
@@ -55,7 +56,12 @@ public class InfectionEventHandler {
 		EntityLivingBase entity = event.getEntityLiving();
 		World world = entity.world;
 		if (entity instanceof EntityPlayer) {
-			
+			EntityZombiePlayer zombie = new EntityZombiePlayer((EntityPlayer)entity);
+			zombie.setPosition(entity.posX, entity.posY, entity.posZ);
+			zombie.renderYawOffset = entity.renderYawOffset;
+			world.spawnEntity(zombie);
+			sendDeathMessage(entity);
+			event.setResult(Result.DENY);
 		} else if (entity instanceof EntityVillager) {
 			EntityZombieVillager zombie = new EntityZombieVillager(world);
 			zombie.setForgeProfession(((EntityVillager) entity).getProfessionForge());
