@@ -127,6 +127,7 @@ public class OngoingHordeEvent implements IOngoingEvent {
 					entity.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(100.0D);
 					world.spawnEntity(entity);
 					entity.getCapability(HordeSpawnProvider.HORDESPAWN, null).setPlayerUUID(player.getUniqueID().toString());
+					entity.enablePersistence();
 					registerEntity(entity);
 					hasChanged = true;
 					entity.targetTasks.taskEntries.clear();
