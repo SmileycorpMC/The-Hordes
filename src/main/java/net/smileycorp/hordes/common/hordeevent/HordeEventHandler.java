@@ -2,6 +2,8 @@ package net.smileycorp.hordes.common.hordeevent;
 
 import java.util.UUID;
 
+import com.google.common.base.Predicate;
+
 import net.minecraft.block.BlockBed;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -30,8 +32,6 @@ import net.smileycorp.atlas.api.entity.ai.EntityAIGoToEntityPos;
 import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.ModDefinitions;
-
-import com.google.common.base.Predicate;
 
 @EventBusSubscriber(modid=ModDefinitions.modid)
 public class HordeEventHandler {
@@ -114,7 +114,7 @@ public class HordeEventHandler {
 		}	
 	}
 	
-	@SubscribeEvent(priority=EventPriority.LOWEST)
+	@SubscribeEvent(priority=EventPriority.HIGHEST)
 	public void playerJoin(PlayerEvent.PlayerLoggedInEvent event) {
 		EntityPlayer player = event.player;
 		World world = player.world;

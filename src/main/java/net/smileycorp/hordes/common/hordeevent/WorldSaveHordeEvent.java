@@ -7,6 +7,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
+import com.mojang.authlib.GameProfile;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
@@ -15,13 +17,11 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.smileycorp.hordes.common.ModDefinitions;
 
-import com.mojang.authlib.GameProfile;
-
 public class WorldSaveHordeEvent extends WorldSavedData {
 
 	public static final String DATA = ModDefinitions.modid + "_HordeEvent";
 	
-	private Map<String, OngoingHordeEvent> ongoingEvents =  new HashMap<String, OngoingHordeEvent>();
+	private Map<String, OngoingHordeEvent> ongoingEvents =  new HashMap<>();
 	
 	public WorldSaveHordeEvent() {
 		super(DATA);
@@ -69,7 +69,7 @@ public class WorldSaveHordeEvent extends WorldSavedData {
 	}
 	
 	public Set<OngoingHordeEvent> getEvents() {
-		Set<OngoingHordeEvent> events = new HashSet<OngoingHordeEvent>();
+		Set<OngoingHordeEvent> events = new HashSet<>();
 		for (OngoingHordeEvent event : ongoingEvents.values()) {
 			if (event.getPlayer()!=null) events.add(event);
 		}
@@ -102,6 +102,9 @@ public class WorldSaveHordeEvent extends WorldSavedData {
 		WorldSaveHordeEvent data = (WorldSaveHordeEvent) world.getMapStorage().getOrLoadData(WorldSaveHordeEvent.class, WorldSaveHordeEvent.DATA);
 		if (data== null) {
 			data = new WorldSaveHordeEvent();
+			for (EntityPlayer player : world.getPlayers(EntityPlayer.class, null)) {
+				data.getEventForPlayer(player);
+			}
 			world.getMapStorage().setData(WorldSaveHordeEvent.DATA, data);
 		}
 		return data;

@@ -32,7 +32,7 @@ public class CommandStopHordeEvent extends CommandBase {
 		server.addScheduledTask(() -> {
 			WorldSaveHordeEvent data = WorldSaveHordeEvent.get(world);
 			for (OngoingHordeEvent event : data.getEvents()) {
-				if (!event.isActive(world)) {
+				if (event.isActive(world)) {
 					event.stopEvent();
 				}
 			}

@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.base.Predicate;
+
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
@@ -34,11 +36,9 @@ import net.smileycorp.hordes.common.TheHordes;
 import net.smileycorp.hordes.common.event.HordeBuildSpawntableEvent;
 import net.smileycorp.hordes.common.event.HordeSpawnEntityEvent;
 
-import com.google.common.base.Predicate;
-
 public class OngoingHordeEvent implements IOngoingEvent {
 
-	private Set<WeakReference<EntityLiving>> entitiesSpawned = new HashSet<WeakReference<EntityLiving>>();
+	private Set<WeakReference<EntityLiving>> entitiesSpawned = new HashSet<>();
 	private int timer = 0;
 	private final EntityPlayer player;
 	private boolean hasChanged = false;
@@ -69,6 +69,16 @@ public class OngoingHordeEvent implements IOngoingEvent {
 			if (isActive(world)) {
 				if ((timer % ConfigHandler.hordeSpawnInterval) == 0) {
 					int amount = (int)(ConfigHandler.hordeSpawnAmount * (1+(day/ConfigHandler.hordeSpawnDays) * (1-ConfigHandler.hordeSpawnMultiplier)));
+					List<EntityPlayer>players = world.getEntities(EntityPlayer.class, new Predicate<EntityPlayer>(){
+						@Override
+						public boolean apply(EntityPlayer entity) {
+							return entity!=player;
+					}});
+					for (EntityPlayer entity : players) {
+						if (player.getDistance(entity)<=25) {
+							amount = (int) Math.floor(amount * 0.8);
+						}
+					}
 					spawnWave(world, amount);
 				}
 				timer--;
@@ -151,7 +161,7 @@ public class OngoingHordeEvent implements IOngoingEvent {
 	}
 
 	private void cleanSpawns() {
-		List<WeakReference<EntityLiving>> toRemove = new ArrayList<WeakReference<EntityLiving>>();
+		List<WeakReference<EntityLiving>> toRemove = new ArrayList<>();
 		for (WeakReference<EntityLiving> ref : entitiesSpawned) {
 			if (ref != null && ref.get() != null) {
 				EntityLiving entity = ref.get();
