@@ -9,7 +9,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.smileycorp.hordes.common.ModDefinitions;
-import net.smileycorp.hordes.common.hordeevent.WorldSaveHordeEvent;
+import net.smileycorp.hordes.common.hordeevent.WorldDataHordeEvent;
 
 public class CommandSpawnWave extends CommandBase {
 
@@ -39,7 +39,7 @@ public class CommandSpawnWave extends CommandBase {
 			if (sender.getCommandSenderEntity() instanceof EntityPlayer) {
 				server.addScheduledTask(() -> {
 					EntityPlayer player = (EntityPlayer) sender.getCommandSenderEntity();
-					WorldSaveHordeEvent data = WorldSaveHordeEvent.get(world);
+					WorldDataHordeEvent data = WorldDataHordeEvent.get(world);
 					data.getEventForPlayer(player).spawnWave(world, count);
 					data.markDirty();
 				});

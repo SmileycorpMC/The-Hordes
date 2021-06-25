@@ -9,7 +9,7 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.smileycorp.hordes.common.ModDefinitions;
 import net.smileycorp.hordes.common.hordeevent.OngoingHordeEvent;
-import net.smileycorp.hordes.common.hordeevent.WorldSaveHordeEvent;
+import net.smileycorp.hordes.common.hordeevent.WorldDataHordeEvent;
 
 public class CommandStartHordeEvent extends CommandBase {
 
@@ -37,7 +37,7 @@ public class CommandStartHordeEvent extends CommandBase {
 		try {
 			int duration = parseInt(args[0], 0);
 			server.addScheduledTask(() -> {
-				WorldSaveHordeEvent data = WorldSaveHordeEvent.get(world);
+				WorldDataHordeEvent data = WorldDataHordeEvent.get(world);
 				for (OngoingHordeEvent event : data.getEvents()) {
 					if (!event.isActive(world)) {
 						event.tryStartEvent(duration);

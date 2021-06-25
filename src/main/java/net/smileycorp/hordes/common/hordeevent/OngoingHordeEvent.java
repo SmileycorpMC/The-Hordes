@@ -6,8 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.base.Predicate;
-
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
@@ -35,6 +33,8 @@ import net.smileycorp.hordes.common.ModDefinitions;
 import net.smileycorp.hordes.common.TheHordes;
 import net.smileycorp.hordes.common.event.HordeBuildSpawntableEvent;
 import net.smileycorp.hordes.common.event.HordeSpawnEntityEvent;
+
+import com.google.common.base.Predicate;
 
 public class OngoingHordeEvent implements IOngoingEvent {
 
@@ -227,4 +227,29 @@ public class OngoingHordeEvent implements IOngoingEvent {
 		}
 	}
 	
+	@Override
+	public String toString() {
+		return "OngoingHordeEvent@" + Integer.toHexString(hashCode()) + "[player=" + player.getName() + ", isActive=" + isActive(player.world) + 
+				", ticksLeft=" + timer +", entityCount="+ entitiesSpawned.size()+"]";
+	}
+	
+	public List<String> getEntityStrings() {
+		List<String> result = new ArrayList<String>();
+		result.add("	entities: {");
+		List<WeakReference<EntityLiving>> entitylist = new ArrayList(entitiesSpawned);
+		for (int i = 0; i < entitylist.size(); i += 10) {
+			List<WeakReference<EntityLiving>> sublist = entitylist.subList(i, Math.min(i+9, entitylist.size()-1));
+			StringBuilder builder = new StringBuilder();
+			builder.append("		");
+			for (WeakReference<EntityLiving> ref : sublist) {
+				EntityLiving entity = ref.get();
+				builder.append(entity.getClass().getSimpleName() + "@");
+				builder.append(Integer.toHexString(entity.hashCode()));
+				if (entitylist.indexOf(ref) < entitylist.size()-1) builder.append(", ");
+				else builder.append("}");
+			}
+			result.add(builder.toString());
+		}
+		return result;
+	}
 }

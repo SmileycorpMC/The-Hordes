@@ -2,8 +2,6 @@ package net.smileycorp.hordes.common.hordeevent;
 
 import java.util.UUID;
 
-import com.google.common.base.Predicate;
-
 import net.minecraft.block.BlockBed;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -33,6 +31,8 @@ import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.ModDefinitions;
 
+import com.google.common.base.Predicate;
+
 @EventBusSubscriber(modid=ModDefinitions.modid)
 public class HordeEventHandler {
 	
@@ -43,7 +43,7 @@ public class HordeEventHandler {
 			if (!world.isRemote) {
 				int day = Math.round(world.getWorldTime()/24000);
 				int time = Math.round(world.getWorldTime()%24000);
-				WorldSaveHordeEvent data = WorldSaveHordeEvent.get(world);
+				WorldDataHordeEvent data = WorldDataHordeEvent.get(world);
 				if (time == ConfigHandler.hordeStartTime && day % ConfigHandler.hordeSpawnDays == 0 && (day!=0 || ConfigHandler.spawnFirstDay)) {
 					for (OngoingHordeEvent hordeEvent: data.getEvents()) {
 						if (!hordeEvent.isActive(world)) {
@@ -72,7 +72,7 @@ public class HordeEventHandler {
 			if (cap.isHordeSpawned()) {
 				String uuid = cap.getPlayerUUID();
 				if (DataUtils.isValidUUID(uuid)) {
-					WorldSaveHordeEvent data = WorldSaveHordeEvent.get(world);
+					WorldDataHordeEvent data = WorldDataHordeEvent.get(world);
 					OngoingHordeEvent hordeevent = data.getEventForPlayer(uuid);
 					if (hordeevent.isActive(world)) {
 						event.setResult(Result.DENY);
@@ -103,7 +103,7 @@ public class HordeEventHandler {
 					}
 					String uuid = cap.getPlayerUUID();
 					EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(UUID.fromString(uuid));
-					WorldSaveHordeEvent data = WorldSaveHordeEvent.get(world);
+					WorldDataHordeEvent data = WorldDataHordeEvent.get(world);
 					OngoingHordeEvent hordeevent = data.getEventForPlayer(uuid);
 					if (player!=null) {
 						entity.tasks.addTask(6, new EntityAIGoToEntityPos(entity, player));
@@ -114,13 +114,15 @@ public class HordeEventHandler {
 		}	
 	}
 	
-	@SubscribeEvent(priority=EventPriority.HIGHEST)
+	@SubscribeEvent
 	public void playerJoin(PlayerEvent.PlayerLoggedInEvent event) {
 		EntityPlayer player = event.player;
 		World world = player.world;
-		if (!world.isRemote) {
-			WorldSaveHordeEvent data = WorldSaveHordeEvent.get(world);
-			data.getEventForPlayer(player);
+		if (player != null && world != null) {
+			if (!world.isRemote) {
+				WorldDataHordeEvent data = WorldDataHordeEvent.get(world);
+				data.getEventForPlayer(player);
+			}
 		}
 	}
 	
@@ -139,7 +141,7 @@ public class HordeEventHandler {
 		IBlockState state = world.getBlockState(event.getPos());
 		if (!ConfigHandler.canSleepDuringHorde && state.getBlock() instanceof BlockBed) {
 			if (!world.isRemote) {
-				WorldSaveHordeEvent data = WorldSaveHordeEvent.get(world);
+				WorldDataHordeEvent data = WorldDataHordeEvent.get(world);
 				OngoingHordeEvent hordeEvent = data.getEventForPlayer(player);
 				if (hordeEvent.isActive(world)) {
 					event.setCanceled(true);

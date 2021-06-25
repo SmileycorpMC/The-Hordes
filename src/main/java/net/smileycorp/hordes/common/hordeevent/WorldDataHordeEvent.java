@@ -7,8 +7,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
-import com.mojang.authlib.GameProfile;
-
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
@@ -17,17 +16,21 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.smileycorp.hordes.common.ModDefinitions;
 
-public class WorldSaveHordeEvent extends WorldSavedData {
+import com.mojang.authlib.GameProfile;
+
+public class WorldDataHordeEvent extends WorldSavedData {
 
 	public static final String DATA = ModDefinitions.modid + "_HordeEvent";
 	
 	private Map<String, OngoingHordeEvent> ongoingEvents =  new HashMap<>();
 	
-	public WorldSaveHordeEvent() {
+	protected World world = null;
+	
+	public WorldDataHordeEvent(World world) {
 		super(DATA);
 	}
 	
-	public WorldSaveHordeEvent(String data) {
+	public WorldDataHordeEvent(String data) {
 		super(data);
 	}
 
@@ -44,9 +47,10 @@ public class WorldSaveHordeEvent extends WorldSavedData {
 	}
 
 	private EntityPlayer getPlayerFromUUID(String uuid) {
-		Side side = FMLCommonHandler.instance().getEffectiveSide();
-		return side == Side.CLIENT ? null :
-            FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(UUID.fromString(uuid));
+		if (world.isRemote) {
+			return Minecraft.getMinecraft().player;
+		}
+        return FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(UUID.fromString(uuid));
 	}
 
 	@Override
@@ -59,11 +63,11 @@ public class WorldSaveHordeEvent extends WorldSavedData {
 					ongoingEvents.put(uuid, event);
 				}
 			}
-			for (Entry<String, OngoingHordeEvent> entry : ongoingEvents.entrySet()) {
-				String uuid = entry.getKey();
-				OngoingHordeEvent event = entry.getValue();
-				nbt.setTag(uuid, event.writeToNBT(new NBTTagCompound()));
-			}
+		}
+		for (Entry<String, OngoingHordeEvent> entry : ongoingEvents.entrySet()) {
+			String uuid = entry.getKey();
+			OngoingHordeEvent event = entry.getValue();
+			nbt.setTag(uuid, event.writeToNBT(new NBTTagCompound()));
 		}
 		return nbt;
 	}
@@ -98,15 +102,13 @@ public class WorldSaveHordeEvent extends WorldSavedData {
 		return ongoingEvents.get(uuid);
 	}
 
-	public static WorldSaveHordeEvent get(World world) {
-		WorldSaveHordeEvent data = (WorldSaveHordeEvent) world.getMapStorage().getOrLoadData(WorldSaveHordeEvent.class, WorldSaveHordeEvent.DATA);
+	public static WorldDataHordeEvent get(World world) {
+		WorldDataHordeEvent data = (WorldDataHordeEvent) world.getMapStorage().getOrLoadData(WorldDataHordeEvent.class, WorldDataHordeEvent.DATA);
 		if (data== null) {
-			data = new WorldSaveHordeEvent();
-			for (EntityPlayer player : world.getPlayers(EntityPlayer.class, null)) {
-				data.getEventForPlayer(player);
-			}
-			world.getMapStorage().setData(WorldSaveHordeEvent.DATA, data);
+			data = new WorldDataHordeEvent(world);
+			world.getMapStorage().setData(WorldDataHordeEvent.DATA, data);
 		}
+		if (data.world==null)data.world = world;
 		return data;
 	}
 	
