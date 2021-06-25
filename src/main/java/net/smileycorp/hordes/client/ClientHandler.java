@@ -20,4 +20,8 @@ public class ClientHandler {
 		world.playSound(player, pos, new SoundEvent(ModDefinitions.getResource("horde_spawn")), SoundCategory.HOSTILE, 0.3f, pitch);
 	}
 
+	public static EntityPlayer getPlayer() {
+		return Minecraft.getMinecraft().player;
+	}
+
 }

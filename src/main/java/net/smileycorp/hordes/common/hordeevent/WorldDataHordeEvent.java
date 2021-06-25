@@ -7,13 +7,13 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
+import net.smileycorp.hordes.client.ClientHandler;
 import net.smileycorp.hordes.common.ModDefinitions;
 
 import com.mojang.authlib.GameProfile;
@@ -47,8 +47,9 @@ public class WorldDataHordeEvent extends WorldSavedData {
 	}
 
 	private EntityPlayer getPlayerFromUUID(String uuid) {
+		if (world == null) return null;
 		if (world.isRemote) {
-			return Minecraft.getMinecraft().player;
+			return ClientHandler.getPlayer();
 		}
         return FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(UUID.fromString(uuid));
 	}
