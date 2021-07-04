@@ -20,4 +20,4 @@ entity.hordes.ZombiePlayer.name=Player Zombie
 
 effect.hordes.Infected=Infected
 text.hordes.DeathMessage=%1$s succumbed to their infection.
-text.hordes.DeathMessage=%1$s succumbed to their infection while fighting %2$s.
+text.hordes.DeathMessageFighting=%1$s succumbed to their infection while fighting %2$s.

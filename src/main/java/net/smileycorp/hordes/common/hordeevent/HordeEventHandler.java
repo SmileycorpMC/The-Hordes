@@ -63,18 +63,23 @@ public class HordeEventHandler {
 		}
 	}
 	
-	@SubscribeEvent(priority=EventPriority.LOWEST)
+	@SubscribeEvent
 	public void tryDespawn(LivingSpawnEvent.AllowDespawn event) {
 		World world = event.getWorld();
 		EntityLivingBase entity = event.getEntityLiving();
+		//System.out.println("event");
 		if (entity.hasCapability(HordeSpawnProvider.HORDESPAWN, null)) {
 			IHordeSpawn cap = entity.getCapability(HordeSpawnProvider.HORDESPAWN, null);
+			//System.out.println("cap");
 			if (cap.isHordeSpawned()) {
+				//System.out.println("spawned");
 				String uuid = cap.getPlayerUUID();
 				if (DataUtils.isValidUUID(uuid)) {
+					//System.out.println("uuid");
 					WorldDataHordeEvent data = WorldDataHordeEvent.get(world);
 					OngoingHordeEvent hordeevent = data.getEventForPlayer(uuid);
 					if (hordeevent.isActive(world)) {
+						//System.out.println("stop");
 						event.setResult(Result.DENY);
 					}
 				}

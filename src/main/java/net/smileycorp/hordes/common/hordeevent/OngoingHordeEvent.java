@@ -83,9 +83,7 @@ public class OngoingHordeEvent implements IOngoingEvent {
 				}
 				timer--;
 				if (timer == 0) {
-					ITextComponent message = new TextComponentTranslation(ModDefinitions.hordeEventEnd);
-					message.setStyle(new Style().setBold(true).setColor(TextFormatting.DARK_RED));
-					player.sendMessage(message);
+					stopEvent();
 				}
 				hasChanged = true;
 			}
@@ -137,7 +135,7 @@ public class OngoingHordeEvent implements IOngoingEvent {
 					entity.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(100.0D);
 					world.spawnEntity(entity);
 					entity.getCapability(HordeSpawnProvider.HORDESPAWN, null).setPlayerUUID(player.getUniqueID().toString());
-					entity.enablePersistence();
+					//entity.enablePersistence();
 					registerEntity(entity);
 					hasChanged = true;
 					entity.targetTasks.taskEntries.clear();
@@ -172,7 +170,9 @@ public class OngoingHordeEvent implements IOngoingEvent {
 						toRemove.add(ref);
 					}
 				}
-			} else toRemove.add(ref);
+			} else {
+				toRemove.add(ref);
+			}
 		}
 		entitiesSpawned.removeAll(toRemove);
 	}
