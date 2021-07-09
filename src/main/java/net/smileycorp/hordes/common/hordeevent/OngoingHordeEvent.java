@@ -113,7 +113,7 @@ public class OngoingHordeEvent implements IOngoingEvent {
 			TheHordes.logError("Spawntable is empty, stopping wave spawn.", new NullPointerException());
 			return;
 		}
-		if (count > 0 && player instanceof EntityPlayerMP) {
+		if (count > 0 && player instanceof EntityPlayerMP && ConfigHandler.hordeSpawnSound) {
 			HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new HordeSoundMessage(basedir), (EntityPlayerMP) player);
 		}
 		for (int n = 0; n<count; n++) {
@@ -199,12 +199,20 @@ public class OngoingHordeEvent implements IOngoingEvent {
 			if (!spawntable.isEmpty()) {
 				timer = duration;
 				hasChanged = true;
-				ITextComponent message = new TextComponentTranslation(ModDefinitions.hordeEventStart);
-				message.setStyle(new Style().setBold(true).setColor(TextFormatting.DARK_RED));
-				player.sendMessage(message);
+				sendMessage(ModDefinitions.hordeEventStart);
 			} else {
 				TheHordes.logError("Spawntable is empty, canceling event start.", new NullPointerException());
 			}
+		}
+	}
+
+	private void sendMessage(String str) {
+		if (ConfigHandler.eventNotifyMode == 1) {
+			ITextComponent message = new TextComponentTranslation(str);
+			message.setStyle(new Style().setBold(true).setColor(TextFormatting.DARK_RED));
+			player.sendMessage(message);
+		} else if (ConfigHandler.eventNotifyMode == 2 || ConfigHandler.eventNotifyMode == 3) {
+			
 		}
 	}
 
@@ -212,9 +220,7 @@ public class OngoingHordeEvent implements IOngoingEvent {
 		timer = 0;
 		hasChanged = true;
 		cleanSpawns();
-		ITextComponent message = new TextComponentTranslation(ModDefinitions.hordeEventEnd);
-		message.setStyle(new Style().setBold(true).setColor(TextFormatting.DARK_RED));
-		player.sendMessage(message);
+		sendMessage(ModDefinitions.hordeEventEnd);
 	}
 
 	public void removeEntity(EntityLiving entity) {

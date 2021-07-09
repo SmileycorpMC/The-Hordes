@@ -19,6 +19,7 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.ModDefinitions;
 import net.smileycorp.hordes.common.event.InfectionDeathEvent;
 
@@ -31,7 +32,7 @@ public class InfectionEventHandler {
 		Entity attacker = event.getSource().getImmediateSource();
 		World world = entity.world;
 		if (!world.isRemote && attacker instanceof EntityZombie) {
-			if (/*entity instanceof EntityPlayer ||*/ entity instanceof EntityVillager) {
+			if (/*entity instanceof EntityPlayer ||*/ (entity instanceof EntityVillager && ConfigHandler.infectVillagers)) {
 				entity.addPotionEffect(new PotionEffect(HordesInfection.INFECTED, 10000, 0));
 			}
 		}
