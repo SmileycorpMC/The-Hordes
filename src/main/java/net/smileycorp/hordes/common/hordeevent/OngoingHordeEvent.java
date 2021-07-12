@@ -24,6 +24,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.smileycorp.atlas.api.IOngoingEvent;
+import net.smileycorp.atlas.api.SimpleStringMessage;
 import net.smileycorp.atlas.api.entity.ai.EntityAIFindNearestTargetPredicate;
 import net.smileycorp.atlas.api.entity.ai.EntityAIGoToEntityPos;
 import net.smileycorp.atlas.api.recipe.WeightedOutputs;
@@ -38,7 +39,7 @@ import com.google.common.base.Predicate;
 
 public class OngoingHordeEvent implements IOngoingEvent {
 
-	private Set<WeakReference<EntityLiving>> entitiesSpawned = new HashSet<>();
+	private Set<WeakReference<EntityLiving>> entitiesSpawned = new HashSet<WeakReference<EntityLiving>>();
 	private int timer = 0;
 	private final EntityPlayer player;
 	private boolean hasChanged = false;
@@ -211,8 +212,8 @@ public class OngoingHordeEvent implements IOngoingEvent {
 			ITextComponent message = new TextComponentTranslation(str);
 			message.setStyle(new Style().setBold(true).setColor(TextFormatting.DARK_RED));
 			player.sendMessage(message);
-		} else if (ConfigHandler.eventNotifyMode == 2 || ConfigHandler.eventNotifyMode == 3) {
-			
+		} else if ((ConfigHandler.eventNotifyMode == 2 || ConfigHandler.eventNotifyMode == 3) && player instanceof EntityPlayerMP) {
+			HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new SimpleStringMessage(str), (EntityPlayerMP) player);
 		}
 	}
 

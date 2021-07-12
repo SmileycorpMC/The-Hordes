@@ -10,9 +10,10 @@ commands.hordes.StopHorde.usage=/stopHordeEvent
 commands.hordes.StopHorde.success=Stopped active horde event
 commands.hordes.HordeDebug.usage=/hordeDebug 
 commands.hordes.HordeDebug.success=Output horde log to %1$s
-message.hordes.EventStart=You hear the howl of an approaching horde
-message.hordes.EventEnd=The sounds of the horde begin to die down
+message.hordes.EventStart=You hear the howls of a nearby horde
+message.hordes.EventEnd=The air is quiet, the horde has stopped
 message.hordes.TrySleep=You many not rest now, a horde is approaching
+message.hordes.title=The Hordes
 hordes.subtitle.hordeHowls=Zombie Howls
 
 entity.hordes.ZombiePlayer.chat=%1$s's Zombie

@@ -20,7 +20,7 @@ public class ClientHandler {
 		Minecraft mc = Minecraft.getMinecraft();
 		World world = mc.world;
 		EntityPlayer player = mc.player;
-		BlockPos pos = new BlockPos(player.posX + (3*dir.x), player.posY, player.posZ + (3*dir.z));
+		BlockPos pos = new BlockPos(player.posX + (5*dir.x), player.posY, player.posZ + (5*dir.z));
 		float pitch = 1+((world.rand.nextInt(6)-3)/10);
 		world.playSound(player, pos, new SoundEvent(ModDefinitions.getResource("horde_spawn")), SoundCategory.HOSTILE, 0.3f, pitch);
 	}
@@ -36,7 +36,9 @@ public class ClientHandler {
 		if (ConfigHandler.eventNotifyMode == 2) {
 			mc.ingameGUI.setOverlayMessage(message, true);
 		} else if (ConfigHandler.eventNotifyMode == 3) {
-			mc.ingameGUI.displayTitle(message.getFormattedText(), null, 10, 20, 10);
+			mc.ingameGUI.displayTitle(null, null, 10, 20, 10);
+			mc.ingameGUI.displayTitle(" ", null, 0, 0, 0);
+			mc.ingameGUI.displayTitle(null, message.getFormattedText(), 0, 0, 0);
 		}
 		
 	}

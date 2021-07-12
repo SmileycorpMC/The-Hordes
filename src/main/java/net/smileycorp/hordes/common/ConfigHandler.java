@@ -43,7 +43,7 @@ public class ConfigHandler {
 					new String[]{"minecraft:zombie-20-0-20", "minecraft:zombie_villager-5-0-10", "minecraft:husk-20-30-0"}, 
 					"A list of entities to spawn followed by the spawn weight then the day they first appear on then the last day. Higher weight is more common. Leave the last value to 0 to set no max day.(e.g. minecraft:zombie-20-0-0)").getStringList();
 			//infection
-			infectVillagers = config.get("Infection", "infectVillagers", false, "Can villagers be infected.").getBoolean();
+			infectVillagers = config.get("Infection", "infectVillagers", true, "Can villagers be infected.").getBoolean();
 		} catch(Exception e) {
 		} finally {
 	    	if (config.hasChanged()) config.save();
