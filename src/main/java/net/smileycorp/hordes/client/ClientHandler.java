@@ -1,7 +1,6 @@
 package net.smileycorp.hordes.client;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
@@ -12,7 +11,6 @@ import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.ModDefinitions;
 
@@ -32,16 +30,15 @@ public class ClientHandler {
 	}
 
 	public static void displayMessage(String text) {
-		GuiIngame gui = Minecraft.getMinecraft().ingameGUI;
+		Minecraft mc = Minecraft.getMinecraft();
 		ITextComponent message = new TextComponentTranslation(text);
 		message.setStyle(new Style().setBold(true).setColor(TextFormatting.DARK_RED));
 		if (ConfigHandler.eventNotifyMode == 2) {
-			gui.setOverlayMessage(message, true);
-			ObfuscationReflectionHelper.setPrivateValue(GuiIngame.class, gui, ConfigHandler.eventNotifyDuration, "overlayMessageTime");
+			mc.ingameGUI.setOverlayMessage(message, true);
 		} else if (ConfigHandler.eventNotifyMode == 3) {
-			gui.displayTitle(null, null, 5, ConfigHandler.eventNotifyDuration, 5);
-			gui.displayTitle(" ", null, 0, 0, 0);
-			gui.displayTitle(null, message.getFormattedText(), 0, 0, 0);
+			mc.ingameGUI.displayTitle(null, null, 10, 20, 10);
+			mc.ingameGUI.displayTitle(" ", null, 0, 0, 0);
+			mc.ingameGUI.displayTitle(null, message.getFormattedText(), 0, 0, 0);
 		}
 		
 	}
