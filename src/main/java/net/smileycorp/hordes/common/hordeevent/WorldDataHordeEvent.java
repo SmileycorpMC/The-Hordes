@@ -75,6 +75,21 @@ public class WorldDataHordeEvent extends WorldSavedData {
 	
 	public Set<OngoingHordeEvent> getEvents() {
 		Set<OngoingHordeEvent> events = new HashSet<>();
+		if (!world.isRemote) {
+			for (EntityPlayer player : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers()) {
+				boolean toadd = true;
+				for (OngoingHordeEvent event : ongoingEvents.values()) {
+					if (event.getPlayer() == player) {
+						toadd = false;
+						break;
+					}
+				}
+				if (toadd == true) {
+					ongoingEvents.put(player.getUniqueID().toString(), new OngoingHordeEvent(player));
+					markDirty();
+				}
+			}
+		}
 		for (OngoingHordeEvent event : ongoingEvents.values()) {
 			if (event.getPlayer()!=null) events.add(event);
 		}

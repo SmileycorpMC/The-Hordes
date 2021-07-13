@@ -17,10 +17,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.smileycorp.atlas.api.IOngoingEvent;
@@ -208,13 +204,7 @@ public class OngoingHordeEvent implements IOngoingEvent {
 	}
 
 	private void sendMessage(String str) {
-		if (ConfigHandler.eventNotifyMode == 1) {
-			ITextComponent message = new TextComponentTranslation(str);
-			message.setStyle(new Style().setBold(true).setColor(TextFormatting.DARK_RED));
-			player.sendMessage(message);
-		} else if ((ConfigHandler.eventNotifyMode == 2 || ConfigHandler.eventNotifyMode == 3) && player instanceof EntityPlayerMP) {
-			HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new SimpleStringMessage(str), (EntityPlayerMP) player);
-		}
+		HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new SimpleStringMessage(str), (EntityPlayerMP) player);
 	}
 
 	public void stopEvent() {
