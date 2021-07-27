@@ -1,11 +1,12 @@
 package net.smileycorp.hordes.common.hordeevent;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.nbt.JsonToNBT;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.GameData;
 import net.smileycorp.atlas.api.recipe.WeightedOutputs;
@@ -14,7 +15,7 @@ import net.smileycorp.hordes.common.TheHordes;
 
 public class HordeEventRegister {
 	
-	protected static List<HordeSpawnEntry> spawnlist = new ArrayList<HordeSpawnEntry>();
+	protected static Map<Class<? extends EntityLiving>, HordeSpawnEntry> spawnlist = new HashMap<Class<? extends EntityLiving>, HordeSpawnEntry>();
 	
 	public static void init() {
 		TheHordes.logInfo("Trying to read spawn table from config");
@@ -31,10 +32,23 @@ public class HordeEventRegister {
 					int weight=0;
 					int minDay=0;
 					int maxDay=0;
+					NBTTagCompound nbt = null;
 					//check if it matches the syntax for a registry name
 					if (name.contains(":")) {
 						String[] nameSplit = name.split("-");
 						if (nameSplit.length>1) {
+							if (nameSplit[0].contains("{")) {
+								
+								String nbtstring = nameSplit[0].substring(nameSplit[0].indexOf("{"));
+								nameSplit[0] = nameSplit[0].substring(0, nameSplit[0].indexOf("{"));
+								try {
+									NBTTagCompound parsed = JsonToNBT.getTagFromJson(nbtstring);
+									if (parsed != null) nbt = parsed;
+								} catch (Exception e) {
+									TheHordes.logError("Error parsing nbt for entity " + name + " " + e.getMessage(), e);
+									//throw new Exception("NBT " + nbt + "is not valid json");
+								}
+							}
 							ResourceLocation loc = new ResourceLocation(nameSplit[0]);
 							if (GameData.getEntityRegistry().containsKey(loc)) {
 								clazz = GameData.getEntityRegistry().getValue(loc).getEntityClass();
@@ -66,7 +80,11 @@ public class HordeEventRegister {
 						throw new Exception("Entry " + name + " is not in the correct format");
 					}
 					if (EntityLiving.class.isAssignableFrom(clazz) && weight>0) {
-						spawnlist.add(new HordeSpawnEntry(clazz, weight, minDay, maxDay));
+						HordeSpawnEntry entry = new HordeSpawnEntry(clazz, weight, minDay, maxDay);
+						if (nbt != null) {
+							entry.setTagCompound(nbt);
+						}
+						spawnlist.put(clazz, entry);
 						TheHordes.logInfo("Loaded entity " + name + " as " + clazz.getName() + " with weight " + weight + ", min day " + minDay + " and max day " + maxDay);
 					} else {
 						throw new Exception("Entity " + name + " is not an instance of EntityLiving");
@@ -82,13 +100,23 @@ public class HordeEventRegister {
 
 	public static WeightedOutputs getSpawnTable(int day) {
 		Map<Class<? extends EntityLiving>, Integer> spawnmap = new HashMap<Class<? extends EntityLiving>, Integer>();
-		for (HordeSpawnEntry entry : HordeEventRegister.spawnlist) {
+		for (Entry<Class<? extends EntityLiving>, HordeSpawnEntry> mapentry : spawnlist.entrySet()) {
+			HordeSpawnEntry entry = mapentry.getValue();
 			if (entry.getMinDay() <= day && (entry.getMaxDay() == 0 || entry.getMaxDay() >= day)) {
-				spawnmap.put(entry.getEntityClass(), entry.getWeight());
+				spawnmap.put(mapentry.getKey(), entry.getWeight());
 				TheHordes.logInfo("Adding entry " + entry.toString() + " to hordespawn on day " + day);
 			}
 		}
 		return new WeightedOutputs(spawnmap);
+	}
+	
+	public static HordeSpawnEntry getEntryFor(EntityLiving entity) {
+		return getEntryFor(entity.getClass());
+	}
+	
+	public static HordeSpawnEntry getEntryFor(Class<? extends EntityLiving> clazz) {
+		if (spawnlist.containsKey(clazz)) return spawnlist.get(clazz);
+		return null;
 	}
 	
 }

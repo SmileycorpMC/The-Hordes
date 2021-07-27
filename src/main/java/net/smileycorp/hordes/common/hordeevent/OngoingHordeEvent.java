@@ -122,6 +122,7 @@ public class OngoingHordeEvent implements IOngoingEvent {
 			Class<? extends EntityLiving> clazz = spawntable.getResult(world.rand);
 			try {
 				EntityLiving entity = clazz.getConstructor(World.class).newInstance(world);
+				entity.readEntityFromNBT(HordeEventRegister.getEntryFor(entity).getNBT());
 				HordeSpawnEntityEvent spawnEntityEvent = new HordeSpawnEntityEvent(player, entity, pos);
 				MinecraftForge.EVENT_BUS.post(spawnEntityEvent);
 				if (!spawnEntityEvent.isCanceled()) {

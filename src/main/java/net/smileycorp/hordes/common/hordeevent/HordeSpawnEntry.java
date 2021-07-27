@@ -1,6 +1,7 @@
 package net.smileycorp.hordes.common.hordeevent;
 
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.nbt.NBTTagCompound;
 
 public class HordeSpawnEntry {
 	
@@ -8,16 +9,13 @@ public class HordeSpawnEntry {
 	protected final int weight;
 	protected final int minDay;
 	protected final int maxDay;
+	protected NBTTagCompound nbt = null;
 	
 	public HordeSpawnEntry(Class<?  extends EntityLiving> clazz, int weight, int minDay, int maxDay) {
 		this.clazz=clazz;
 		this.weight=weight;
 		this.minDay=minDay;
 		this.maxDay=maxDay;
-	}
-	
-	public Class<?  extends EntityLiving> getEntityClass() {
-		return clazz;
 	}
 	
 	public int getWeight() {
@@ -34,7 +32,16 @@ public class HordeSpawnEntry {
 	
 	@Override
 	public String toString() {
-		return "HordeSpawnEntry[clazz="+clazz+",weight="+weight+",minDay="+minDay+",maxDay="+maxDay+"]";
+		String str = "HordeSpawnEntry[clazz="+clazz+",weight="+weight+",minDay="+minDay+",maxDay="+maxDay+"]";
+		return nbt==null ? str : str + "{" + nbt.toString() + "}";
+	}
+
+	public void setTagCompound(NBTTagCompound nbt) {
+		this.nbt=nbt;
+	}
+	
+	public NBTTagCompound getNBT() {
+		return nbt == null ? new NBTTagCompound() : nbt;
 	}
 	
 }

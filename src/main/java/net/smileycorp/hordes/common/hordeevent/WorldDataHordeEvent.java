@@ -14,6 +14,7 @@ import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.smileycorp.hordes.client.ClientHandler;
+import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.ModDefinitions;
 
 import com.mojang.authlib.GameProfile;
@@ -25,6 +26,8 @@ public class WorldDataHordeEvent extends WorldSavedData {
 	private Map<String, OngoingHordeEvent> ongoingEvents =  new HashMap<>();
 	
 	protected World world = null;
+	
+	protected int nextEventTime = ConfigHandler.hordeSpawnDays*24000;
 	
 	public WorldDataHordeEvent(World world) {
 		super(DATA);

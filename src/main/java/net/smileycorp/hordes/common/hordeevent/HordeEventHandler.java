@@ -35,6 +35,7 @@ import com.google.common.base.Predicate;
 
 @EventBusSubscriber(modid=ModDefinitions.modid)
 public class HordeEventHandler {
+
 	
 	@SubscribeEvent
 	public void worldTick(WorldTickEvent event) {
@@ -124,7 +125,7 @@ public class HordeEventHandler {
 				data.getEventForPlayer(player);
 			}
 		}
-	}
+	}	
 	
 	@SubscribeEvent
 	public void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
