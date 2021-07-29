@@ -38,7 +38,7 @@ public class PotionInfected extends Potion {
 
     @Override
 	public List<ItemStack> getCurativeItems() {
-    	return ConfigHandler.enableMobInfection ? InfectionCureRegister.getCureList() : super.getCurativeItems();
+    	return ConfigHandler.enableMobInfection ? InfectionRegister.getCureList() : super.getCurativeItems();
     }
 
 }

@@ -3,11 +3,14 @@ package net.smileycorp.hordes.infection;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.oredict.OreDictionary;
@@ -15,35 +18,70 @@ import net.smileycorp.atlas.api.util.RecipeUtils;
 import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.TheHordes;
 
-public class InfectionCureRegister {
+public class InfectionRegister {
 	
 	private static List<ItemStack> cures = new ArrayList<ItemStack>();
 	private static List<ItemStack> curesClient = new ArrayList<ItemStack>();
 	
+	private static List<Class<? extends EntityLiving>> infectionEntities = new ArrayList<Class<? extends EntityLiving>>();
+	
 	public static void readConfig() {
+		readInfectionEntities();
+		readCureItems();
+	}
+	
+	private static void readInfectionEntities() {
 		try {
-			if (ConfigHandler.hordeSpawnList == null) {
-				throw new Exception("Cure list has loaded as null");
+			if (ConfigHandler.infectionEntities == null) {
+				throw new Exception("Infection entity list has loaded as null");
 			}
-			else if (ConfigHandler.hordeSpawnList.length<=0) {
-				throw new Exception("Cure list in config is empty");
+			else if (ConfigHandler.cureItemList.length<=0) {
+				throw new Exception("Infection entity list in config is empty");
 			}
-			cures = readData(ConfigHandler.cureItemList);
+			for (String name : ConfigHandler.infectionEntities) {
+				String[] nameSplit = name.split(":");
+				if (nameSplit.length>=2) {
+					ResourceLocation loc = new ResourceLocation(nameSplit[0], nameSplit[1]);
+					if (ForgeRegistries.ENTITIES.containsKey(loc)) {
+						EntityEntry entry = ForgeRegistries.ENTITIES.getValue(loc);
+						Class clazz = entry.getEntityClass();
+						if (EntityLiving.class.isAssignableFrom(clazz)) {
+							infectionEntities.add(clazz);
+						}
+					}
+				} else {
+					throw new Exception(name + " is not a valid registry.");
+				}
+			}
 		} catch (Exception e) {
 			TheHordes.logError("Failed to read config, " + e.getCause() + " " + e.getMessage(), e);
 		}
 	}
-	
-	public static void readPacketData(String data) {
+
+	private static void readCureItems() {
+		try {
+			if (ConfigHandler.cureItemList == null) {
+				throw new Exception("Cure list has loaded as null");
+			}
+			else if (ConfigHandler.cureItemList.length<=0) {
+				throw new Exception("Cure list in config is empty");
+			}
+			cures = parseCureData(ConfigHandler.cureItemList);
+		} catch (Exception e) {
+			TheHordes.logError("Failed to read config, " + e.getCause() + " " + e.getMessage(), e);
+		}
+	}
+
+	public static void readCurePacketData(String data) {
 		try {
 			String[] splitData = data.split(";");
-			curesClient = readData(splitData);
+			curesClient = parseCureData(splitData);
 		} catch (Exception e) {
 			TheHordes.logError("Failed to read data from server, " + e.getCause() + " " + e.getMessage(), e);
 		}
 	}
 	
-	public static String getPacketData() {
+	public static String getCurePacketData() {
 		StringBuilder builder = new StringBuilder();
 		for (ItemStack stack : cures) {
 			builder.append(stack.getItem().getRegistryName());
@@ -57,7 +95,7 @@ public class InfectionCureRegister {
 		return builder.toString();
 	}
 	
-	public static List<ItemStack> readData(String[] data) throws Exception {
+	public static List<ItemStack> parseCureData(String[] data) throws Exception {
 		List<ItemStack> stacks = new ArrayList<ItemStack>();
 		for (String name : data) {
 			NBTTagCompound nbt = null;
@@ -89,7 +127,7 @@ public class InfectionCureRegister {
 					stacks.add(stack);
 				}
 			} else {
-				throw new Exception();
+				throw new Exception(name + " is not a valid registry");
 			}
 		}
 		return stacks;
@@ -119,6 +157,15 @@ public class InfectionCureRegister {
 		for (ItemStack cure : (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) ? curesClient : cures) {
 			if (RecipeUtils.compareItemStacks(stack, cure, cure.getTagCompound() != null)) {
 				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static boolean canCauseInfection(Entity entity) {
+		if (entity instanceof EntityLiving) {
+			for (Class clazz : infectionEntities) {
+				if (clazz.isAssignableFrom(entity.getClass())) return true;
 			}
 		}
 		return false;

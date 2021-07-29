@@ -28,7 +28,7 @@ public class InfectionPacketHandler {
 			if (ctx.side == Side.CLIENT) {
 				Minecraft mc = Minecraft.getMinecraft();
 				mc.addScheduledTask(() -> {
-					InfectionCureRegister.readPacketData(message.getText());
+					InfectionRegister.readCurePacketData(message.getText());
 				});
 			}
 			return null;

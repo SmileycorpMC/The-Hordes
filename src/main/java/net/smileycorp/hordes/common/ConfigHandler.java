@@ -31,6 +31,7 @@ public class ConfigHandler {
 	public static boolean infectPlayers;
 	public static int playerInfectChance;
 	public static int ticksForEffectStage;
+	public static String[] infectionEntities;
 	public static String[] cureItemList;
 	
 	//load config properties
@@ -65,6 +66,9 @@ public class ConfigHandler {
 			infectPlayers = config.get("Infection", "infectPlayers", true, "Can players be infected.").getBoolean();
 			playerInfectChance = config.get("Infection", "playerInfectChance", 75, "Chance out of 100 for a player to get infected").getInt();
 			ticksForEffectStage = config.get("Infection", "ticksForEffectStage", 6000, "How long do each of the 4 effect phases last for before the next phase is activated?").getInt();
+			infectionEntities = config.get("Infection", "infectionEntities",
+					new String[]{"minecraft:zombie"}, 
+					"Mobs which are based on entities in this list can cause the infection effect.").getStringList();
 			cureItemList = config.get("Infection", "cureItemList",
 					new String[]{"minecraft:golden_apple:*"}, 
 					"A list of items which can cure infection when 'consumed' use '*' to specify any metadata, can accept nbt tags. eg.minecraft:golden_apple:*, minecraft:potion{Potion: \"minecraft:strong_regeneration\"}").getStringList();
