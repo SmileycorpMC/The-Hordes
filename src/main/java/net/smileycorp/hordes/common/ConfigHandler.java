@@ -31,6 +31,7 @@ public class ConfigHandler {
 	public static boolean infectPlayers;
 	public static int playerInfectChance;
 	public static int ticksForEffectStage;
+	public static boolean playerInfectionVisuals;
 	public static String[] infectionEntities;
 	public static String[] cureItemList;
 	
@@ -66,6 +67,7 @@ public class ConfigHandler {
 			infectPlayers = config.get("Infection", "infectPlayers", true, "Can players be infected.").getBoolean();
 			playerInfectChance = config.get("Infection", "playerInfectChance", 75, "Chance out of 100 for a player to get infected").getInt();
 			ticksForEffectStage = config.get("Infection", "ticksForEffectStage", 6000, "How long do each of the 4 effect phases last for before the next phase is activated?").getInt();
+			playerInfectionVisuals = config.get("Horde Spawn Event", "playerInfectionVisuals", true, "Tint the player's screen if they are infected.").getBoolean();
 			infectionEntities = config.get("Infection", "infectionEntities",
 					new String[]{"minecraft:zombie"}, 
 					"Mobs which are based on entities in this list can cause the infection effect.").getStringList();
