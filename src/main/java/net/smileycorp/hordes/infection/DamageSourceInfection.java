@@ -12,5 +12,10 @@ public class DamageSourceInfection extends DamageSource {
 	public boolean isDamageAbsolute() {
         return true;
     }
+	
+	@Override
+	public boolean isUnblockable() {
+        return true;
+    }
 
 }

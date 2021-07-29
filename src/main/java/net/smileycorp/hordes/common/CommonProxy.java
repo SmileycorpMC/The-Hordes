@@ -9,12 +9,15 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.smileycorp.hordes.common.hordeevent.HordeEventHandler;
 import net.smileycorp.hordes.common.hordeevent.HordeEventPacketHandler;
+import net.smileycorp.hordes.common.hordeevent.HordeEventRegister;
 import net.smileycorp.hordes.common.hordeevent.IHordeSpawn;
 import net.smileycorp.hordes.common.hordeevent.command.CommandHordeDebug;
 import net.smileycorp.hordes.common.hordeevent.command.CommandSpawnWave;
 import net.smileycorp.hordes.common.hordeevent.command.CommandStartHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.command.CommandStopHordeEvent;
+import net.smileycorp.hordes.infection.InfectionCureRegister;
 import net.smileycorp.hordes.infection.InfectionEventHandler;
+import net.smileycorp.hordes.infection.InfectionPacketHandler;
 
 public class CommonProxy {
 	
@@ -24,17 +27,23 @@ public class CommonProxy {
 		MinecraftForge.EVENT_BUS.register(this);
 		
 		//Horde Event
-		HordeEventPacketHandler.initPackets();
-		MinecraftForge.EVENT_BUS.register(new HordeEventHandler());
-		CapabilityManager.INSTANCE.register(IHordeSpawn.class, new IHordeSpawn.Storage(), new IHordeSpawn.Factory());
-		
-		//Zombie Gibbing
-		/*GibbingPacketHandler.initPackets();
-		MinecraftForge.EVENT_BUS.register(new GibbingEventHandler());
-		CapabilityManager.INSTANCE.register(IZombieGibbing.class, new IZombieGibbing.Storage(), new IZombieGibbing.Factory());*/
+		if (ConfigHandler.enableHordeEvent) {
+			HordeEventPacketHandler.initPackets();
+			HordeEventRegister.readConfig();
+			MinecraftForge.EVENT_BUS.register(new HordeEventHandler());
+			CapabilityManager.INSTANCE.register(IHordeSpawn.class, new IHordeSpawn.Storage(), new IHordeSpawn.Factory());
+		} else {
+			MinecraftForge.EVENT_BUS.unregister(HordeEventHandler.class);
+		}
 		
 		//Mob Infection
-		MinecraftForge.EVENT_BUS.register(new InfectionEventHandler());
+		if (ConfigHandler.enableMobInfection) {
+			InfectionCureRegister.readConfig();
+			InfectionPacketHandler.initPackets();
+			MinecraftForge.EVENT_BUS.register(new InfectionEventHandler());
+		} else {
+			MinecraftForge.EVENT_BUS.unregister(InfectionEventHandler.class);
+		}
 	}
 	
 	public void init(FMLInitializationEvent event) {
@@ -46,9 +55,11 @@ public class CommonProxy {
 	}
 
 	public void serverStart(FMLServerStartingEvent event) {
-		event.registerServerCommand(new CommandSpawnWave());
-		event.registerServerCommand(new CommandStartHordeEvent());
-		event.registerServerCommand(new CommandStopHordeEvent());
-		event.registerServerCommand(new CommandHordeDebug());
+		if (ConfigHandler.enableHordeEvent) {
+			event.registerServerCommand(new CommandSpawnWave());
+			event.registerServerCommand(new CommandStartHordeEvent());
+			event.registerServerCommand(new CommandStopHordeEvent());
+			event.registerServerCommand(new CommandHordeDebug());
+		}
 	}
 }

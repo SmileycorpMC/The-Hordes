@@ -2,6 +2,7 @@ package net.smileycorp.hordes.infection.entities;
 
 import java.util.UUID;
 
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -13,7 +14,6 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.scoreboard.ScorePlayerTeam;
-import net.minecraft.util.DamageSource;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -49,11 +49,19 @@ public class EntityZombiePlayer extends EntityZombie {
 	
 	public void setPlayer(EntityPlayer player) {
 		InventoryPlayer inv  = player.inventory;
-		//inv.addAll(player)
-		for(EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
+		for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
 			ItemStack stack = slot.getSlotType() == EntityEquipmentSlot.Type.ARMOR ? inv.armorItemInSlot(slot.getIndex()) :
 				slot == EntityEquipmentSlot.MAINHAND ? player.getHeldItemMainhand() : player.getHeldItemOffhand();
 			setItemStackToSlot(slot, stack);
+		}
+		for (ItemStack stack : inv.mainInventory) {
+			playerItems.add(stack.copy());
+		}
+		for (ItemStack stack : inv.armorInventory) {
+			playerItems.add(stack.copy());
+		}
+		for (ItemStack stack : inv.offHandInventory) {
+			playerItems.add(stack.copy());
 		}
 		setPlayer(player.getGameProfile());
 	}
@@ -77,14 +85,13 @@ public class EntityZombiePlayer extends EntityZombie {
 	}
 	
 	@Override
-	public void onDeath(DamageSource source) {
-		super.onDeath(source);
-        for (ItemStack stack : playerItems) {
-            if (!stack.isEmpty()) {
+	protected void dropEquipment(boolean recentlyHit, int looting) {
+		for (ItemStack stack : playerItems) {
+            if (!stack.isEmpty() && ! EnchantmentHelper.hasVanishingCurse(stack)) {
                 entityDropItem(stack, 0f);
             }
         }
-	}
+    }
 	
 	@Override
 	public boolean shouldBurnInDay() {
@@ -94,7 +101,9 @@ public class EntityZombiePlayer extends EntityZombie {
 	@Override
 	public void writeEntityToNBT(NBTTagCompound compound) {
         super.writeEntityToNBT(compound);
-        compound.setUniqueId("player", uuid);
+        if (uuid != null) {
+        	compound.setString("player", uuid.toString());
+        }
         ItemStackHelper.saveAllItems(compound, playerItems);
     }
 	
@@ -102,10 +111,11 @@ public class EntityZombiePlayer extends EntityZombie {
 	public void readEntityFromNBT(NBTTagCompound compound) {
        super.readEntityFromNBT(compound);
        if (compound.hasKey("player")) {
-    	   setPlayer(compound.getUniqueId("player"));
+    	   uuid = UUID.fromString(compound.getString("player"));
        }
-       ItemStackHelper.loadAllItems(compound, playerItems);
-
+       NonNullList<ItemStack> read = NonNullList.<ItemStack>withSize(compound.getTagList("Items", 10).tagCount(), ItemStack.EMPTY);
+       ItemStackHelper.loadAllItems(compound, read);
+       playerItems = read;
     }
 	
 	@Override

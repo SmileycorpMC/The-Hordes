@@ -9,8 +9,8 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.ModDefinitions;
-import net.smileycorp.hordes.common.TheHordes;
 
 public class PotionInfected extends Potion {
 	
@@ -38,8 +38,7 @@ public class PotionInfected extends Potion {
 
     @Override
 	public List<ItemStack> getCurativeItems() {
-    	TheHordes.logInfo(InfectionCureHandler.getCureList());
-    	return InfectionCureHandler.getCureList();
+    	return ConfigHandler.enableMobInfection ? InfectionCureRegister.getCureList() : super.getCurativeItems();
     }
 
 }

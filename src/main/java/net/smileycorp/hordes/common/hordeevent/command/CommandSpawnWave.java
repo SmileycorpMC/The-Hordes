@@ -41,7 +41,7 @@ public class CommandSpawnWave extends CommandBase {
 					EntityPlayer player = (EntityPlayer) sender.getCommandSenderEntity();
 					WorldDataHordeEvent data = WorldDataHordeEvent.get(world);
 					data.getEventForPlayer(player).spawnWave(world, count);
-					data.markDirty();
+					data.save();
 				});
 			}
 			notifyCommandListener(sender, this, "commands."+ModDefinitions.modid+".SpawnHordeWave.success", new Object[0]);

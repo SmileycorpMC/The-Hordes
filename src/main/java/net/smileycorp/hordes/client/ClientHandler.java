@@ -39,8 +39,9 @@ public class ClientHandler {
 		if (ConfigHandler.eventNotifyMode == 1) {
 			gui.addChatMessage(ChatType.CHAT, message);
 		} else if (ConfigHandler.eventNotifyMode == 2) {
-			gui.setOverlayMessage(message, true);
 			ObfuscationReflectionHelper.setPrivateValue(GuiIngame.class, gui, ConfigHandler.eventNotifyDuration, "overlayMessageTime", "field_73845_h");
+			ObfuscationReflectionHelper.setPrivateValue(GuiIngame.class, gui, message.getFormattedText(), "overlayMessage", "field_73838_g");
+			ObfuscationReflectionHelper.setPrivateValue(GuiIngame.class, gui, false, "animateOverlayMessageColor", "field_73844_j");
 		} else if (ConfigHandler.eventNotifyMode == 3) {
 			gui.displayTitle(null, null, 5, ConfigHandler.eventNotifyDuration, 5);
 			gui.displayTitle(" ", null, 0, 0, 0);

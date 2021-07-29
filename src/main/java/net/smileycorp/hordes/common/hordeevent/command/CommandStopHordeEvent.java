@@ -33,10 +33,10 @@ public class CommandStopHordeEvent extends CommandBase {
 			WorldDataHordeEvent data = WorldDataHordeEvent.get(world);
 			for (OngoingHordeEvent event : data.getEvents()) {
 				if (event.isActive(world)) {
-					event.stopEvent();
+					event.stopEvent(world, true);
 				}
 			}
-			data.markDirty();
+			data.save();
 		});
 		notifyCommandListener(sender, this, "commands."+ModDefinitions.modid+".StopHorde.success", new Object[] {});
 	}

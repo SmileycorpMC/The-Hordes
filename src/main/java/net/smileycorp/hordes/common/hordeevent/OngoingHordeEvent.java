@@ -62,7 +62,7 @@ public class OngoingHordeEvent implements IOngoingEvent {
 	@Override
 	public void update(World world) {
 		if (!world.isRemote && player!=null) {
-			int day = Math.round(world.getWorldTime()/24000);
+			int day = (int) Math.floor(world.getWorldTime()/24000);
 			if (isActive(world)) {
 				if ((timer % ConfigHandler.hordeSpawnInterval) == 0) {
 					int amount = (int)(ConfigHandler.hordeSpawnAmount * (1+(day/ConfigHandler.hordeSpawnDays) * (1-ConfigHandler.hordeSpawnMultiplier)));
@@ -73,14 +73,14 @@ public class OngoingHordeEvent implements IOngoingEvent {
 					}});
 					for (EntityPlayer entity : players) {
 						if (player.getDistance(entity)<=25) {
-							amount = (int) Math.floor(amount * 0.8);
+							amount = (int) Math.floor(amount * ConfigHandler.hordeMultiplayerScaling);
 						}
 					}
 					spawnWave(world, amount);
 				}
 				timer--;
 				if (timer == 0) {
-					stopEvent();
+					stopEvent(world, false);
 				}
 				hasChanged = true;
 			}
@@ -89,7 +89,7 @@ public class OngoingHordeEvent implements IOngoingEvent {
 	
 	public void spawnWave(World world, int count) {
 		cleanSpawns();
-		int day = Math.round(world.getWorldTime()/24000);
+		int day = (int) Math.floor(world.getWorldTime()/24000);
 		Vec3d basedir = DirectionUtils.getRandomDirectionVecXZ(world.rand);
 		BlockPos basepos = DirectionUtils.getClosestLoadedPos(world, player.getPosition(), basedir, 75, 7, 0);
 		int i = 0;
@@ -190,7 +190,7 @@ public class OngoingHordeEvent implements IOngoingEvent {
 
 	public void tryStartEvent(int duration) {
 		if (player!=null) {
-			int day = Math.round(player.world.getWorldTime()/24000);
+			int day = (int) Math.floor(player.world.getWorldTime()/24000);
 			HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, HordeEventRegister.getSpawnTable(day), player.getPosition());
 			MinecraftForge.EVENT_BUS.post(buildTableEvent);
 			WeightedOutputs<Class<? extends EntityLiving>> spawntable = buildTableEvent.spawntable;
@@ -208,7 +208,7 @@ public class OngoingHordeEvent implements IOngoingEvent {
 		HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new SimpleStringMessage(str), (EntityPlayerMP) player);
 	}
 
-	public void stopEvent() {
+	public void stopEvent(World world, boolean isCommand) {
 		timer = 0;
 		hasChanged = true;
 		cleanSpawns();
@@ -220,8 +220,9 @@ public class OngoingHordeEvent implements IOngoingEvent {
 	}
 
 	public void registerEntity(EntityLiving entity) {
-		if (!entitiesSpawned.contains(entity)) {
-			entitiesSpawned.add(new WeakReference(entity));
+		WeakReference ref = new WeakReference(entity);
+		if (!entitiesSpawned.contains(ref)) {
+			entitiesSpawned.add(ref);
 		}
 	}
 	
@@ -250,4 +251,5 @@ public class OngoingHordeEvent implements IOngoingEvent {
 		}
 		return result;
 	}
+	
 }

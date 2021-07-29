@@ -17,7 +17,7 @@ public class HordeEventRegister {
 	
 	protected static Map<Class<? extends EntityLiving>, HordeSpawnEntry> spawnlist = new HashMap<Class<? extends EntityLiving>, HordeSpawnEntry>();
 	
-	public static void init() {
+	public static void readConfig() {
 		TheHordes.logInfo("Trying to read spawn table from config");
 		try {
 			if (ConfigHandler.hordeSpawnList == null) {

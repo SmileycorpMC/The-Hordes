@@ -11,6 +11,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -41,11 +42,14 @@ public class HordeEventHandler {
 	public void worldTick(WorldTickEvent event) {
 		if (event.phase == Phase.END) {
 			World world = event.world;
-			if (!world.isRemote) {
-				int day = Math.round(world.getWorldTime()/24000);
+			if (!world.isRemote && (world.getGameRules().getBoolean("doDayLightCycle") |! ConfigHandler.pauseEventServer)) {
+				int day = (int) Math.floor(world.getWorldTime()/24000);
 				int time = Math.round(world.getWorldTime()%24000);
 				WorldDataHordeEvent data = WorldDataHordeEvent.get(world);
-				if (time == ConfigHandler.hordeStartTime && day % ConfigHandler.hordeSpawnDays == 0 && (day!=0 || ConfigHandler.spawnFirstDay)) {
+				if (day == data.getNextDay() + 1) {
+					data.setNextDay(world.rand.nextInt(ConfigHandler.hordeSpawnVariation + 1) + ConfigHandler.hordeSpawnDays + data.getNextDay());
+				}
+				if (time >= ConfigHandler.hordeStartTime && day == data.getNextDay() && (day!=0 || ConfigHandler.spawnFirstDay)) {
 					for (OngoingHordeEvent hordeEvent: data.getEvents()) {
 						if (!hordeEvent.isActive(world)) {
 							hordeEvent.tryStartEvent(ConfigHandler.hordeSpawnDuration);
@@ -60,6 +64,7 @@ public class HordeEventHandler {
 						}
 					}
 				}
+				data.save();
 			}
 		}
 	}
@@ -78,6 +83,7 @@ public class HordeEventHandler {
 					if (hordeevent.isActive(world)) {
 						event.setResult(Result.DENY);
 					}
+					data.save();
 				}
 			}
 		}
@@ -110,6 +116,7 @@ public class HordeEventHandler {
 						entity.tasks.addTask(6, new EntityAIGoToEntityPos(entity, player));
 					}
 					hordeevent.registerEntity(entity);
+					data.save();
 				}
 			}
 		}	
@@ -117,15 +124,36 @@ public class HordeEventHandler {
 	
 	@SubscribeEvent
 	public void playerJoin(PlayerEvent.PlayerLoggedInEvent event) {
+		MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
 		EntityPlayer player = event.player;
 		World world = player.world;
 		if (player != null && world != null) {
 			if (!world.isRemote) {
 				WorldDataHordeEvent data = WorldDataHordeEvent.get(world);
 				data.getEventForPlayer(player);
+				data.save();
 			}
 		}
-	}	
+		if (ConfigHandler.pauseEventServer) {
+			for (World sworld : server.worlds) {
+				if (sworld.getGameRules().getBoolean("doDaylightCycle") == false) {
+					sworld.getGameRules().setOrCreateGameRule("doDaylightCycle", "true");
+				}
+			}
+		}
+	}
+	
+	@SubscribeEvent
+	public void playerLeave(PlayerEvent.PlayerLoggedOutEvent event) {
+		if (ConfigHandler.pauseEventServer) {
+			MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+			if (server.getPlayerList().getPlayers().isEmpty()) {
+				for (World sworld : server.worlds) {
+					sworld.getGameRules().setOrCreateGameRule("doDaylightCycle", "false");
+				}
+			}
+		}
+	}
 	
 	@SubscribeEvent
 	public void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
@@ -143,11 +171,11 @@ public class HordeEventHandler {
 		if (!ConfigHandler.canSleepDuringHorde && state.getBlock() instanceof BlockBed) {
 			if (!world.isRemote) {
 				WorldDataHordeEvent data = WorldDataHordeEvent.get(world);
-				OngoingHordeEvent hordeEvent = data.getEventForPlayer(player);
-				if (hordeEvent.isActive(world)) {
+				if (data.getNextDay() == Math.floor(world.getWorldTime()/24000)) {
 					event.setCanceled(true);
 					player.sendMessage(new TextComponentTranslation(ModDefinitions.hordeTrySleep));
 				}
+				data.save();
 			}
 		}
 	}

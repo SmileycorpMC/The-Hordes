@@ -50,6 +50,7 @@ public class CommandHordeDebug extends CommandBase {
 			try {
 				Files.write(path, out, StandardCharsets.UTF_8);
 			} catch (Exception e) {}
+			data.save();
 		});
 		notifyCommandListener(sender, this, "commands."+ModDefinitions.modid+".HordeDebug.success", path.toAbsolutePath().toString());
     }

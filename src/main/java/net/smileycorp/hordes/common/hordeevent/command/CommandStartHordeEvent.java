@@ -43,7 +43,7 @@ public class CommandStartHordeEvent extends CommandBase {
 						event.tryStartEvent(duration);
 					}
 				}
-				data.markDirty();
+				data.save();
 			});
 			notifyCommandListener(sender, this, "commands."+ModDefinitions.modid+".StartHorde.success", new Object[] {new TextComponentTranslation(args[0])});
         }
