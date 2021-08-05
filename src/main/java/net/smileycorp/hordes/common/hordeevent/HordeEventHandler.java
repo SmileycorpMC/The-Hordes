@@ -42,10 +42,10 @@ public class HordeEventHandler {
 	public void worldTick(WorldTickEvent event) {
 		if (event.phase == Phase.END) {
 			World world = event.world;
-			if (!world.isRemote && (world.getGameRules().getBoolean("doDayLightCycle") |! ConfigHandler.pauseEventServer)) {
+			if (!world.isRemote && (world.getGameRules().getBoolean("doDaylightCycle") |! ConfigHandler.pauseEventServer)) {
 				int day = (int) Math.floor(world.getWorldTime()/24000);
 				int time = Math.round(world.getWorldTime()%24000);
-				WorldDataHordeEvent data = WorldDataHordeEvent.get(world);
+				WorldDataHordeEvent data = WorldDataHordeEvent.getData(world);
 				if (day == data.getNextDay() + 1) {
 					data.setNextDay(world.rand.nextInt(ConfigHandler.hordeSpawnVariation + 1) + ConfigHandler.hordeSpawnDays + data.getNextDay());
 				}
@@ -56,12 +56,9 @@ public class HordeEventHandler {
 						}
 					}
 				}
-				for (OngoingHordeEvent hordeEvent: data.getEvents()) {
+				for (OngoingHordeEvent hordeEvent : data.getEvents()) {
 					if (hordeEvent.isActive(world)) {
 						hordeEvent.update(world);
-						if (hordeEvent.hasChanged()) {
-							data.markDirty();
-						}
 					}
 				}
 				data.save();
@@ -78,7 +75,7 @@ public class HordeEventHandler {
 			if (cap.isHordeSpawned()) {
 				String uuid = cap.getPlayerUUID();
 				if (DataUtils.isValidUUID(uuid)) {
-					WorldDataHordeEvent data = WorldDataHordeEvent.get(world);
+					WorldDataHordeEvent data = WorldDataHordeEvent.getData(world);
 					OngoingHordeEvent hordeevent = data.getEventForPlayer(uuid);
 					if (hordeevent.isActive(world)) {
 						event.setResult(Result.DENY);
@@ -110,7 +107,7 @@ public class HordeEventHandler {
 					}
 					String uuid = cap.getPlayerUUID();
 					EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(UUID.fromString(uuid));
-					WorldDataHordeEvent data = WorldDataHordeEvent.get(world);
+					WorldDataHordeEvent data = WorldDataHordeEvent.getData(world);
 					OngoingHordeEvent hordeevent = data.getEventForPlayer(uuid);
 					if (player!=null) {
 						entity.tasks.addTask(6, new EntityAIGoToEntityPos(entity, player));
@@ -129,7 +126,7 @@ public class HordeEventHandler {
 		World world = player.world;
 		if (player != null && world != null) {
 			if (!world.isRemote) {
-				WorldDataHordeEvent data = WorldDataHordeEvent.get(world);
+				WorldDataHordeEvent data = WorldDataHordeEvent.getData(world);
 				data.getEventForPlayer(player);
 				data.save();
 			}
@@ -170,7 +167,7 @@ public class HordeEventHandler {
 		IBlockState state = world.getBlockState(event.getPos());
 		if (!ConfigHandler.canSleepDuringHorde && state.getBlock() instanceof BlockBed) {
 			if (!world.isRemote) {
-				WorldDataHordeEvent data = WorldDataHordeEvent.get(world);
+				WorldDataHordeEvent data = WorldDataHordeEvent.getData(world);
 				if (data.getNextDay() == Math.floor(world.getWorldTime()/24000)) {
 					event.setCanceled(true);
 					player.sendMessage(new TextComponentTranslation(ModDefinitions.hordeTrySleep));

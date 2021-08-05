@@ -16,11 +16,11 @@ import net.smileycorp.hordes.common.ModDefinitions;
 import net.smileycorp.hordes.common.hordeevent.OngoingHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.WorldDataHordeEvent;
 
-public class CommandHordeDebug extends CommandBase {
+public class CommandDebugHordeEvent extends CommandBase {
 
 	@Override
 	public String getName() {
-		return "hordeDebug";
+		return "debugHorde";
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class CommandHordeDebug extends CommandBase {
 		World world = sender.getEntityWorld();
 		Path path = Paths.get("logs/hordes.log");
 		server.addScheduledTask(() -> {
-			WorldDataHordeEvent data = WorldDataHordeEvent.get(world);
+			WorldDataHordeEvent data = WorldDataHordeEvent.getData(world);
 			List<String> out = new ArrayList<String>();
 			out.add("World time: " + world.getWorldTime());
 			out.add("Existing events: {");

@@ -6,38 +6,32 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 import net.smileycorp.hordes.common.ModDefinitions;
-import net.smileycorp.hordes.common.hordeevent.OngoingHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.WorldDataHordeEvent;
 
-public class CommandStopHordeEvent extends CommandBase {
+public class CommandClearHordeData extends CommandBase {
 
 	@Override
 	public String getName() {
-		return "stopHordeEvent";
+		return "clearHordeData";
 	}
 
 	@Override
 	public String getUsage(ICommandSender sender) {
-		 return "commands."+ModDefinitions.modid+".StopHorde.usage";
+		 return "commands."+ModDefinitions.modid+".HordeClean.usage";
 	}
 	
 	@Override
 	public int getRequiredPermissionLevel() {
-        return 2;
+        return 1;
     }
 
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		World world = sender.getEntityWorld();
 		server.addScheduledTask(() -> {
-			WorldDataHordeEvent data = WorldDataHordeEvent.getData(world);
-			for (OngoingHordeEvent event : data.getEvents()) {
-				if (event.isActive(world)) {
-					event.stopEvent(world, true);
-				}
-			}
-			data.save();
+			WorldDataHordeEvent.getCleanData(world);
 		});
-		notifyCommandListener(sender, this, "commands."+ModDefinitions.modid+".StopHorde.success", new Object[] {});
-	}
+		notifyCommandListener(sender, this, "commands."+ModDefinitions.modid+".HordeClean.success", new Object[]{});
+    }
+ 
 }

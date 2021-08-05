@@ -42,7 +42,6 @@ public class OngoingHordeEvent implements IOngoingEvent {
 	
 	public OngoingHordeEvent(EntityPlayer player) {
 		this.player=player;
-		
 	}
 
 	@Override
@@ -62,28 +61,26 @@ public class OngoingHordeEvent implements IOngoingEvent {
 	@Override
 	public void update(World world) {
 		if (!world.isRemote && player!=null) {
-			int day = (int) Math.floor(world.getWorldTime()/24000);
-			if (isActive(world)) {
-				if ((timer % ConfigHandler.hordeSpawnInterval) == 0) {
-					int amount = (int)(ConfigHandler.hordeSpawnAmount * (1+(day/ConfigHandler.hordeSpawnDays) * (1-ConfigHandler.hordeSpawnMultiplier)));
-					List<EntityPlayer>players = world.getEntities(EntityPlayer.class, new Predicate<EntityPlayer>(){
-						@Override
-						public boolean apply(EntityPlayer entity) {
-							return entity!=player;
-					}});
-					for (EntityPlayer entity : players) {
-						if (player.getDistance(entity)<=25) {
-							amount = (int) Math.floor(amount * ConfigHandler.hordeMultiplayerScaling);
-						}
+		int day = (int) Math.floor(world.getWorldTime()/24000);
+			if ((timer % ConfigHandler.hordeSpawnInterval) == 0) {
+				int amount = (int)(ConfigHandler.hordeSpawnAmount * (1+(day/ConfigHandler.hordeSpawnDays) * (1-ConfigHandler.hordeSpawnMultiplier)));
+				List<EntityPlayer>players = world.getEntities(EntityPlayer.class, new Predicate<EntityPlayer>(){
+					@Override
+					public boolean apply(EntityPlayer entity) {
+						return entity!=player;
+				}});
+				for (EntityPlayer entity : players) {
+					if (player.getDistance(entity)<=25) {
+						amount = (int) Math.floor(amount * ConfigHandler.hordeMultiplayerScaling);
 					}
-					spawnWave(world, amount);
 				}
-				timer--;
-				if (timer == 0) {
-					stopEvent(world, false);
-				}
-				hasChanged = true;
+				spawnWave(world, amount);
 			}
+			timer--;
+			if (timer == 0) {
+				stopEvent(world, false);
+			}
+			hasChanged = true;
 		}
 	}
 	
@@ -202,6 +199,7 @@ public class OngoingHordeEvent implements IOngoingEvent {
 				TheHordes.logError("Spawntable is empty, canceling event start.", new NullPointerException());
 			}
 		}
+		TheHordes.logError("player is null for " + this.toString(), new NullPointerException());
 	}
 
 	private void sendMessage(String str) {
@@ -228,7 +226,7 @@ public class OngoingHordeEvent implements IOngoingEvent {
 	
 	@Override
 	public String toString() {
-		return "OngoingHordeEvent@" + Integer.toHexString(hashCode()) + "[player=" + player.getName() + ", isActive=" + isActive(player.world) + 
+		return "OngoingHordeEvent@" + Integer.toHexString(hashCode()) + "[player=" + (player == null ? "null" : player.getName()) + ", isActive=" + (timer > 0) + 
 				", ticksLeft=" + timer +", entityCount="+ entitiesSpawned.size()+"]";
 	}
 	
@@ -245,8 +243,8 @@ public class OngoingHordeEvent implements IOngoingEvent {
 				builder.append(entity.getClass().getSimpleName() + "@");
 				builder.append(Integer.toHexString(entity.hashCode()));
 				if (entitylist.indexOf(ref) < entitylist.size()-1) builder.append(", ");
-				else builder.append("}");
 			}
+			builder.append("}");
 			result.add(builder.toString());
 		}
 		return result;

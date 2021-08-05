@@ -37,7 +37,7 @@ public class CommandStartHordeEvent extends CommandBase {
 		try {
 			int duration = parseInt(args[0], 0);
 			server.addScheduledTask(() -> {
-				WorldDataHordeEvent data = WorldDataHordeEvent.get(world);
+				WorldDataHordeEvent data = WorldDataHordeEvent.getData(world);
 				for (OngoingHordeEvent event : data.getEvents()) {
 					if (!event.isActive(world)) {
 						event.tryStartEvent(duration);

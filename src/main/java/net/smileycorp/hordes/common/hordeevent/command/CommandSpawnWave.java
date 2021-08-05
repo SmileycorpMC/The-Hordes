@@ -39,7 +39,7 @@ public class CommandSpawnWave extends CommandBase {
 			if (sender.getCommandSenderEntity() instanceof EntityPlayer) {
 				server.addScheduledTask(() -> {
 					EntityPlayer player = (EntityPlayer) sender.getCommandSenderEntity();
-					WorldDataHordeEvent data = WorldDataHordeEvent.get(world);
+					WorldDataHordeEvent data = WorldDataHordeEvent.getData(world);
 					data.getEventForPlayer(player).spawnWave(world, count);
 					data.save();
 				});

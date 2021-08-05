@@ -11,7 +11,7 @@ import net.smileycorp.hordes.common.hordeevent.HordeEventHandler;
 import net.smileycorp.hordes.common.hordeevent.HordeEventPacketHandler;
 import net.smileycorp.hordes.common.hordeevent.HordeEventRegister;
 import net.smileycorp.hordes.common.hordeevent.IHordeSpawn;
-import net.smileycorp.hordes.common.hordeevent.command.CommandHordeDebug;
+import net.smileycorp.hordes.common.hordeevent.command.CommandDebugHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.command.CommandSpawnWave;
 import net.smileycorp.hordes.common.hordeevent.command.CommandStartHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.command.CommandStopHordeEvent;
@@ -65,7 +65,7 @@ public class CommonProxy {
 			event.registerServerCommand(new CommandSpawnWave());
 			event.registerServerCommand(new CommandStartHordeEvent());
 			event.registerServerCommand(new CommandStopHordeEvent());
-			event.registerServerCommand(new CommandHordeDebug());
+			event.registerServerCommand(new CommandDebugHordeEvent());
 		}
 	}
 }
