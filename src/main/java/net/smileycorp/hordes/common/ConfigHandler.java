@@ -61,13 +61,13 @@ public class ConfigHandler {
 					new String[]{"minecraft:zombie-20-0-20", "minecraft:zombie_villager-5-0-10", "minecraft:husk-20-30-0"}, 
 					"A list of entities to spawn followed by the spawn weight then the day they first appear on then the last day. Higher weight is more common. Leave the last value to 0 to set no max day, entities can have nbt attached to them.(e.g. minecraft:zombie-20-0-0{ActiveEffects:[{Id:12,Amplifier:0,Duration:10000}]})").getStringList();
 			//infection
-			enableMobInfection = config.get("Horde Spawn Event", "enableMobInfection", true, "Set to false to completely disable mob infection and anything related to it.").getBoolean();
+			enableMobInfection = config.get("Infection", "enableMobInfection", true, "Set to false to completely disable mob infection and anything related to it.").getBoolean();
 			infectVillagers = config.get("Infection", "infectVillagers", true, "Can villagers be infected.").getBoolean();
 			villagerInfectChance = config.get("Infection", "villagerInfectChance", 85, "Chance out of 100 for a villager to get infected").getInt();
 			infectPlayers = config.get("Infection", "infectPlayers", true, "Can players be infected.").getBoolean();
 			playerInfectChance = config.get("Infection", "playerInfectChance", 75, "Chance out of 100 for a player to get infected").getInt();
 			ticksForEffectStage = config.get("Infection", "ticksForEffectStage", 6000, "How long do each of the 4 effect phases last for before the next phase is activated?").getInt();
-			playerInfectionVisuals = config.get("Horde Spawn Event", "playerInfectionVisuals", true, "Tint the player's screen if they are infected.").getBoolean();
+			playerInfectionVisuals = config.get("Infection", "playerInfectionVisuals", true, "Tint the player's screen if they are infected.").getBoolean();
 			infectionEntities = config.get("Infection", "infectionEntities",
 					new String[]{"minecraft:zombie"}, 
 					"Mobs which are based on entities in this list can cause the infection effect.").getStringList();
