@@ -25,7 +25,7 @@ public interface IHordeSpawn {
 	
 		@Override
 		public void readNBT(Capability<IHordeSpawn> capability, IHordeSpawn instance, EnumFacing side, NBTBase nbt) {
-				instance.setPlayerUUID(((NBTTagString) nbt).getString());
+			instance.setPlayerUUID(((NBTTagString) nbt).getString());
 		}
 		
 		
