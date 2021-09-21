@@ -26,8 +26,8 @@ import net.smileycorp.atlas.api.entity.ai.EntityAIGoToEntityPos;
 import net.smileycorp.atlas.api.recipe.WeightedOutputs;
 import net.smileycorp.atlas.api.util.DirectionUtils;
 import net.smileycorp.hordes.common.ConfigHandler;
+import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.ModDefinitions;
-import net.smileycorp.hordes.common.TheHordes;
 import net.smileycorp.hordes.common.event.HordeBuildSpawntableEvent;
 import net.smileycorp.hordes.common.event.HordeSpawnEntityEvent;
 
@@ -95,7 +95,7 @@ public class OngoingHordeEvent implements IOngoingEvent {
 			basepos = DirectionUtils.getClosestLoadedPos(world, player.getPosition(), basedir, 75, 7, 0);
 			i++;
 			if (i==20) {
-				TheHordes.logInfo("Unable to find unlight pos ");
+				Hordes.logInfo("Unable to find unlight pos ");
 				basepos = DirectionUtils.getClosestLoadedPos(world, player.getPosition(), basedir, 75);
 				break;
 			}
@@ -104,7 +104,7 @@ public class OngoingHordeEvent implements IOngoingEvent {
 		MinecraftForge.EVENT_BUS.post(buildTableEvent);
 		WeightedOutputs<Class<? extends EntityLiving>> spawntable = buildTableEvent.spawntable;
 		if (spawntable.isEmpty()) {
-			TheHordes.logError("Spawntable is empty, stopping wave spawn.", new NullPointerException());
+			Hordes.logError("Spawntable is empty, stopping wave spawn.", new NullPointerException());
 			return;
 		}
 		if (count > 0 && player instanceof EntityPlayerMP && ConfigHandler.hordeSpawnSound) {
@@ -129,7 +129,7 @@ public class OngoingHordeEvent implements IOngoingEvent {
 					entity.setPosition(pos.getX(), pos.getY(), pos.getZ());
 					entity.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(100.0D);
 					world.spawnEntity(entity);
-					entity.getCapability(HordeSpawnProvider.HORDESPAWN, null).setPlayerUUID(player.getUniqueID().toString());
+					entity.getCapability(Hordes.HORDESPAWN, null).setPlayerUUID(player.getUniqueID().toString());
 					//entity.enablePersistence();
 					registerEntity(entity);
 					hasChanged = true;
@@ -148,7 +148,7 @@ public class OngoingHordeEvent implements IOngoingEvent {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
-				TheHordes.logError("Unable to spawn entity from " + clazz, e);
+				Hordes.logError("Unable to spawn entity from " + clazz, e);
 			}
 		}
 	}
@@ -159,8 +159,8 @@ public class OngoingHordeEvent implements IOngoingEvent {
 			if (ref != null && ref.get() != null) {
 				EntityLiving entity = ref.get();
 				if (entity.isDead) {
-					if (entity.hasCapability(HordeSpawnProvider.HORDESPAWN, null)) {
-						IHordeSpawn cap = entity.getCapability(HordeSpawnProvider.HORDESPAWN, null);
+					if (entity.hasCapability(Hordes.HORDESPAWN, null)) {
+						IHordeSpawn cap = entity.getCapability(Hordes.HORDESPAWN, null);
 						cap.setPlayerUUID("");
 						toRemove.add(ref);
 					}
@@ -196,10 +196,10 @@ public class OngoingHordeEvent implements IOngoingEvent {
 				hasChanged = true;
 				sendMessage(ModDefinitions.hordeEventStart);
 			} else {
-				TheHordes.logError("Spawntable is empty, canceling event start.", new NullPointerException());
+				Hordes.logError("Spawntable is empty, canceling event start.", new NullPointerException());
 			}
 		}
-		TheHordes.logError("player is null for " + this.toString(), new NullPointerException());
+		Hordes.logError("player is null for " + this.toString(), new NullPointerException());
 	}
 
 	private void sendMessage(String str) {

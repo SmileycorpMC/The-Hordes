@@ -30,7 +30,7 @@ public class CommonProxy {
 		if (ConfigHandler.enableHordeEvent) {
 			HordeEventPacketHandler.initPackets();
 			MinecraftForge.EVENT_BUS.register(new HordeEventHandler());
-			CapabilityManager.INSTANCE.register(IHordeSpawn.class, new IHordeSpawn.Storage(), new IHordeSpawn.Factory());
+			CapabilityManager.INSTANCE.register(IHordeSpawn.class, new IHordeSpawn.Storage(), () -> new IHordeSpawn.Implementation());
 		} else {
 			MinecraftForge.EVENT_BUS.unregister(HordeEventHandler.class);
 		}

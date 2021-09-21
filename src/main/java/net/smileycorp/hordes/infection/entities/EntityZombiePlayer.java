@@ -1,5 +1,8 @@
 package net.smileycorp.hordes.infection.entities;
 
+import java.util.ArrayList;
+import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.UUID;
 
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -18,7 +21,11 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
+import net.minecraftforge.items.IItemHandler;
 
 import com.google.common.base.Optional;
 import com.mojang.authlib.GameProfile;
@@ -27,6 +34,8 @@ import com.mojang.authlib.GameProfile;
 public class EntityZombiePlayer extends EntityZombie {
 	
 	protected static final DataParameter<Optional<UUID>> PLAYER_UUID = EntityDataManager.createKey(EntityZombiePlayer.class, DataSerializers.OPTIONAL_UNIQUE_ID);
+	
+	private static final List<Capability<? extends IItemHandler>> ITEMHANDLER_CAPABILITIES = new ArrayList<Capability<? extends IItemHandler>>();
 	
 	protected NonNullList<ItemStack> playerItems = NonNullList.<ItemStack>create();
 	protected UUID uuid;
@@ -48,20 +57,24 @@ public class EntityZombiePlayer extends EntityZombie {
     }
 	
 	public void setPlayer(EntityPlayer player) {
-		InventoryPlayer inv  = player.inventory;
+		InventoryPlayer inv = player.inventory;
 		for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
 			ItemStack stack = slot.getSlotType() == EntityEquipmentSlot.Type.ARMOR ? inv.armorItemInSlot(slot.getIndex()) :
 				slot == EntityEquipmentSlot.MAINHAND ? player.getHeldItemMainhand() : player.getHeldItemOffhand();
 			setItemStackToSlot(slot, stack);
 		}
-		for (ItemStack stack : inv.mainInventory) {
-			playerItems.add(stack.copy());
+		for (NonNullList<ItemStack> subInv : inv.allInventories) {
+			for (ItemStack stack : subInv) playerItems.add(stack.copy());
+			subInv.clear();
 		}
-		for (ItemStack stack : inv.armorInventory) {
-			playerItems.add(stack.copy());
-		}
-		for (ItemStack stack : inv.offHandInventory) {
-			playerItems.add(stack.copy());
+		if (ITEMHANDLER_CAPABILITIES.isEmpty()) getItemCapabilities(player);
+		for (Capability<?> cap : ITEMHANDLER_CAPABILITIES) {
+			IItemHandler items = (IItemHandler)player.getCapability(cap, null);
+			for (int slot = 0; slot < items.getSlots(); slot++) {
+				ItemStack stack = items.getStackInSlot(slot);
+				playerItems.add(stack);
+				items.extractItem(slot, stack.getCount(), false);
+			}
 		}
 		setPlayer(player.getGameProfile());
 	}
@@ -98,6 +111,15 @@ public class EntityZombiePlayer extends EntityZombie {
 		return false;
 	}
 	
+	private void getItemCapabilities(EntityPlayer player) {
+		Object obj = ReflectionHelper.getPrivateValue(CapabilityManager.class, CapabilityManager.INSTANCE, "providers");
+		if (obj instanceof IdentityHashMap) {
+			for (Capability<?> cap :((IdentityHashMap<String, Capability<?>>)obj).values()) {
+				if (player.getCapability(cap, null) instanceof IItemHandler) ITEMHANDLER_CAPABILITIES.add((Capability<? extends IItemHandler>) cap);
+			}
+		}
+	}
+	
 	@Override
 	public void writeEntityToNBT(NBTTagCompound compound) {
         super.writeEntityToNBT(compound);
@@ -126,5 +148,4 @@ public class EntityZombiePlayer extends EntityZombie {
         return textcomponentstring;
     }
 	
-
 }

@@ -50,6 +50,11 @@ public class ModelZombiePlayer extends ModelPlayer {
         this.bipedLeftArm.rotateAngleZ -= MathHelper.cos(ageInTicks * 0.09F) * 0.05F + 0.05F;
         this.bipedRightArm.rotateAngleX += MathHelper.sin(ageInTicks * 0.067F) * 0.05F;
         this.bipedLeftArm.rotateAngleX -= MathHelper.sin(ageInTicks * 0.067F) * 0.05F;
+        copyModelAngles(this.bipedLeftLeg, this.bipedLeftLegwear);
+        copyModelAngles(this.bipedRightLeg, this.bipedRightLegwear);
+        copyModelAngles(this.bipedLeftArm, this.bipedLeftArmwear);
+        copyModelAngles(this.bipedRightArm, this.bipedRightArmwear);
+        copyModelAngles(this.bipedBody, this.bipedBodyWear);
     }
 
 }

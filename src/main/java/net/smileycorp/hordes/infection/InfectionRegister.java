@@ -16,7 +16,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.oredict.OreDictionary;
 import net.smileycorp.atlas.api.util.RecipeUtils;
 import net.smileycorp.hordes.common.ConfigHandler;
-import net.smileycorp.hordes.common.TheHordes;
+import net.smileycorp.hordes.common.Hordes;
 
 public class InfectionRegister {
 	
@@ -54,7 +54,7 @@ public class InfectionRegister {
 				}
 			}
 		} catch (Exception e) {
-			TheHordes.logError("Failed to read config, " + e.getCause() + " " + e.getMessage(), e);
+			Hordes.logError("Failed to read config, " + e.getCause() + " " + e.getMessage(), e);
 		}
 	}
 
@@ -68,7 +68,7 @@ public class InfectionRegister {
 			}
 			cures = parseCureData(ConfigHandler.cureItemList);
 		} catch (Exception e) {
-			TheHordes.logError("Failed to read config, " + e.getCause() + " " + e.getMessage(), e);
+			Hordes.logError("Failed to read config, " + e.getCause() + " " + e.getMessage(), e);
 		}
 	}
 
@@ -77,7 +77,7 @@ public class InfectionRegister {
 			String[] splitData = data.split(";");
 			curesClient = parseCureData(splitData);
 		} catch (Exception e) {
-			TheHordes.logError("Failed to read data from server, " + e.getCause() + " " + e.getMessage(), e);
+			Hordes.logError("Failed to read data from server, " + e.getCause() + " " + e.getMessage(), e);
 		}
 	}
 	
@@ -106,7 +106,7 @@ public class InfectionRegister {
 					NBTTagCompound parsed = JsonToNBT.getTagFromJson(nbtstring);
 					if (parsed != null) nbt = parsed;
 				} catch (Exception e) {
-					TheHordes.logError("Error parsing nbt for entity " + name + " " + e.getMessage(), e);
+					Hordes.logError("Error parsing nbt for entity " + name + " " + e.getMessage(), e);
 				}
 			}
 			String[] nameSplit = name.split(":");
@@ -117,7 +117,7 @@ public class InfectionRegister {
 					meta = nameSplit.length > 2 ? (nameSplit[2].equals("*") ? OreDictionary.WILDCARD_VALUE : Integer.valueOf(nameSplit[2])) : 0;
 				} catch (Exception e) {
 					meta = 0;
-					TheHordes.logError("Entry" + name + " has a non integer, non wildcard metadata value", e); 
+					Hordes.logError("Entry" + name + " has a non integer, non wildcard metadata value", e); 
 				}
 				if (ForgeRegistries.ITEMS.containsKey(loc)) {
 					ItemStack stack = new ItemStack(ForgeRegistries.ITEMS.getValue(loc), 1, meta);

@@ -37,7 +37,7 @@ public class ConfigHandler {
 	
 	//load config properties
 	public static void syncConfig() {
-		TheHordes.logInfo("Trying to load config");
+		Hordes.logInfo("Trying to load config");
 		try{
 			config.load();
 			//horde event

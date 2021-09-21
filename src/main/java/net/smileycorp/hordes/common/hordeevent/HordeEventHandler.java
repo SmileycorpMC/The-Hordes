@@ -30,6 +30,7 @@ import net.smileycorp.atlas.api.entity.ai.EntityAIFindNearestTargetPredicate;
 import net.smileycorp.atlas.api.entity.ai.EntityAIGoToEntityPos;
 import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.hordes.common.ConfigHandler;
+import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.ModDefinitions;
 
 import com.google.common.base.Predicate;
@@ -70,8 +71,8 @@ public class HordeEventHandler {
 	public void tryDespawn(LivingSpawnEvent.AllowDespawn event) {
 		World world = event.getWorld();
 		EntityLivingBase entity = event.getEntityLiving();
-		if (entity.hasCapability(HordeSpawnProvider.HORDESPAWN, null)) {
-			IHordeSpawn cap = entity.getCapability(HordeSpawnProvider.HORDESPAWN, null);
+		if (entity.hasCapability(Hordes.HORDESPAWN, null)) {
+			IHordeSpawn cap = entity.getCapability(Hordes.HORDESPAWN, null);
 			if (cap.isHordeSpawned()) {
 				String uuid = cap.getPlayerUUID();
 				if (DataUtils.isValidUUID(uuid)) {
@@ -91,8 +92,8 @@ public class HordeEventHandler {
 		World world = event.getWorld();
 		if (!world.isRemote && event.getEntity() instanceof EntityLiving) {
 			EntityLiving entity = (EntityLiving) event.getEntity();
-			if (entity.hasCapability(HordeSpawnProvider.HORDESPAWN, null)) {
-				IHordeSpawn cap = entity.getCapability(HordeSpawnProvider.HORDESPAWN, null);
+			if (entity.hasCapability(Hordes.HORDESPAWN, null)) {
+				IHordeSpawn cap = entity.getCapability(Hordes.HORDESPAWN, null);
 				if (cap.isHordeSpawned() && DataUtils.isValidUUID(cap.getPlayerUUID())) {
 					entity.targetTasks.taskEntries.clear();
 					if (entity instanceof EntityCreature) {
@@ -155,8 +156,8 @@ public class HordeEventHandler {
 	@SubscribeEvent
 	public void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
 		Entity entity = event.getObject();
-		if (!entity.hasCapability(HordeSpawnProvider.HORDESPAWN, null) && entity instanceof EntityLiving && !(entity instanceof EntityPlayer)) {
-			event.addCapability(ModDefinitions.getResource("HordeSpawn"), new HordeSpawnProvider());
+		if (!entity.hasCapability(Hordes.HORDESPAWN, null) && entity instanceof EntityLiving && !(entity instanceof EntityPlayer)) {
+			event.addCapability(ModDefinitions.getResource("HordeSpawn"), new IHordeSpawn.Provider());
 		}
 	}
 	

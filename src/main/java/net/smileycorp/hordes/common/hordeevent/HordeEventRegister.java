@@ -11,14 +11,14 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.GameData;
 import net.smileycorp.atlas.api.recipe.WeightedOutputs;
 import net.smileycorp.hordes.common.ConfigHandler;
-import net.smileycorp.hordes.common.TheHordes;
+import net.smileycorp.hordes.common.Hordes;
 
 public class HordeEventRegister {
 	
 	protected static Map<Class<? extends EntityLiving>, HordeSpawnEntry> spawnlist = new HashMap<Class<? extends EntityLiving>, HordeSpawnEntry>();
 	
 	public static void readConfig() {
-		TheHordes.logInfo("Trying to read spawn table from config");
+		Hordes.logInfo("Trying to read spawn table from config");
 		try {
 			if (ConfigHandler.hordeSpawnList == null) {
 				throw new Exception("Spawn table has loaded as null");
@@ -45,7 +45,7 @@ public class HordeEventRegister {
 									NBTTagCompound parsed = JsonToNBT.getTagFromJson(nbtstring);
 									if (parsed != null) nbt = parsed;
 								} catch (Exception e) {
-									TheHordes.logError("Error parsing nbt for entity " + name + " " + e.getMessage(), e);
+									Hordes.logError("Error parsing nbt for entity " + name + " " + e.getMessage(), e);
 									//throw new Exception("NBT " + nbt + "is not valid json");
 								}
 							}
@@ -85,16 +85,16 @@ public class HordeEventRegister {
 							entry.setTagCompound(nbt);
 						}
 						spawnlist.put(clazz, entry);
-						TheHordes.logInfo("Loaded entity " + name + " as " + clazz.getName() + " with weight " + weight + ", min day " + minDay + " and max day " + maxDay);
+						Hordes.logInfo("Loaded entity " + name + " as " + clazz.getName() + " with weight " + weight + ", min day " + minDay + " and max day " + maxDay);
 					} else {
 						throw new Exception("Entity " + name + " is not an instance of EntityLiving");
 					}
 				} catch (Exception e) {
-					TheHordes.logError("Error adding entity " + name + " " + e.getCause() + " " + e.getMessage(), e);
+					Hordes.logError("Error adding entity " + name + " " + e.getCause() + " " + e.getMessage(), e);
 				}
 			}
 		} catch (Exception e) {
-			TheHordes.logError("Failed to read config, " + e.getCause() + " " + e.getMessage(), e);
+			Hordes.logError("Failed to read config, " + e.getCause() + " " + e.getMessage(), e);
 		}
 	}
 
@@ -104,7 +104,7 @@ public class HordeEventRegister {
 			HordeSpawnEntry entry = mapentry.getValue();
 			if (entry.getMinDay() <= day && (entry.getMaxDay() == 0 || entry.getMaxDay() >= day)) {
 				spawnmap.put(mapentry.getKey(), entry.getWeight());
-				TheHordes.logInfo("Adding entry " + entry.toString() + " to hordespawn on day " + day);
+				Hordes.logInfo("Adding entry " + entry.toString() + " to hordespawn on day " + day);
 			}
 		}
 		return new WeightedOutputs(spawnmap);

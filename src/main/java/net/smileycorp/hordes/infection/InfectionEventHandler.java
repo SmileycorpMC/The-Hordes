@@ -16,16 +16,18 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
+import net.minecraftforge.event.entity.player.PlayerDropsEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.smileycorp.atlas.api.SimpleStringMessage;
 import net.smileycorp.atlas.api.util.DirectionUtils;
 import net.smileycorp.hordes.common.ConfigHandler;
@@ -38,7 +40,7 @@ public class InfectionEventHandler {
 	
 
 	@SubscribeEvent
-	public void playerJoin(PlayerEvent.PlayerLoggedInEvent event) {
+	public void playerJoin(PlayerLoggedInEvent event) {
 		EntityPlayer player = event.player;
 		if (player != null) {
 			if (player instanceof EntityPlayerMP) {
@@ -123,8 +125,23 @@ public class InfectionEventHandler {
 			}
 		}
 	}
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	public void onDrop(PlayerDropsEvent event) {
+		EntityPlayer player = event.getEntityPlayer();
+		if (player!=null &!(player instanceof FakePlayer)) {
+			if (player.isPotionActive(HordesInfection.INFECTED)) {
+				World world = player.world;
+				if (player instanceof EntityPlayer) {
+					EntityZombiePlayer zombie = new EntityZombiePlayer(player);
+					zombie.setPosition(player.posX, player.posY, player.posZ);
+					zombie.renderYawOffset = player.renderYawOffset;
+					world.spawnEntity(zombie);
+				}
+			}
+		}
+	}
 	
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onDeath(LivingDeathEvent event) {
 		EntityLivingBase entity = event.getEntityLiving();
 		World world = entity.world;
@@ -141,14 +158,7 @@ public class InfectionEventHandler {
 	public void onInfectDeath(InfectionDeathEvent event) {
 		EntityLivingBase entity = event.getEntityLiving();
 		World world = entity.world;
-		if (entity instanceof EntityPlayer) {
-			EntityZombiePlayer zombie = new EntityZombiePlayer((EntityPlayer)entity);
-			zombie.setPosition(entity.posX, entity.posY, entity.posZ);
-			zombie.renderYawOffset = entity.renderYawOffset;
-			world.spawnEntity(zombie);
-			//sendDeathMessage(entity);
-			event.setResult(Result.DENY);
-		} else if (entity instanceof EntityVillager) {
+		if (entity instanceof EntityVillager) {
 			EntityZombieVillager zombie = new EntityZombieVillager(world);
 			zombie.setForgeProfession(((EntityVillager) entity).getProfessionForge());
 			zombie.setPosition(entity.posX, entity.posY, entity.posZ);
