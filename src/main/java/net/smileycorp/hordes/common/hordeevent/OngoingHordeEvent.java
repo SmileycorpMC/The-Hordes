@@ -37,11 +37,16 @@ public class OngoingHordeEvent implements IOngoingEvent {
 
 	private Set<WeakReference<EntityLiving>> entitiesSpawned = new HashSet<WeakReference<EntityLiving>>();
 	private int timer = 0;
+	private int nextDay;
+	private final World world;
 	private final EntityPlayer player;
 	private boolean hasChanged = false;
 	
-	public OngoingHordeEvent(EntityPlayer player) {
+	public OngoingHordeEvent(World world, EntityPlayer player) {
+		this.world=world;
 		this.player=player;
+		WorldDataHordeEvent data = WorldDataHordeEvent.getData(world);
+		this.nextDay = data.getNextDay();
 	}
 
 	@Override
@@ -49,11 +54,15 @@ public class OngoingHordeEvent implements IOngoingEvent {
 		if (nbt.hasKey("timer")) {
 			timer = nbt.getInteger("timer");
 		}
+		if (nbt.hasKey("nextDay")) {
+			nextDay = nbt.getInteger("nextDay");
+		}
 	}
 
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
 		nbt.setInteger("timer", timer);
+		nbt.setInteger("nextDay", nextDay);
 		hasChanged = false;
 		return nbt;
 	}
@@ -61,26 +70,28 @@ public class OngoingHordeEvent implements IOngoingEvent {
 	@Override
 	public void update(World world) {
 		if (!world.isRemote && player!=null) {
-		int day = (int) Math.floor(world.getWorldTime()/24000);
-			if ((timer % ConfigHandler.hordeSpawnInterval) == 0) {
-				int amount = (int)(ConfigHandler.hordeSpawnAmount * (1+(day/ConfigHandler.hordeSpawnDays) * (1-ConfigHandler.hordeSpawnMultiplier)));
-				List<EntityPlayer>players = world.getEntities(EntityPlayer.class, new Predicate<EntityPlayer>(){
-					@Override
-					public boolean apply(EntityPlayer entity) {
-						return entity!=player;
-				}});
-				for (EntityPlayer entity : players) {
-					if (player.getDistance(entity)<=25) {
-						amount = (int) Math.floor(amount * ConfigHandler.hordeMultiplayerScaling);
+			if (player.world.provider.getDimension()==0) {
+				int day = (int) Math.floor(world.getWorldTime()/24000);
+				if ((timer % ConfigHandler.hordeSpawnInterval) == 0) {
+					int amount = (int)(ConfigHandler.hordeSpawnAmount * (1+(day/ConfigHandler.hordeSpawnDays) * (1-ConfigHandler.hordeSpawnMultiplier)));
+					List<EntityPlayer>players = world.getEntities(EntityPlayer.class, new Predicate<EntityPlayer>(){
+						@Override
+						public boolean apply(EntityPlayer entity) {
+							return entity!=player;
+					}});
+					for (EntityPlayer entity : players) {
+						if (player.getDistance(entity)<=25) {
+							amount = (int) Math.floor(amount * ConfigHandler.hordeMultiplayerScaling);
+						}
 					}
+					spawnWave(world, amount);
 				}
-				spawnWave(world, amount);
+				timer--;
+				if (timer == 0) {
+					stopEvent(world, false);
+				}
+				hasChanged = true;
 			}
-			timer--;
-			if (timer == 0) {
-				stopEvent(world, false);
-			}
-			hasChanged = true;
 		}
 	}
 	
@@ -171,6 +182,11 @@ public class OngoingHordeEvent implements IOngoingEvent {
 		}
 		entitiesSpawned.removeAll(toRemove);
 	}
+	
+	public boolean isHordeDay(World world) {
+		if (world.isRemote || player==null) return false;
+		return isActive(world) || Math.floor(world.getWorldTime()/24000)>nextDay;
+	}
 
 	@Override
 	public boolean isActive(World world) {
@@ -185,21 +201,34 @@ public class OngoingHordeEvent implements IOngoingEvent {
 		return player;
 	}
 
-	public void tryStartEvent(int duration) {
+	public void tryStartEvent(int duration, boolean isCommand) {
 		if (player!=null) {
-			int day = (int) Math.floor(player.world.getWorldTime()/24000);
-			HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, HordeEventRegister.getSpawnTable(day), player.getPosition());
-			MinecraftForge.EVENT_BUS.post(buildTableEvent);
-			WeightedOutputs<Class<? extends EntityLiving>> spawntable = buildTableEvent.spawntable;
-			if (!spawntable.isEmpty()) {
-				timer = duration;
-				hasChanged = true;
-				sendMessage(ModDefinitions.hordeEventStart);
-			} else {
-				Hordes.logError("Spawntable is empty, canceling event start.", new NullPointerException());
-			}
-		}
-		Hordes.logError("player is null for " + this.toString(), new NullPointerException());
+			if (player.world.provider.getDimension()==0) {
+				int day = (int) Math.floor(world.getWorldTime()/24000);
+				HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, HordeEventRegister.getSpawnTable(day), player.getPosition());
+				MinecraftForge.EVENT_BUS.post(buildTableEvent);
+				WeightedOutputs<Class<? extends EntityLiving>> spawntable = buildTableEvent.spawntable;
+				if (!spawntable.isEmpty()) {
+					timer = duration;
+					hasChanged = true;
+					sendMessage(ModDefinitions.hordeEventStart);
+					if (!isCommand) {
+						WorldDataHordeEvent data = WorldDataHordeEvent.getData(world);
+						this.nextDay = data.getNextDay();
+					}
+				} else {
+					Hordes.logError("Spawntable is empty, canceling event start.", new NullPointerException());
+				}
+			} 
+		} else Hordes.logError("player is null for " + this.toString(), new NullPointerException());
+	}
+	
+	public void setNextDay(int day) {
+		nextDay=day;
+	}
+	
+	public int getNextDay() {
+		return nextDay;
 	}
 
 	private void sendMessage(String str) {
@@ -208,9 +237,9 @@ public class OngoingHordeEvent implements IOngoingEvent {
 
 	public void stopEvent(World world, boolean isCommand) {
 		timer = 0;
-		hasChanged = true;
 		cleanSpawns();
 		sendMessage(ModDefinitions.hordeEventEnd);
+		hasChanged = true;
 	}
 
 	public void removeEntity(EntityLiving entity) {
@@ -227,7 +256,7 @@ public class OngoingHordeEvent implements IOngoingEvent {
 	@Override
 	public String toString() {
 		return "OngoingHordeEvent@" + Integer.toHexString(hashCode()) + "[player=" + (player == null ? "null" : player.getName()) + ", isActive=" + (timer > 0) + 
-				", ticksLeft=" + timer +", entityCount="+ entitiesSpawned.size()+"]";
+				", ticksLeft=" + timer +", entityCount="+ entitiesSpawned.size()+", nextDay="+nextDay+"]";
 	}
 	
 	public List<String> getEntityStrings() {
@@ -249,5 +278,4 @@ public class OngoingHordeEvent implements IOngoingEvent {
 		}
 		return result;
 	}
-	
 }

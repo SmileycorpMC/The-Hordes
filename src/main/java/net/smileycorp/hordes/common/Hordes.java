@@ -29,6 +29,9 @@ public class Hordes {
 	@CapabilityInject(IHordeSpawn.class)
 	public final static Capability<IHordeSpawn> HORDESPAWN = null;
 	
+	@CapabilityInject(IZombifyPlayer.class)
+	public final static Capability<IZombifyPlayer> ZOMBIFY_PLAYER = null;
+	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event){
 		proxy.preInit(event);

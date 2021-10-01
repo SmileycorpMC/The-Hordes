@@ -32,8 +32,12 @@ public class ConfigHandler {
 	public static int playerInfectChance;
 	public static int ticksForEffectStage;
 	public static boolean playerInfectionVisuals;
+	public static boolean playerInfectSound;
 	public static String[] infectionEntities;
 	public static String[] cureItemList;
+	
+	//misc
+	public static boolean zombieGraves;
 	
 	//load config properties
 	public static void syncConfig() {
@@ -67,13 +71,15 @@ public class ConfigHandler {
 			infectPlayers = config.get("Infection", "infectPlayers", true, "Can players be infected.").getBoolean();
 			playerInfectChance = config.get("Infection", "playerInfectChance", 75, "Chance out of 100 for a player to get infected").getInt();
 			ticksForEffectStage = config.get("Infection", "ticksForEffectStage", 6000, "How long do each of the 4 effect phases last for before the next phase is activated?").getInt();
-			playerInfectionVisuals = config.get("Infection", "playerInfectionVisuals", true, "Tint the player's screen if they are infected.").getBoolean();
+			playerInfectionVisuals = config.get("Infection", "playerInfectionVisuals", true, "Tint the player's screen and display other visual effects if they are infected.").getBoolean();
+			playerInfectSound = config.get("Infection", "playerInfectSound", true, "Play a sound when the player beomes infected.").getBoolean();
 			infectionEntities = config.get("Infection", "infectionEntities",
-					new String[]{"minecraft:zombie"}, 
+					new String[]{"minecraft:zombie", "minecraft:zombie_villager", "minecraft:husk"}, 
 					"Mobs which are based on entities in this list can cause the infection effect.").getStringList();
 			cureItemList = config.get("Infection", "cureItemList",
 					new String[]{"minecraft:golden_apple:*"}, 
 					"A list of items which can cure infection when 'consumed' use '*' to specify any metadata, can accept nbt tags. eg.minecraft:golden_apple:*, minecraft:potion{Potion: \"minecraft:strong_regeneration\"}").getStringList();
+			zombieGraves = config.get("Misc", "zombieGraves", false, "Whether to use zombie players as graves all the time. (Even if infection is disabled)").getBoolean();
 		} catch(Exception e) {
 		} finally {
 	    	if (config.hasChanged()) config.save();

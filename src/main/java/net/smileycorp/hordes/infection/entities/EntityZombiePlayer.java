@@ -1,14 +1,12 @@
 package net.smileycorp.hordes.infection.entities;
 
-import java.util.ArrayList;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.UUID;
 
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
@@ -21,11 +19,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
-import net.minecraftforge.items.IItemHandler;
 
 import com.google.common.base.Optional;
 import com.mojang.authlib.GameProfile;
@@ -34,8 +28,6 @@ import com.mojang.authlib.GameProfile;
 public class EntityZombiePlayer extends EntityZombie {
 	
 	protected static final DataParameter<Optional<UUID>> PLAYER_UUID = EntityDataManager.createKey(EntityZombiePlayer.class, DataSerializers.OPTIONAL_UNIQUE_ID);
-	
-	private static final List<Capability<? extends IItemHandler>> ITEMHANDLER_CAPABILITIES = new ArrayList<Capability<? extends IItemHandler>>();
 	
 	protected NonNullList<ItemStack> playerItems = NonNullList.<ItemStack>create();
 	protected UUID uuid;
@@ -57,24 +49,10 @@ public class EntityZombiePlayer extends EntityZombie {
     }
 	
 	public void setPlayer(EntityPlayer player) {
-		InventoryPlayer inv = player.inventory;
 		for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
-			ItemStack stack = slot.getSlotType() == EntityEquipmentSlot.Type.ARMOR ? inv.armorItemInSlot(slot.getIndex()) :
+			ItemStack stack = slot.getSlotType() == EntityEquipmentSlot.Type.ARMOR ? player.inventory.armorItemInSlot(slot.getIndex()) :
 				slot == EntityEquipmentSlot.MAINHAND ? player.getHeldItemMainhand() : player.getHeldItemOffhand();
 			setItemStackToSlot(slot, stack);
-		}
-		for (NonNullList<ItemStack> subInv : inv.allInventories) {
-			for (ItemStack stack : subInv) playerItems.add(stack.copy());
-			subInv.clear();
-		}
-		if (ITEMHANDLER_CAPABILITIES.isEmpty()) getItemCapabilities(player);
-		for (Capability<?> cap : ITEMHANDLER_CAPABILITIES) {
-			IItemHandler items = (IItemHandler)player.getCapability(cap, null);
-			for (int slot = 0; slot < items.getSlots(); slot++) {
-				ItemStack stack = items.getStackInSlot(slot);
-				playerItems.add(stack);
-				items.extractItem(slot, stack.getCount(), false);
-			}
 		}
 		setPlayer(player.getGameProfile());
 	}
@@ -97,6 +75,15 @@ public class EntityZombiePlayer extends EntityZombie {
 		return dataManager.get(PLAYER_UUID).get();
 	}
 	
+	public void setInventory(List<EntityItem> list) {
+		playerItems.clear();
+		for (EntityItem item : list) {
+			ItemStack stack = item.getItem();
+			item.setDead();
+			if (stack != null) playerItems.add(stack.copy());
+		}
+	}
+	
 	@Override
 	protected void dropEquipment(boolean recentlyHit, int looting) {
 		for (ItemStack stack : playerItems) {
@@ -109,15 +96,6 @@ public class EntityZombiePlayer extends EntityZombie {
 	@Override
 	public boolean shouldBurnInDay() {
 		return false;
-	}
-	
-	private void getItemCapabilities(EntityPlayer player) {
-		Object obj = ReflectionHelper.getPrivateValue(CapabilityManager.class, CapabilityManager.INSTANCE, "providers");
-		if (obj instanceof IdentityHashMap) {
-			for (Capability<?> cap :((IdentityHashMap<String, Capability<?>>)obj).values()) {
-				if (player.getCapability(cap, null) instanceof IItemHandler) ITEMHANDLER_CAPABILITIES.add((Capability<? extends IItemHandler>) cap);
-			}
-		}
 	}
 	
 	@Override

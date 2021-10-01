@@ -74,8 +74,8 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
-	
 }
+
 jar {
 	manifest {
 		attributes 'FMLAT': 'hordes_at.cfg'

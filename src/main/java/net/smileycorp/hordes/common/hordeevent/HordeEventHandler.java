@@ -14,6 +14,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
@@ -25,6 +26,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent;
 import net.smileycorp.atlas.api.entity.ai.EntityAIFindNearestTargetPredicate;
 import net.smileycorp.atlas.api.entity.ai.EntityAIGoToEntityPos;
@@ -47,19 +49,34 @@ public class HordeEventHandler {
 				int day = (int) Math.floor(world.getWorldTime()/24000);
 				int time = Math.round(world.getWorldTime()%24000);
 				WorldDataHordeEvent data = WorldDataHordeEvent.getData(world);
-				if (day == data.getNextDay() + 1) {
+				if (((time >= ConfigHandler.hordeStartTime && day == data.getNextDay()) || day > data.getNextDay()) && (!ConfigHandler.spawnFirstDay)) {
 					data.setNextDay(world.rand.nextInt(ConfigHandler.hordeSpawnVariation + 1) + ConfigHandler.hordeSpawnDays + data.getNextDay());
-				}
-				if (time >= ConfigHandler.hordeStartTime && day == data.getNextDay() && (day!=0 || ConfigHandler.spawnFirstDay)) {
-					for (OngoingHordeEvent hordeEvent: data.getEvents()) {
-						if (!hordeEvent.isActive(world)) {
-							hordeEvent.tryStartEvent(ConfigHandler.hordeSpawnDuration);
-						}
-					}
 				}
 				for (OngoingHordeEvent hordeEvent : data.getEvents()) {
 					if (hordeEvent.isActive(world)) {
 						hordeEvent.update(world);
+					}
+				}
+				data.save();
+			}
+		}
+	}
+	
+	@SubscribeEvent
+	public void playerTick(PlayerTickEvent event) {
+		EntityPlayer player = event.player;
+		if (event.phase == Phase.END && player != null && !(player instanceof FakePlayer)) {
+			World world = player.world;
+			if (!world.isRemote && (world.getGameRules().getBoolean("doDaylightCycle") |! ConfigHandler.pauseEventServer)) {
+				int day = (int) Math.floor(world.getWorldTime()/24000);
+				int time = Math.round(world.getWorldTime()%24000);
+				WorldDataHordeEvent data = WorldDataHordeEvent.getData(world);
+				OngoingHordeEvent hordeEvent = data.getEventForPlayer(player);
+				if (hordeEvent != null && !hordeEvent.isActive(world)) {
+					if (((time >= ConfigHandler.hordeStartTime && day == hordeEvent.getNextDay()) || day > hordeEvent.getNextDay()) && (day!=0 || ConfigHandler.spawnFirstDay)) {
+						if (!hordeEvent.isActive(world)) {
+							hordeEvent.tryStartEvent(ConfigHandler.hordeSpawnDuration, false);
+						}
 					}
 				}
 				data.save();
@@ -169,9 +186,12 @@ public class HordeEventHandler {
 		if (!ConfigHandler.canSleepDuringHorde && state.getBlock() instanceof BlockBed) {
 			if (!world.isRemote) {
 				WorldDataHordeEvent data = WorldDataHordeEvent.getData(world);
-				if (data.getNextDay() == Math.floor(world.getWorldTime()/24000)) {
-					event.setCanceled(true);
-					player.sendMessage(new TextComponentTranslation(ModDefinitions.hordeTrySleep));
+				OngoingHordeEvent horde = data.getEventForPlayer(player);
+				if (horde!=null) {
+					if (horde.isHordeDay(world)) {
+						event.setCanceled(true);
+						player.sendMessage(new TextComponentTranslation(ModDefinitions.hordeTrySleep));
+					}
 				}
 				data.save();
 			}

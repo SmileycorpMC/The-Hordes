@@ -40,7 +40,7 @@ public class CommandStartHordeEvent extends CommandBase {
 				WorldDataHordeEvent data = WorldDataHordeEvent.getData(world);
 				for (OngoingHordeEvent event : data.getEvents()) {
 					if (!event.isActive(world)) {
-						event.tryStartEvent(duration);
+						event.tryStartEvent(duration, true);
 					}
 				}
 				data.save();

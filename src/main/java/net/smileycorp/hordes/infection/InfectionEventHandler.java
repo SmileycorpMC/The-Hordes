@@ -16,12 +16,10 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
-import net.minecraftforge.event.entity.player.PlayerDropsEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
@@ -33,12 +31,11 @@ import net.smileycorp.atlas.api.util.DirectionUtils;
 import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.ModDefinitions;
 import net.smileycorp.hordes.common.event.InfectionDeathEvent;
-import net.smileycorp.hordes.infection.entities.EntityZombiePlayer;
+import net.smileycorp.hordes.infection.InfectionPacketHandler.InfectMessage;
 
 @EventBusSubscriber(modid=ModDefinitions.modid)
 public class InfectionEventHandler {
 	
-
 	@SubscribeEvent
 	public void playerJoin(PlayerLoggedInEvent event) {
 		EntityPlayer player = event.player;
@@ -112,30 +109,18 @@ public class InfectionEventHandler {
 		World world = entity.world;
 		Random rand = world.rand;
 		if (!world.isRemote && InfectionRegister.canCauseInfection(attacker)) {
-			if ((entity instanceof EntityPlayer && ConfigHandler.infectPlayers)) {
-				int c = rand.nextInt(100);
-				if (c <= ConfigHandler.playerInfectChance) {
-					entity.addPotionEffect(new PotionEffect(HordesInfection.INFECTED, 10000, 0));
-				}
-			} else if ((entity instanceof EntityVillager && ConfigHandler.infectVillagers)) {
-				int c = rand.nextInt(100);
-				if (c <= ConfigHandler.villagerInfectChance) {
-					entity.addPotionEffect(new PotionEffect(HordesInfection.INFECTED, 10000, 0));
-				}
-			}
-		}
-	}
-	@SubscribeEvent(priority = EventPriority.HIGHEST)
-	public void onDrop(PlayerDropsEvent event) {
-		EntityPlayer player = event.getEntityPlayer();
-		if (player!=null &!(player instanceof FakePlayer)) {
-			if (player.isPotionActive(HordesInfection.INFECTED)) {
-				World world = player.world;
-				if (player instanceof EntityPlayer) {
-					EntityZombiePlayer zombie = new EntityZombiePlayer(player);
-					zombie.setPosition(player.posX, player.posY, player.posZ);
-					zombie.renderYawOffset = player.renderYawOffset;
-					world.spawnEntity(zombie);
+			if (!entity.isPotionActive(HordesInfection.INFECTED)) {
+				if ((entity instanceof EntityPlayer && ConfigHandler.infectPlayers)) {
+					int c = rand.nextInt(100);
+					if (c <= ConfigHandler.playerInfectChance) {
+						entity.addPotionEffect(new PotionEffect(HordesInfection.INFECTED, 10000, 0));
+						InfectionPacketHandler.NETWORK_INSTANCE.sendTo(new InfectMessage(), (EntityPlayerMP) entity);
+					}
+				} else if ((entity instanceof EntityVillager && ConfigHandler.infectVillagers)) {
+					int c = rand.nextInt(100);
+					if (c <= ConfigHandler.villagerInfectChance) {
+						entity.addPotionEffect(new PotionEffect(HordesInfection.INFECTED, 10000, 0));
+					}
 				}
 			}
 		}
