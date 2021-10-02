@@ -18,13 +18,15 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent;
@@ -138,7 +140,7 @@ public class HordeEventHandler {
 	}
 	
 	@SubscribeEvent
-	public void playerJoin(PlayerEvent.PlayerLoggedInEvent event) {
+	public void playerJoin(PlayerLoggedInEvent event) {
 		MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
 		EntityPlayer player = event.player;
 		World world = player.world;
@@ -159,7 +161,7 @@ public class HordeEventHandler {
 	}
 	
 	@SubscribeEvent
-	public void playerLeave(PlayerEvent.PlayerLoggedOutEvent event) {
+	public void playerLeave(PlayerLoggedOutEvent event) {
 		if (ConfigHandler.pauseEventServer) {
 			MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
 			if (server.getPlayerList().getPlayers().isEmpty()) {
@@ -193,6 +195,21 @@ public class HordeEventHandler {
 						player.sendMessage(new TextComponentTranslation(ModDefinitions.hordeTrySleep));
 					}
 				}
+				data.save();
+			}
+		}
+	}
+	
+	@SubscribeEvent(receiveCanceled = true)
+	public void playerClone(PlayerEvent.Clone event) {
+		EntityPlayer player = event.getEntityPlayer();
+		EntityPlayer original = event.getOriginal();
+		World world = player.world;
+		if (player != null && original != null &!(player instanceof FakePlayer || original instanceof FakePlayer)) {
+			WorldDataHordeEvent data = WorldDataHordeEvent.getData(world);
+			OngoingHordeEvent horde = data.getEventForPlayer(player);
+			if (horde.getPlayer() != player) {
+				horde.setPlayer(player);
 				data.save();
 			}
 		}

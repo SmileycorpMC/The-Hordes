@@ -8,10 +8,10 @@ import java.util.Set;
 
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
+import net.minecraft.entity.ai.EntityAITasks.EntityAITaskEntry;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -31,15 +31,13 @@ import net.smileycorp.hordes.common.ModDefinitions;
 import net.smileycorp.hordes.common.event.HordeBuildSpawntableEvent;
 import net.smileycorp.hordes.common.event.HordeSpawnEntityEvent;
 
-import com.google.common.base.Predicate;
-
 public class OngoingHordeEvent implements IOngoingEvent {
 
 	private Set<WeakReference<EntityLiving>> entitiesSpawned = new HashSet<WeakReference<EntityLiving>>();
 	private int timer = 0;
 	private int nextDay;
 	private final World world;
-	private final EntityPlayer player;
+	private EntityPlayer player;
 	private boolean hasChanged = false;
 	
 	public OngoingHordeEvent(World world, EntityPlayer player) {
@@ -74,11 +72,7 @@ public class OngoingHordeEvent implements IOngoingEvent {
 				int day = (int) Math.floor(world.getWorldTime()/24000);
 				if ((timer % ConfigHandler.hordeSpawnInterval) == 0) {
 					int amount = (int)(ConfigHandler.hordeSpawnAmount * (1+(day/ConfigHandler.hordeSpawnDays) * (1-ConfigHandler.hordeSpawnMultiplier)));
-					List<EntityPlayer>players = world.getEntities(EntityPlayer.class, new Predicate<EntityPlayer>(){
-						@Override
-						public boolean apply(EntityPlayer entity) {
-							return entity!=player;
-					}});
+					List<EntityPlayer>players = world.getEntities(EntityPlayer.class, (p) -> p != player);
 					for (EntityPlayer entity : players) {
 						if (player.getDistance(entity)<=25) {
 							amount = (int) Math.floor(amount * ConfigHandler.hordeMultiplayerScaling);
@@ -149,11 +143,7 @@ public class OngoingHordeEvent implements IOngoingEvent {
 						entity.targetTasks.addTask(1, new EntityAIHurtByTarget((EntityCreature) entity, true));
 						entity.targetTasks.addTask(2, new EntityAINearestAttackableTarget((EntityCreature) entity, EntityPlayer.class, false));
 					} else {
-						entity.targetTasks.addTask(1, new EntityAIFindNearestTargetPredicate(entity, new Predicate<EntityLivingBase>(){
-							@Override
-							public boolean apply(EntityLivingBase entity) {
-								return entity instanceof EntityPlayer;
-							}}));
+						entity.targetTasks.addTask(1, new EntityAIFindNearestTargetPredicate(entity, (e) -> e instanceof EntityPlayer));
 					}
 					entity.tasks.addTask(6, new EntityAIGoToEntityPos(entity, player));
 				}
@@ -199,6 +189,29 @@ public class OngoingHordeEvent implements IOngoingEvent {
 	
 	public EntityPlayer getPlayer() {
 		return player;
+	}
+	
+	public void setPlayer(EntityPlayer player) {
+		this.player=player;
+		Set<WeakReference<EntityLiving>> toRemove = new HashSet<WeakReference<EntityLiving>>();
+		for (WeakReference<EntityLiving> ref : entitiesSpawned) {
+			EntityLiving entity = ref.get();
+			if (entity!=null) {
+				EntityAIGoToEntityPos task = null;
+				for (EntityAITaskEntry entry : entity.tasks.taskEntries) {
+					if (entry.action instanceof EntityAIGoToEntityPos) {
+						task = (EntityAIGoToEntityPos) entry.action;
+						break;
+					}
+				}
+				if (task!=null) {
+					entity.tasks.removeTask(task);
+					entity.tasks.addTask(6, new EntityAIGoToEntityPos(entity, player));
+				}
+			} else toRemove.add(ref);
+		}
+		entitiesSpawned.removeAll(toRemove);
+		hasChanged = true;
 	}
 
 	public void tryStartEvent(int duration, boolean isCommand) {

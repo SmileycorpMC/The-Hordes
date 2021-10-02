@@ -160,9 +160,8 @@ public class WorldDataHordeEvent extends WorldSavedData {
 		WorldDataHordeEvent data = new WorldDataHordeEvent();
 		int day = Math.round(world.getWorldTime()/24000);
 		int multiplier = (int) Math.ceil(day / ConfigHandler.hordeSpawnDays);
-		data.setNextDay(day * multiplier);
+		data.setNextDay((day * multiplier) + world.rand.nextInt(ConfigHandler.hordeSpawnVariation + 1));
 		data.world = world;
-		data.setNextDay(world.rand.nextInt(ConfigHandler.hordeSpawnVariation + 1) + ConfigHandler.hordeSpawnDays);
 		world.getMapStorage().setData(DATA, data);
 		data.getEvents();
 		data.save();
