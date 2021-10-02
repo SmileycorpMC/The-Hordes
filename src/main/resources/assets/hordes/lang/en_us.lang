@@ -25,3 +25,4 @@ effect.hordes.Infected=Infected
 death.attack.infection=%1$s succumbed to their infection.
 text.hordes.DeathMessage=%1$s succumbed to their infection.
 text.hordes.DeathMessageFighting=%1$s succumbed to their infection while fighting %2$s.
+text.hordes.DeathMessageOther=%1$s while infected.

@@ -11,6 +11,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.RayTraceResult;
@@ -26,8 +27,6 @@ import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
-import net.smileycorp.atlas.api.SimpleStringMessage;
-import net.smileycorp.atlas.api.util.DirectionUtils;
 import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.ModDefinitions;
 import net.smileycorp.hordes.common.event.InfectionDeathEvent;
@@ -126,16 +125,15 @@ public class InfectionEventHandler {
 		}
 	}
 	
-	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	@SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled=true)
 	public void onDeath(LivingDeathEvent event) {
 		EntityLivingBase entity = event.getEntityLiving();
+		DamageSource source = event.getSource();
 		World world = entity.world;
-		if (!world.isRemote && (event.getSource() == HordesInfection.INFECTION_DAMAGE || entity.isPotionActive(HordesInfection.INFECTED))) {
+		if (!world.isRemote && (source == HordesInfection.INFECTION_DAMAGE || entity.isPotionActive(HordesInfection.INFECTED))) {
 			InfectionDeathEvent newevent = new InfectionDeathEvent(entity, event.getSource());
 			MinecraftForge.EVENT_BUS.post(newevent);
-			if (newevent.getResult() == Result.DENY) {
-				event.setCanceled(true);
-			}
+			if (newevent.getResult() == Result.DENY) event.setCanceled(true);
 		}	
 	}
 	
@@ -153,7 +151,6 @@ public class InfectionEventHandler {
 			zombie.renderYawOffset = entity.renderYawOffset;
 			if (entity.hasCustomName()) {
 				zombie.setCustomNameTag(entity.getCustomNameTag());
-				//sendDeathMessage(entity);
 			}
 			world.spawnEntity(zombie);
 			entity.setDead();
@@ -173,7 +170,6 @@ public class InfectionEventHandler {
 					entity.addPotionEffect(new PotionEffect(HordesInfection.INFECTED, 10000, a+1));
 				} else {
 					entity.attackEntityFrom(HordesInfection.INFECTION_DAMAGE, Float.MAX_VALUE);
-					entity.removePotionEffect(HordesInfection.INFECTED);
 				}
 			}
 		}

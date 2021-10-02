@@ -35,6 +35,7 @@ public class OngoingHordeEvent implements IOngoingEvent {
 
 	private Set<WeakReference<EntityLiving>> entitiesSpawned = new HashSet<WeakReference<EntityLiving>>();
 	private int timer = 0;
+	private int day;
 	private int nextDay;
 	private final World world;
 	private EntityPlayer player;
@@ -44,7 +45,7 @@ public class OngoingHordeEvent implements IOngoingEvent {
 		this.world=world;
 		this.player=player;
 		WorldDataHordeEvent data = WorldDataHordeEvent.getData(world);
-		this.nextDay = data.getNextDay();
+		day = nextDay = data.getNextDay();
 	}
 
 	@Override
@@ -55,12 +56,16 @@ public class OngoingHordeEvent implements IOngoingEvent {
 		if (nbt.hasKey("nextDay")) {
 			nextDay = nbt.getInteger("nextDay");
 		}
+		if (nbt.hasKey("day")) {
+			nextDay = nbt.getInteger("day");
+		}
 	}
 
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
 		nbt.setInteger("timer", timer);
 		nbt.setInteger("nextDay", nextDay);
+		nbt.setInteger("day", day);
 		hasChanged = false;
 		return nbt;
 	}
@@ -69,7 +74,6 @@ public class OngoingHordeEvent implements IOngoingEvent {
 	public void update(World world) {
 		if (!world.isRemote && player!=null) {
 			if (player.world.provider.getDimension()==0) {
-				int day = (int) Math.floor(world.getWorldTime()/24000);
 				if ((timer % ConfigHandler.hordeSpawnInterval) == 0) {
 					int amount = (int)(ConfigHandler.hordeSpawnAmount * (1+(day/ConfigHandler.hordeSpawnDays) * (1-ConfigHandler.hordeSpawnMultiplier)));
 					List<EntityPlayer>players = world.getEntities(EntityPlayer.class, (p) -> p != player);
@@ -91,7 +95,6 @@ public class OngoingHordeEvent implements IOngoingEvent {
 	
 	public void spawnWave(World world, int count) {
 		cleanSpawns();
-		int day = (int) Math.floor(world.getWorldTime()/24000);
 		Vec3d basedir = DirectionUtils.getRandomDirectionVecXZ(world.rand);
 		BlockPos basepos = DirectionUtils.getClosestLoadedPos(world, player.getPosition(), basedir, 75, 7, 0);
 		int i = 0;
@@ -217,7 +220,7 @@ public class OngoingHordeEvent implements IOngoingEvent {
 	public void tryStartEvent(int duration, boolean isCommand) {
 		if (player!=null) {
 			if (player.world.provider.getDimension()==0) {
-				int day = (int) Math.floor(world.getWorldTime()/24000);
+				day = nextDay;
 				HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, HordeEventRegister.getSpawnTable(day), player.getPosition());
 				MinecraftForge.EVENT_BUS.post(buildTableEvent);
 				WeightedOutputs<Class<? extends EntityLiving>> spawntable = buildTableEvent.spawntable;
@@ -227,13 +230,13 @@ public class OngoingHordeEvent implements IOngoingEvent {
 					sendMessage(ModDefinitions.hordeEventStart);
 					if (!isCommand) {
 						WorldDataHordeEvent data = WorldDataHordeEvent.getData(world);
-						this.nextDay = data.getNextDay();
+						nextDay = data.getNextDay();
 					}
 				} else {
 					Hordes.logError("Spawntable is empty, canceling event start.", new NullPointerException());
 				}
 			} 
-		} else Hordes.logError("player is null for " + this.toString(), new NullPointerException());
+		} else Hordes.logError("player is null for " + toString(), new NullPointerException());
 	}
 	
 	public void setNextDay(int day) {
