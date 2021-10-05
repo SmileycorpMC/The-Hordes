@@ -27,6 +27,8 @@ import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
+import net.smileycorp.atlas.api.SimpleStringMessage;
+import net.smileycorp.atlas.api.util.DirectionUtils;
 import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.ModDefinitions;
 import net.smileycorp.hordes.common.event.InfectionDeathEvent;
@@ -51,7 +53,7 @@ public class InfectionEventHandler {
 		ItemStack stack = event.getItem();
 		if (entity.isPotionActive(HordesInfection.INFECTED)) {
 			if (InfectionRegister.isCure(stack)) {
-				entity.removeActivePotionEffect(HordesInfection.INFECTED);
+				entity.removePotionEffect(HordesInfection.INFECTED);
 			}
 		}
 	}
@@ -64,7 +66,7 @@ public class InfectionEventHandler {
 			EntityLivingBase entity = (EntityLivingBase) event.getTarget();
 			if (entity.isPotionActive(HordesInfection.INFECTED)) {
 				if (InfectionRegister.isCure(stack)) {
-					entity.removeActivePotionEffect(HordesInfection.INFECTED);
+					entity.removePotionEffect(HordesInfection.INFECTED);
 					if (!player.capabilities.isCreativeMode) {
 						ItemStack container = stack.getItem().getContainerItem(stack);
 						if (stack.isItemStackDamageable()) {
@@ -92,7 +94,7 @@ public class InfectionEventHandler {
 				EntityLivingBase entity = (EntityLivingBase) ray.entityHit;
 				if (entity.isPotionActive(HordesInfection.INFECTED)) {
 					if (InfectionRegister.isCure(stack)) {
-						entity.removeActivePotionEffect(HordesInfection.INFECTED);
+						entity.removePotionEffect(HordesInfection.INFECTED);
 						event.setCanceled(true);
 						event.setCancellationResult(EnumActionResult.FAIL);
 					}

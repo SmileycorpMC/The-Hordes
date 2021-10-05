@@ -61,7 +61,10 @@ dependencies {
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2855'
-
+	
+	compile files('libs/Atlas-Lib-1.12.2-1.1.4.jar')
+	compile files('libs/jei_1.12.2-4.15.0.268.jar')
+	
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"
     // compile "some.group:artifact:version"

@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.layers.LayerBipedArmor;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.util.ResourceLocation;
-import net.smileycorp.hordes.infection.entities.EntityZombiePlayer;
+import net.smileycorp.hordes.common.entities.EntityZombiePlayer;
 
 import com.mojang.authlib.GameProfile;
 

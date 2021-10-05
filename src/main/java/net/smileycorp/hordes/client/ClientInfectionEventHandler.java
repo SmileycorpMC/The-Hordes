@@ -27,6 +27,9 @@ public class ClientInfectionEventHandler {
 				if (player.getActivePotionEffect(HordesInfection.INFECTED).getAmplifier()>2) {
 					GlStateManager.colorLogicOp(GlStateManager.LogicOp.SET);
 					GlStateManager.color(1, 0, 0);
+				} else if (player.getActivePotionEffect(HordesInfection.INFECTED).getAmplifier() == 2) {
+					GlStateManager.colorLogicOp(GlStateManager.LogicOp.EQUIV);
+					GlStateManager.color(1, 0.4f, 0.4f);
 				}
 			}
 		}
@@ -38,7 +41,7 @@ public class ClientInfectionEventHandler {
 			Minecraft mc = Minecraft.getMinecraft();
 			EntityPlayer player = mc.player;
 			if (player.isPotionActive(HordesInfection.INFECTED) && event.getEntity() != player) {
-				if (player.getActivePotionEffect(HordesInfection.INFECTED).getAmplifier()>2) {
+				if (player.getActivePotionEffect(HordesInfection.INFECTED).getAmplifier() >= 2) {
 					GlStateManager.color(1, 1, 1);
 					GlStateManager.colorLogicOp(GlStateManager.LogicOp.AND);
 				}

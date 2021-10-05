@@ -5,7 +5,7 @@ import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
-import net.smileycorp.hordes.infection.entities.EntityZombiePlayer;
+import net.smileycorp.hordes.common.entities.EntityZombiePlayer;
 
 public class ModelZombiePlayer extends ModelPlayer {
 	

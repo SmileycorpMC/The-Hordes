@@ -55,7 +55,7 @@ public class ClientHandler {
 			Minecraft mc = Minecraft.getMinecraft();
 			World world = mc.world;
 			EntityPlayer player = mc.player;
-			world.playSound(player, player.getPosition(), SoundEvents.ENTITY_ZOMBIE_VILLAGER_CONVERTED, SoundCategory.HOSTILE, 0.5f, world.rand.nextFloat());
+			world.playSound(player, player.getPosition(), SoundEvents.ENTITY_ZOMBIE_VILLAGER_CONVERTED, SoundCategory.HOSTILE, 0.75f, world.rand.nextFloat());
 		}
 	}
 

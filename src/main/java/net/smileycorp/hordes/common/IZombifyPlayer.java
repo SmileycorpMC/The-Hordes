@@ -6,7 +6,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.Capability.IStorage;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.smileycorp.hordes.infection.entities.EntityZombiePlayer;
+import net.smileycorp.hordes.common.entities.EntityZombiePlayer;
 
 public interface IZombifyPlayer {
 

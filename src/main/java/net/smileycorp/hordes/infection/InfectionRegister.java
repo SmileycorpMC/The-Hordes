@@ -10,6 +10,7 @@ import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
@@ -17,6 +18,7 @@ import net.minecraftforge.oredict.OreDictionary;
 import net.smileycorp.atlas.api.util.RecipeUtils;
 import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.infection.jei.JEIPluginInfection;
 
 public class InfectionRegister {
 	
@@ -35,7 +37,7 @@ public class InfectionRegister {
 			if (ConfigHandler.infectionEntities == null) {
 				throw new Exception("Infection entity list has loaded as null");
 			}
-			else if (ConfigHandler.cureItemList.length<=0) {
+			else if (ConfigHandler.infectionEntities.length <= 0) {
 				throw new Exception("Infection entity list in config is empty");
 			}
 			for (String name : ConfigHandler.infectionEntities) {
@@ -79,6 +81,7 @@ public class InfectionRegister {
 		} catch (Exception e) {
 			Hordes.logError("Failed to read data from server, " + e.getCause() + " " + e.getMessage(), e);
 		}
+		if (Loader.isModLoaded("jei")) JEIPluginInfection.setRecipes(curesClient);
 	}
 	
 	public static String getCurePacketData() {
@@ -135,7 +138,7 @@ public class InfectionRegister {
 	
 	static List<ItemStack> getCureList() {
 		List<ItemStack> result = new ArrayList<ItemStack>();
-		for (ItemStack stack : cures) {
+		for (ItemStack stack : FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT ? curesClient : cures) {
 			result.add(new ItemStack(stack.getItem(), stack.getMetadata()));
 		}
 		return result;

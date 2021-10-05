@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.infection.entities;
+package net.smileycorp.hordes.common.entities;
 
 import java.util.List;
 import java.util.UUID;

@@ -13,8 +13,8 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerDropsEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.smileycorp.hordes.common.entities.EntityZombiePlayer;
 import net.smileycorp.hordes.infection.HordesInfection;
-import net.smileycorp.hordes.infection.entities.EntityZombiePlayer;
 
 public class MiscEventHandler {
 	
