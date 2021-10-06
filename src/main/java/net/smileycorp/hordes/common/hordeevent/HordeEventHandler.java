@@ -2,8 +2,6 @@ package net.smileycorp.hordes.common.hordeevent;
 
 import java.util.UUID;
 
-import net.minecraft.block.BlockBed;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
@@ -11,25 +9,32 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayer.SleepResult;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldProvider.WorldSleepResult;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent;
 import net.smileycorp.atlas.api.entity.ai.EntityAIFindNearestTargetPredicate;
 import net.smileycorp.atlas.api.entity.ai.EntityAIGoToEntityPos;
 import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.hordes.common.ConfigHandler;
+import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.ModDefinitions;
 
 import com.google.common.base.Predicate;
@@ -43,18 +48,11 @@ public class HordeEventHandler {
 		if (event.phase == Phase.END) {
 			World world = event.world;
 			if (!world.isRemote && (world.getGameRules().getBoolean("doDaylightCycle") |! ConfigHandler.pauseEventServer)) {
-				int day = (int) Math.floor(world.getWorldTime()/24000);
-				int time = Math.round(world.getWorldTime()%24000);
+				int day = (int) Math.floor(world.getWorldTime()/ConfigHandler.dayLength);
+				int time = Math.round(world.getWorldTime()%ConfigHandler.dayLength);
 				WorldDataHordeEvent data = WorldDataHordeEvent.getData(world);
-				if (day == data.getNextDay() + 1) {
+				if (((time >= ConfigHandler.hordeStartTime && day == data.getNextDay()) || day > data.getNextDay())) {
 					data.setNextDay(world.rand.nextInt(ConfigHandler.hordeSpawnVariation + 1) + ConfigHandler.hordeSpawnDays + data.getNextDay());
-				}
-				if (time >= ConfigHandler.hordeStartTime && day == data.getNextDay() && (day!=0 || ConfigHandler.spawnFirstDay)) {
-					for (OngoingHordeEvent hordeEvent: data.getEvents()) {
-						if (!hordeEvent.isActive(world)) {
-							hordeEvent.tryStartEvent(ConfigHandler.hordeSpawnDuration);
-						}
-					}
 				}
 				for (OngoingHordeEvent hordeEvent : data.getEvents()) {
 					if (hordeEvent.isActive(world)) {
@@ -67,11 +65,33 @@ public class HordeEventHandler {
 	}
 	
 	@SubscribeEvent
+	public void playerTick(PlayerTickEvent event) {
+		EntityPlayer player = event.player;
+		if (event.phase == Phase.END && player != null && !(player instanceof FakePlayer)) {
+			World world = player.world;
+			if (!world.isRemote && (world.getGameRules().getBoolean("doDaylightCycle") |! ConfigHandler.pauseEventServer)) {
+				int day = (int) Math.floor(world.getWorldTime() / ConfigHandler.dayLength);
+				int time = Math.round(world.getWorldTime() % ConfigHandler.dayLength);
+				WorldDataHordeEvent data = WorldDataHordeEvent.getData(world);
+				OngoingHordeEvent hordeEvent = data.getEventForPlayer(player);
+				if (hordeEvent != null && !hordeEvent.isActive(world)) {
+					if (time >= ConfigHandler.hordeStartTime && day >= hordeEvent.getNextDay() && (day!=0 || ConfigHandler.spawnFirstDay)) {
+						if (!hordeEvent.isActive(world)) {
+							hordeEvent.tryStartEvent(ConfigHandler.hordeSpawnDuration, false);
+						}
+					}
+				}
+				data.save();
+			}
+		}
+	}
+	
+	@SubscribeEvent
 	public void tryDespawn(LivingSpawnEvent.AllowDespawn event) {
 		World world = event.getWorld();
 		EntityLivingBase entity = event.getEntityLiving();
-		if (entity.hasCapability(HordeSpawnProvider.HORDESPAWN, null)) {
-			IHordeSpawn cap = entity.getCapability(HordeSpawnProvider.HORDESPAWN, null);
+		if (entity.hasCapability(Hordes.HORDESPAWN, null)) {
+			IHordeSpawn cap = entity.getCapability(Hordes.HORDESPAWN, null);
 			if (cap.isHordeSpawned()) {
 				String uuid = cap.getPlayerUUID();
 				if (DataUtils.isValidUUID(uuid)) {
@@ -91,8 +111,8 @@ public class HordeEventHandler {
 		World world = event.getWorld();
 		if (!world.isRemote && event.getEntity() instanceof EntityLiving) {
 			EntityLiving entity = (EntityLiving) event.getEntity();
-			if (entity.hasCapability(HordeSpawnProvider.HORDESPAWN, null)) {
-				IHordeSpawn cap = entity.getCapability(HordeSpawnProvider.HORDESPAWN, null);
+			if (entity.hasCapability(Hordes.HORDESPAWN, null)) {
+				IHordeSpawn cap = entity.getCapability(Hordes.HORDESPAWN, null);
 				if (cap.isHordeSpawned() && DataUtils.isValidUUID(cap.getPlayerUUID())) {
 					entity.targetTasks.taskEntries.clear();
 					if (entity instanceof EntityCreature) {
@@ -120,7 +140,7 @@ public class HordeEventHandler {
 	}
 	
 	@SubscribeEvent
-	public void playerJoin(PlayerEvent.PlayerLoggedInEvent event) {
+	public void playerJoin(PlayerLoggedInEvent event) {
 		MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
 		EntityPlayer player = event.player;
 		World world = player.world;
@@ -141,7 +161,7 @@ public class HordeEventHandler {
 	}
 	
 	@SubscribeEvent
-	public void playerLeave(PlayerEvent.PlayerLoggedOutEvent event) {
+	public void playerLeave(PlayerLoggedOutEvent event) {
 		if (ConfigHandler.pauseEventServer) {
 			MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
 			if (server.getPlayerList().getPlayers().isEmpty()) {
@@ -155,23 +175,41 @@ public class HordeEventHandler {
 	@SubscribeEvent
 	public void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
 		Entity entity = event.getObject();
-		if (!entity.hasCapability(HordeSpawnProvider.HORDESPAWN, null) && entity instanceof EntityLiving && !(entity instanceof EntityPlayer)) {
-			event.addCapability(ModDefinitions.getResource("HordeSpawn"), new HordeSpawnProvider());
+		if (!entity.hasCapability(Hordes.HORDESPAWN, null) && entity instanceof EntityLiving && !(entity instanceof EntityPlayer)) {
+			event.addCapability(ModDefinitions.getResource("HordeSpawn"), new IHordeSpawn.Provider());
 		}
 	}
 	
 	@SubscribeEvent
-	public static void useBlock(PlayerInteractEvent.RightClickBlock event) {
+	public void trySleep(PlayerSleepInBedEvent event) {
 		EntityPlayer player = event.getEntityPlayer();
-		World world = event.getWorld();
-		IBlockState state = world.getBlockState(event.getPos());
-		if (!ConfigHandler.canSleepDuringHorde && state.getBlock() instanceof BlockBed) {
+		World world = player.world;
+		if (!ConfigHandler.canSleepDuringHorde) {
 			if (!world.isRemote) {
 				WorldDataHordeEvent data = WorldDataHordeEvent.getData(world);
-				if (data.getNextDay() == Math.floor(world.getWorldTime()/24000)) {
-					event.setCanceled(true);
-					player.sendMessage(new TextComponentTranslation(ModDefinitions.hordeTrySleep));
+				OngoingHordeEvent horde = data.getEventForPlayer(player);
+				if (horde!=null) {
+					if ((horde.isHordeDay(world) && world.provider.canSleepAt(player, event.getPos()) == WorldSleepResult.ALLOW &! world.isDaytime())
+							|| horde.isActive(world)) {
+						event.setResult(SleepResult.OTHER_PROBLEM);
+						player.sendMessage(new TextComponentTranslation(ModDefinitions.hordeTrySleep));
+					}
 				}
+				data.save();
+			}
+		}
+	}
+	
+	@SubscribeEvent(receiveCanceled = true)
+	public void playerClone(PlayerEvent.Clone event) {
+		EntityPlayer player = event.getEntityPlayer();
+		EntityPlayer original = event.getOriginal();
+		World world = player.world;
+		if (player != null && original != null &!(player instanceof FakePlayer || original instanceof FakePlayer)) {
+			WorldDataHordeEvent data = WorldDataHordeEvent.getData(world);
+			OngoingHordeEvent horde = data.getEventForPlayer(player);
+			if (horde.getPlayer() != player) {
+				horde.setPlayer(player);
 				data.save();
 			}
 		}

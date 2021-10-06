@@ -1,11 +1,12 @@
-package net.smileycorp.hordes.infection.entities;
+package net.smileycorp.hordes.common.entities;
 
+import java.util.List;
 import java.util.UUID;
 
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
@@ -48,20 +49,10 @@ public class EntityZombiePlayer extends EntityZombie {
     }
 	
 	public void setPlayer(EntityPlayer player) {
-		InventoryPlayer inv  = player.inventory;
 		for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
-			ItemStack stack = slot.getSlotType() == EntityEquipmentSlot.Type.ARMOR ? inv.armorItemInSlot(slot.getIndex()) :
+			ItemStack stack = slot.getSlotType() == EntityEquipmentSlot.Type.ARMOR ? player.inventory.armorItemInSlot(slot.getIndex()) :
 				slot == EntityEquipmentSlot.MAINHAND ? player.getHeldItemMainhand() : player.getHeldItemOffhand();
 			setItemStackToSlot(slot, stack);
-		}
-		for (ItemStack stack : inv.mainInventory) {
-			playerItems.add(stack.copy());
-		}
-		for (ItemStack stack : inv.armorInventory) {
-			playerItems.add(stack.copy());
-		}
-		for (ItemStack stack : inv.offHandInventory) {
-			playerItems.add(stack.copy());
 		}
 		setPlayer(player.getGameProfile());
 	}
@@ -82,6 +73,15 @@ public class EntityZombiePlayer extends EntityZombie {
 
 	public UUID getPlayerUUID() {
 		return dataManager.get(PLAYER_UUID).get();
+	}
+	
+	public void setInventory(List<EntityItem> list) {
+		playerItems.clear();
+		for (EntityItem item : list) {
+			ItemStack stack = item.getItem();
+			item.setDead();
+			if (stack != null) playerItems.add(stack.copy());
+		}
 	}
 	
 	@Override
@@ -126,5 +126,4 @@ public class EntityZombiePlayer extends EntityZombie {
         return textcomponentstring;
     }
 	
-
 }

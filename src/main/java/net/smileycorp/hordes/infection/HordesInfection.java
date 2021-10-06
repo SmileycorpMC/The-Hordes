@@ -9,7 +9,7 @@ import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.smileycorp.hordes.common.ModDefinitions;
-import net.smileycorp.hordes.infection.entities.EntityZombiePlayer;
+import net.smileycorp.hordes.common.entities.EntityZombiePlayer;
 
 @EventBusSubscriber(modid=ModDefinitions.modid)
 public class HordesInfection {

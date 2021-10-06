@@ -3,6 +3,7 @@ package net.smileycorp.hordes.client;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
@@ -13,7 +14,6 @@ import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.ModDefinitions;
 
@@ -39,15 +39,24 @@ public class ClientHandler {
 		if (ConfigHandler.eventNotifyMode == 1) {
 			gui.addChatMessage(ChatType.CHAT, message);
 		} else if (ConfigHandler.eventNotifyMode == 2) {
-			ObfuscationReflectionHelper.setPrivateValue(GuiIngame.class, gui, ConfigHandler.eventNotifyDuration, "overlayMessageTime", "field_73845_h");
-			ObfuscationReflectionHelper.setPrivateValue(GuiIngame.class, gui, message.getFormattedText(), "overlayMessage", "field_73838_g");
-			ObfuscationReflectionHelper.setPrivateValue(GuiIngame.class, gui, false, "animateOverlayMessageColor", "field_73844_j");
+			gui.overlayMessage=message.getFormattedText();
+			gui.overlayMessageTime=ConfigHandler.eventNotifyDuration;
+			gui.animateOverlayMessageColor=false;
 		} else if (ConfigHandler.eventNotifyMode == 3) {
 			gui.displayTitle(null, null, 5, ConfigHandler.eventNotifyDuration, 5);
 			gui.displayTitle(" ", null, 0, 0, 0);
 			gui.displayTitle(null, message.getFormattedText(), 0, 0, 0);
 		}
 		
+	}
+
+	public static void onInfect() {
+		if (ConfigHandler.playerInfectSound) {
+			Minecraft mc = Minecraft.getMinecraft();
+			World world = mc.world;
+			EntityPlayer player = mc.player;
+			world.playSound(player, player.getPosition(), SoundEvents.ENTITY_ZOMBIE_VILLAGER_CONVERTED, SoundCategory.HOSTILE, 0.75f, world.rand.nextFloat());
+		}
 	}
 
 }

@@ -1,7 +1,9 @@
 package net.smileycorp.hordes.common.hordeevent;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -24,8 +26,8 @@ public class WorldDataHordeEvent extends WorldSavedData {
 
 	public static final String DATA = ModDefinitions.modid + "_HordeEvent";
 	
-	private Map<String, OngoingHordeEvent> ongoingEvents =  new HashMap<String, OngoingHordeEvent>();
-	private int nextDay;
+	private Map<String, OngoingHordeEvent> ongoingEvents = new HashMap<String, OngoingHordeEvent>();
+	private int nextDay = 0;
 	
 	protected World world = null;
 	
@@ -40,18 +42,20 @@ public class WorldDataHordeEvent extends WorldSavedData {
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
 		ongoingEvents.clear();
-		world = null;
 		for (String uuidstring : nbt.getKeySet()) {
 			if (nbt.getTagId(uuidstring) == 10 && DataUtils.isValidUUID(uuidstring)) {
 				UUID uuid = UUID.fromString(uuidstring);
 				EntityPlayer player = getPlayerFromUUID(uuid);
-				OngoingHordeEvent event = new OngoingHordeEvent(player);
+				OngoingHordeEvent event = new OngoingHordeEvent(world, player, this);
 				event.readFromNBT(nbt.getCompoundTag(uuidstring));
 				ongoingEvents.put(uuidstring, event);
 			}
 		}
 		if (nbt.hasKey("nextDay")) {
-			nextDay = nbt.getInteger("nextDay");
+			int next = nbt.getInteger("nextDay");
+			if (nextDay == 0 || next > nextDay) {
+				nextDay = next;
+			}
 		}
 	}
 
@@ -61,7 +65,7 @@ public class WorldDataHordeEvent extends WorldSavedData {
 			for (EntityPlayer player : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers()) {
 				String uuid = player.getUniqueID().toString();
 				if (!ongoingEvents.containsKey(uuid) && DataUtils.isValidUUID(uuid)) {
-					OngoingHordeEvent event = new OngoingHordeEvent(player);
+					OngoingHordeEvent event = new OngoingHordeEvent(world, player, this);
 					ongoingEvents.put(uuid, event);
 				}
 			}
@@ -95,7 +99,7 @@ public class WorldDataHordeEvent extends WorldSavedData {
 					}
 				}
 				if (toAdd) {
-					ongoingEvents.put(player.getUniqueID().toString(), new OngoingHordeEvent(player));
+					ongoingEvents.put(player.getUniqueID().toString(), new OngoingHordeEvent(world, player, this));
 				}
 			}
 		}
@@ -119,7 +123,7 @@ public class WorldDataHordeEvent extends WorldSavedData {
 		if (DataUtils.isValidUUID(uuid)) {
 			if (! ongoingEvents.containsKey(uuid)) {
 				EntityPlayer player = getPlayerFromUUID(UUID.fromString(uuid));
-				OngoingHordeEvent event = new OngoingHordeEvent(player);
+				OngoingHordeEvent event = new OngoingHordeEvent(world, player, this);
 				ongoingEvents.put(uuid, event);
 				markDirty();
 			}
@@ -148,20 +152,43 @@ public class WorldDataHordeEvent extends WorldSavedData {
 		if (data == null) {
 			return getCleanData(world);
 		} 
-		if (data.world==null)data.world = world;
+		if (data.world == null) {
+			data.world = world;
+			int day = Math.round(world.getWorldTime()/ConfigHandler.dayLength);
+			if (!ConfigHandler.spawnFirstDay && day <1) day  = 1;
+			int multiplier = (int) Math.ceil(day / ConfigHandler.hordeSpawnDays);
+			data.setNextDay((day * multiplier) + world.rand.nextInt(ConfigHandler.hordeSpawnVariation + 1));
+		}
 		return data;
 	}
 
 	public static WorldDataHordeEvent getCleanData(World world) {
 		WorldDataHordeEvent data = new WorldDataHordeEvent();
-		int day = Math.round(world.getWorldTime()/24000);
-		int multiplier = (int) Math.ceil(day / ConfigHandler.hordeSpawnDays);
-		data.setNextDay(day * multiplier);
 		data.world = world;
+		int day = Math.round(world.getWorldTime()/ConfigHandler.dayLength);
+		double multiplier = Math.ceil(day / ConfigHandler.hordeSpawnDays);
+		if (!(ConfigHandler.spawnFirstDay && day == 0)) multiplier += 1;
+		int nextDay = (int) Math.floor(((multiplier*ConfigHandler.hordeSpawnDays) + world.rand.nextInt(ConfigHandler.hordeSpawnVariation + 1)));
+		data.setNextDay(nextDay);
 		world.getMapStorage().setData(DATA, data);
-		data.getEvents();
 		data.save();
 		return data;
 	}
+
+	public List<String> getDebugText() {
+		List<String> out = new ArrayList<String>();
+		out.add(this.toString());
+		out.add("Existing events: {");
+		for (OngoingHordeEvent event : getEvents()) {
+			out.add("	" +event.toString());
+			out.addAll(event.getEntityStrings());
+		}
+		out.add("}");
+		return out;
+	}
 	
+	@Override
+	public String toString() {
+		return super.toString() + "[worldTime: " + world.getWorldTime() + ", nextDay="+nextDay+"]";
+	}
 }

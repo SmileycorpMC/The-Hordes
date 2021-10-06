@@ -25,12 +25,12 @@ public class CommonProxy {
 		ConfigHandler.config = new Configuration(event.getSuggestedConfigurationFile());
 		ConfigHandler.syncConfig();
 		MinecraftForge.EVENT_BUS.register(this);
-		
+		CapabilityManager.INSTANCE.register(IZombifyPlayer.class, new IZombifyPlayer.Storage(), () -> new IZombifyPlayer.Implementation());
 		//Horde Event
 		if (ConfigHandler.enableHordeEvent) {
 			HordeEventPacketHandler.initPackets();
 			MinecraftForge.EVENT_BUS.register(new HordeEventHandler());
-			CapabilityManager.INSTANCE.register(IHordeSpawn.class, new IHordeSpawn.Storage(), new IHordeSpawn.Factory());
+			CapabilityManager.INSTANCE.register(IHordeSpawn.class, new IHordeSpawn.Storage(), () -> new IHordeSpawn.Implementation());
 		} else {
 			MinecraftForge.EVENT_BUS.unregister(HordeEventHandler.class);
 		}
@@ -42,6 +42,8 @@ public class CommonProxy {
 		} else {
 			MinecraftForge.EVENT_BUS.unregister(InfectionEventHandler.class);
 		}
+		
+		MinecraftForge.EVENT_BUS.register(new MiscEventHandler());
 	}
 	
 	public void init(FMLInitializationEvent event) {
@@ -68,4 +70,5 @@ public class CommonProxy {
 			event.registerServerCommand(new CommandDebugHordeEvent());
 		}
 	}
+	
 }

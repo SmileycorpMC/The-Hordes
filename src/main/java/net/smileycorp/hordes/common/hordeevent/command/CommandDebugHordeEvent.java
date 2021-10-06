@@ -4,7 +4,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.command.CommandBase;
@@ -13,7 +12,6 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 import net.smileycorp.hordes.common.ModDefinitions;
-import net.smileycorp.hordes.common.hordeevent.OngoingHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.WorldDataHordeEvent;
 
 public class CommandDebugHordeEvent extends CommandBase {
@@ -39,14 +37,7 @@ public class CommandDebugHordeEvent extends CommandBase {
 		Path path = Paths.get("logs/hordes.log");
 		server.addScheduledTask(() -> {
 			WorldDataHordeEvent data = WorldDataHordeEvent.getData(world);
-			List<String> out = new ArrayList<String>();
-			out.add("World time: " + world.getWorldTime());
-			out.add("Existing events: {");
-			for (OngoingHordeEvent event : data.getEvents()) {
-				out.add("	" +event.toString());
-				out.addAll(event.getEntityStrings());
-			}
-			out.add("}");
+			List<String> out = data.getDebugText();
 			try {
 				Files.write(path, out, StandardCharsets.UTF_8);
 			} catch (Exception e) {}

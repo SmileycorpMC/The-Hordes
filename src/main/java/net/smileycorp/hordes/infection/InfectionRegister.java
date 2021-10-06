@@ -10,13 +10,15 @@ import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.oredict.OreDictionary;
 import net.smileycorp.atlas.api.util.RecipeUtils;
 import net.smileycorp.hordes.common.ConfigHandler;
-import net.smileycorp.hordes.common.TheHordes;
+import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.infection.jei.JEIPluginInfection;
 
 public class InfectionRegister {
 	
@@ -35,7 +37,7 @@ public class InfectionRegister {
 			if (ConfigHandler.infectionEntities == null) {
 				throw new Exception("Infection entity list has loaded as null");
 			}
-			else if (ConfigHandler.cureItemList.length<=0) {
+			else if (ConfigHandler.infectionEntities.length <= 0) {
 				throw new Exception("Infection entity list in config is empty");
 			}
 			for (String name : ConfigHandler.infectionEntities) {
@@ -54,7 +56,7 @@ public class InfectionRegister {
 				}
 			}
 		} catch (Exception e) {
-			TheHordes.logError("Failed to read config, " + e.getCause() + " " + e.getMessage(), e);
+			Hordes.logError("Failed to read config, " + e.getCause() + " " + e.getMessage(), e);
 		}
 	}
 
@@ -68,7 +70,7 @@ public class InfectionRegister {
 			}
 			cures = parseCureData(ConfigHandler.cureItemList);
 		} catch (Exception e) {
-			TheHordes.logError("Failed to read config, " + e.getCause() + " " + e.getMessage(), e);
+			Hordes.logError("Failed to read config, " + e.getCause() + " " + e.getMessage(), e);
 		}
 	}
 
@@ -77,8 +79,9 @@ public class InfectionRegister {
 			String[] splitData = data.split(";");
 			curesClient = parseCureData(splitData);
 		} catch (Exception e) {
-			TheHordes.logError("Failed to read data from server, " + e.getCause() + " " + e.getMessage(), e);
+			Hordes.logError("Failed to read data from server, " + e.getCause() + " " + e.getMessage(), e);
 		}
+		if (Loader.isModLoaded("jei")) JEIPluginInfection.setRecipes(curesClient);
 	}
 	
 	public static String getCurePacketData() {
@@ -106,7 +109,7 @@ public class InfectionRegister {
 					NBTTagCompound parsed = JsonToNBT.getTagFromJson(nbtstring);
 					if (parsed != null) nbt = parsed;
 				} catch (Exception e) {
-					TheHordes.logError("Error parsing nbt for entity " + name + " " + e.getMessage(), e);
+					Hordes.logError("Error parsing nbt for entity " + name + " " + e.getMessage(), e);
 				}
 			}
 			String[] nameSplit = name.split(":");
@@ -117,7 +120,7 @@ public class InfectionRegister {
 					meta = nameSplit.length > 2 ? (nameSplit[2].equals("*") ? OreDictionary.WILDCARD_VALUE : Integer.valueOf(nameSplit[2])) : 0;
 				} catch (Exception e) {
 					meta = 0;
-					TheHordes.logError("Entry" + name + " has a non integer, non wildcard metadata value", e); 
+					Hordes.logError("Entry" + name + " has a non integer, non wildcard metadata value", e); 
 				}
 				if (ForgeRegistries.ITEMS.containsKey(loc)) {
 					ItemStack stack = new ItemStack(ForgeRegistries.ITEMS.getValue(loc), 1, meta);
@@ -135,7 +138,7 @@ public class InfectionRegister {
 	
 	static List<ItemStack> getCureList() {
 		List<ItemStack> result = new ArrayList<ItemStack>();
-		for (ItemStack stack : cures) {
+		for (ItemStack stack : FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT ? curesClient : cures) {
 			result.add(new ItemStack(stack.getItem(), stack.getMetadata()));
 		}
 		return result;

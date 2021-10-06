@@ -1,12 +1,12 @@
 package net.smileycorp.hordes.common.hordeevent;
 
-import java.util.concurrent.Callable;
-
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.Capability.IStorage;
+import net.minecraftforge.common.capabilities.ICapabilitySerializable;
+import net.smileycorp.hordes.common.Hordes;
 
 public interface IHordeSpawn {
 
@@ -25,22 +25,13 @@ public interface IHordeSpawn {
 	
 		@Override
 		public void readNBT(Capability<IHordeSpawn> capability, IHordeSpawn instance, EnumFacing side, NBTBase nbt) {
-				instance.setPlayerUUID(((NBTTagString) nbt).getString());
+			instance.setPlayerUUID(((NBTTagString) nbt).getString());
 		}
 		
 		
 	}
 	
-	public static class Factory implements Callable<IHordeSpawn> {
-
-		  @Override
-		  public IHordeSpawn call() throws Exception {
-		    return new Capabilty();
-		  }
-		  
-	}
-	
-	public static class Capabilty implements IHordeSpawn {
+	public static class Implementation implements IHordeSpawn {
 
 		private String uuid = "";
 		
@@ -60,5 +51,31 @@ public interface IHordeSpawn {
 		}
 
 	}
+	
+	public static class Provider implements ICapabilitySerializable<NBTBase> {
+		
+		protected IHordeSpawn instance = Hordes.HORDESPAWN.getDefaultInstance();
+
+		@Override
+		public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+			return capability == Hordes.HORDESPAWN;
+		}
+
+		@Override
+		public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+			return capability == Hordes.HORDESPAWN ? Hordes.HORDESPAWN.cast(instance) : null;
+		}
+
+		@Override
+		public NBTBase serializeNBT() {
+			return Hordes.HORDESPAWN.getStorage().writeNBT(Hordes.HORDESPAWN, instance, null);
+		}
+
+		@Override
+		public void deserializeNBT(NBTBase nbt) {
+			Hordes.HORDESPAWN.getStorage().readNBT(Hordes.HORDESPAWN, instance, null, nbt);
+		}
+
+}
  
 }

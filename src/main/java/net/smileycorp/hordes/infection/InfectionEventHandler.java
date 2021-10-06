@@ -1,11 +1,7 @@
 package net.smileycorp.hordes.infection;
 
-import java.awt.Color;
 import java.util.Random;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityZombieVillager;
@@ -15,12 +11,11 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -31,22 +26,19 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.smileycorp.atlas.api.SimpleStringMessage;
 import net.smileycorp.atlas.api.util.DirectionUtils;
 import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.ModDefinitions;
 import net.smileycorp.hordes.common.event.InfectionDeathEvent;
-import net.smileycorp.hordes.infection.entities.EntityZombiePlayer;
-
-import org.lwjgl.opengl.GL11;
+import net.smileycorp.hordes.infection.InfectionPacketHandler.InfectMessage;
 
 @EventBusSubscriber(modid=ModDefinitions.modid)
 public class InfectionEventHandler {
 	
-
 	@SubscribeEvent
-	public void playerJoin(PlayerEvent.PlayerLoggedInEvent event) {
+	public void playerJoin(PlayerLoggedInEvent event) {
 		EntityPlayer player = event.player;
 		if (player != null) {
 			if (player instanceof EntityPlayerMP) {
@@ -61,7 +53,7 @@ public class InfectionEventHandler {
 		ItemStack stack = event.getItem();
 		if (entity.isPotionActive(HordesInfection.INFECTED)) {
 			if (InfectionRegister.isCure(stack)) {
-				entity.removeActivePotionEffect(HordesInfection.INFECTED);
+				entity.removePotionEffect(HordesInfection.INFECTED);
 			}
 		}
 	}
@@ -74,7 +66,7 @@ public class InfectionEventHandler {
 			EntityLivingBase entity = (EntityLivingBase) event.getTarget();
 			if (entity.isPotionActive(HordesInfection.INFECTED)) {
 				if (InfectionRegister.isCure(stack)) {
-					entity.removeActivePotionEffect(HordesInfection.INFECTED);
+					entity.removePotionEffect(HordesInfection.INFECTED);
 					if (!player.capabilities.isCreativeMode) {
 						ItemStack container = stack.getItem().getContainerItem(stack);
 						if (stack.isItemStackDamageable()) {
@@ -102,7 +94,7 @@ public class InfectionEventHandler {
 				EntityLivingBase entity = (EntityLivingBase) ray.entityHit;
 				if (entity.isPotionActive(HordesInfection.INFECTED)) {
 					if (InfectionRegister.isCure(stack)) {
-						entity.removeActivePotionEffect(HordesInfection.INFECTED);
+						entity.removePotionEffect(HordesInfection.INFECTED);
 						event.setCanceled(true);
 						event.setCancellationResult(EnumActionResult.FAIL);
 					}
@@ -118,30 +110,32 @@ public class InfectionEventHandler {
 		World world = entity.world;
 		Random rand = world.rand;
 		if (!world.isRemote && InfectionRegister.canCauseInfection(attacker)) {
-			if ((entity instanceof EntityPlayer && ConfigHandler.infectPlayers)) {
-				int c = rand.nextInt(100);
-				if (c <= ConfigHandler.playerInfectChance) {
-					entity.addPotionEffect(new PotionEffect(HordesInfection.INFECTED, 10000, 0));
-				}
-			} else if ((entity instanceof EntityVillager && ConfigHandler.infectVillagers)) {
-				int c = rand.nextInt(100);
-				if (c <= ConfigHandler.villagerInfectChance) {
-					entity.addPotionEffect(new PotionEffect(HordesInfection.INFECTED, 10000, 0));
+			if (!entity.isPotionActive(HordesInfection.INFECTED)) {
+				if ((entity instanceof EntityPlayer && ConfigHandler.infectPlayers)) {
+					int c = rand.nextInt(100);
+					if (c <= ConfigHandler.playerInfectChance) {
+						entity.addPotionEffect(new PotionEffect(HordesInfection.INFECTED, 10000, 0));
+						InfectionPacketHandler.NETWORK_INSTANCE.sendTo(new InfectMessage(), (EntityPlayerMP) entity);
+					}
+				} else if ((entity instanceof EntityVillager && ConfigHandler.infectVillagers)) {
+					int c = rand.nextInt(100);
+					if (c <= ConfigHandler.villagerInfectChance) {
+						entity.addPotionEffect(new PotionEffect(HordesInfection.INFECTED, 10000, 0));
+					}
 				}
 			}
 		}
 	}
 	
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled=true)
 	public void onDeath(LivingDeathEvent event) {
 		EntityLivingBase entity = event.getEntityLiving();
+		DamageSource source = event.getSource();
 		World world = entity.world;
-		if (!world.isRemote && (event.getSource() == HordesInfection.INFECTION_DAMAGE || entity.isPotionActive(HordesInfection.INFECTED))) {
+		if (!world.isRemote && (source == HordesInfection.INFECTION_DAMAGE || entity.isPotionActive(HordesInfection.INFECTED))) {
 			InfectionDeathEvent newevent = new InfectionDeathEvent(entity, event.getSource());
 			MinecraftForge.EVENT_BUS.post(newevent);
-			if (newevent.getResult() == Result.DENY) {
-				event.setCanceled(true);
-			}
+			if (newevent.getResult() == Result.DENY) event.setCanceled(true);
 		}	
 	}
 	
@@ -149,14 +143,7 @@ public class InfectionEventHandler {
 	public void onInfectDeath(InfectionDeathEvent event) {
 		EntityLivingBase entity = event.getEntityLiving();
 		World world = entity.world;
-		if (entity instanceof EntityPlayer) {
-			EntityZombiePlayer zombie = new EntityZombiePlayer((EntityPlayer)entity);
-			zombie.setPosition(entity.posX, entity.posY, entity.posZ);
-			zombie.renderYawOffset = entity.renderYawOffset;
-			world.spawnEntity(zombie);
-			//sendDeathMessage(entity);
-			event.setResult(Result.DENY);
-		} else if (entity instanceof EntityVillager) {
+		if (entity instanceof EntityVillager) {
 			EntityZombieVillager zombie = new EntityZombieVillager(world);
 			zombie.setForgeProfession(((EntityVillager) entity).getProfessionForge());
 			zombie.setPosition(entity.posX, entity.posY, entity.posZ);
@@ -166,7 +153,6 @@ public class InfectionEventHandler {
 			zombie.renderYawOffset = entity.renderYawOffset;
 			if (entity.hasCustomName()) {
 				zombie.setCustomNameTag(entity.getCustomNameTag());
-				//sendDeathMessage(entity);
 			}
 			world.spawnEntity(zombie);
 			entity.setDead();
@@ -186,29 +172,6 @@ public class InfectionEventHandler {
 					entity.addPotionEffect(new PotionEffect(HordesInfection.INFECTED, 10000, a+1));
 				} else {
 					entity.attackEntityFrom(HordesInfection.INFECTION_DAMAGE, Float.MAX_VALUE);
-					entity.removePotionEffect(HordesInfection.INFECTED);
-				}
-			}
-		}
-	}
-	
-	@SubscribeEvent
-	public void renderOverlay(RenderGameOverlayEvent.Pre event){
-		if (ConfigHandler.playerInfectionVisuals) {
-			Minecraft mc = Minecraft.getMinecraft();
-			EntityPlayer player = mc.player;
-			if (player!= null && event.getType() == ElementType.POTION_ICONS) {
-				if (player.isPotionActive(HordesInfection.INFECTED)) {
-					int level = player.getActivePotionEffect(HordesInfection.INFECTED).getAmplifier();
-			    	Color colour = new Color(0.4745f, 0.6117f, 0.3961f, 0.05f*level*level);
-					GL11.glDisable(GL11.GL_DEPTH_TEST);
-					GL11.glDepthMask(false);
-			        GL11.glDisable(GL11.GL_ALPHA_TEST);
-			        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-			    	Gui.drawRect(0, 0, mc.displayWidth, mc.displayHeight, colour.getRGB());
-			    	GL11.glDepthMask(true);
-			        GL11.glEnable(GL11.GL_DEPTH_TEST);
-			        GL11.glEnable(GL11.GL_ALPHA_TEST);
 				}
 			}
 		}

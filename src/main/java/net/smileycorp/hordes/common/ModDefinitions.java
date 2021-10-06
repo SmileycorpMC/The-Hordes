@@ -7,7 +7,7 @@ public class ModDefinitions {
 	public static final String modid = "hordes";
 	public static final String name = "The Hordes";
 	public static final String version = "1.1.2";
-	public static final String dependencies = "required-after:atlaslib@1.1.4";
+	public static final String dependencies = "required-after:atlaslib@1.1.4;after:baubles;after:galacticraft;before:deathchest;before:corpse;before:jei";
 	public static final String location = "net.smileycorp.hordes.";
 	public static final String client = location + "client.ClientProxy";
 	public static final String server = location + "common.CommonProxy";
@@ -15,6 +15,9 @@ public class ModDefinitions {
 	public static final String hordeEventStart = "message.hordes.EventStart";
 	public static final String hordeEventEnd = "message.hordes.EventEnd";
 	public static final String hordeTrySleep = "message.hordes.TrySleep";
+	public static final String deathMessage = "message.hordes.DeathMessage";
+	public static final String deathMessageFighting = "message.hordes.DeathMessageFighting";
+	public static final String deathMessageOther = "message.hordes.DeathMessageOther";
 	
 	public static String getName(String name) {
 		return getName(modid, name);

@@ -15,6 +15,7 @@ public class ConfigHandler {
 	public static int hordeStartTime;
 	public static int hordeSpawnDays;
 	public static int hordeSpawnVariation;
+	public static int dayLength;
 	public static boolean spawnFirstDay;
 	public static boolean canSleepDuringHorde;
 	public static int eventNotifyMode;
@@ -29,15 +30,21 @@ public class ConfigHandler {
 	public static boolean infectVillagers;
 	public static int villagerInfectChance;
 	public static boolean infectPlayers;
+	public static boolean infectSlowness;
+	public static boolean infectHunger;
 	public static int playerInfectChance;
 	public static int ticksForEffectStage;
 	public static boolean playerInfectionVisuals;
+	public static boolean playerInfectSound;
 	public static String[] infectionEntities;
 	public static String[] cureItemList;
 	
+	//misc
+	public static boolean zombieGraves;
+	
 	//load config properties
 	public static void syncConfig() {
-		TheHordes.logInfo("Trying to load config");
+		Hordes.logInfo("Trying to load config");
 		try{
 			config.load();
 			//horde event
@@ -46,10 +53,11 @@ public class ConfigHandler {
 			hordeSpawnMultiplier = config.get("Horde Spawn Event", "hordeSpawnMultiplier", 1.1, "Multiplier by which the spawn amount increases by each time the event naturally spawns. (Set to 1 to disable scaling.)").getDouble();
 			hordeSpawnDuration = config.get("Horde Spawn Event", "hordeSpawnDuration", 6000, "Time in ticks the spawn lasts for.").getInt();
 			hordeSpawnInterval = config.get("Horde Spawn Event", "hordeSpawnInterval", 1000, "Time in ticks between spawns for the horde spawn event.").getInt();
-			hordeStartTime = config.get("Horde Spawn Event", "hordeStartTime", 18000, "What time of day does the horde event start? eg 18000 is midnight.").getInt();
+			hordeStartTime = config.get("Horde Spawn Event", "hordeStartTime", 18000, "What time of day does the horde event start? eg 18000 is midnight with default day length.").getInt();
 			hordeSpawnDays = config.get("Horde Spawn Event", "hordeSpawnDays", 10, "Amount of days between horde spawns").getInt();
 			hordeSpawnVariation = config.get("Horde Spawn Event", "hordeSpawnVariation", 0, "Amount of days a horde event can be randomly extended by").getInt();
 			hordeSpawnMax = config.get("Horde Spawn Event", "hordeSpawnMax", 120, "Max cap for the number of entities that can exist from the horde at once.").getInt();
+			dayLength = config.get("Horde Spawn Event", "dayLength", 24000, "Length of a day (use only if you have another day that changes the length of the day/night cycle) Default is 24000").getInt();
 			spawnFirstDay = config.get("Horde Spawn Event", "spawnFirstDay", false, "Set to true to enable the horde spawning on the first day.").getBoolean();
 			canSleepDuringHorde = config.get("Horde Spawn Event", "canSleepDuringHorde", false, "Set to false to disable the use of beds during a horde event.").getBoolean();
 			eventNotifyMode = config.get("Horde Spawn Event", "eventNotifyMode", 1, "How do players get notified of a horde event. 0: Off, 1: Chat, 2:Action Bar, 3:Title").getInt();
@@ -65,15 +73,20 @@ public class ConfigHandler {
 			infectVillagers = config.get("Infection", "infectVillagers", true, "Can villagers be infected.").getBoolean();
 			villagerInfectChance = config.get("Infection", "villagerInfectChance", 85, "Chance out of 100 for a villager to get infected").getInt();
 			infectPlayers = config.get("Infection", "infectPlayers", true, "Can players be infected.").getBoolean();
+			infectSlowness = config.get("Infection", "infectSlowness", true, "Whether later levels of infected should slightly slow movement speed? ").getBoolean();
+			infectHunger = config.get("Infection", "infectHunger", true, "Whether later levels of infected should depleet hunger quicker? ").getBoolean();
 			playerInfectChance = config.get("Infection", "playerInfectChance", 75, "Chance out of 100 for a player to get infected").getInt();
 			ticksForEffectStage = config.get("Infection", "ticksForEffectStage", 6000, "How long do each of the 4 effect phases last for before the next phase is activated?").getInt();
-			playerInfectionVisuals = config.get("Infection", "playerInfectionVisuals", true, "Tint the player's screen if they are infected.").getBoolean();
+			playerInfectionVisuals = config.get("Infection", "playerInfectionVisuals", true, "Tint the player's screen and display other visual effects if they are infected.").getBoolean();
+			playerInfectSound = config.get("Infection", "playerInfectSound", true, "Play a sound when the player beomes infected.").getBoolean();
 			infectionEntities = config.get("Infection", "infectionEntities",
-					new String[]{"minecraft:zombie"}, 
+					new String[]{"minecraft:zombie", "minecraft:zombie_villager", "minecraft:husk"}, 
 					"Mobs which are based on entities in this list can cause the infection effect.").getStringList();
 			cureItemList = config.get("Infection", "cureItemList",
 					new String[]{"minecraft:golden_apple:*"}, 
 					"A list of items which can cure infection when 'consumed' use '*' to specify any metadata, can accept nbt tags. eg.minecraft:golden_apple:*, minecraft:potion{Potion: \"minecraft:strong_regeneration\"}").getStringList();
+			//misc
+			zombieGraves = config.get("Misc", "zombieGraves", false, "Whether to use zombie players as graves all the time. (Even if infection is disabled)").getBoolean();
 		} catch(Exception e) {
 		} finally {
 	    	if (config.hasChanged()) config.save();
