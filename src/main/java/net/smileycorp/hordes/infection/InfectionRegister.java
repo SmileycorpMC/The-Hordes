@@ -21,17 +21,18 @@ import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.infection.jei.JEIPluginInfection;
 
 public class InfectionRegister {
-	
+
 	private static List<ItemStack> cures = new ArrayList<ItemStack>();
 	private static List<ItemStack> curesClient = new ArrayList<ItemStack>();
-	
+
 	private static List<Class<? extends EntityLiving>> infectionEntities = new ArrayList<Class<? extends EntityLiving>>();
-	
+
 	public static void readConfig() {
 		readInfectionEntities();
 		readCureItems();
 	}
-	
+
+	@SuppressWarnings("unchecked")
 	private static void readInfectionEntities() {
 		try {
 			if (ConfigHandler.infectionEntities == null) {
@@ -46,9 +47,9 @@ public class InfectionRegister {
 					ResourceLocation loc = new ResourceLocation(nameSplit[0], nameSplit[1]);
 					if (ForgeRegistries.ENTITIES.containsKey(loc)) {
 						EntityEntry entry = ForgeRegistries.ENTITIES.getValue(loc);
-						Class clazz = entry.getEntityClass();
+						Class<?> clazz = entry.getEntityClass();
 						if (EntityLiving.class.isAssignableFrom(clazz)) {
-							infectionEntities.add(clazz);
+							infectionEntities.add((Class<? extends EntityLiving>) clazz);
 						}
 					}
 				} else {
@@ -83,7 +84,7 @@ public class InfectionRegister {
 		}
 		if (Loader.isModLoaded("jei")) JEIPluginInfection.setRecipes(curesClient);
 	}
-	
+
 	public static String getCurePacketData() {
 		StringBuilder builder = new StringBuilder();
 		for (ItemStack stack : cures) {
@@ -97,7 +98,7 @@ public class InfectionRegister {
 		}
 		return builder.toString();
 	}
-	
+
 	public static List<ItemStack> parseCureData(String[] data) throws Exception {
 		List<ItemStack> stacks = new ArrayList<ItemStack>();
 		for (String name : data) {
@@ -120,7 +121,7 @@ public class InfectionRegister {
 					meta = nameSplit.length > 2 ? (nameSplit[2].equals("*") ? OreDictionary.WILDCARD_VALUE : Integer.valueOf(nameSplit[2])) : 0;
 				} catch (Exception e) {
 					meta = 0;
-					Hordes.logError("Entry" + name + " has a non integer, non wildcard metadata value", e); 
+					Hordes.logError("Entry" + name + " has a non integer, non wildcard metadata value", e);
 				}
 				if (ForgeRegistries.ITEMS.containsKey(loc)) {
 					ItemStack stack = new ItemStack(ForgeRegistries.ITEMS.getValue(loc), 1, meta);
@@ -135,7 +136,7 @@ public class InfectionRegister {
 		}
 		return stacks;
 	}
-	
+
 	static List<ItemStack> getCureList() {
 		List<ItemStack> result = new ArrayList<ItemStack>();
 		for (ItemStack stack : FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT ? curesClient : cures) {
@@ -143,11 +144,11 @@ public class InfectionRegister {
 		}
 		return result;
 	}
-	
+
 	public static void addCureItem(ItemStack stack) {
 		cures.add(stack);
 	}
-	
+
 	public static void removeCureItem(ItemStack stack) {
 		for (ItemStack match : cures) {
 			if (RecipeUtils.compareItemStacks(match, stack, true)) {
@@ -164,10 +165,10 @@ public class InfectionRegister {
 		}
 		return false;
 	}
-	
+
 	public static boolean canCauseInfection(Entity entity) {
 		if (entity instanceof EntityLiving) {
-			for (Class clazz : infectionEntities) {
+			for (Class<?> clazz : infectionEntities) {
 				if (clazz.isAssignableFrom(entity.getClass())) return true;
 			}
 		}

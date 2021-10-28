@@ -14,10 +14,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
 import net.smileycorp.atlas.api.util.DataUtils;
-import net.smileycorp.hordes.client.ClientHandler;
 import net.smileycorp.hordes.common.ConfigHandler;
+import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.ModDefinitions;
 
 import com.mojang.authlib.GameProfile;
@@ -26,7 +25,9 @@ public class WorldDataHordeEvent extends WorldSavedData {
 
 	public static final String DATA = ModDefinitions.modid + "_HordeEvent";
 	
-	private Map<String, OngoingHordeEvent> ongoingEvents = new HashMap<String, OngoingHordeEvent>();
+	//stores legacy event data until it's needed to be loaded by a player capability
+	private Map<String, NBTTagCompound> legacyEventData = new HashMap<String, NBTTagCompound>();
+	
 	private int nextDay = 0;
 	
 	protected World world = null;
@@ -41,14 +42,10 @@ public class WorldDataHordeEvent extends WorldSavedData {
 
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
-		ongoingEvents.clear();
+		legacyEventData.clear();
 		for (String uuidstring : nbt.getKeySet()) {
 			if (nbt.getTagId(uuidstring) == 10 && DataUtils.isValidUUID(uuidstring)) {
-				UUID uuid = UUID.fromString(uuidstring);
-				EntityPlayer player = getPlayerFromUUID(uuid);
-				OngoingHordeEvent event = new OngoingHordeEvent(world, player, this);
-				event.readFromNBT(nbt.getCompoundTag(uuidstring));
-				ongoingEvents.put(uuidstring, event);
+				legacyEventData.put(uuidstring, (NBTTagCompound) nbt.getTag(uuidstring));
 			}
 		}
 		if (nbt.hasKey("nextDay")) {
@@ -61,19 +58,8 @@ public class WorldDataHordeEvent extends WorldSavedData {
 
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
-		if (FMLCommonHandler.instance().getSide() == Side.SERVER) {
-			for (EntityPlayer player : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers()) {
-				String uuid = player.getUniqueID().toString();
-				if (!ongoingEvents.containsKey(uuid) && DataUtils.isValidUUID(uuid)) {
-					OngoingHordeEvent event = new OngoingHordeEvent(world, player, this);
-					ongoingEvents.put(uuid, event);
-				}
-			}
-		}
-		for (Entry<String, OngoingHordeEvent> entry : ongoingEvents.entrySet()) {
-			String uuid = entry.getKey().toString();
-			OngoingHordeEvent event = entry.getValue();
-			nbt.setTag(uuid, event.writeToNBT(new NBTTagCompound()));
+		for (Entry<String, NBTTagCompound> entry : legacyEventData.entrySet()) {
+			nbt.setTag(entry.getKey(), entry.getValue());
 		}
 		nbt.setInteger("nextDay", nextDay);
 		return nbt;
@@ -87,60 +73,64 @@ public class WorldDataHordeEvent extends WorldSavedData {
 		this.nextDay = nextDay;
 	}
 	
+	//legacy function -- use capabilities instead
+	@Deprecated
 	public Set<OngoingHordeEvent> getEvents() {
 		Set<OngoingHordeEvent> events = new HashSet<OngoingHordeEvent>();
 		if (!world.isRemote) {
 			for (EntityPlayer player : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers()) {
-				boolean toAdd = true;
-				for (OngoingHordeEvent event : ongoingEvents.values()) {
-					if (event.getPlayer() == player) {
-						toAdd = false;
-						break;
-					}
+				if (player.hasCapability(Hordes.HORDE_EVENT, null)) {
+					events.add((OngoingHordeEvent) player.getCapability(Hordes.HORDE_EVENT, null));
 				}
-				if (toAdd) {
-					ongoingEvents.put(player.getUniqueID().toString(), new OngoingHordeEvent(world, player, this));
-				}
-			}
-		}
-		for (Entry<String, OngoingHordeEvent> entry : ongoingEvents.entrySet()) {
-			if (DataUtils.isValidUUID(entry.getKey()) &!(entry.getValue().getPlayer() == null)) {
-				events.add(entry.getValue());
 			}
 		}
 		return events;
 	}
 	
+	//legacy function -- use capabilities instead
+	@Deprecated
 	public OngoingHordeEvent getEventForPlayer(EntityPlayer player) {
-		return getEventForPlayer(player.getUniqueID());
+		if (player.hasCapability(Hordes.HORDE_EVENT, null)) {
+			return (OngoingHordeEvent) player.getCapability(Hordes.HORDE_EVENT, null);
+		}
+		return null;
 	}
 	
+	//legacy function -- use capabilities instead
+	@Deprecated
 	public OngoingHordeEvent getEventForPlayer(GameProfile profile) {
 		return getEventForPlayer(profile.getId());
 	}
 	
-	public OngoingHordeEvent getEventForPlayer(String uuid) {
+	//legacy function -- use capabilities instead
+	@Deprecated
+	public  OngoingHordeEvent getEventForPlayer(String uuid) {
 		if (DataUtils.isValidUUID(uuid)) {
-			if (! ongoingEvents.containsKey(uuid)) {
-				EntityPlayer player = getPlayerFromUUID(UUID.fromString(uuid));
-				OngoingHordeEvent event = new OngoingHordeEvent(world, player, this);
-				ongoingEvents.put(uuid, event);
-				markDirty();
-			}
-			return ongoingEvents.get(uuid);
-		} return null;
+			return getEventForPlayer(UUID.fromString(uuid));
+		} 
+		return null;
 	}
 	
+	//legacy function -- use capabilities instead
+	@Deprecated
 	public OngoingHordeEvent getEventForPlayer(UUID uuid) {
-		return getEventForPlayer(uuid.toString());
+		if (world != null) {
+			if (!world.isRemote) {
+				return getEventForPlayer(FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(uuid));
+			}
+		}
+		return null;
 	}
 	
-	private EntityPlayer getPlayerFromUUID(UUID uuid) {
-		if (world == null) return null;
-		if (world.isRemote) {
-			return ClientHandler.getPlayer();
-		}
-        return FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(uuid);
+	public boolean hasLegacyData(UUID uuid) {
+		return legacyEventData.containsKey(uuid.toString());
+	}
+	
+	public NBTTagCompound getLegacyData(UUID uuid) {
+		NBTTagCompound nbt = legacyEventData.get(uuid.toString());
+		legacyEventData.remove(uuid.toString());
+		if (nbt == null) nbt = new NBTTagCompound();
+		return nbt;
 	}
 	
 	public void save() {
@@ -174,7 +164,7 @@ public class WorldDataHordeEvent extends WorldSavedData {
 		data.save();
 		return data;
 	}
-
+	
 	public List<String> getDebugText() {
 		List<String> out = new ArrayList<String>();
 		out.add(this.toString());
@@ -191,4 +181,5 @@ public class WorldDataHordeEvent extends WorldSavedData {
 	public String toString() {
 		return super.toString() + "[worldTime: " + world.getWorldTime() + ", nextDay="+nextDay+"]";
 	}
+	
 }

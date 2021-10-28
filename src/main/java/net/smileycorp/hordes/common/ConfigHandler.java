@@ -58,7 +58,7 @@ public class ConfigHandler {
 			hordeSpawnVariation = config.get("Horde Spawn Event", "hordeSpawnVariation", 0, "Amount of days a horde event can be randomly extended by").getInt();
 			hordeSpawnMax = config.get("Horde Spawn Event", "hordeSpawnMax", 120, "Max cap for the number of entities that can exist from the horde at once.").getInt();
 			dayLength = config.get("Horde Spawn Event", "dayLength", 24000, "Length of a day (use only if you have another day that changes the length of the day/night cycle) Default is 24000").getInt();
-			spawnFirstDay = config.get("Horde Spawn Event", "spawnFirstDay", false, "Set to true to enable the horde spawning on the first day.").getBoolean();
+			spawnFirstDay = config.get("Horde Spawn Event", "spawnFirstDay", false, "Set to true to enable the horde spawning on the first day. (Game day 0)").getBoolean();
 			canSleepDuringHorde = config.get("Horde Spawn Event", "canSleepDuringHorde", false, "Set to false to disable the use of beds during a horde event.").getBoolean();
 			eventNotifyMode = config.get("Horde Spawn Event", "eventNotifyMode", 1, "How do players get notified of a horde event. 0: Off, 1: Chat, 2:Action Bar, 3:Title").getInt();
 			eventNotifyDuration = config.get("Horde Spawn Event", "eventNotifyDuration", 60, "How long in ticks does the horde notification appear? (Only applies to modes 2 and 3)").getInt();

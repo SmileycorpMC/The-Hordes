@@ -76,6 +76,6 @@ public interface IHordeSpawn {
 			Hordes.HORDESPAWN.getStorage().readNBT(Hordes.HORDESPAWN, instance, null, nbt);
 		}
 
-}
+	}
  
 }

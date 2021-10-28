@@ -15,17 +15,18 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.smileycorp.hordes.common.ConfigHandler;
-import net.smileycorp.hordes.common.ModDefinitions;
 
 public class ClientHandler {
 
-	public static void playHordeSound(Vec3d dir) {
-		Minecraft mc = Minecraft.getMinecraft();
-		World world = mc.world;
-		EntityPlayer player = mc.player;
-		BlockPos pos = new BlockPos(player.posX + (5*dir.x), player.posY, player.posZ + (5*dir.z));
-		float pitch = 1+((world.rand.nextInt(6)-3)/10);
-		world.playSound(player, pos, new SoundEvent(ModDefinitions.getResource("horde_spawn")), SoundCategory.HOSTILE, 0.3f, pitch);
+	public static void playHordeSound(Vec3d dir, SoundEvent sound) {
+		if (ConfigHandler.hordeSpawnSound) {
+			Minecraft mc = Minecraft.getMinecraft();
+			World world = mc.world;
+			EntityPlayer player = mc.player;
+			BlockPos pos = new BlockPos(player.posX + (5*dir.x), player.posY, player.posZ + (5*dir.z));
+			float pitch = 1+((world.rand.nextInt(6)-3)/10);
+			world.playSound(player, pos, sound, SoundCategory.HOSTILE, 0.3f, pitch);
+		}
 	}
 
 	public static EntityPlayer getPlayer() {
@@ -47,7 +48,7 @@ public class ClientHandler {
 			gui.displayTitle(" ", null, 0, 0, 0);
 			gui.displayTitle(null, message.getFormattedText(), 0, 0, 0);
 		}
-		
+
 	}
 
 	public static void onInfect() {

@@ -11,6 +11,8 @@ import net.smileycorp.hordes.common.hordeevent.HordeEventHandler;
 import net.smileycorp.hordes.common.hordeevent.HordeEventPacketHandler;
 import net.smileycorp.hordes.common.hordeevent.HordeEventRegister;
 import net.smileycorp.hordes.common.hordeevent.IHordeSpawn;
+import net.smileycorp.hordes.common.hordeevent.IOngoingHordeEvent;
+import net.smileycorp.hordes.common.hordeevent.OngoingHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.command.CommandDebugHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.command.CommandSpawnWave;
 import net.smileycorp.hordes.common.hordeevent.command.CommandStartHordeEvent;
@@ -26,11 +28,12 @@ public class CommonProxy {
 		ConfigHandler.syncConfig();
 		MinecraftForge.EVENT_BUS.register(this);
 		CapabilityManager.INSTANCE.register(IZombifyPlayer.class, new IZombifyPlayer.Storage(), () -> new IZombifyPlayer.Implementation());
+		CapabilityManager.INSTANCE.register(IHordeSpawn.class, new IHordeSpawn.Storage(), () -> new IHordeSpawn.Implementation());
+		CapabilityManager.INSTANCE.register(IOngoingHordeEvent.class, new IOngoingHordeEvent.Storage(), () -> new OngoingHordeEvent());
 		//Horde Event
 		if (ConfigHandler.enableHordeEvent) {
 			HordeEventPacketHandler.initPackets();
 			MinecraftForge.EVENT_BUS.register(new HordeEventHandler());
-			CapabilityManager.INSTANCE.register(IHordeSpawn.class, new IHordeSpawn.Storage(), () -> new IHordeSpawn.Implementation());
 		} else {
 			MinecraftForge.EVENT_BUS.unregister(HordeEventHandler.class);
 		}

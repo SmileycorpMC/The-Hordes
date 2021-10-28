@@ -14,9 +14,10 @@ import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
 
 public class HordeEventRegister {
-	
+
 	protected static Map<Class<? extends EntityLiving>, HordeSpawnEntry> spawnlist = new HashMap<Class<? extends EntityLiving>, HordeSpawnEntry>();
-	
+
+	@SuppressWarnings("unchecked")
 	public static void readConfig() {
 		Hordes.logInfo("Trying to read spawn table from config");
 		try {
@@ -28,7 +29,7 @@ public class HordeEventRegister {
 			}
 			for (String name : ConfigHandler.hordeSpawnList) {
 				try {
-					Class clazz = null;
+					Class<?> clazz = null;
 					int weight=0;
 					int minDay=0;
 					int maxDay=0;
@@ -38,7 +39,7 @@ public class HordeEventRegister {
 						String[] nameSplit = name.split("-");
 						if (nameSplit.length>1) {
 							if (nameSplit[0].contains("{")) {
-								
+
 								String nbtstring = nameSplit[0].substring(nameSplit[0].indexOf("{"));
 								nameSplit[0] = nameSplit[0].substring(0, nameSplit[0].indexOf("{"));
 								try {
@@ -51,7 +52,7 @@ public class HordeEventRegister {
 							}
 							ResourceLocation loc = new ResourceLocation(nameSplit[0]);
 							if (GameData.getEntityRegistry().containsKey(loc)) {
-								clazz = GameData.getEntityRegistry().getValue(loc).getEntityClass();
+								clazz = (Class<? extends EntityLiving>) GameData.getEntityRegistry().getValue(loc).getEntityClass();
 								try {
 									weight = Integer.valueOf(nameSplit[1]);
 								} catch (Exception e) {
@@ -80,11 +81,11 @@ public class HordeEventRegister {
 						throw new Exception("Entry " + name + " is not in the correct format");
 					}
 					if (EntityLiving.class.isAssignableFrom(clazz) && weight>0) {
-						HordeSpawnEntry entry = new HordeSpawnEntry(clazz, weight, minDay, maxDay);
+						HordeSpawnEntry entry = new HordeSpawnEntry((Class<? extends EntityLiving>) clazz, weight, minDay, maxDay);
 						if (nbt != null) {
 							entry.setTagCompound(nbt);
 						}
-						spawnlist.put(clazz, entry);
+						spawnlist.put((Class<? extends EntityLiving>) clazz, entry);
 						Hordes.logInfo("Loaded entity " + name + " as " + clazz.getName() + " with weight " + weight + ", min day " + minDay + " and max day " + maxDay);
 					} else {
 						throw new Exception("Entity " + name + " is not an instance of EntityLiving");
@@ -98,7 +99,7 @@ public class HordeEventRegister {
 		}
 	}
 
-	public static WeightedOutputs getSpawnTable(int day) {
+	public static WeightedOutputs<Class<? extends EntityLiving>> getSpawnTable(int day) {
 		Map<Class<? extends EntityLiving>, Integer> spawnmap = new HashMap<Class<? extends EntityLiving>, Integer>();
 		for (Entry<Class<? extends EntityLiving>, HordeSpawnEntry> mapentry : spawnlist.entrySet()) {
 			HordeSpawnEntry entry = mapentry.getValue();
@@ -107,16 +108,16 @@ public class HordeEventRegister {
 				Hordes.logInfo("Adding entry " + entry.toString() + " to hordespawn on day " + day);
 			}
 		}
-		return new WeightedOutputs(spawnmap);
+		return new WeightedOutputs<Class<? extends EntityLiving>>(spawnmap);
 	}
-	
+
 	public static HordeSpawnEntry getEntryFor(EntityLiving entity) {
 		return getEntryFor(entity.getClass());
 	}
-	
+
 	public static HordeSpawnEntry getEntryFor(Class<? extends EntityLiving> clazz) {
 		if (spawnlist.containsKey(clazz)) return spawnlist.get(clazz);
 		return null;
 	}
-	
+
 }
