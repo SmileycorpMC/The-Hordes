@@ -7,9 +7,8 @@ import net.minecraft.command.NumberInvalidException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.world.World;
+import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.ModDefinitions;
-import net.smileycorp.hordes.common.hordeevent.WorldDataHordeEvent;
 
 public class CommandSpawnWave extends CommandBase {
 
@@ -20,17 +19,16 @@ public class CommandSpawnWave extends CommandBase {
 
 	@Override
 	public String getUsage(ICommandSender sender) {
-		 return "commands."+ModDefinitions.modid+".SpawnHordeWave.usage";
+		return "commands."+ModDefinitions.modid+".SpawnHordeWave.usage";
 	}
-	
+
 	@Override
 	public int getRequiredPermissionLevel() {
-        return 2;
-    }
+		return 2;
+	}
 
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-		World world = sender.getEntityWorld();
 		if (args.length!=1) {
 			throw new CommandException("commands."+ModDefinitions.modid+".SpawnHordeWave.usage", new Object[] {});
 		}
@@ -39,17 +37,15 @@ public class CommandSpawnWave extends CommandBase {
 			if (sender.getCommandSenderEntity() instanceof EntityPlayer) {
 				server.addScheduledTask(() -> {
 					EntityPlayer player = (EntityPlayer) sender.getCommandSenderEntity();
-					WorldDataHordeEvent data = WorldDataHordeEvent.getData(world);
-					data.getEventForPlayer(player).spawnWave(world, count);
-					data.save();
+					if (player.hasCapability(Hordes.HORDE_EVENT, null)) player.getCapability(Hordes.HORDE_EVENT, null).spawnWave(player.world, count);
 				});
 			}
 			notifyCommandListener(sender, this, "commands."+ModDefinitions.modid+".SpawnHordeWave.success", new Object[0]);
-        }
-        catch (NumberInvalidException e) {
-        	 throw new CommandException("commands."+ModDefinitions.modid+".SpawnHordeWave.invalidValue", new Object[] {new TextComponentTranslation(args[0])});
-        }
-		
+		}
+		catch (NumberInvalidException e) {
+			throw new CommandException("commands."+ModDefinitions.modid+".SpawnHordeWave.invalidValue", new Object[] {new TextComponentTranslation(args[0])});
+		}
+
 	}
- 
+
 }

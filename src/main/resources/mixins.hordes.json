@@ -1,0 +1,10 @@
+{
+  "compatibilityLevel": "JAVA_8",
+  "package": "net.smileycorp.hordes.infection.mixin",
+  "refmap": "mixins.hordes.refmap.json",
+  "mixins": [
+    "MixinEntityLiving"
+  ],
+  "client": [],
+  "server": []
+}

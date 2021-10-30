@@ -13,7 +13,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -36,7 +35,7 @@ import net.smileycorp.hordes.infection.InfectionPacketHandler.InfectMessage;
 
 @EventBusSubscriber(modid=ModDefinitions.modid)
 public class InfectionEventHandler {
-	
+
 	@SubscribeEvent
 	public void playerJoin(PlayerLoggedInEvent event) {
 		EntityPlayer player = event.player;
@@ -46,7 +45,7 @@ public class InfectionEventHandler {
 			}
 		}
 	}
-	
+
 	@SubscribeEvent
 	public void onItemStackConsume(LivingEntityUseItemEvent.Finish event) {
 		EntityLivingBase entity = event.getEntityLiving();
@@ -57,8 +56,8 @@ public class InfectionEventHandler {
 			}
 		}
 	}
-	
-	@SubscribeEvent(priority = EventPriority.HIGHEST)
+
+	/*@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
 		EntityPlayer player = event.getEntityPlayer();
 		ItemStack stack = event.getItemStack();
@@ -83,8 +82,8 @@ public class InfectionEventHandler {
 				}
 			}
 		}
-	}
-	
+	}*/
+
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onItemUse(PlayerInteractEvent.RightClickItem event) {
 		ItemStack stack = event.getItemStack();
@@ -102,7 +101,7 @@ public class InfectionEventHandler {
 			}
 		}
 	}
-	
+
 	@SubscribeEvent
 	public void onDamage(LivingDamageEvent event) {
 		EntityLivingBase entity = event.getEntityLiving();
@@ -126,7 +125,7 @@ public class InfectionEventHandler {
 			}
 		}
 	}
-	
+
 	@SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled=true)
 	public void onDeath(LivingDeathEvent event) {
 		EntityLivingBase entity = event.getEntityLiving();
@@ -136,9 +135,9 @@ public class InfectionEventHandler {
 			InfectionDeathEvent newevent = new InfectionDeathEvent(entity, event.getSource());
 			MinecraftForge.EVENT_BUS.post(newevent);
 			if (newevent.getResult() == Result.DENY) event.setCanceled(true);
-		}	
+		}
 	}
-	
+
 	@SubscribeEvent
 	public void onInfectDeath(InfectionDeathEvent event) {
 		EntityLivingBase entity = event.getEntityLiving();
@@ -159,7 +158,7 @@ public class InfectionEventHandler {
 			event.setResult(Result.DENY);
 		}
 	}
-	
+
 	@SubscribeEvent
 	public static void onTick(LivingUpdateEvent event) {
 		EntityLivingBase entity = event.getEntityLiving();
@@ -176,5 +175,5 @@ public class InfectionEventHandler {
 			}
 		}
 	}
-	
+
 }

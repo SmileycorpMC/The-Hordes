@@ -28,7 +28,7 @@ public class CommonProxy {
 		ConfigHandler.syncConfig();
 		MinecraftForge.EVENT_BUS.register(this);
 		CapabilityManager.INSTANCE.register(IZombifyPlayer.class, new IZombifyPlayer.Storage(), () -> new IZombifyPlayer.Implementation());
-		CapabilityManager.INSTANCE.register(IHordeSpawn.class, new IHordeSpawn.Storage(), () -> new IHordeSpawn.Implementation());
+		CapabilityManager.INSTANCE.register(IHordeSpawn.class, new IHordeSpawn.Storage(), () -> new IHordeSpawn.HordeSpawn());
 		CapabilityManager.INSTANCE.register(IOngoingHordeEvent.class, new IOngoingHordeEvent.Storage(), () -> new OngoingHordeEvent());
 		//Horde Event
 		if (ConfigHandler.enableHordeEvent) {

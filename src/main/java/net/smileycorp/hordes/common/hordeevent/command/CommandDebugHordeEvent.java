@@ -10,7 +10,6 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.World;
 import net.smileycorp.hordes.common.ModDefinitions;
 import net.smileycorp.hordes.common.hordeevent.WorldDataHordeEvent;
 
@@ -23,20 +22,19 @@ public class CommandDebugHordeEvent extends CommandBase {
 
 	@Override
 	public String getUsage(ICommandSender sender) {
-		 return "commands."+ModDefinitions.modid+".HordeDebug.usage";
+		return "commands."+ModDefinitions.modid+".HordeDebug.usage";
 	}
-	
+
 	@Override
 	public int getRequiredPermissionLevel() {
-        return 0;
-    }
+		return 0;
+	}
 
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-		World world = sender.getEntityWorld();
 		Path path = Paths.get("logs/hordes.log");
 		server.addScheduledTask(() -> {
-			WorldDataHordeEvent data = WorldDataHordeEvent.getData(world);
+			WorldDataHordeEvent data = WorldDataHordeEvent.getData(sender.getEntityWorld());
 			List<String> out = data.getDebugText();
 			try {
 				Files.write(path, out, StandardCharsets.UTF_8);
@@ -44,6 +42,6 @@ public class CommandDebugHordeEvent extends CommandBase {
 			data.save();
 		});
 		notifyCommandListener(sender, this, "commands."+ModDefinitions.modid+".HordeDebug.success", path.toAbsolutePath().toString());
-    }
- 
+	}
+
 }

@@ -6,8 +6,8 @@ public class ModDefinitions {
 
 	public static final String modid = "hordes";
 	public static final String name = "The Hordes";
-	public static final String version = "1.1.2";
-	public static final String dependencies = "required-after:atlaslib@1.1.4;after:baubles;after:galacticraft;before:deathchest;before:corpse;before:jei";
+	public static final String version = "1.1.4";
+	public static final String dependencies = "required-after:atlaslib@1.1.5;after:baubles;after:galacticraft;before:deathchest;before:corpse;before:jei";
 	public static final String location = "net.smileycorp.hordes.";
 	public static final String client = location + "client.ClientProxy";
 	public static final String server = location + "common.CommonProxy";

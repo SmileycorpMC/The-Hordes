@@ -31,7 +31,7 @@ public interface IHordeSpawn {
 		
 	}
 	
-	public static class Implementation implements IHordeSpawn {
+	public static class HordeSpawn implements IHordeSpawn {
 
 		private String uuid = "";
 		

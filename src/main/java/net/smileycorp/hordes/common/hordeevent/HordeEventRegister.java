@@ -1,6 +1,10 @@
 package net.smileycorp.hordes.common.hordeevent;
 
+import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -15,7 +19,7 @@ import net.smileycorp.hordes.common.Hordes;
 
 public class HordeEventRegister {
 
-	protected static Map<Class<? extends EntityLiving>, HordeSpawnEntry> spawnlist = new HashMap<Class<? extends EntityLiving>, HordeSpawnEntry>();
+	protected static Map<Class<? extends EntityLiving>, List<HordeSpawnEntry>> spawnlist = new HashMap<Class<? extends EntityLiving>, List<HordeSpawnEntry>>();
 
 	@SuppressWarnings("unchecked")
 	public static void readConfig() {
@@ -85,7 +89,8 @@ public class HordeEventRegister {
 						if (nbt != null) {
 							entry.setTagCompound(nbt);
 						}
-						spawnlist.put((Class<? extends EntityLiving>) clazz, entry);
+						if (spawnlist.containsKey(clazz)) spawnlist.get(clazz).add(entry);
+						else spawnlist.put((Class<? extends EntityLiving>) clazz, Arrays.asList(entry));
 						Hordes.logInfo("Loaded entity " + name + " as " + clazz.getName() + " with weight " + weight + ", min day " + minDay + " and max day " + maxDay);
 					} else {
 						throw new Exception("Entity " + name + " is not an instance of EntityLiving");
@@ -100,23 +105,33 @@ public class HordeEventRegister {
 	}
 
 	public static WeightedOutputs<Class<? extends EntityLiving>> getSpawnTable(int day) {
-		Map<Class<? extends EntityLiving>, Integer> spawnmap = new HashMap<Class<? extends EntityLiving>, Integer>();
-		for (Entry<Class<? extends EntityLiving>, HordeSpawnEntry> mapentry : spawnlist.entrySet()) {
-			HordeSpawnEntry entry = mapentry.getValue();
-			if (entry.getMinDay() <= day && (entry.getMaxDay() == 0 || entry.getMaxDay() >= day)) {
-				spawnmap.put(mapentry.getKey(), entry.getWeight());
-				Hordes.logInfo("Adding entry " + entry.toString() + " to hordespawn on day " + day);
+		List<Entry<Class<? extends EntityLiving>, Integer>> spawnmap = new ArrayList<Entry<Class<? extends EntityLiving>, Integer>>();
+		for (Entry<Class<? extends EntityLiving>, List<HordeSpawnEntry>> mapentry : spawnlist.entrySet()) {
+			for(HordeSpawnEntry entry : mapentry.getValue()) {
+				if (entry.getMinDay() <= day && (entry.getMaxDay() == 0 || entry.getMaxDay() >= day)) {
+					spawnmap.add(new SimpleEntry<Class<? extends EntityLiving>, Integer>(mapentry.getKey(), entry.getWeight()));
+					Hordes.logInfo("Adding entry " + entry.toString() + " to hordespawn on day " + day);
+				}
 			}
 		}
-		return new WeightedOutputs<Class<? extends EntityLiving>>(spawnmap);
+		return new WeightedOutputs<Class<? extends EntityLiving>>(1, spawnmap);
 	}
 
-	public static HordeSpawnEntry getEntryFor(EntityLiving entity) {
-		return getEntryFor(entity.getClass());
+	public static List<HordeSpawnEntry> getEntriesFor(EntityLiving entity) {
+		return getEntriesFor(entity.getClass());
 	}
 
-	public static HordeSpawnEntry getEntryFor(Class<? extends EntityLiving> clazz) {
+	public static List<HordeSpawnEntry> getEntriesFor(Class<? extends EntityLiving> clazz) {
 		if (spawnlist.containsKey(clazz)) return spawnlist.get(clazz);
+		return Arrays.asList();
+	}
+
+	public static HordeSpawnEntry getEntryFor(EntityLiving entity, int day) {
+		for (HordeSpawnEntry entry : getEntriesFor(entity)) {
+			if (entry.getMinDay() <= day && (entry.getMaxDay() == 0 || entry.getMaxDay() >= day)) {
+				return entry;
+			}
+		}
 		return null;
 	}
 

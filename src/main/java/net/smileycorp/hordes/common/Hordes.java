@@ -1,6 +1,6 @@
 package net.smileycorp.hordes.common;
 
-import net.minecraft.util.SoundEvent;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fml.common.Mod;
@@ -22,7 +22,7 @@ public class Hordes {
 
 	private static Logger logger = LogManager.getLogger(ModDefinitions.name);
 
-	public static final SoundEvent HORDE_SOUND = new SoundEvent(ModDefinitions.getResource("horde_spawn"));
+	public static final ResourceLocation HORDE_SOUND = ModDefinitions.getResource("horde_spawn");
 
 	@Instance(ModDefinitions.modid)
 	public static Hordes INSTANCE;
