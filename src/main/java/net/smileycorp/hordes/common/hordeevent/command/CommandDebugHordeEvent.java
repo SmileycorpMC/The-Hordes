@@ -11,7 +11,7 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import net.smileycorp.hordes.common.ModDefinitions;
-import net.smileycorp.hordes.common.hordeevent.WorldDataHordeEvent;
+import net.smileycorp.hordes.common.hordeevent.capability.HordeWorldData;
 
 public class CommandDebugHordeEvent extends CommandBase {
 
@@ -34,7 +34,7 @@ public class CommandDebugHordeEvent extends CommandBase {
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		Path path = Paths.get("logs/hordes.log");
 		server.addScheduledTask(() -> {
-			WorldDataHordeEvent data = WorldDataHordeEvent.getData(sender.getEntityWorld());
+			HordeWorldData data = HordeWorldData.getData(sender.getEntityWorld());
 			List<String> out = data.getDebugText();
 			try {
 				Files.write(path, out, StandardCharsets.UTF_8);

@@ -35,4 +35,6 @@ public class ModDefinitions {
 		return getResource(string).toString();
 	}
 
+	public static final ResourceLocation HORDE_SOUND = getResource("horde_spawn");
+
 }

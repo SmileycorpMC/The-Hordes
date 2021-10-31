@@ -4,37 +4,34 @@ import java.util.List;
 import java.util.UUID;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.AbstractAttributeMap;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.IAttributeInstance;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.potion.Effect;
+import net.minecraft.potion.EffectType;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.ModDefinitions;
 
-public class PotionInfected extends Potion {
-	
+import org.spongepowered.asm.mixin.MixinEnvironment.Side;
+
+public class InfectedEffect extends Effect {
+
 	public static final ResourceLocation TEXTURE = ModDefinitions.getResource("textures/gui/potions.png");
-	
+
 	private final UUID SPEED_MOD_UUID = UUID.fromString("05d68949-cb8b-4031-92a6-bd75e42b5cdd");
 	private final String SPEED_MOD_NAME = ModDefinitions.getName("Infected");
-	private final AttributeModifier SPEED_MOD = new AttributeModifier(SPEED_MOD_NAME, -0.1f, 2);
-	
-	public PotionInfected() {
-		super(true, 0x00440002);
+	private final AttributeModifier SPEED_MOD = new AttributeModifier(SPEED_MOD_NAME, -0.1, AttributeModifier.Operation.MULTIPLY_TOTAL);
+
+	public InfectedEffect() {
+		super(EffectType.HARMFUL, 0x00440002);
 		String name = "Infected";
-		setPotionName("effect." + ModDefinitions.getName(name));
+		setName("effect." + ModDefinitions.getName(name));
 		setRegistryName(ModDefinitions.getResource(name));
 		setIconIndex(0, 0);
 	}
-	
+
 	@Override
     public boolean shouldRender(PotionEffect effect) {
         return true;
@@ -51,21 +48,21 @@ public class PotionInfected extends Potion {
 	public List<ItemStack> getCurativeItems() {
     	return ConfigHandler.enableMobInfection ? InfectionRegister.getCureList() : super.getCurativeItems();
     }
-    
+
     @Override
-    public void performEffect(EntityLivingBase entity, int amplifier) {
-    	if (entity instanceof EntityPlayer) {
-            ((EntityPlayer)entity).addExhaustion(0.007F * (amplifier+1));
+    public void applyEffectTick(LivingEntity entity, int amplifier) {
+    	if (entity instanceof PlayerEntity) {
+            ((PlayerEntity)entity).addExhaustion(0.007F * (amplifier+1));
         }
     }
-    
+
     @Override
     public boolean isReady(int duration, int amplifier) {
     	return ConfigHandler.infectHunger;
     }
-    
+
     @Override
-	public void applyAttributesModifiersToEntity(EntityLivingBase entity, AbstractAttributeMap map, int amplifier) {
+	public void applyAttributesModifiersToEntity(LivingEntity entity, AbstractAttributeMap map, int amplifier) {
         if (amplifier > 0 && ConfigHandler.infectSlowness) {
         	IAttributeInstance attribute = map.getAttributeInstance(SharedMonsterAttributes.MOVEMENT_SPEED);
         	if (attribute != null) {
@@ -74,9 +71,9 @@ public class PotionInfected extends Potion {
             }
         }
     }
-    
+
     @Override
-	public void removeAttributesModifiersFromEntity(EntityLivingBase entity, AbstractAttributeMap map, int amplifier) {
+	public void removeAttributesModifiersFromEntity(LivingEntity entity, AbstractAttributeMap map, int amplifier) {
     	IAttributeInstance attribute = map.getAttributeInstance(SharedMonsterAttributes.MOVEMENT_SPEED);
     	if (attribute != null) attribute.removeModifier(SPEED_MOD_UUID);
     }

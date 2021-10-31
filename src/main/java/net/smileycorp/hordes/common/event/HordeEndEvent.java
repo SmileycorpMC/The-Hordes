@@ -1,9 +1,9 @@
 package net.smileycorp.hordes.common.event;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.smileycorp.hordes.common.ModDefinitions;
-import net.smileycorp.hordes.common.hordeevent.IOngoingHordeEvent;
+import net.smileycorp.hordes.common.hordeevent.capability.IOngoingHordeEvent;
 
 public class HordeEndEvent extends HordeEvent {
 
@@ -11,9 +11,9 @@ public class HordeEndEvent extends HordeEvent {
 	protected String message = ModDefinitions.hordeEventEnd;
 	protected final boolean wasCommand;
 
-	public HordeEndEvent(EntityPlayer player, IOngoingHordeEvent horde, boolean wasCommand) {
+	public HordeEndEvent(PlayerEntity player, IOngoingHordeEvent horde, boolean wasCommand) {
 		super(player, horde);
-		pos = player.getPosition();
+		pos = player.blockPosition();
 		this.wasCommand = wasCommand;
 	}
 

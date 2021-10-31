@@ -4,17 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.registry.EntityEntry;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.fml.common.thread.SidedThreadGroups;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.smileycorp.atlas.api.util.RecipeUtils;
 import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
@@ -25,7 +22,7 @@ public class InfectionRegister {
 	private static List<ItemStack> cures = new ArrayList<ItemStack>();
 	private static List<ItemStack> curesClient = new ArrayList<ItemStack>();
 
-	private static List<Class<? extends EntityLiving>> infectionEntities = new ArrayList<Class<? extends EntityLiving>>();
+	private static List<EntityType<?>> infectionEntities = new ArrayList<EntityType<?>>();
 
 	public static void readConfig() {
 		readInfectionEntities();
@@ -46,10 +43,9 @@ public class InfectionRegister {
 				if (nameSplit.length>=2) {
 					ResourceLocation loc = new ResourceLocation(nameSplit[0], nameSplit[1]);
 					if (ForgeRegistries.ENTITIES.containsKey(loc)) {
-						EntityEntry entry = ForgeRegistries.ENTITIES.getValue(loc);
-						Class<?> clazz = entry.getEntityClass();
-						if (EntityLiving.class.isAssignableFrom(clazz)) {
-							infectionEntities.add((Class<? extends EntityLiving>) clazz);
+						EntityType<?> type = ForgeRegistries.ENTITIES.getValue(loc);
+						if (type != null) {
+							infectionEntities.add(type);
 						}
 					}
 				} else {
@@ -89,10 +85,8 @@ public class InfectionRegister {
 		StringBuilder builder = new StringBuilder();
 		for (ItemStack stack : cures) {
 			builder.append(stack.getItem().getRegistryName());
-			builder.append(":");
-			builder.append(stack.getMetadata());
-			if (stack.getTagCompound() != null) {
-				builder.append(stack.getTagCompound().toString());
+			if (stack.getTag() != null) {
+				builder.append(stack.getTag().toString());
 			}
 			builder.append(";");
 		}
@@ -102,12 +96,12 @@ public class InfectionRegister {
 	public static List<ItemStack> parseCureData(String[] data) throws Exception {
 		List<ItemStack> stacks = new ArrayList<ItemStack>();
 		for (String name : data) {
-			NBTTagCompound nbt = null;
+			CompoundNBT nbt = null;
 			if (name.contains("{")) {
 				String nbtstring = name.substring(name.indexOf("{"));
 				name = name.substring(0, name.indexOf("{"));
 				try {
-					NBTTagCompound parsed = JsonToNBT.getTagFromJson(nbtstring);
+					CompoundNBT parsed = JsonToNBT.parseTag(nbtstring);
 					if (parsed != null) nbt = parsed;
 				} catch (Exception e) {
 					Hordes.logError("Error parsing nbt for entity " + name + " " + e.getMessage(), e);
@@ -117,16 +111,10 @@ public class InfectionRegister {
 			if (nameSplit.length>=2) {
 				ResourceLocation loc = new ResourceLocation(nameSplit[0], nameSplit[1]);
 				int meta;
-				try {
-					meta = nameSplit.length > 2 ? (nameSplit[2].equals("*") ? OreDictionary.WILDCARD_VALUE : Integer.valueOf(nameSplit[2])) : 0;
-				} catch (Exception e) {
-					meta = 0;
-					Hordes.logError("Entry" + name + " has a non integer, non wildcard metadata value", e);
-				}
 				if (ForgeRegistries.ITEMS.containsKey(loc)) {
-					ItemStack stack = new ItemStack(ForgeRegistries.ITEMS.getValue(loc), 1, meta);
+					ItemStack stack = new ItemStack(ForgeRegistries.ITEMS.getValue(loc));
 					if (nbt!=null) {
-						stack.setTagCompound(nbt);
+						stack.setTag(nbt);
 					}
 					stacks.add(stack);
 				}
@@ -139,8 +127,8 @@ public class InfectionRegister {
 
 	static List<ItemStack> getCureList() {
 		List<ItemStack> result = new ArrayList<ItemStack>();
-		for (ItemStack stack : FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT ? curesClient : cures) {
-			result.add(new ItemStack(stack.getItem(), stack.getMetadata()));
+		for (ItemStack stack : Thread.currentThread().getThreadGroup() == SidedThreadGroups.CLIENT ? curesClient : cures) {
+			result.add(new ItemStack(stack.getItem()));
 		}
 		return result;
 	}
@@ -158,8 +146,8 @@ public class InfectionRegister {
 	}
 
 	public static boolean isCure(ItemStack stack) {
-		for (ItemStack cure : (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) ? curesClient : cures) {
-			if (RecipeUtils.compareItemStacks(stack, cure, cure.getTagCompound() != null)) {
+		for (ItemStack cure : (Thread.currentThread().getThreadGroup() == SidedThreadGroups.CLIENT) ? curesClient : cures) {
+			if (RecipeUtils.compareItemStacks(stack, cure, cure.getTag() != null)) {
 				return true;
 			}
 		}
@@ -167,9 +155,9 @@ public class InfectionRegister {
 	}
 
 	public static boolean canCauseInfection(Entity entity) {
-		if (entity instanceof EntityLiving) {
-			for (Class<?> clazz : infectionEntities) {
-				if (clazz.isAssignableFrom(entity.getClass())) return true;
+		if (entity instanceof MobEntity) {
+			for (EntityType<?> type : infectionEntities) {
+				if (entity.getType() == type) return true;
 			}
 		}
 		return false;

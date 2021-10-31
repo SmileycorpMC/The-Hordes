@@ -13,11 +13,11 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.layers.LayerBipedArmor;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.util.ResourceLocation;
-import net.smileycorp.hordes.common.entities.EntityZombiePlayer;
+import net.smileycorp.hordes.common.entities.ZombiePlayerEntity;
 
 import com.mojang.authlib.GameProfile;
 
-public class RenderZombiePlayer extends RenderBiped<EntityZombiePlayer> {
+public class RenderZombiePlayer extends RenderBiped<ZombiePlayerEntity> {
 
     public RenderZombiePlayer(RenderManager rendermanager) {
         super(rendermanager, new ModelZombiePlayer(), 0.5F);
@@ -36,7 +36,7 @@ public class RenderZombiePlayer extends RenderBiped<EntityZombiePlayer> {
     }
 
     @Override
-	protected ResourceLocation getEntityTexture(EntityZombiePlayer entity) {
+	protected ResourceLocation getEntityTexture(ZombiePlayerEntity entity) {
     	UUID uuid = entity.getPlayerUUID();
     	NetworkPlayerInfo playerinfo = Minecraft.getMinecraft().getConnection().getPlayerInfo(uuid);
     	return playerinfo == null ? getTexture(uuid) : playerinfo.getLocationSkin();
@@ -50,7 +50,7 @@ public class RenderZombiePlayer extends RenderBiped<EntityZombiePlayer> {
 	}
 
 	@Override
-    public void doRender(EntityZombiePlayer entity, double x, double y, double z, float entityYaw, float partialTicks) {
+    public void doRender(ZombiePlayerEntity entity, double x, double y, double z, float entityYaw, float partialTicks) {
     	GlStateManager.pushMatrix();
     	GlStateManager.color(0.4745f, 0.6117f, 0.3961f);
     	super.doRender(entity, x, y, z, entityYaw, partialTicks);

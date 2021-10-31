@@ -5,7 +5,7 @@ import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
-import net.smileycorp.hordes.common.entities.EntityZombiePlayer;
+import net.smileycorp.hordes.common.entities.ZombiePlayerEntity;
 
 public class ModelZombiePlayer extends ModelPlayer {
 	
@@ -18,7 +18,7 @@ public class ModelZombiePlayer extends ModelPlayer {
 	@Override
 	public void render(Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
 		if (!fixedArms) {
-			if (DefaultPlayerSkin.getSkinType(((EntityZombiePlayer) entity).getPlayerUUID()).equals("slim")) {
+			if (DefaultPlayerSkin.getSkinType(((ZombiePlayerEntity) entity).getPlayerUUID()).equals("slim")) {
 				this.bipedLeftArm = new ModelRenderer(this, 32, 48);
 		        this.bipedLeftArm.addBox(-1.0F, -2.0F, -2.0F, 3, 12, 4, 0.0f);
 		        this.bipedLeftArm.setRotationPoint(5.0F, 2.5F, 0.0F);
@@ -34,7 +34,7 @@ public class ModelZombiePlayer extends ModelPlayer {
 	@Override
 	public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor, Entity entityIn) {
         super.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor, entityIn);
-        boolean flag = ((EntityZombiePlayer)entityIn).isArmsRaised();
+        boolean flag = ((ZombiePlayerEntity)entityIn).isArmsRaised();
         float f = MathHelper.sin(this.swingProgress * (float)Math.PI);
         float f1 = MathHelper.sin((1.0F - (1.0F - this.swingProgress) * (1.0F - this.swingProgress)) * (float)Math.PI);
         this.bipedRightArm.rotateAngleZ = 0.0F;
