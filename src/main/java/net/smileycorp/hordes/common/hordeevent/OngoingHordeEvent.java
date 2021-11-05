@@ -145,7 +145,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 		}
 		HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, HordeEventRegister.getSpawnTable(day), this);
 		MinecraftForge.EVENT_BUS.post(buildTableEvent);
-		WeightedOutputs<Class<? extends EntityLiving>> spawntable = buildTableEvent.spawntable;
+		WeightedOutputs<HordeSpawnEntry> spawntable = buildTableEvent.spawntable;
 		if (spawntable.isEmpty()) {
 			logInfo("Spawntable is empty, stopping wave spawn.");
 			return;
@@ -164,10 +164,11 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 			}
 			Vec3d dir = DirectionUtils.getRandomDirectionVecXZ(world.rand);
 			BlockPos pos = DirectionUtils.getClosestLoadedPos(world, basepos, dir, world.rand.nextInt(10));
-			Class<? extends EntityLiving> clazz = spawntable.getResult(world.rand);
+			HordeSpawnEntry entry = spawntable.getResult(world.rand);
+			Class<? extends EntityLiving> clazz = entry.getEntity();
 			try {
 				EntityLiving entity = clazz.getConstructor(World.class).newInstance(world);
-				entity.readFromNBT(HordeEventRegister.getEntryFor(entity, day).getNBT());
+				entity.readFromNBT(entry.getTagCompound());
 				HordeSpawnEntityEvent spawnEntityEvent = new HordeSpawnEntityEvent(player, entity, pos, this);
 				MinecraftForge.EVENT_BUS.post(spawnEntityEvent);
 				if (!spawnEntityEvent.isCanceled()) {
@@ -273,15 +274,13 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 				if (startEvent.isCanceled()) return;
 				HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, HordeEventRegister.getSpawnTable((int) Math.floor(world.getWorldTime()/ConfigHandler.dayLength)), this);
 				MinecraftForge.EVENT_BUS.post(buildTableEvent);
-				WeightedOutputs<Class<? extends EntityLiving>> spawntable = buildTableEvent.spawntable;
+				WeightedOutputs<HordeSpawnEntry> spawntable = buildTableEvent.spawntable;
 				if (!spawntable.isEmpty()) {
 					timer = duration;
 					hasChanged = true;
 					sendMessage(startEvent.getMessage());
-					if (!isCommand) {
-						day = nextDay;
-						nextDay = WorldDataHordeEvent.getData(world).getNextDay();
-					} else day = (int) Math.floor(world.getWorldTime()/ConfigHandler.dayLength);
+					if (isCommand) day = (int) Math.floor(world.getWorldTime()/ConfigHandler.dayLength);
+					else day = nextDay;
 				} else {
 					if (!isCommand) nextDay = WorldDataHordeEvent.getData(world).getNextDay();
 					logInfo("Spawntable is empty, canceling event start.");

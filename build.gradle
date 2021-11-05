@@ -17,7 +17,7 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 apply plugin: 'org.spongepowered.mixin'
 
-version = "1.12.2-1.1.4"
+version = "1.12.2-1.1.4a"
 group = "net.smileycorp.hordes" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "The-Hordes"
 
