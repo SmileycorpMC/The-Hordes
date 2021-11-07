@@ -191,7 +191,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 					}
 					entity.tasks.addTask(6, new EntityAIGoToEntityPos(entity, player));
 				} else {
-					logInfo("Entity spawn event has been cancelled, not spawninf entity  of class " + clazz);
+					logInfo("Entity spawn event has been cancelled, not spawning entity  of class " + clazz);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
