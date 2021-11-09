@@ -1,6 +1,7 @@
 package net.smileycorp.hordes.common.entities;
 
-import java.util.List;
+import java.awt.Color;
+import java.util.Collection;
 import java.util.UUID;
 
 import net.minecraft.entity.item.ItemEntity;
@@ -20,6 +21,8 @@ public interface IZombiePlayer {
 
 	public UUID getPlayerUUID();
 
-	public void setInventory(List<ItemEntity> list);
+	public void setInventory(Collection<ItemEntity> drops);
+
+	public Color getColour();
 
 }

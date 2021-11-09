@@ -22,7 +22,7 @@ public class CommandDebugHordeEvent extends CommandBase {
 
 	@Override
 	public String getUsage(ICommandSender sender) {
-		return "commands."+ModDefinitions.modid+".HordeDebug.usage";
+		return "commands."+ModDefinitions.MODID+".HordeDebug.usage";
 	}
 
 	@Override
@@ -41,7 +41,7 @@ public class CommandDebugHordeEvent extends CommandBase {
 			} catch (Exception e) {}
 			data.save();
 		});
-		notifyCommandListener(sender, this, "commands."+ModDefinitions.modid+".HordeDebug.success", path.toAbsolutePath().toString());
+		notifyCommandListener(sender, this, "commands."+ModDefinitions.MODID+".HordeDebug.success", path.toAbsolutePath().toString());
 	}
 
 }

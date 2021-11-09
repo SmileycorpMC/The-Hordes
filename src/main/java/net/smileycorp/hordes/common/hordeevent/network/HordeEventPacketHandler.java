@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.common.hordeevent;
+package net.smileycorp.hordes.common.hordeevent.network;
 
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -13,7 +13,7 @@ import net.smileycorp.hordes.common.ModDefinitions;
 
 public class HordeEventPacketHandler {
 
-	public static final SimpleNetworkWrapper NETWORK_INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(ModDefinitions.modid+"_hordeevent");
+	public static final SimpleNetworkWrapper NETWORK_INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(ModDefinitions.MODID+"_hordeevent");
 
 	public static void initPackets() {
 		NETWORK_INSTANCE.registerMessage(SoundMessageHandler.class, HordeSoundMessage.class, 0, Side.CLIENT);

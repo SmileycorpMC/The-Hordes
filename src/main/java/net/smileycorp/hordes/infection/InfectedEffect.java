@@ -3,18 +3,24 @@ package net.smileycorp.hordes.infection;
 import java.util.List;
 import java.util.UUID;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.DisplayEffectsScreen;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.AttributeModifierManager;
+import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Effect;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.EffectType;
 import net.minecraft.util.ResourceLocation;
-import net.smileycorp.hordes.common.ConfigHandler;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.ModDefinitions;
 
-import org.spongepowered.asm.mixin.MixinEnvironment.Side;
+import com.mojang.blaze3d.matrix.MatrixStack;
 
 public class InfectedEffect extends Effect {
 
@@ -27,54 +33,51 @@ public class InfectedEffect extends Effect {
 	public InfectedEffect() {
 		super(EffectType.HARMFUL, 0x00440002);
 		String name = "Infected";
-		setName("effect." + ModDefinitions.getName(name));
 		setRegistryName(ModDefinitions.getResource(name));
-		setIconIndex(0, 0);
 	}
 
 	@Override
-    public boolean shouldRender(PotionEffect effect) {
+    public boolean shouldRender(EffectInstance effect) {
         return true;
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
-    public int getStatusIconIndex() {
-        Minecraft.getMinecraft().renderEngine.bindTexture(TEXTURE);
-        return super.getStatusIconIndex();
+    @OnlyIn(Dist.CLIENT)
+    public void renderInventoryEffect(EffectInstance effect, DisplayEffectsScreen<?> gui, MatrixStack mStack, int x, int y, float z) {
+
     }
 
     @Override
 	public List<ItemStack> getCurativeItems() {
-    	return ConfigHandler.enableMobInfection ? InfectionRegister.getCureList() : super.getCurativeItems();
+    	return CommonConfigHandler.enableMobInfection.get() ? InfectionRegister.getCureList() : super.getCurativeItems();
     }
 
     @Override
     public void applyEffectTick(LivingEntity entity, int amplifier) {
     	if (entity instanceof PlayerEntity) {
-            ((PlayerEntity)entity).addExhaustion(0.007F * (amplifier+1));
+            ((PlayerEntity)entity).causeFoodExhaustion(0.007F * (amplifier+1));
         }
     }
 
     @Override
-    public boolean isReady(int duration, int amplifier) {
-    	return ConfigHandler.infectHunger;
+    public boolean isDurationEffectTick(int duration, int amplifier) {
+    	return CommonConfigHandler.infectHunger.get();
     }
 
     @Override
-	public void applyAttributesModifiersToEntity(LivingEntity entity, AbstractAttributeMap map, int amplifier) {
-        if (amplifier > 0 && ConfigHandler.infectSlowness) {
-        	IAttributeInstance attribute = map.getAttributeInstance(SharedMonsterAttributes.MOVEMENT_SPEED);
+	public void addAttributeModifiers(LivingEntity entity,  AttributeModifierManager map, int amplifier) {
+        if (amplifier > 0 && CommonConfigHandler.infectSlowness.get()) {
+        	ModifiableAttributeInstance attribute = map.getInstance(Attributes.MOVEMENT_SPEED);
         	if (attribute != null) {
         		attribute.removeModifier(SPEED_MOD_UUID);
-        		attribute.applyModifier(new AttributeModifier(SPEED_MOD_UUID, SPEED_MOD_NAME + " " + amplifier, this.getAttributeModifierAmount(amplifier-1, SPEED_MOD), 2));
+        		attribute.addPermanentModifier(new AttributeModifier(SPEED_MOD_UUID, SPEED_MOD_NAME + " " + amplifier, this.getAttributeModifierValue(amplifier-1, SPEED_MOD), AttributeModifier.Operation.MULTIPLY_TOTAL));
             }
         }
     }
 
     @Override
-	public void removeAttributesModifiersFromEntity(LivingEntity entity, AbstractAttributeMap map, int amplifier) {
-    	IAttributeInstance attribute = map.getAttributeInstance(SharedMonsterAttributes.MOVEMENT_SPEED);
+	public void removeAttributeModifiers(LivingEntity entity, AttributeModifierManager map, int amplifier) {
+    	ModifiableAttributeInstance attribute = map.getInstance(Attributes.MOVEMENT_SPEED);
     	if (attribute != null) attribute.removeModifier(SPEED_MOD_UUID);
     }
 

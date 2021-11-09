@@ -1,63 +1,81 @@
 package net.smileycorp.hordes.client;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiIngame;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.SoundEvents;
+import net.minecraft.client.gui.IngameGui;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ChatType;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.Color;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.smileycorp.hordes.common.ConfigHandler;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.smileycorp.hordes.common.ModDefinitions;
+import net.smileycorp.hordes.common.entities.DrownedPlayerEntity;
+import net.smileycorp.hordes.common.entities.ZombiePlayerEntity;
+import net.smileycorp.hordes.infection.HordesInfection;
 
+@EventBusSubscriber(modid = ModDefinitions.MODID, value = Dist.CLIENT)
 public class ClientHandler {
 
-	public static void playHordeSound(Vec3d dir, ResourceLocation sound) {
-		if (ConfigHandler.hordeSpawnSound) {
-			Minecraft mc = Minecraft.getMinecraft();
-			World world = mc.world;
-			EntityPlayer player = mc.player;
-			BlockPos pos = new BlockPos(player.posX + (5*dir.x), player.posY, player.posZ + (5*dir.z));
-			float pitch = 1+((world.rand.nextInt(6)-3)/10);
+	private static Color TEXT_COLOUR = Color.fromRgb(0x440002);
+
+	@SubscribeEvent
+	public static void registerModels(ModelRegistryEvent event) {
+		RenderingRegistry.registerEntityRenderingHandler(HordesInfection.ZOMBIE_PLAYER.get(), m -> new RenderZombiePlayer<ZombiePlayerEntity>(m));
+		RenderingRegistry.registerEntityRenderingHandler(HordesInfection.DROWNED_PLAYER.get(), m -> new RenderZombiePlayer<DrownedPlayerEntity>(m));
+	}
+
+	public static void playHordeSound(Vector3d dir, ResourceLocation sound) {
+		if (ClientConfigHandler.hordeSpawnSound.get()) {
+			Minecraft mc = Minecraft.getInstance();
+			World world = mc.level;
+			PlayerEntity player = mc.player;
+			BlockPos pos = new BlockPos(player.getX() + (5*dir.x), player.getY(), player.getZ() + (5*dir.z));
+			float pitch = 1+((world.random.nextInt(6)-3)/10);
 			world.playSound(player, pos, new SoundEvent(sound), SoundCategory.HOSTILE, 0.3f, pitch);
 		}
 	}
 
-	public static EntityPlayer getPlayer() {
-		return Minecraft.getMinecraft().player;
+	public static PlayerEntity getPlayer() {
+		return Minecraft.getInstance().player;
 	}
 
 	public static void displayMessage(String text) {
-		GuiIngame gui = Minecraft.getMinecraft().ingameGUI;
-		ITextComponent message = new TextComponentTranslation(text);
-		message.setStyle(new Style().setBold(true).setColor(TextFormatting.DARK_RED));
-		if (ConfigHandler.eventNotifyMode == 1) {
-			gui.addChatMessage(ChatType.CHAT, message);
-		} else if (ConfigHandler.eventNotifyMode == 2) {
-			gui.overlayMessage=message.getFormattedText();
-			gui.overlayMessageTime=ConfigHandler.eventNotifyDuration;
+		IngameGui gui = Minecraft.getInstance().gui;
+		TextComponent message = new TranslationTextComponent(text);
+		message.setStyle(Style.EMPTY.withColor(TEXT_COLOUR));
+		if (ClientConfigHandler.eventNotifyMode.get() == 1) {
+			gui.handleChat(ChatType.CHAT, message, null);
+		} else if (ClientConfigHandler.eventNotifyMode.get() == 2) {
+			gui.overlayMessageString=message;
+			gui.overlayMessageTime=ClientConfigHandler.eventNotifyDuration.get();
 			gui.animateOverlayMessageColor=false;
-		} else if (ConfigHandler.eventNotifyMode == 3) {
-			gui.displayTitle(null, null, 5, ConfigHandler.eventNotifyDuration, 5);
-			gui.displayTitle(" ", null, 0, 0, 0);
-			gui.displayTitle(null, message.getFormattedText(), 0, 0, 0);
+		} else if (ClientConfigHandler.eventNotifyMode.get() == 3) {
+			gui.setTitles(null, null, 5, ClientConfigHandler.eventNotifyDuration.get(), 5);
+			gui.setTitles(new StringTextComponent(" "), null, 0, 0, 0);
+			gui.setTitles(null, message, 0, 0, 0);
 		}
 
 	}
 
 	public static void onInfect() {
-		if (ConfigHandler.playerInfectSound) {
-			Minecraft mc = Minecraft.getMinecraft();
-			World world = mc.world;
-			EntityPlayer player = mc.player;
-			world.playSound(player, player.getPosition(), SoundEvents.ENTITY_ZOMBIE_VILLAGER_CONVERTED, SoundCategory.HOSTILE, 0.75f, world.rand.nextFloat());
+		if (ClientConfigHandler.playerInfectSound.get()) {
+			Minecraft mc = Minecraft.getInstance();
+			World world = mc.level;
+			PlayerEntity player = mc.player;
+			world.playSound(player, player.blockPosition(), SoundEvents.ZOMBIE_VILLAGER_CONVERTED, SoundCategory.HOSTILE, 0.75f, world.random.nextFloat());
 		}
 	}
 

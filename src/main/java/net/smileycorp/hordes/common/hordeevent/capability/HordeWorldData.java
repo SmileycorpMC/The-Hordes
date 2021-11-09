@@ -3,19 +3,22 @@ package net.smileycorp.hordes.common.hordeevent.capability;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
 
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.storage.WorldSavedData;
-import net.smileycorp.hordes.common.ConfigHandler;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.ModDefinitions;
 
 public class HordeWorldData extends WorldSavedData {
 
-	public static final String DATA = ModDefinitions.modid + "_HordeEvent";
+	public static final String DATA = ModDefinitions.MODID + "_HordeEvent";
 
 	private int nextDay = 0;
 
@@ -30,9 +33,9 @@ public class HordeWorldData extends WorldSavedData {
 	}
 
 	@Override
-	public void readFromNBT(CompoundNBT nbt) {
-		if (nbt.hasKey("nextDay")) {
-			int next = nbt.getInteger("nextDay");
+	public void load(CompoundNBT nbt) {
+		if (nbt.contains("nextDay")) {
+			int next = nbt.getInt("nextDay");
 			if (nextDay == 0 || next > nextDay) {
 				nextDay = next;
 			}
@@ -40,11 +43,8 @@ public class HordeWorldData extends WorldSavedData {
 	}
 
 	@Override
-	public CompoundNBT writeToNBT(CompoundNBT nbt) {
-		for (Entry<String, CompoundNBT> entry : legacyEventData.entrySet()) {
-			nbt.setTag(entry.getKey(), entry.getValue());
-		}
-		nbt.setInteger("nextDay", nextDay);
+	public CompoundNBT save(CompoundNBT nbt) {
+		nbt.putInt("nextDay", nextDay);
 		return nbt;
 	}
 
@@ -56,45 +56,40 @@ public class HordeWorldData extends WorldSavedData {
 		this.nextDay = nextDay;
 	}
 
-	//legacy function -- use capabilities instead
-	@Deprecated
 	public Set<OngoingHordeEvent> getEvents() {
 		Set<OngoingHordeEvent> events = new HashSet<OngoingHordeEvent>();
-		if (!world.isRemote) {
-			for (EntityPlayer player : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers()) {
-				if (player.hasCapability(Hordes.HORDE_EVENT, null)) {
-					events.add((OngoingHordeEvent) player.getCapability(Hordes.HORDE_EVENT, null));
+		if (!world.isClientSide) {
+			for (PlayerEntity player : ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers()) {
+				LazyOptional<IOngoingHordeEvent> optional = player.getCapability(Hordes.HORDE_EVENT, null);
+				if (optional.isPresent()) {
+					events.add((OngoingHordeEvent) player.getCapability(Hordes.HORDE_EVENT, null).resolve().get());
 				}
 			}
 		}
 		return events;
 	}
 
-	public static HordeWorldData getData(World world) {
-		HordeWorldData data = (HordeWorldData) world.get;
-		if (data == null) {
-			return getCleanData(world);
-		}
+	public static HordeWorldData getData(ServerWorld world) {
+		HordeWorldData data = (HordeWorldData) world.getChunkSource().getDataStorage().computeIfAbsent(() -> getCleanData(world), DATA);
 		if (data.world == null) {
 			data.world = world;
-			int day = Math.round(world.getDayTime()/ConfigHandler.dayLength);
-			if (!ConfigHandler.spawnFirstDay && day <1) day  = 1;
-			int multiplier = (int) Math.ceil(day / ConfigHandler.hordeSpawnDays);
-			data.setNextDay((day * multiplier) + world.random.nextInt(ConfigHandler.hordeSpawnVariation + 1));
+			int day = Math.round(world.getDayTime()/CommonConfigHandler.dayLength.get());
+			if (!CommonConfigHandler.spawnFirstDay.get() && day <1) day  = 1;
+			int multiplier = (int) Math.ceil(day / CommonConfigHandler.hordeSpawnDays.get());
+			data.setNextDay((day * multiplier) + world.random.nextInt(CommonConfigHandler.hordeSpawnVariation.get() + 1));
+			data.setDirty();
 		}
 		return data;
 	}
 
-	public static HordeWorldData getCleanData(World world) {
+	public static HordeWorldData getCleanData(ServerWorld world) {
 		HordeWorldData data = new HordeWorldData();
 		data.world = world;
-		int day = Math.round(world.getDayTime()/ConfigHandler.dayLength);
-		double multiplier = Math.ceil(day / ConfigHandler.hordeSpawnDays);
-		if (!(ConfigHandler.spawnFirstDay && day == 0)) multiplier += 1;
-		int nextDay = (int) Math.floor(((multiplier*ConfigHandler.hordeSpawnDays) + world.rand.nextInt(ConfigHandler.hordeSpawnVariation + 1)));
+		int day = Math.round(world.getDayTime()/CommonConfigHandler.dayLength.get());
+		double multiplier = Math.ceil(day / CommonConfigHandler.hordeSpawnDays.get());
+		if (!(CommonConfigHandler.spawnFirstDay.get() && day == 0)) multiplier += 1;
+		int nextDay = (int) Math.floor(((multiplier*CommonConfigHandler.hordeSpawnDays.get()) + world.random.nextInt(CommonConfigHandler.hordeSpawnVariation.get() + 1)));
 		data.setNextDay(nextDay);
-		world.getMapStorage().setData(DATA, data);
-		data.save();
 		return data;
 	}
 

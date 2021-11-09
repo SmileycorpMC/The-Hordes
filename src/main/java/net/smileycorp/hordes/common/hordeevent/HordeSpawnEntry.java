@@ -11,7 +11,11 @@ public class HordeSpawnEntry {
 	protected final int maxDay;
 	protected CompoundNBT nbt = null;
 
-	public HordeSpawnEntry(EntityType<?> type, int weight, int minDay, int maxDay) {
+	public HordeSpawnEntry(EntityType<?> type) {
+		this(type, 0, 0, 0);
+	}
+
+	HordeSpawnEntry(EntityType<?> type, int weight, int minDay, int maxDay) {
 		this.type=type;
 		this.weight=weight;
 		this.minDay=minDay;
@@ -30,18 +34,22 @@ public class HordeSpawnEntry {
 		return maxDay;
 	}
 
-	@Override
-	public String toString() {
-		String str = "HordeSpawnEntry[type="+type+",weight="+weight+",minDay="+minDay+",maxDay="+maxDay+"]";
-		return nbt==null ? str : str + "{" + nbt.toString() + "}";
-	}
-
-	public void setTagCompound(CompoundNBT nbt) {
-		this.nbt=nbt;
+	public EntityType<?> getEntity() {
+		return type;
 	}
 
 	public CompoundNBT getNBT() {
 		return nbt == null ? new CompoundNBT() : nbt;
+	}
+
+	public void setNBT(CompoundNBT nbt) {
+		this.nbt=nbt;
+	}
+
+	@Override
+	public String toString() {
+		String str = "HordeSpawnEntry[type="+type+",weight="+weight+",minDay="+minDay+",maxDay="+maxDay+"]";
+		return nbt==null ? str : str + "{" + nbt.toString() + "}";
 	}
 
 }

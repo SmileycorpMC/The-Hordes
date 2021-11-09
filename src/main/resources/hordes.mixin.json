@@ -3,7 +3,7 @@
   "package": "net.smileycorp.hordes.infection.mixin",
   "refmap": "mixins.hordes.refmap.json",
   "mixins": [
-    "MixinEntityLiving"
+    "MixinMobEntity"
   ],
   "client": [],
   "server": []

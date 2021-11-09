@@ -13,9 +13,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.thread.SidedThreadGroups;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.smileycorp.atlas.api.util.RecipeUtils;
-import net.smileycorp.hordes.common.ConfigHandler;
+import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
-import net.smileycorp.hordes.infection.jei.JEIPluginInfection;
 
 public class InfectionRegister {
 
@@ -29,16 +28,15 @@ public class InfectionRegister {
 		readCureItems();
 	}
 
-	@SuppressWarnings("unchecked")
 	private static void readInfectionEntities() {
 		try {
-			if (ConfigHandler.infectionEntities == null) {
+			if (CommonConfigHandler.infectionEntities == null) {
 				throw new Exception("Infection entity list has loaded as null");
 			}
-			else if (ConfigHandler.infectionEntities.length <= 0) {
+			else if (CommonConfigHandler.infectionEntities.get().size() <= 0) {
 				throw new Exception("Infection entity list in config is empty");
 			}
-			for (String name : ConfigHandler.infectionEntities) {
+			for (String name : CommonConfigHandler.infectionEntities.get()) {
 				String[] nameSplit = name.split(":");
 				if (nameSplit.length>=2) {
 					ResourceLocation loc = new ResourceLocation(nameSplit[0], nameSplit[1]);
@@ -59,19 +57,19 @@ public class InfectionRegister {
 
 	private static void readCureItems() {
 		try {
-			if (ConfigHandler.cureItemList == null) {
+			if (CommonConfigHandler.cureItemList == null) {
 				throw new Exception("Cure list has loaded as null");
 			}
-			else if (ConfigHandler.cureItemList.length<=0) {
+			else if (CommonConfigHandler.cureItemList.get().size()<=0) {
 				throw new Exception("Cure list in config is empty");
 			}
-			cures = parseCureData(ConfigHandler.cureItemList);
+			cures = parseCureData(CommonConfigHandler.cureItemList.get());
 		} catch (Exception e) {
 			Hordes.logError("Failed to read config, " + e.getCause() + " " + e.getMessage(), e);
 		}
 	}
 
-	public static void readCurePacketData(String data) {
+	/*public static void readCurePacketData(String data) {
 		try {
 			String[] splitData = data.split(";");
 			curesClient = parseCureData(splitData);
@@ -79,7 +77,7 @@ public class InfectionRegister {
 			Hordes.logError("Failed to read data from server, " + e.getCause() + " " + e.getMessage(), e);
 		}
 		if (Loader.isModLoaded("jei")) JEIPluginInfection.setRecipes(curesClient);
-	}
+	}*/
 
 	public static String getCurePacketData() {
 		StringBuilder builder = new StringBuilder();
@@ -93,7 +91,7 @@ public class InfectionRegister {
 		return builder.toString();
 	}
 
-	public static List<ItemStack> parseCureData(String[] data) throws Exception {
+	public static List<ItemStack> parseCureData(List<String> data) throws Exception {
 		List<ItemStack> stacks = new ArrayList<ItemStack>();
 		for (String name : data) {
 			CompoundNBT nbt = null;
@@ -110,7 +108,6 @@ public class InfectionRegister {
 			String[] nameSplit = name.split(":");
 			if (nameSplit.length>=2) {
 				ResourceLocation loc = new ResourceLocation(nameSplit[0], nameSplit[1]);
-				int meta;
 				if (ForgeRegistries.ITEMS.containsKey(loc)) {
 					ItemStack stack = new ItemStack(ForgeRegistries.ITEMS.getValue(loc));
 					if (nbt!=null) {

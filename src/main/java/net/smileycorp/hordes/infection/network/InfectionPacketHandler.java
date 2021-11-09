@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.infection;
+package net.smileycorp.hordes.infection.network;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
@@ -14,7 +14,7 @@ import net.smileycorp.hordes.common.ModDefinitions;
 
 public class InfectionPacketHandler {
 	
-	public static final SimpleNetworkWrapper NETWORK_INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(ModDefinitions.modid + "_infection");
+	public static final SimpleNetworkWrapper NETWORK_INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(ModDefinitions.MODID + "_infection");
 	
 	public static void initPackets() {
 		NETWORK_INSTANCE.registerMessage(ClientCureMessageHandler.class, SimpleStringMessage.class, 0, Side.CLIENT);

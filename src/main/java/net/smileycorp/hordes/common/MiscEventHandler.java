@@ -1,19 +1,22 @@
 package net.smileycorp.hordes.common;
 
-import java.util.List;
+import java.util.Collection;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.smileycorp.hordes.common.capability.IZombifyPlayer;
-import net.smileycorp.hordes.common.entities.ZombiePlayerEntity;
+import net.smileycorp.hordes.common.entities.IZombiePlayer;
 import net.smileycorp.hordes.infection.HordesInfection;
 
 public class MiscEventHandler {
@@ -25,9 +28,10 @@ public class MiscEventHandler {
 			World world = entity.level;
 			if (!world.isClientSide) {
 				if (entity instanceof PlayerEntity &!(entity instanceof FakePlayer)) {
-					if ((entity.isPotionActive(HordesInfection.INFECTED) && ConfigHandler.enableMobInfection) || ConfigHandler.zombieGraves) {
-						if (entity.hasCapability(Hordes.ZOMBIFY_PLAYER, null)) {
-							entity.getCapability(Hordes.ZOMBIFY_PLAYER, null).createZombie();
+					if ((entity.hasEffect(HordesInfection.INFECTED.get()) && CommonConfigHandler.enableMobInfection.get()) || CommonConfigHandler.zombieGraves.get()) {
+						LazyOptional<IZombifyPlayer> optional = entity.getCapability(Hordes.ZOMBIFY_PLAYER, null);
+						if (optional.isPresent()) {
+							optional.resolve().get().createZombie((PlayerEntity) entity);
 						}
 					}
 				}
@@ -41,15 +45,16 @@ public class MiscEventHandler {
 			PlayerEntity player = (PlayerEntity) event.getEntity();
 			World world = player.level;
 			if (!world.isClientSide &!(player instanceof FakePlayer)) {
-				if ((player.hasEffect(HordesInfection.INFECTED) && ConfigHandler.enableMobInfection) || ConfigHandler.zombieGraves) {
-					if (player.hasCapability(Hordes.ZOMBIFY_PLAYER, null)) {
-						IZombifyPlayer cap = player.getCapability(Hordes.ZOMBIFY_PLAYER, null);
-						ZombiePlayerEntity zombie = cap.getZombie();
+				if ((player.hasEffect(HordesInfection.INFECTED.get()) && CommonConfigHandler.enableMobInfection.get()) || CommonConfigHandler.zombieGraves.get()) {
+					LazyOptional<IZombifyPlayer> optional = player.getCapability(Hordes.ZOMBIFY_PLAYER, null);
+					if (optional.isPresent()) {
+						IZombifyPlayer cap = optional.resolve().get();
+						MobEntity zombie = cap.getZombie();
 						if (zombie!=null) {
-							List<EntityItem> drops = event.getDrops();
-							zombie.setInventory(drops);
-							zombie.enablePersistence();
-							world.spawnEntity(zombie);
+							Collection<ItemEntity> drops = event.getDrops();
+							((IZombiePlayer)zombie).setInventory(drops);
+							zombie.setPersistenceRequired();
+							world.addFreshEntity(zombie);
 							drops.clear();
 							cap.clearZombie();
 						}
@@ -63,7 +68,7 @@ public class MiscEventHandler {
 	public void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
 		Entity entity = event.getObject();
 		if (entity instanceof PlayerEntity &!(entity instanceof FakePlayer)) {
-			event.addCapability(ModDefinitions.getResource("Infection"), new IZombifyPlayer.Provider((PlayerEntity) entity));
+			event.addCapability(ModDefinitions.getResource("Infection"), new IZombifyPlayer.Provider());
 		}
 	}
 }

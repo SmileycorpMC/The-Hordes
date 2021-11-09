@@ -22,22 +22,24 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
 import net.smileycorp.atlas.api.entity.ai.GoToEntityPositionGoal;
 import net.smileycorp.atlas.api.network.SimpleStringMessage;
 import net.smileycorp.atlas.api.recipe.WeightedOutputs;
 import net.smileycorp.atlas.api.util.DirectionUtils;
-import net.smileycorp.hordes.common.ConfigHandler;
+import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.event.HordeBuildSpawntableEvent;
 import net.smileycorp.hordes.common.event.HordeEndEvent;
 import net.smileycorp.hordes.common.event.HordeSpawnEntityEvent;
 import net.smileycorp.hordes.common.event.HordeStartEvent;
 import net.smileycorp.hordes.common.event.HordeStartWaveEvent;
-import net.smileycorp.hordes.common.hordeevent.HordeEventPacketHandler;
 import net.smileycorp.hordes.common.hordeevent.HordeEventRegister;
-import net.smileycorp.hordes.common.hordeevent.HordeSoundMessage;
+import net.smileycorp.hordes.common.hordeevent.HordeSpawnEntry;
+import net.smileycorp.hordes.common.hordeevent.network.HordeEventPacketHandler;
+import net.smileycorp.hordes.common.hordeevent.network.HordeSoundMessage;
 
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -54,8 +56,8 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 	public OngoingHordeEvent(World world, PlayerEntity player) {
 		this.world=world;
 		this.player=player;
-		if (world!=null) {
-			HordeWorldData data = HordeWorldData.getData(world);
+		if (world instanceof ServerWorld) {
+			HordeWorldData data = HordeWorldData.getData((ServerWorld) world);
 			nextDay = data.getNextDay();
 		}
 	}
@@ -107,12 +109,12 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 	public void update(World world) {
 		if (!world.isClientSide && player!=null) {
 			if (player.level.dimension().getRegistryName() == new ResourceLocation("overworld")) {
-				if ((timer % ConfigHandler.hordeSpawnInterval) == 0) {
-					int amount = (int)(ConfigHandler.hordeSpawnAmount * (1+(day/ConfigHandler.hordeSpawnDays) * (ConfigHandler.hordeSpawnMultiplier-1)));
+				if ((timer % CommonConfigHandler.hordeSpawnInterval.get()) == 0) {
+					int amount = (int)(CommonConfigHandler.hordeSpawnAmount.get() * (1+(day/CommonConfigHandler.hordeSpawnDays.get()) * (CommonConfigHandler.hordeSpawnMultiplier.get()-1)));
 					List<? extends PlayerEntity>players = world.players();
 					for (PlayerEntity entity : players) {
 						if (entity != player && player.distanceTo(entity)<=25) {
-							amount = (int) Math.floor(amount * ConfigHandler.hordeMultiplayerScaling);
+							amount = (int) Math.floor(amount * CommonConfigHandler.hordeMultiplayerScaling.get());
 						}
 					}
 					spawnWave(world, amount);
@@ -148,7 +150,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 		}
 		HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, HordeEventRegister.getSpawnTable(day), this);
 		MinecraftForge.EVENT_BUS.post(buildTableEvent);
-		WeightedOutputs<EntityType<?>> spawntable = buildTableEvent.spawntable;
+		WeightedOutputs<HordeSpawnEntry> spawntable = buildTableEvent.spawntable;
 		if (spawntable.isEmpty()) {
 			logInfo("Spawntable is empty, stopping wave spawn.");
 			return;
@@ -161,13 +163,14 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 			logInfo("Stopping wave spawn because count is " + count);
 		}
 		for (int n = 0; n<count; n++) {
-			if (entitiesSpawned.size() > ConfigHandler.hordeSpawnMax) {
+			if (entitiesSpawned.size() > CommonConfigHandler.hordeSpawnMax.get()) {
 				logInfo("Can't spawn wave because max cap has been reached");
 				return;
 			}
 			Vector3d dir = DirectionUtils.getRandomDirectionVecXZ(world.random);
 			BlockPos pos = DirectionUtils.getClosestLoadedPos(world, basepos, dir, world.random.nextInt(10));
-			EntityType<?> type = spawntable.getResult(world.random);
+			HordeSpawnEntry entry = spawntable.getResult(world.random);
+			EntityType<?> type = entry.getEntity();
 			try {
 				MobEntity entity = (MobEntity) type.create(world);
 				entity.readAdditionalSaveData(HordeEventRegister.getEntryFor(entity, day).getNBT());
@@ -175,6 +178,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 				MinecraftForge.EVENT_BUS.post(spawnEntityEvent);
 				if (!spawnEntityEvent.isCanceled()) {
 					entity = spawnEntityEvent.entity;
+					entity.readAdditionalSaveData(entry.getNBT());
 					pos = spawnEntityEvent.pos;
 					entity.finalizeSpawn((IServerWorld) world, world.getCurrentDifficultyAt(pos), null, null, null);
 					entity.setPos(pos.getX(), pos.getY(), pos.getZ());
@@ -224,7 +228,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 	public boolean isHordeDay(World world) {
 		if (world.isClientSide || player==null) return false;
 		if (world!=this.world) return false;
-		return isActive(world) || Math.floor(world.getDayTime()/ConfigHandler.dayLength)>=nextDay;
+		return isActive(world) || Math.floor(world.getDayTime()/CommonConfigHandler.dayLength.get())>=nextDay;
 	}
 
 	@Override
@@ -273,21 +277,18 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 				HordeStartEvent startEvent = new HordeStartEvent(player, this, isCommand);
 				MinecraftForge.EVENT_BUS.post(startEvent);
 				if (startEvent.isCanceled()) return;
-				HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, HordeEventRegister.getSpawnTable((int) Math.floor(world.getDayTime()/ConfigHandler.dayLength)), this);
+				HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, HordeEventRegister.getSpawnTable((int) Math.floor(world.getDayTime()/CommonConfigHandler.dayLength.get())), this);
 				MinecraftForge.EVENT_BUS.post(buildTableEvent);
-				WeightedOutputs<EntityType<?>> spawntable = buildTableEvent.spawntable;
-				if (!spawntable.isEmpty()) {
+				if (!buildTableEvent.spawntable.isEmpty()) {
 					timer = duration;
 					hasChanged = true;
 					sendMessage(startEvent.getMessage());
-					if (!isCommand) {
-						day = nextDay;
-						nextDay = HordeWorldData.getData(world).getNextDay();
-					} else day = (int) Math.floor(world.getDayTime()/ConfigHandler.dayLength);
+					if (isCommand) day = (int) Math.floor(world.getDayTime()/CommonConfigHandler.dayLength.get());
+					else day = nextDay;
 				} else {
-					if (!isCommand) nextDay = HordeWorldData.getData(world).getNextDay();
 					logInfo("Spawntable is empty, canceling event start.");
 				}
+				if (!isCommand) nextDay = HordeWorldData.getData((ServerWorld) world).getNextDay();
 			}
 		} else Hordes.logError("player is null for " + toString(), new NullPointerException());
 	}

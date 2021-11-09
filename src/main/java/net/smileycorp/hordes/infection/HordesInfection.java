@@ -1,33 +1,30 @@
 package net.smileycorp.hordes.infection;
 
+import net.minecraft.entity.EntityClassification;
+import net.minecraft.entity.EntityType;
 import net.minecraft.potion.Effect;
 import net.minecraft.util.DamageSource;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.smileycorp.hordes.common.ModDefinitions;
+import net.smileycorp.hordes.common.entities.DrownedPlayerEntity;
 import net.smileycorp.hordes.common.entities.ZombiePlayerEntity;
 
-@EventBusSubscriber(modid=ModDefinitions.modid)
+@EventBusSubscriber(modid=ModDefinitions.MODID)
 public class HordesInfection {
 
-	public static Effect INFECTED = new InfectedEffect();
+	public static final DeferredRegister<Effect> EFFECTS = DeferredRegister.create(ForgeRegistries.POTIONS, ModDefinitions.MODID);
+	public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(ForgeRegistries.ENTITIES, ModDefinitions.MODID);
+
+	public static RegistryObject<Effect> INFECTED = EFFECTS.register("infected", () -> new InfectedEffect());
+
+	public static RegistryObject<EntityType<ZombiePlayerEntity>> ZOMBIE_PLAYER = ENTITIES.register("zombie_player", () ->
+		EntityType.Builder.<ZombiePlayerEntity>of(ZombiePlayerEntity::new, EntityClassification.MONSTER).sized(0.6F, 1.95F).clientTrackingRange(8).build("zombie_player"));
+	public static RegistryObject<EntityType<DrownedPlayerEntity>> DROWNED_PLAYER = ENTITIES.register("drowned_player", () ->
+		EntityType.Builder.<DrownedPlayerEntity>of(DrownedPlayerEntity::new, EntityClassification.MONSTER).sized(0.6F, 1.95F).clientTrackingRange(8).build("drowned_player"));
+
 	public static DamageSource INFECTION_DAMAGE = new DamageSourceInfection();
-
-	@SubscribeEvent
-    public static void registerPotions(RegistryEvent.Register<Effect> event) {
-        event.getRegistry().register(INFECTED);
-    }
-
-	@SubscribeEvent
-    public static void registerEntities(RegistryEvent.Register<EntityEntry> event) {
-		IForgeRegistry<EntityEntry> registry = event.getRegistry();
-		int ID = 201;
-		EntityEntry ZOMBIE_PLAYER = EntityEntryBuilder.create().entity(ZombiePlayerEntity.class)
-				.id(ModDefinitions.getResource("zombie_player"), ID++)
-				.name(ModDefinitions.getName("ZombiePlayer")).tracker(80, 3, true).build();
-		registry.register(ZOMBIE_PLAYER);
-    }
 
 }

@@ -17,7 +17,7 @@ public class CommandClearHordeData extends CommandBase {
 
 	@Override
 	public String getUsage(ICommandSender sender) {
-		 return "commands."+ModDefinitions.modid+".HordeClean.usage";
+		 return "commands."+ModDefinitions.MODID+".HordeClean.usage";
 	}
 	
 	@Override
@@ -31,7 +31,7 @@ public class CommandClearHordeData extends CommandBase {
 		server.addScheduledTask(() -> {
 			HordeWorldData.getCleanData(world);
 		});
-		notifyCommandListener(sender, this, "commands."+ModDefinitions.modid+".HordeClean.success", new Object[]{});
+		notifyCommandListener(sender, this, "commands."+ModDefinitions.MODID+".HordeClean.success", new Object[]{});
     }
  
 }

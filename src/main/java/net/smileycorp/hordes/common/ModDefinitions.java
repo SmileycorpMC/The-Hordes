@@ -4,13 +4,8 @@ import net.minecraft.util.ResourceLocation;
 
 public class ModDefinitions {
 
-	public static final String modid = "hordes";
-	public static final String name = "The Hordes";
-	public static final String version = "1.1.4";
-	public static final String dependencies = "required-after:atlaslib@1.1.5;after:baubles;after:galacticraft;before:deathchest;before:corpse;before:jei";
-	public static final String location = "net.smileycorp.hordes.";
-	public static final String client = location + "client.ClientProxy";
-	public static final String server = location + "common.CommonProxy";
+	public static final String MODID = "hordes";
+	public static final String NAME = "The Hordes";
 
 	public static final String hordeEventStart = "message.hordes.EventStart";
 	public static final String hordeEventEnd = "message.hordes.EventEnd";
@@ -19,8 +14,10 @@ public class ModDefinitions {
 	public static final String deathMessageFighting = "message.hordes.DeathMessageFighting";
 	public static final String deathMessageOther = "message.hordes.DeathMessageOther";
 
+	public static final ResourceLocation HORDE_SOUND = getResource("horde_spawn");
+
 	public static String getName(String name) {
-		return getName(modid, name);
+		return getName(MODID, name);
 	}
 
 	public static String getName(String modid, String name) {
@@ -28,13 +25,11 @@ public class ModDefinitions {
 	}
 
 	public static ResourceLocation getResource(String name) {
-		return new ResourceLocation(modid, name.toLowerCase());
+		return new ResourceLocation(MODID, name.toLowerCase());
 	}
 
 	public static String getResourceName(String string) {
 		return getResource(string).toString();
 	}
-
-	public static final ResourceLocation HORDE_SOUND = getResource("horde_spawn");
 
 }

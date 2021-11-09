@@ -1,5 +1,6 @@
 package net.smileycorp.hordes.common.capability;
 
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.Direction;
@@ -8,13 +9,12 @@ import net.minecraftforge.common.capabilities.Capability.IStorage;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.smileycorp.hordes.common.Hordes;
-import net.smileycorp.hordes.common.entities.IZombiePlayer;
 
 public interface IZombifyPlayer {
 
-	public IZombiePlayer createZombie();
+	public MobEntity createZombie(PlayerEntity player);
 
-	public IZombiePlayer getZombie();
+	public MobEntity getZombie();
 
 	public void clearZombie();
 
@@ -33,11 +33,7 @@ public interface IZombifyPlayer {
 
 	public static class Provider implements ICapabilityProvider {
 
-		protected final IZombifyPlayer impl;
-
-		public Provider(PlayerEntity player) {
-			impl = new ZombifyPlayer(player);
-		}
+		protected final IZombifyPlayer impl = new ZombifyPlayer();
 
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> capability, Direction facing) {

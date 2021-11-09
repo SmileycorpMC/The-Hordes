@@ -44,7 +44,7 @@ public class JEIPluginInfection implements IModPlugin {
 		if (recipeManager != null) {
 			RecipeManagerInternal manager = ObfuscationReflectionHelper.getPrivateValue(RecipeManager.class, recipeManager , "internal");
 			if (manager!=null) {
-				for (InfectionCureWrapper recipe : recipes) manager.removeRecipe(recipe, InfectionCureCategory.ID);
+				for (InfectionCureWrapper recipe : recipes) manager.hideRecipe(recipe, InfectionCureCategory.ID);
 				recipes.clear();
 				List<ItemStack> items = new ArrayList<ItemStack>();
 				for (ItemStack stack : cures) {

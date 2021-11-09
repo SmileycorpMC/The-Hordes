@@ -1,10 +1,12 @@
 package net.smileycorp.hordes.common.entities;
 
-import java.util.List;
+import java.awt.Color;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.monster.DrownedEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -23,6 +25,7 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.smileycorp.hordes.infection.HordesInfection;
 
 import com.mojang.authlib.GameProfile;
 
@@ -31,15 +34,17 @@ public class DrownedPlayerEntity extends DrownedEntity implements IZombiePlayer 
 
 	protected static final DataParameter<Optional<UUID>> PLAYER_UUID = EntityDataManager.defineId(DrownedPlayerEntity.class, DataSerializers.OPTIONAL_UUID);
 
+	protected Color COLOUR = new Color(0x689E93);
+
 	protected NonNullList<ItemStack> playerItems = NonNullList.<ItemStack>create();
 	protected UUID uuid;
 
-	public DrownedPlayerEntity(World world) {
-		super(null, world);
+	public DrownedPlayerEntity(EntityType<? extends DrownedPlayerEntity> type, World world) {
+		super(type, world);
 	}
 
 	public DrownedPlayerEntity(PlayerEntity player) {
-		this(player.level);
+		this(HordesInfection.DROWNED_PLAYER.get(), player.level);
 		setPlayer(player);
 	}
 
@@ -83,7 +88,7 @@ public class DrownedPlayerEntity extends DrownedEntity implements IZombiePlayer 
 	}
 
 	@Override
-	public void setInventory(List<ItemEntity> list) {
+	public void setInventory(Collection<ItemEntity> list) {
 		playerItems.clear();
 		for (ItemEntity item : list) {
 			ItemStack stack = item.getItem();
@@ -134,5 +139,10 @@ public class DrownedPlayerEntity extends DrownedEntity implements IZombiePlayer 
         textcomponentstring.getStyle().withInsertion(this.getEncodeId());
         return textcomponentstring;
     }
+
+	@Override
+	public Color getColour() {
+		return COLOUR;
+	}
 
 }

@@ -16,6 +16,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -35,30 +36,30 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.entity.ai.GoToEntityPositionGoal;
 import net.smileycorp.atlas.api.util.DataUtils;
-import net.smileycorp.hordes.common.ConfigHandler;
+import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.ModDefinitions;
 import net.smileycorp.hordes.common.hordeevent.capability.HordeWorldData;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeSpawn;
 import net.smileycorp.hordes.common.hordeevent.capability.IOngoingHordeEvent;
 
-@EventBusSubscriber(modid=ModDefinitions.modid)
+@EventBusSubscriber(modid=ModDefinitions.MODID)
 public class HordeEventHandler {
 
 
 	@SubscribeEvent
-	public void worldTick(ServerTickEvent event) {
+	public void serverTick(ServerTickEvent event) {
 		if (event.phase == Phase.END) {
 			MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-			World world = server.overworld();
-			if ((world.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT) |! ConfigHandler.pauseEventServer)) {
-				int day = (int) Math.floor(world.getGameTime()/ConfigHandler.dayLength);
-				int time = Math.round(world.getGameTime()%ConfigHandler.dayLength);
+			ServerWorld world = server.overworld();
+			if ((world.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT) || !CommonConfigHandler.pauseEventServer.get())) {
+				int day = (int) Math.floor(world.getGameTime()/CommonConfigHandler.dayLength.get());
+				int time = Math.round(world.getGameTime()%CommonConfigHandler.dayLength.get());
 				HordeWorldData data = HordeWorldData.getData(world);
-				if (((time >= ConfigHandler.hordeStartTime && day == data.getNextDay()) || day > data.getNextDay())) {
-					data.setNextDay(world.random.nextInt(ConfigHandler.hordeSpawnVariation + 1) + ConfigHandler.hordeSpawnDays + data.getNextDay());
+				if (((time >= CommonConfigHandler.hordeStartTime.get() && day == data.getNextDay()) || day > data.getNextDay())) {
+					data.setNextDay(world.random.nextInt(CommonConfigHandler.hordeSpawnVariation.get() + 1) + CommonConfigHandler.hordeSpawnDays.get() + data.getNextDay());
 				}
-				data.save();
+				data.setDirty();
 			}
 		}
 	}
@@ -68,16 +69,16 @@ public class HordeEventHandler {
 		PlayerEntity player = event.player;
 		if (event.phase == Phase.END && player != null && !(player instanceof FakePlayer)) {
 			World world = player.level;
-			if (!world.isClientSide && (world.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT) |! ConfigHandler.pauseEventServer)) {
+			if (!world.isClientSide && (world.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT) || !CommonConfigHandler.pauseEventServer.get())) {
 				LazyOptional<IOngoingHordeEvent> optional = player.getCapability(Hordes.HORDE_EVENT, null);
 				if (optional.isPresent()) {
 					IOngoingHordeEvent horde = optional.resolve().get();
-					int day = (int) Math.floor(world.getGameTime() / ConfigHandler.dayLength);
-					int time = Math.round(world.getGameTime() % ConfigHandler.dayLength);
+					int day = (int) Math.floor(world.getDayTime() / CommonConfigHandler.dayLength.get());
+					int time = Math.round(world.getDayTime() % CommonConfigHandler.dayLength.get());
 					if (horde != null && !horde.isActive(world)) {
-						if (time >= ConfigHandler.hordeStartTime && day >= horde.getNextDay() && (day!=0 || ConfigHandler.spawnFirstDay)) {
+						if (time >= CommonConfigHandler.hordeStartTime.get() && day >= horde.getNextDay() && (day!=0 || CommonConfigHandler.spawnFirstDay.get())) {
 							if (!horde.isActive(world)) {
-								horde.tryStartEvent(ConfigHandler.hordeSpawnDuration, false);
+								horde.tryStartEvent(CommonConfigHandler.hordeSpawnDuration.get(), false);
 							}
 						}
 					}
@@ -143,7 +144,7 @@ public class HordeEventHandler {
 	@SubscribeEvent
 	public void playerJoin(PlayerLoggedInEvent event) {
 		MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-		if (ConfigHandler.pauseEventServer) {
+		if (CommonConfigHandler.pauseEventServer.get()) {
 			server.getAllLevels().forEach( (world) -> {
 				if (world.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT) == false) {
 					world.getGameRules().getRule(GameRules.RULE_DAYLIGHT).set(true, server);
@@ -154,7 +155,7 @@ public class HordeEventHandler {
 
 	@SubscribeEvent
 	public void playerLeave(PlayerLoggedOutEvent event) {
-		if (ConfigHandler.pauseEventServer) {
+		if (CommonConfigHandler.pauseEventServer.get()) {
 			MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
 			if (server.getPlayerCount() == 0) {
 				server.getAllLevels().forEach( (world) -> {
@@ -181,7 +182,7 @@ public class HordeEventHandler {
 	public void trySleep(PlayerSleepInBedEvent event) {
 		PlayerEntity player = event.getPlayer();
 		World world = player.level;
-		if (!ConfigHandler.canSleepDuringHorde) {
+		if (!CommonConfigHandler.canSleepDuringHorde.get()) {
 			if (!world.isClientSide) {
 				LazyOptional<IOngoingHordeEvent> optional = player.getCapability(Hordes.HORDE_EVENT, null);
 				if (optional.isPresent()) {

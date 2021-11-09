@@ -17,7 +17,7 @@ public class CommandStopHordeEvent extends CommandBase {
 
 	@Override
 	public String getUsage(ICommandSender sender) {
-		return "commands."+ModDefinitions.modid+".StopHorde.usage";
+		return "commands."+ModDefinitions.MODID+".StopHorde.usage";
 	}
 
 	@Override
@@ -31,6 +31,6 @@ public class CommandStopHordeEvent extends CommandBase {
 			EntityPlayer player = (EntityPlayer) sender.getCommandSenderEntity();
 			if (player.hasCapability(Hordes.HORDE_EVENT, null)) player.getCapability(Hordes.HORDE_EVENT, null).stopEvent(sender.getEntityWorld(), true);
 		});
-		notifyCommandListener(sender, this, "commands."+ModDefinitions.modid+".StopHorde.success", new Object[] {});
+		notifyCommandListener(sender, this, "commands."+ModDefinitions.MODID+".StopHorde.success", new Object[] {});
 	}
 }
