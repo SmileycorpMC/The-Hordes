@@ -1,9 +1,13 @@
 package net.smileycorp.hordes.client;
 
+import java.util.Random;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiIngame;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
@@ -16,6 +20,7 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.smileycorp.hordes.common.ConfigHandler;
+import net.smileycorp.hordes.infection.CureEntityMessage;
 
 public class ClientHandler {
 
@@ -58,6 +63,18 @@ public class ClientHandler {
 			World world = mc.world;
 			EntityPlayer player = mc.player;
 			world.playSound(player, player.getPosition(), SoundEvents.ENTITY_ZOMBIE_VILLAGER_CONVERTED, SoundCategory.HOSTILE, 0.75f, world.rand.nextFloat());
+		}
+	}
+
+	public static void processCureEntityMessage(CureEntityMessage message) {
+		Minecraft mc = Minecraft.getMinecraft();
+		World world = mc.world;
+		Entity entity = message.getEntity(world);
+		world.playSound(entity.posX, entity.posY, entity.posZ, SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, entity.getSoundCategory(), 1f, 1f, true);
+		Random rand = world.rand;
+		for (int i = 0; i < 6; ++i) {
+			world.spawnParticle(EnumParticleTypes.VILLAGER_HAPPY, entity.posX + (rand.nextDouble() - 0.5D) * entity.width,
+					entity.posY + rand.nextDouble() * entity.height, entity.posZ + (rand.nextDouble() - 0.5D) * entity.width, 0.0D, 0.3D, 0.0D);
 		}
 	}
 

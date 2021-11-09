@@ -13,21 +13,22 @@ import net.smileycorp.hordes.client.ClientHandler;
 import net.smileycorp.hordes.common.ModDefinitions;
 
 public class InfectionPacketHandler {
-	
+
 	public static final SimpleNetworkWrapper NETWORK_INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(ModDefinitions.modid + "_infection");
-	
+
 	public static void initPackets() {
 		NETWORK_INSTANCE.registerMessage(ClientCureMessageHandler.class, SimpleStringMessage.class, 0, Side.CLIENT);
 		NETWORK_INSTANCE.registerMessage(InfectMessageHandler.class, InfectMessage.class, 1, Side.CLIENT);
+		NETWORK_INSTANCE.registerMessage(CureEntityHandler.class, CureEntityMessage.class, 2, Side.CLIENT);
 	}
-	
+
 	public static class ClientCureMessageHandler implements IMessageHandler<SimpleStringMessage, IMessage> {
 
 		public ClientCureMessageHandler() {}
 
 		@Override
 		public IMessage onMessage(SimpleStringMessage message, MessageContext ctx) {
-			
+
 			if (ctx.side == Side.CLIENT) {
 				Minecraft mc = Minecraft.getMinecraft();
 				mc.addScheduledTask(() -> {
@@ -37,14 +38,14 @@ public class InfectionPacketHandler {
 			return null;
 		}
 	}
-	
+
 	public static class InfectMessageHandler implements IMessageHandler<InfectMessage, IMessage> {
 
 		public InfectMessageHandler() {}
 
 		@Override
 		public IMessage onMessage(InfectMessage message, MessageContext ctx) {
-			
+
 			if (ctx.side == Side.CLIENT) {
 				Minecraft mc = Minecraft.getMinecraft();
 				mc.addScheduledTask(() -> {
@@ -54,14 +55,31 @@ public class InfectionPacketHandler {
 			return null;
 		}
 	}
-	
+
+	public static class CureEntityHandler implements IMessageHandler<CureEntityMessage, IMessage> {
+
+		public CureEntityHandler() {}
+
+		@Override
+		public IMessage onMessage(CureEntityMessage message, MessageContext ctx) {
+
+			if (ctx.side == Side.CLIENT) {
+				Minecraft mc = Minecraft.getMinecraft();
+				mc.addScheduledTask(() -> {
+					ClientHandler.processCureEntityMessage(message);
+				});
+			}
+			return null;
+		}
+	}
+
 	public static class InfectMessage implements IMessage {
-		
+
 		public InfectMessage(){}
-		
+
 		@Override
 		public void fromBytes(ByteBuf buf) {}
-	
+
 		@Override
 		public void toBytes(ByteBuf buf) {}
 	}

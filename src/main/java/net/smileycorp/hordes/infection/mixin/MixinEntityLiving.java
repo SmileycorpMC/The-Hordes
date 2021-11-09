@@ -6,7 +6,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
+import net.smileycorp.hordes.infection.CureEntityMessage;
 import net.smileycorp.hordes.infection.HordesInfection;
+import net.smileycorp.hordes.infection.InfectionPacketHandler;
 import net.smileycorp.hordes.infection.InfectionRegister;
 
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,6 +29,7 @@ public abstract class MixinEntityLiving extends EntityLivingBase {
 		if (isPotionActive(HordesInfection.INFECTED)) {
 			if (InfectionRegister.isCure(stack)) {
 				removePotionEffect(HordesInfection.INFECTED);
+				if (!player.world.isRemote) InfectionPacketHandler.NETWORK_INSTANCE.sendToAllTracking(new CureEntityMessage(this), this);
 				if (!player.capabilities.isCreativeMode) {
 					ItemStack container = stack.getItem().getContainerItem(stack);
 					if (stack.isItemStackDamageable()) {
