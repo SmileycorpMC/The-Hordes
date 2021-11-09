@@ -282,9 +282,9 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 					if (isCommand) day = (int) Math.floor(world.getWorldTime()/ConfigHandler.dayLength);
 					else day = nextDay;
 				} else {
-					if (!isCommand) nextDay = WorldDataHordeEvent.getData(world).getNextDay();
 					logInfo("Spawntable is empty, canceling event start.");
 				}
+				if (!isCommand) nextDay = WorldDataHordeEvent.getData(world).getNextDay();
 			}
 		} else Hordes.logError("player is null for " + toString(), new NullPointerException());
 	}
