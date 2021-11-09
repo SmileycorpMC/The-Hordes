@@ -72,9 +72,9 @@ public class ClientHandler {
 		Entity entity = message.getEntity(world);
 		world.playSound(entity.posX, entity.posY, entity.posZ, SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, entity.getSoundCategory(), 1f, 1f, true);
 		Random rand = world.rand;
-		for (int i = 0; i < 6; ++i) {
-			world.spawnParticle(EnumParticleTypes.VILLAGER_HAPPY, entity.posX + (rand.nextDouble() - 0.5D) * entity.width,
-					entity.posY + rand.nextDouble() * entity.height, entity.posZ + (rand.nextDouble() - 0.5D) * entity.width, 0.0D, 0.3D, 0.0D);
+		for (int i = 0; i < 10; ++i) {
+			world.spawnParticle(EnumParticleTypes.VILLAGER_HAPPY, entity.posX + (rand.nextDouble() - 0.5D) * entity.width * 1.5,
+					entity.posY + rand.nextDouble() * entity.height, entity.posZ + (rand.nextDouble() - 0.5D) * entity.width * 1.5, 0.0D, 0.3D, 0.0D);
 		}
 	}
 
