@@ -5,6 +5,7 @@ import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -25,8 +26,8 @@ public abstract class MixinMobEntity extends LivingEntity {
 		super(null, world);
 	}
 
-	@Inject(at=@At("HEAD"), method = "interact(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Z", cancellable = true)
-	public void interact(PlayerEntity player, Hand hand, CallbackInfoReturnable<Boolean> callback) {
+	@Inject(at=@At("HEAD"), method = "checkAndHandleImportantInteractions(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResultType;", cancellable = true)
+	public void interact(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResultType> callback) {
 		ItemStack stack = player.getItemInHand(hand);
 		if (hasEffect(HordesInfection.INFECTED.get())) {
 			if (InfectionRegister.isCure(stack)) {
@@ -43,7 +44,7 @@ public abstract class MixinMobEntity extends LivingEntity {
 						player.setItemInHand(hand, container);
 					}
 				}
-				callback.setReturnValue(true);
+				callback.setReturnValue(ActionResultType.sidedSuccess(player.level.isClientSide));
 				callback.cancel();
 			}
 		}
