@@ -14,7 +14,6 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.GameRules;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.FakePlayer;
@@ -75,15 +74,13 @@ public class HordeEventHandler {
 					IOngoingHordeEvent horde = optional.resolve().get();
 					int day = (int) Math.floor(world.getDayTime() / CommonConfigHandler.dayLength.get());
 					int time = Math.round(world.getDayTime() % CommonConfigHandler.dayLength.get());
-					if (horde != null && !horde.isActive(world)) {
+					if (horde != null && !horde.isActive(player)) {
 						if (time >= CommonConfigHandler.hordeStartTime.get() && day >= horde.getNextDay() && (day!=0 || CommonConfigHandler.spawnFirstDay.get())) {
-							if (!horde.isActive(world)) {
-								horde.tryStartEvent(CommonConfigHandler.hordeSpawnDuration.get(), false);
-							}
+							horde.tryStartEvent(player, CommonConfigHandler.hordeSpawnDuration.get(), false);
 						}
 					}
-					if (horde.isActive(world)) {
-						horde.update(world);
+					if (horde.isActive(player)) {
+						horde.update(player);
 					}
 				}
 			}
@@ -92,7 +89,6 @@ public class HordeEventHandler {
 
 	@SubscribeEvent
 	public void tryDespawn(LivingSpawnEvent.AllowDespawn event) {
-		IWorld world = event.getWorld();
 		LivingEntity entity = event.getEntityLiving();
 		LazyOptional<IHordeSpawn> optional = entity.getCapability(Hordes.HORDESPAWN, null);
 		if (optional.isPresent()) {
@@ -103,7 +99,7 @@ public class HordeEventHandler {
 					PlayerEntity player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(UUID.fromString(uuid));
 					LazyOptional<IOngoingHordeEvent> optionalp = player.getCapability(Hordes.HORDE_EVENT, null);
 					if (optionalp.isPresent()) {
-						if (optionalp.resolve().get().isActive((World) world)) {
+						if (optionalp.resolve().get().isActive(player)) {
 							event.setResult(Result.DENY);
 						}
 					}
@@ -174,7 +170,7 @@ public class HordeEventHandler {
 			event.addCapability(ModDefinitions.getResource("HordeSpawn"), new IHordeSpawn.Provider());
 		}
 		if (entity instanceof PlayerEntity && !(entity instanceof FakePlayer)) {
-			event.addCapability(ModDefinitions.getResource("HordeEvent"), new IOngoingHordeEvent.Provider((PlayerEntity) entity));
+			event.addCapability(ModDefinitions.getResource("HordeEvent"), new IOngoingHordeEvent.Provider());
 		}
 	}
 
@@ -187,7 +183,7 @@ public class HordeEventHandler {
 				LazyOptional<IOngoingHordeEvent> optional = player.getCapability(Hordes.HORDE_EVENT, null);
 				if (optional.isPresent()) {
 					IOngoingHordeEvent horde = optional.resolve().get();
-					if ((horde.isHordeDay(world) && world.dimensionType().bedWorks() &! world.isDay()) || horde.isActive(world)) {
+					if ((horde.isHordeDay(player) && world.dimensionType().bedWorks() &! world.isDay()) || horde.isActive(player)) {
 						event.setResult(SleepResult.OTHER_PROBLEM);
 						player.displayClientMessage(new TranslationTextComponent(ModDefinitions.hordeTrySleep), true);
 					}

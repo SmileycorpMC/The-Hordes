@@ -2,6 +2,7 @@ package net.smileycorp.hordes.common.capability;
 
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
@@ -22,7 +23,7 @@ public interface IZombifyPlayer {
 
 		@Override
 		public INBT writeNBT(Capability<IZombifyPlayer> capability, IZombifyPlayer instance, Direction side) {
-			return null;
+			return new CompoundNBT();
 		}
 
 		@Override

@@ -1,16 +1,15 @@
 package net.smileycorp.hordes.common;
 
-import net.minecraft.command.CommandSource;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -22,12 +21,9 @@ import net.smileycorp.hordes.common.capability.ZombifyPlayer;
 import net.smileycorp.hordes.common.hordeevent.HordeEventHandler;
 import net.smileycorp.hordes.common.hordeevent.HordeEventRegister;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeSpawn;
+import net.smileycorp.hordes.common.hordeevent.capability.IHordeSpawn.HordeSpawn;
 import net.smileycorp.hordes.common.hordeevent.capability.IOngoingHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.capability.OngoingHordeEvent;
-import net.smileycorp.hordes.common.hordeevent.command.CommandDebugHordeEvent;
-import net.smileycorp.hordes.common.hordeevent.command.CommandSpawnWave;
-import net.smileycorp.hordes.common.hordeevent.command.CommandStartHordeEvent;
-import net.smileycorp.hordes.common.hordeevent.command.CommandStopHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.network.HordeEventPacketHandler;
 import net.smileycorp.hordes.common.infection.HordesInfection;
 import net.smileycorp.hordes.common.infection.InfectionEventHandler;
@@ -37,9 +33,8 @@ import net.smileycorp.hordes.common.infection.network.InfectionPacketHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.mojang.brigadier.CommandDispatcher;
-
 @Mod(value = ModDefinitions.MODID)
+@Mod.EventBusSubscriber(modid = ModDefinitions.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class Hordes {
 
 	private static Logger logger = LogManager.getLogger(ModDefinitions.NAME);
@@ -58,12 +53,8 @@ public class Hordes {
 		ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfigHandler.config);
 	}
 
-
-	public void constructMod(FMLConstructModEvent event) {
-		MinecraftForge.EVENT_BUS.register(this);
-		CapabilityManager.INSTANCE.register(IZombifyPlayer.class, new IZombifyPlayer.Storage(), () -> new ZombifyPlayer());
-		CapabilityManager.INSTANCE.register(IHordeSpawn.class, new IHordeSpawn.Storage(), () -> new IHordeSpawn.HordeSpawn());
-		CapabilityManager.INSTANCE.register(IOngoingHordeEvent.class, new IOngoingHordeEvent.Storage(), () -> new OngoingHordeEvent());
+	@SubscribeEvent
+	public static void constructMod(FMLConstructModEvent event) {
 		//Horde Event
 		if (CommonConfigHandler.enableHordeEvent.get()) {
 			HordeEventPacketHandler.initPackets();
@@ -83,7 +74,15 @@ public class Hordes {
 		HordesInfection.ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
 	}
 
-	public void loadComplete(FMLLoadCompleteEvent event) {
+	@SubscribeEvent
+	public static void commonSetup(FMLCommonSetupEvent event) {
+		CapabilityManager.INSTANCE.register(IZombifyPlayer.class, new IZombifyPlayer.Storage(), () -> new ZombifyPlayer());
+		CapabilityManager.INSTANCE.register(IHordeSpawn.class, new IHordeSpawn.Storage(), () -> new HordeSpawn());
+		CapabilityManager.INSTANCE.register(IOngoingHordeEvent.class, new IOngoingHordeEvent.Storage(), () -> new OngoingHordeEvent());
+	}
+
+	@SubscribeEvent
+	public static void loadComplete(FMLLoadCompleteEvent event) {
 		//Horde Event
 		if (CommonConfigHandler.enableHordeEvent.get()) {
 			HordeEventRegister.readConfig();
@@ -98,16 +97,6 @@ public class Hordes {
 	public static void clientSetup(FMLClientSetupEvent event){
 		MinecraftForge.EVENT_BUS.register(new ClientHandler());
 		MinecraftForge.EVENT_BUS.register(new ClientInfectionEventHandler());
-	}
-
-	public void serverStart(RegisterCommandsEvent event) {
-		if (CommonConfigHandler.enableHordeEvent.get()) {
-			CommandDispatcher<CommandSource> dispatcher = event.getDispatcher();
-			CommandSpawnWave.register(dispatcher);
-			CommandStartHordeEvent.register(dispatcher);
-			CommandStopHordeEvent.register(dispatcher);
-			CommandDebugHordeEvent.register(dispatcher);
-		}
 	}
 
 	public static void logInfo(Object message) {

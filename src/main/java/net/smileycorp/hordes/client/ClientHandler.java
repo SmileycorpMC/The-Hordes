@@ -13,7 +13,6 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.Color;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.Style;
@@ -62,7 +61,7 @@ public class ClientHandler {
 		TextComponent message = new TranslationTextComponent(text);
 		message.setStyle(Style.EMPTY.withColor(TEXT_COLOUR));
 		if (ClientConfigHandler.eventNotifyMode.get() == 1) {
-			gui.handleChat(ChatType.CHAT, message, null);
+			gui.getChat().addMessage(message);
 		} else if (ClientConfigHandler.eventNotifyMode.get() == 2) {
 			gui.overlayMessageString=message;
 			gui.overlayMessageTime=ClientConfigHandler.eventNotifyDuration.get();

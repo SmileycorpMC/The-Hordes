@@ -3,7 +3,6 @@ package net.smileycorp.hordes.client;
 import java.awt.Color;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -65,7 +64,7 @@ public class ClientInfectionEventHandler {
 					GL11.glDepthMask(false);
 					GL11.glDisable(GL11.GL_ALPHA_TEST);
 					GlStateManager._blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-					AbstractGui.fill(event.getMatrixStack(), 0, 0, mc.screen.width, mc.screen.height, colour.getRGB());
+					//AbstractGui.fill(event.getMatrixStack(), 0, 0, mc.screen.width, mc.screen.height, colour.getRGB());
 					GL11.glDepthMask(true);
 					GL11.glEnable(GL11.GL_DEPTH_TEST);
 					GL11.glEnable(GL11.GL_ALPHA_TEST);

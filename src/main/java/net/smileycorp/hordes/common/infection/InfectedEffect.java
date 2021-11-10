@@ -32,53 +32,51 @@ public class InfectedEffect extends Effect {
 
 	public InfectedEffect() {
 		super(EffectType.HARMFUL, 0x00440002);
-		String name = "Infected";
-		setRegistryName(ModDefinitions.getResource(name));
 	}
 
 	@Override
-    public boolean shouldRender(EffectInstance effect) {
-        return true;
-    }
+	public boolean shouldRender(EffectInstance effect) {
+		return true;
+	}
 
-    @Override
-    @OnlyIn(Dist.CLIENT)
-    public void renderInventoryEffect(EffectInstance effect, DisplayEffectsScreen<?> gui, MatrixStack mStack, int x, int y, float z) {
+	@Override
+	@OnlyIn(Dist.CLIENT)
+	public void renderInventoryEffect(EffectInstance effect, DisplayEffectsScreen<?> gui, MatrixStack mStack, int x, int y, float z) {
 
-    }
+	}
 
-    @Override
+	@Override
 	public List<ItemStack> getCurativeItems() {
-    	return CommonConfigHandler.enableMobInfection.get() ? InfectionRegister.getCureList() : super.getCurativeItems();
-    }
+		return CommonConfigHandler.enableMobInfection.get() ? InfectionRegister.getCureList() : super.getCurativeItems();
+	}
 
-    @Override
-    public void applyEffectTick(LivingEntity entity, int amplifier) {
-    	if (entity instanceof PlayerEntity) {
-            ((PlayerEntity)entity).causeFoodExhaustion(0.007F * (amplifier+1));
-        }
-    }
+	@Override
+	public void applyEffectTick(LivingEntity entity, int amplifier) {
+		if (entity instanceof PlayerEntity) {
+			((PlayerEntity)entity).causeFoodExhaustion(0.007F * (amplifier+1));
+		}
+	}
 
-    @Override
-    public boolean isDurationEffectTick(int duration, int amplifier) {
-    	return CommonConfigHandler.infectHunger.get();
-    }
+	@Override
+	public boolean isDurationEffectTick(int duration, int amplifier) {
+		return CommonConfigHandler.infectHunger.get();
+	}
 
-    @Override
+	@Override
 	public void addAttributeModifiers(LivingEntity entity,  AttributeModifierManager map, int amplifier) {
-        if (amplifier > 0 && CommonConfigHandler.infectSlowness.get()) {
-        	ModifiableAttributeInstance attribute = map.getInstance(Attributes.MOVEMENT_SPEED);
-        	if (attribute != null) {
-        		attribute.removeModifier(SPEED_MOD_UUID);
-        		attribute.addPermanentModifier(new AttributeModifier(SPEED_MOD_UUID, SPEED_MOD_NAME + " " + amplifier, this.getAttributeModifierValue(amplifier-1, SPEED_MOD), AttributeModifier.Operation.MULTIPLY_TOTAL));
-            }
-        }
-    }
+		if (amplifier > 0 && CommonConfigHandler.infectSlowness.get()) {
+			ModifiableAttributeInstance attribute = map.getInstance(Attributes.MOVEMENT_SPEED);
+			if (attribute != null) {
+				attribute.removeModifier(SPEED_MOD_UUID);
+				attribute.addPermanentModifier(new AttributeModifier(SPEED_MOD_UUID, SPEED_MOD_NAME + " " + amplifier, this.getAttributeModifierValue(amplifier-1, SPEED_MOD), AttributeModifier.Operation.MULTIPLY_TOTAL));
+			}
+		}
+	}
 
-    @Override
+	@Override
 	public void removeAttributeModifiers(LivingEntity entity, AttributeModifierManager map, int amplifier) {
-    	ModifiableAttributeInstance attribute = map.getInstance(Attributes.MOVEMENT_SPEED);
-    	if (attribute != null) attribute.removeModifier(SPEED_MOD_UUID);
-    }
+		ModifiableAttributeInstance attribute = map.getInstance(Attributes.MOVEMENT_SPEED);
+		if (attribute != null) attribute.removeModifier(SPEED_MOD_UUID);
+	}
 
 }

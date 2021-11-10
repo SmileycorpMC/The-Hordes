@@ -25,7 +25,9 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fml.common.thread.SidedThreadGroups;
 import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.entity.ai.GoToEntityPositionGoal;
 import net.smileycorp.atlas.api.network.SimpleStringMessage;
 import net.smileycorp.atlas.api.recipe.WeightedOutputs;
@@ -50,21 +52,15 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 	private int timer = 0;
 	private int day = 0;
 	private int nextDay;
-	private final World world;
-	private PlayerEntity player;
 	private boolean hasChanged = false;
 
-	public OngoingHordeEvent(World world, PlayerEntity player) {
-		this.world=world;
-		this.player=player;
+	public OngoingHordeEvent(){}
+
+	public OngoingHordeEvent(World world) {
 		if (world instanceof ServerWorld) {
 			HordeWorldData data = HordeWorldData.getData((ServerWorld) world);
 			nextDay = data.getNextDay();
 		}
-	}
-
-	public OngoingHordeEvent() {
-		world = null;
 	}
 
 	@Override
@@ -80,7 +76,8 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 			day = nbt.getInt("day");
 		}
 		if (nbt.contains("entities")) {
-			if (world!=null) {
+			if (Thread.currentThread().getThreadGroup() == SidedThreadGroups.SERVER) {
+				World world = ServerLifecycleHooks.getCurrentServer().overworld();
 				for (int id : nbt.getIntArray("entities")) {
 					Entity entity = world.getEntity(id);
 					if (entity instanceof MobEntity) entitiesSpawned.add(new WeakReference<MobEntity>((MobEntity) entity));
@@ -107,7 +104,8 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 	}
 
 	@Override
-	public void update(World world) {
+	public void update(PlayerEntity player) {
+		World world = player.level;
 		if (!world.isClientSide && player!=null) {
 			if (player.level.dimension().getRegistryName() == new ResourceLocation("overworld")) {
 				if ((timer % CommonConfigHandler.hordeSpawnInterval.get()) == 0) {
@@ -118,11 +116,11 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 							amount = (int) Math.floor(amount * CommonConfigHandler.hordeMultiplayerScaling.get());
 						}
 					}
-					spawnWave(world, amount);
+					spawnWave(player, amount);
 				}
 				timer--;
 				if (timer == 0) {
-					stopEvent(world, false);
+					stopEvent(player, false);
 				}
 				hasChanged = true;
 			}
@@ -130,8 +128,9 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 	}
 
 	@Override
-	public void spawnWave(World world, int count) {
+	public void spawnWave(PlayerEntity player, int count) {
 		cleanSpawns();
+		World world = player.level;
 		HordeStartWaveEvent startEvent = new HordeStartWaveEvent(player, this, count);
 		MinecraftForge.EVENT_BUS.post(startEvent);
 		if (startEvent.isCanceled()) return;
@@ -226,14 +225,14 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 	}
 
 	@Override
-	public boolean isHordeDay(World world) {
-		if (world.isClientSide || player==null) return false;
-		if (world!=this.world) return false;
-		return isActive(world) || Math.floor(world.getDayTime()/CommonConfigHandler.dayLength.get())>=nextDay;
+	public boolean isHordeDay(PlayerEntity player) {
+		World world = player.level;
+		if (world.isClientSide |!(world.dimension().getRegistryName() == new ResourceLocation("overworld"))) return false;
+		return isActive(player) || Math.floor(world.getDayTime()/CommonConfigHandler.dayLength.get())>=nextDay;
 	}
 
 	@Override
-	public boolean isActive(World world) {
+	public boolean isActive(PlayerEntity player) {
 		return timer > 0;
 	}
 
@@ -243,13 +242,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 	}
 
 	@Override
-	public PlayerEntity getPlayer() {
-		return player;
-	}
-
-	@Override
 	public void setPlayer(PlayerEntity player) {
-		this.player=player;
 		Set<WeakReference<MobEntity>> toRemove = new HashSet<WeakReference<MobEntity>>();
 		for (WeakReference<MobEntity> ref : entitiesSpawned) {
 			MobEntity entity = ref.get();
@@ -272,9 +265,10 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 	}
 
 	@Override
-	public void tryStartEvent(int duration, boolean isCommand) {
+	public void tryStartEvent(PlayerEntity player, int duration, boolean isCommand) {
 		if (player!=null) {
-			if (player.level.dimension().getRegistryName() == new ResourceLocation("overworld")) {
+			World world = player.level;
+			if (world.dimension().getRegistryName() == new ResourceLocation("overworld")) {
 				HordeStartEvent startEvent = new HordeStartEvent(player, this, isCommand);
 				MinecraftForge.EVENT_BUS.post(startEvent);
 				if (startEvent.isCanceled()) return;
@@ -283,7 +277,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 				if (!buildTableEvent.spawntable.isEmpty()) {
 					timer = duration;
 					hasChanged = true;
-					sendMessage(startEvent.getMessage());
+					sendMessage(player, startEvent.getMessage());
 					if (isCommand) day = (int) Math.floor(world.getDayTime()/CommonConfigHandler.dayLength.get());
 					else day = nextDay;
 				} else {
@@ -304,17 +298,17 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 		return nextDay;
 	}
 
-	private void sendMessage(String str) {
+	private void sendMessage(PlayerEntity player, String str) {
 		HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new SimpleStringMessage(str), ((ServerPlayerEntity) player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 	}
 
 	@Override
-	public void stopEvent(World world, boolean isCommand) {
+	public void stopEvent(PlayerEntity player, boolean isCommand) {
 		HordeEndEvent endEvent = new HordeEndEvent(player, this, isCommand);
 		MinecraftForge.EVENT_BUS.post(endEvent);
 		timer = 0;
 		cleanSpawns();
-		sendMessage(endEvent.getMessage());
+		sendMessage(player, endEvent.getMessage());
 		hasChanged = true;
 	}
 
@@ -331,8 +325,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 		}
 	}
 
-	@Override
-	public String toString() {
+	public String toString(PlayerEntity player) {
 		return "OngoingHordeEvent@" + Integer.toHexString(hashCode()) + "[player=" + (player == null ? "null" : player.getName()) + ", isActive=" + (timer > 0) +
 				", ticksLeft=" + timer +", entityCount="+ entitiesSpawned.size()+", nextDay="+nextDay + ", day="+day+"]";
 	}
@@ -362,7 +355,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 	}
 
 	@Override
-	public void reset() {
+	public void reset(ServerWorld world) {
 		entitiesSpawned.clear();
 		if (world instanceof ServerWorld) {
 			HordeWorldData data = HordeWorldData.getData((ServerWorld) world);

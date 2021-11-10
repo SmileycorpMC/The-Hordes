@@ -1,9 +1,10 @@
 package net.smileycorp.hordes.common.hordeevent.capability;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -56,13 +57,13 @@ public class HordeWorldData extends WorldSavedData {
 		this.nextDay = nextDay;
 	}
 
-	public Set<OngoingHordeEvent> getEvents() {
-		Set<OngoingHordeEvent> events = new HashSet<OngoingHordeEvent>();
+	public Map<PlayerEntity, OngoingHordeEvent> getEvents() {
+		Map<PlayerEntity, OngoingHordeEvent> events = new HashMap<PlayerEntity, OngoingHordeEvent>();
 		if (!world.isClientSide) {
 			for (PlayerEntity player : ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers()) {
 				LazyOptional<IOngoingHordeEvent> optional = player.getCapability(Hordes.HORDE_EVENT, null);
-				if (optional.isPresent()) {
-					events.add((OngoingHordeEvent) player.getCapability(Hordes.HORDE_EVENT, null).resolve().get());
+				if (optional.isPresent() &! player.isDeadOrDying()) {
+					events.put(player, (OngoingHordeEvent) player.getCapability(Hordes.HORDE_EVENT, null).resolve().get());
 				}
 			}
 		}
@@ -97,9 +98,9 @@ public class HordeWorldData extends WorldSavedData {
 		List<String> out = new ArrayList<String>();
 		out.add(this.toString());
 		out.add("Existing events: {");
-		for (OngoingHordeEvent event : getEvents()) {
-			out.add("	" +event.toString());
-			out.addAll(event.getEntityStrings());
+		for (Entry<PlayerEntity,OngoingHordeEvent> entry : getEvents().entrySet()) {
+			out.add("	" +entry.getValue().toString(entry.getKey()));
+			out.addAll(entry.getValue().getEntityStrings());
 		}
 		out.add("}");
 		return out;

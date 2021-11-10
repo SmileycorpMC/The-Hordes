@@ -24,7 +24,9 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.infection.HordesInfection;
 
 import com.mojang.authlib.GameProfile;
@@ -43,24 +45,18 @@ public class ZombiePlayerEntity extends ZombieEntity implements IZombiePlayer {
 		super(type, world);
 	}
 
-	public ZombiePlayerEntity(PlayerEntity player) {
-		this(HordesInfection.ZOMBIE_PLAYER.get(), player.level);
-		setPlayer(player);
-	}
-
-
 	@Override
 	protected void defineSynchedData(){
-        super.defineSynchedData();
-        entityData.define(PLAYER_UUID, Optional.of(UUID.fromString("1512ce82-00e5-441a-9774-f46d9b7badfb")));
-    }
+		super.defineSynchedData();
+		entityData.define(PLAYER_UUID, Optional.of(UUID.fromString("1512ce82-00e5-441a-9774-f46d9b7badfb")));
+	}
 
 	@Override
 	public void setPlayer(PlayerEntity player) {
 		for (EquipmentSlotType slot : EquipmentSlotType.values()) {
 			ItemStack stack = slot.getType() == EquipmentSlotType.Group.ARMOR ? player.inventory.getArmor(slot.getIndex()) :
 				slot == EquipmentSlotType.MAINHAND ? player.getMainHandItem() : player.getOffhandItem();
-			setItemSlot(slot, stack);
+				setItemSlot(slot, stack);
 		}
 		setPlayer(player.getGameProfile());
 	}
@@ -98,13 +94,40 @@ public class ZombiePlayerEntity extends ZombieEntity implements IZombiePlayer {
 	}
 
 	@Override
+	public void setInventory(NonNullList<ItemStack> list) {
+		playerItems.clear();
+		playerItems.addAll(list);
+	}
+
+	@Override
+	public NonNullList<ItemStack> getInventory() {
+		return playerItems;
+	}
+
+	@Override
 	protected void dropCustomDeathLoot(DamageSource source, int looting, boolean recentlyHitIn){
 		for (ItemStack stack : playerItems) {
-            if (!stack.isEmpty() && ! EnchantmentHelper.hasVanishingCurse(stack)) {
-            	spawnAtLocation(stack, 0f);
-            }
-        }
-    }
+			if (!stack.isEmpty() && ! EnchantmentHelper.hasVanishingCurse(stack)) {
+				spawnAtLocation(stack, 0f);
+			}
+		}
+	}
+
+	@Override
+	protected void doUnderWaterConversion() {
+		if (CommonConfigHandler.drownedPlayers.get()) {
+			ZombieEntity drowned = this.convertTo(HordesInfection.DROWNED_PLAYER.get(), true);
+			if (drowned != null) {
+				drowned.handleAttributes(drowned.level.getCurrentDifficultyAt(drowned.blockPosition()).getSpecialMultiplier());
+	         	drowned.setCanBreakDoors(drowned.supportsBreakDoorGoal() && this.canBreakDoors());
+	         	ForgeEventFactory.onLivingConvert(this, drowned);
+	         	if (drowned instanceof IZombiePlayer) ((IZombiePlayer) drowned).copyFrom(this);
+			}
+			if (!this.isSilent()) {
+				this.level.levelEvent((PlayerEntity)null, 1040, this.blockPosition(), 0);
+			}
+		}
+	}
 
 	@Override
 	public boolean isSunSensitive() {
@@ -113,32 +136,32 @@ public class ZombiePlayerEntity extends ZombieEntity implements IZombiePlayer {
 
 	@Override
 	public void addAdditionalSaveData(CompoundNBT compound) {
-        super.addAdditionalSaveData(compound);
-        if (uuid != null) {
-        	compound.putString("player", uuid.toString());
-        }
-        ItemStackHelper.saveAllItems(compound, playerItems);
-    }
+		super.addAdditionalSaveData(compound);
+		if (uuid != null) {
+			compound.putString("player", uuid.toString());
+		}
+		ItemStackHelper.saveAllItems(compound, playerItems);
+	}
 
-    @Override
+	@Override
 	public void readAdditionalSaveData(CompoundNBT compound) {
-       super.readAdditionalSaveData(compound);
-       if (compound.contains("player")) {
-    	   uuid = UUID.fromString(compound.getString("player"));
-       }
-       NonNullList<ItemStack> read = NonNullList.<ItemStack>withSize(compound.getList("Items", 10).size(), ItemStack.EMPTY);
-       ItemStackHelper.loadAllItems(compound, read);
-       playerItems = read;
-    }
+		super.readAdditionalSaveData(compound);
+		if (compound.contains("player")) {
+			uuid = UUID.fromString(compound.getString("player"));
+		}
+		NonNullList<ItemStack> read = NonNullList.<ItemStack>withSize(compound.getList("Items", 10).size(), ItemStack.EMPTY);
+		ItemStackHelper.loadAllItems(compound, read);
+		playerItems = read;
+	}
 
 	@Override
 	public ITextComponent getDisplayName() {
 		TranslationTextComponent textcomponentstring = new TranslationTextComponent(ScorePlayerTeam.formatNameForTeam(getTeam(),
 				new StringTextComponent("entity.hordes.ZombiePlayer.chat")).getString(), ScorePlayerTeam.formatNameForTeam(getTeam(), getName()));
-        textcomponentstring.getStyle().withHoverEvent(this.createHoverEvent());
-        textcomponentstring.getStyle().withInsertion(this.getEncodeId());
-        return textcomponentstring;
-    }
+		textcomponentstring.getStyle().withHoverEvent(this.createHoverEvent());
+		textcomponentstring.getStyle().withInsertion(this.getEncodeId());
+		return textcomponentstring;
+	}
 
 	@Override
 	public Color getColour() {

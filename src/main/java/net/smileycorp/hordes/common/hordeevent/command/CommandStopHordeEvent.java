@@ -28,7 +28,7 @@ public class CommandStopHordeEvent {
 			PlayerEntity player = (PlayerEntity) source.getEntity();
 			LazyOptional<IOngoingHordeEvent> optional = player.getCapability(Hordes.HORDE_EVENT, null);
 			if (optional.isPresent()) {
-				optional.resolve().get().stopEvent(source.getServer().overworld(), true);
+				optional.resolve().get().stopEvent(player, true);
 				return 1;
 			}
 		}

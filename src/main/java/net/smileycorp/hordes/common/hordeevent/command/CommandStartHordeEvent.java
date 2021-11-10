@@ -30,7 +30,7 @@ public class CommandStartHordeEvent {
 			PlayerEntity player = (PlayerEntity) source.getEntity();
 			LazyOptional<IOngoingHordeEvent> optional = player.getCapability(Hordes.HORDE_EVENT, null);
 			if (optional.isPresent()) {
-				optional.resolve().get().tryStartEvent(length, true);
+				optional.resolve().get().tryStartEvent(player, length, true);
 				return 1;
 			}
 		}

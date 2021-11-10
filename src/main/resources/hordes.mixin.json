@@ -1,10 +1,10 @@
 {
-  "compatibilityLevel": "JAVA_8",
-  "package": "net.smileycorp.hordes.common.infection.mixin",
-  "refmap": "mixins.hordes.refmap.json",
-  "mixins": [
-    "MixinMobEntity"
-  ],
-  "client": [],
-  "server": []
+	"required": true,
+	"package": "net.smileycorp.hordes.common.infection.mixin",
+	"compatibilityLevel": "JAVA_8",
+	"refmap": "hordes.refmap.json",
+	"mixins": [
+		"MixinMobEntity"
+	],
+	"minVersion": "0.8"
 }

@@ -67,9 +67,9 @@ public class InfectionEventHandler {
 		ItemStack stack = event.getItemStack();
 		if (event.getTarget() instanceof LivingEntity) {
 			LivingEntity entity = (LivingEntity) event.getTarget();
-			if (entity.isPotionActive(HordesInfection.INFECTED)) {
+			if (entity.isPotionActive(HordesInfection.INFECTED.get())) {
 				if (InfectionRegister.isCure(stack)) {
-					entity.removePotionEffect(HordesInfection.INFECTED);
+					entity.removePotionEffect(HordesInfection.INFECTED.get());
 					if (!player.capabilities.isCreativeMode) {
 						ItemStack container = stack.getItem().getContainerItem(stack);
 						if (stack.isItemStackDamageable()) {

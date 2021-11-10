@@ -10,12 +10,12 @@ public class DamageSourceInfection extends DamageSource {
 
 	@Override
 	public boolean isBypassArmor() {
-      return true;
+		return true;
 	}
 
 	@Override
 	public boolean isBypassInvul() {
 		return true;
-   	}
+	}
 
 }

@@ -5,40 +5,37 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.Direction;
-import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.Capability.IStorage;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.IOngoingEvent;
 import net.smileycorp.hordes.common.Hordes;
 
-public interface IOngoingHordeEvent extends IOngoingEvent {
+public interface IOngoingHordeEvent extends IOngoingEvent<PlayerEntity> {
 
-	public void spawnWave(World world, int count);
+	public void spawnWave(PlayerEntity player, int count);
 
-	public boolean isHordeDay(World world);
+	public boolean isHordeDay(PlayerEntity player);
 
 	public boolean hasChanged();
 
-	public PlayerEntity getPlayer();
-
 	public void setPlayer(PlayerEntity player);
 
-	public void tryStartEvent(int duration, boolean isCommand);
+	public void tryStartEvent(PlayerEntity player, int duration, boolean isCommand);
 
 	public void setNextDay(int day);
 
 	public int getNextDay();
 
-	public void stopEvent(World world, boolean isCommand);
+	public void stopEvent(PlayerEntity player, boolean isCommand);
 
 	public void removeEntity(MobEntity entity);
 
 	public void registerEntity(MobEntity entity);
 
-	public void reset();
+	public void reset(ServerWorld world);
 
 	public static class Storage implements IStorage<IOngoingHordeEvent> {
 
@@ -56,11 +53,7 @@ public interface IOngoingHordeEvent extends IOngoingEvent {
 
 	public static class Provider implements ICapabilitySerializable<INBT> {
 
-		protected IOngoingHordeEvent impl;
-
-		public Provider(PlayerEntity player) {
-			impl = new OngoingHordeEvent(player.level.isClientSide ? player.level : ServerLifecycleHooks.getCurrentServer().overworld(), player);
-		}
+		protected IOngoingHordeEvent impl = new OngoingHordeEvent();
 
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction facing) {
