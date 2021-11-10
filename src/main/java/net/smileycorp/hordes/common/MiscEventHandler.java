@@ -17,7 +17,7 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.smileycorp.hordes.common.capability.IZombifyPlayer;
 import net.smileycorp.hordes.common.entities.IZombiePlayer;
-import net.smileycorp.hordes.infection.HordesInfection;
+import net.smileycorp.hordes.common.infection.HordesInfection;
 
 public class MiscEventHandler {
 
@@ -28,7 +28,8 @@ public class MiscEventHandler {
 			World world = entity.level;
 			if (!world.isClientSide) {
 				if (entity instanceof PlayerEntity &!(entity instanceof FakePlayer)) {
-					if ((entity.hasEffect(HordesInfection.INFECTED.get()) && CommonConfigHandler.enableMobInfection.get()) || CommonConfigHandler.zombieGraves.get()) {
+					if ((entity.hasEffect(HordesInfection.INFECTED.get()) && CommonConfigHandler.enableMobInfection.get()) || CommonConfigHandler.zombieGraves.get() ||
+							(entity.isUnderWater() && CommonConfigHandler.drownedGraves.get())) {
 						LazyOptional<IZombifyPlayer> optional = entity.getCapability(Hordes.ZOMBIFY_PLAYER, null);
 						if (optional.isPresent()) {
 							optional.resolve().get().createZombie((PlayerEntity) entity);

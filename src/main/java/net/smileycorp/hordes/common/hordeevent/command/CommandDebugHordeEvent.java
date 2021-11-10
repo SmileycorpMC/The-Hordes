@@ -6,42 +6,33 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.server.MinecraftServer;
-import net.smileycorp.hordes.common.ModDefinitions;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
 import net.smileycorp.hordes.common.hordeevent.capability.HordeWorldData;
 
-public class CommandDebugHordeEvent extends CommandBase {
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-	@Override
-	public String getName() {
-		return "debugHorde";
+public class CommandDebugHordeEvent {
+
+	public static void register(CommandDispatcher<CommandSource> dispatcher) {
+		LiteralArgumentBuilder<CommandSource> command = Commands.literal("debugHorde")
+				.requires((commandSource) -> commandSource.hasPermission(1))
+				.executes(ctx -> execute(ctx));
+		dispatcher.register(command);
 	}
 
-	@Override
-	public String getUsage(ICommandSender sender) {
-		return "commands."+ModDefinitions.MODID+".HordeDebug.usage";
-	}
-
-	@Override
-	public int getRequiredPermissionLevel() {
-		return 0;
-	}
-
-	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+	public static int execute(CommandContext<CommandSource> ctx) throws CommandSyntaxException {
+		CommandSource source = ctx.getSource();
 		Path path = Paths.get("logs/hordes.log");
-		server.addScheduledTask(() -> {
-			HordeWorldData data = HordeWorldData.getData(sender.getEntityWorld());
-			List<String> out = data.getDebugText();
-			try {
-				Files.write(path, out, StandardCharsets.UTF_8);
-			} catch (Exception e) {}
-			data.save();
-		});
-		notifyCommandListener(sender, this, "commands."+ModDefinitions.MODID+".HordeDebug.success", path.toAbsolutePath().toString());
+		HordeWorldData data = HordeWorldData.getData(source.getServer().overworld());
+		List<String> out = data.getDebugText();
+		try {
+			Files.write(path, out, StandardCharsets.UTF_8);
+		} catch (Exception e) {}
+		return 1;
 	}
 
 }

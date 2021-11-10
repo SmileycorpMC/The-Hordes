@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.infection.jei;
+package net.smileycorp.hordes.common.infection.jei;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.smileycorp.hordes.common.ModDefinitions;
-import net.smileycorp.hordes.infection.InfectedEffect;
+import net.smileycorp.hordes.common.infection.InfectedEffect;
 
 public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapper> {
 

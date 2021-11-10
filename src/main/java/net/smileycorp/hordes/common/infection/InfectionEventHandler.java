@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.infection;
+package net.smileycorp.hordes.common.infection;
 
 import java.util.Random;
 
@@ -28,13 +28,14 @@ import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.network.NetworkDirection;
 import net.smileycorp.atlas.api.network.SimpleStringMessage;
 import net.smileycorp.atlas.api.util.DirectionUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.ModDefinitions;
 import net.smileycorp.hordes.common.event.InfectionDeathEvent;
-import net.smileycorp.hordes.infection.network.InfectionPacketHandler;
-import net.smileycorp.hordes.infection.network.InfectionPacketHandler.InfectMessage;
+import net.smileycorp.hordes.common.infection.network.InfectMessage;
+import net.smileycorp.hordes.common.infection.network.InfectionPacketHandler;
 
 @EventBusSubscriber(modid=ModDefinitions.MODID)
 public class InfectionEventHandler {
@@ -44,7 +45,7 @@ public class InfectionEventHandler {
 		PlayerEntity player = event.getPlayer();
 		if (player != null) {
 			if (player instanceof ServerPlayerEntity) {
-				InfectionPacketHandler.NETWORK_INSTANCE.sendTo(new SimpleStringMessage(InfectionRegister.getCurePacketData()), (EntityPlayerMP) player);
+				InfectionPacketHandler.NETWORK_INSTANCE.sendTo(new SimpleStringMessage(InfectionRegister.getCurePacketData()), ((ServerPlayerEntity) player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 			}
 		}
 	}
@@ -117,7 +118,8 @@ public class InfectionEventHandler {
 					int c = rand.nextInt(100);
 					if (c <= CommonConfigHandler.playerInfectChance.get()) {
 						entity.addEffect(new EffectInstance(HordesInfection.INFECTED.get(), 10000, 0));
-						InfectionPacketHandler.NETWORK_INSTANCE.sendTo(new InfectMessage(), (ServerPlayerEntity) entity);
+						//PacketHandler.NETWORK_INSTANCE.sendTo(new DenyFollowMessage(entity), ((ServerPlayerEntity)user).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+						InfectionPacketHandler.NETWORK_INSTANCE.sendTo(new InfectMessage(), ((ServerPlayerEntity) entity).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 					}
 				} else if ((entity instanceof VillagerEntity && CommonConfigHandler.infectVillagers.get())) {
 					int c = rand.nextInt(100);

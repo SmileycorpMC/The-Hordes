@@ -1,49 +1,40 @@
 package net.smileycorp.hordes.common.hordeevent.command;
 
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.command.NumberInvalidException;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraftforge.common.util.LazyOptional;
 import net.smileycorp.hordes.common.Hordes;
-import net.smileycorp.hordes.common.ModDefinitions;
+import net.smileycorp.hordes.common.hordeevent.capability.IOngoingHordeEvent;
 
-public class CommandStartHordeEvent extends CommandBase {
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-	@Override
-	public String getName() {
-		return "startHordeEvent";
+public class CommandStartHordeEvent {
+
+	public static void register(CommandDispatcher<CommandSource> dispatcher) {
+		LiteralArgumentBuilder<CommandSource> command = Commands.literal("startHordeEvent")
+				.requires((commandSource) -> commandSource.hasPermission(1))
+				.then(Commands.argument("length", IntegerArgumentType.integer()))
+				.executes(ctx -> execute(ctx, IntegerArgumentType.getInteger(ctx, "length")));
+		dispatcher.register(command);
 	}
 
-	@Override
-	public String getUsage(ICommandSender sender) {
-		return "commands."+ModDefinitions.MODID+".StartHorde.usage";
-	}
-
-	@Override
-	public int getRequiredPermissionLevel() {
-		return 2;
-	}
-
-	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-		if (args.length!=1) {
-			throw new CommandException("commands."+ModDefinitions.MODID+".StartHorde.usage", new Object[] {});
+	public static int execute(CommandContext<CommandSource> ctx, int length) throws CommandSyntaxException {
+		CommandSource source = ctx.getSource();
+		if (source.getEntity() instanceof Entity) {
+			PlayerEntity player = (PlayerEntity) source.getEntity();
+			LazyOptional<IOngoingHordeEvent> optional = player.getCapability(Hordes.HORDE_EVENT, null);
+			if (optional.isPresent()) {
+				optional.resolve().get().tryStartEvent(length, true);
+				return 1;
+			}
 		}
-		try {
-			int duration = parseInt(args[0], 0);
-			server.addScheduledTask(() -> {
-				EntityPlayer player = (EntityPlayer) sender.getCommandSenderEntity();
-				if (player.hasCapability(Hordes.HORDE_EVENT, null)) player.getCapability(Hordes.HORDE_EVENT, null).tryStartEvent(duration, true);
-			});
-			notifyCommandListener(sender, this, "commands."+ModDefinitions.MODID+".StartHorde.success", new Object[] {new TextComponentTranslation(args[0])});
-		}
-		catch (NumberInvalidException e) {
-			throw new CommandException("commands."+ModDefinitions.MODID+".StartHorde.invalidValue", new Object[] {new TextComponentTranslation(args[0])});
-		}
-
+		return 0;
 	}
 
 }

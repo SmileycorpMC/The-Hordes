@@ -1,8 +1,12 @@
 package net.smileycorp.hordes.client;
 
+import java.util.Random;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IngameGui;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
@@ -24,7 +28,8 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.smileycorp.hordes.common.ModDefinitions;
 import net.smileycorp.hordes.common.entities.DrownedPlayerEntity;
 import net.smileycorp.hordes.common.entities.ZombiePlayerEntity;
-import net.smileycorp.hordes.infection.HordesInfection;
+import net.smileycorp.hordes.common.infection.HordesInfection;
+import net.smileycorp.hordes.common.infection.network.CureEntityMessage;
 
 @EventBusSubscriber(modid = ModDefinitions.MODID, value = Dist.CLIENT)
 public class ClientHandler {
@@ -76,6 +81,18 @@ public class ClientHandler {
 			World world = mc.level;
 			PlayerEntity player = mc.player;
 			world.playSound(player, player.blockPosition(), SoundEvents.ZOMBIE_VILLAGER_CONVERTED, SoundCategory.HOSTILE, 0.75f, world.random.nextFloat());
+		}
+	}
+
+	public static void processCureEntity(CureEntityMessage message) {
+		Minecraft mc = Minecraft.getInstance();
+		World world = mc.level;
+		Entity entity = message.getEntity(world);
+		world.playLocalSound(entity.getX(), entity.getY(), entity.getZ(), SoundEvents.EXPERIENCE_ORB_PICKUP, entity.getSoundSource(), 1f, 1f, true);
+		Random rand = world.random;
+		for (int i = 0; i < 10; ++i) {
+			world.addParticle(ParticleTypes.HAPPY_VILLAGER, entity.getX() + (rand.nextDouble() - 0.5D) * entity.getBbWidth() * 1.5,
+					entity.getY() + rand.nextDouble() * entity.getBbHeight(), entity.getZ() + (rand.nextDouble() - 0.5D) * entity.getBbWidth() * 1.5, 0.0D, 0.3D, 0.0D);
 		}
 	}
 

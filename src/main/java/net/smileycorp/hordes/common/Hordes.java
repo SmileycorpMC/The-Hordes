@@ -1,5 +1,6 @@
 package net.smileycorp.hordes.common;
 
+import net.minecraft.command.CommandSource;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -28,13 +29,15 @@ import net.smileycorp.hordes.common.hordeevent.command.CommandSpawnWave;
 import net.smileycorp.hordes.common.hordeevent.command.CommandStartHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.command.CommandStopHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.network.HordeEventPacketHandler;
-import net.smileycorp.hordes.infection.HordesInfection;
-import net.smileycorp.hordes.infection.InfectionEventHandler;
-import net.smileycorp.hordes.infection.InfectionRegister;
-import net.smileycorp.hordes.infection.network.InfectionPacketHandler;
+import net.smileycorp.hordes.common.infection.HordesInfection;
+import net.smileycorp.hordes.common.infection.InfectionEventHandler;
+import net.smileycorp.hordes.common.infection.InfectionRegister;
+import net.smileycorp.hordes.common.infection.network.InfectionPacketHandler;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.mojang.brigadier.CommandDispatcher;
 
 @Mod(value = ModDefinitions.MODID)
 public class Hordes {
@@ -99,10 +102,11 @@ public class Hordes {
 
 	public void serverStart(RegisterCommandsEvent event) {
 		if (CommonConfigHandler.enableHordeEvent.get()) {
-			event.registerServerCommand(new CommandSpawnWave());
-			event.registerServerCommand(new CommandStartHordeEvent());
-			event.registerServerCommand(new CommandStopHordeEvent());
-			event.registerServerCommand(new CommandDebugHordeEvent());
+			CommandDispatcher<CommandSource> dispatcher = event.getDispatcher();
+			CommandSpawnWave.register(dispatcher);
+			CommandStartHordeEvent.register(dispatcher);
+			CommandStopHordeEvent.register(dispatcher);
+			CommandDebugHordeEvent.register(dispatcher);
 		}
 	}
 

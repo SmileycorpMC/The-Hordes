@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.infection.network;
+package net.smileycorp.hordes.common.infection.network;
 
 import java.io.IOException;
 

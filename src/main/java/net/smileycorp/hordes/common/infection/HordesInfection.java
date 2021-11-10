@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.infection;
+package net.smileycorp.hordes.common.infection;
 
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;

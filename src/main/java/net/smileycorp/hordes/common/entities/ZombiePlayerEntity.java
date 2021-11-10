@@ -25,7 +25,7 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
-import net.smileycorp.hordes.infection.HordesInfection;
+import net.smileycorp.hordes.common.infection.HordesInfection;
 
 import com.mojang.authlib.GameProfile;
 

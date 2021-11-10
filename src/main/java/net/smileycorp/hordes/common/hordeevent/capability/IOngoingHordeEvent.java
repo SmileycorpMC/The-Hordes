@@ -38,6 +38,8 @@ public interface IOngoingHordeEvent extends IOngoingEvent {
 
 	public void registerEntity(MobEntity entity);
 
+	public void reset();
+
 	public static class Storage implements IStorage<IOngoingHordeEvent> {
 
 		@Override
@@ -76,4 +78,5 @@ public interface IOngoingHordeEvent extends IOngoingEvent {
 		}
 
 	}
+
 }

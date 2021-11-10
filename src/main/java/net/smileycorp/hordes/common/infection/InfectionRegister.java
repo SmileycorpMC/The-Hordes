@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.infection;
+package net.smileycorp.hordes.common.infection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +15,8 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.smileycorp.atlas.api.util.RecipeUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
+
+import com.google.common.collect.Lists;
 
 public class InfectionRegister {
 
@@ -69,15 +71,14 @@ public class InfectionRegister {
 		}
 	}
 
-	/*public static void readCurePacketData(String data) {
+	public static void readCurePacketData(String data) {
 		try {
-			String[] splitData = data.split(";");
-			curesClient = parseCureData(splitData);
+			curesClient = parseCureData(Lists.newArrayList(data.split(";")));
 		} catch (Exception e) {
 			Hordes.logError("Failed to read data from server, " + e.getCause() + " " + e.getMessage(), e);
 		}
-		if (Loader.isModLoaded("jei")) JEIPluginInfection.setRecipes(curesClient);
-	}*/
+		//if (Loader.isModLoaded("jei")) JEIPluginInfection.setRecipes(curesClient);
+	}
 
 	public static String getCurePacketData() {
 		StringBuilder builder = new StringBuilder();

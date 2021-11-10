@@ -1,36 +1,37 @@
 package net.smileycorp.hordes.common.hordeevent.command;
 
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraftforge.common.util.LazyOptional;
 import net.smileycorp.hordes.common.Hordes;
-import net.smileycorp.hordes.common.ModDefinitions;
+import net.smileycorp.hordes.common.hordeevent.capability.IOngoingHordeEvent;
 
-public class CommandStopHordeEvent extends CommandBase {
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-	@Override
-	public String getName() {
-		return "stopHordeEvent";
+public class CommandStopHordeEvent {
+
+	public static void register(CommandDispatcher<CommandSource> dispatcher) {
+		LiteralArgumentBuilder<CommandSource> comamnd = Commands.literal("stopHordeEvent")
+				.requires((commandSource) -> commandSource.hasPermission(1))
+				.executes(ctx -> execute(ctx));
+		dispatcher.register(comamnd);
 	}
 
-	@Override
-	public String getUsage(ICommandSender sender) {
-		return "commands."+ModDefinitions.MODID+".StopHorde.usage";
-	}
-
-	@Override
-	public int getRequiredPermissionLevel() {
-		return 2;
-	}
-
-	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-		server.addScheduledTask(() -> {
-			EntityPlayer player = (EntityPlayer) sender.getCommandSenderEntity();
-			if (player.hasCapability(Hordes.HORDE_EVENT, null)) player.getCapability(Hordes.HORDE_EVENT, null).stopEvent(sender.getEntityWorld(), true);
-		});
-		notifyCommandListener(sender, this, "commands."+ModDefinitions.MODID+".StopHorde.success", new Object[] {});
+	public static int execute(CommandContext<CommandSource> ctx) throws CommandSyntaxException {
+		CommandSource source = ctx.getSource();
+		if (source.getEntity() instanceof Entity) {
+			PlayerEntity player = (PlayerEntity) source.getEntity();
+			LazyOptional<IOngoingHordeEvent> optional = player.getCapability(Hordes.HORDE_EVENT, null);
+			if (optional.isPresent()) {
+				optional.resolve().get().stopEvent(source.getServer().overworld(), true);
+				return 1;
+			}
+		}
+		return 0;
 	}
 }

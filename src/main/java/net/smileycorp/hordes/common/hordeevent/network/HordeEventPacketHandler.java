@@ -1,60 +1,35 @@
 package net.smileycorp.hordes.common.hordeevent.network;
 
-import net.minecraft.client.Minecraft;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import net.minecraftforge.fml.relauncher.Side;
-import net.smileycorp.atlas.api.SimpleStringMessage;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.network.NetworkEvent.Context;
+import net.minecraftforge.fml.network.NetworkRegistry;
+import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.smileycorp.atlas.api.network.SimpleMessageDecoder;
+import net.smileycorp.atlas.api.network.SimpleMessageEncoder;
+import net.smileycorp.atlas.api.network.SimpleStringMessage;
 import net.smileycorp.hordes.client.ClientHandler;
 import net.smileycorp.hordes.common.ModDefinitions;
 
 public class HordeEventPacketHandler {
 
-	public static final SimpleNetworkWrapper NETWORK_INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(ModDefinitions.MODID+"_hordeevent");
+	public static SimpleChannel NETWORK_INSTANCE;
 
 	public static void initPackets() {
-		NETWORK_INSTANCE.registerMessage(SoundMessageHandler.class, HordeSoundMessage.class, 0, Side.CLIENT);
-		NETWORK_INSTANCE.registerMessage(NotificationMessageHandler.class, SimpleStringMessage.class, 1, Side.CLIENT);
+		NETWORK_INSTANCE = NetworkRegistry.newSimpleChannel(ModDefinitions.getResource("HordeEvent"), ()-> "1", "1"::equals, "1"::equals);
+		NETWORK_INSTANCE.registerMessage(0, HordeSoundMessage.class, new SimpleMessageEncoder<HordeSoundMessage>(),
+				new SimpleMessageDecoder<HordeSoundMessage>(HordeSoundMessage.class), (T, K)-> processSoundMessage(T, K.get()));
+		NETWORK_INSTANCE.registerMessage(1, SimpleStringMessage.class, new SimpleMessageEncoder<SimpleStringMessage>(),
+				new SimpleMessageDecoder<SimpleStringMessage>(SimpleStringMessage.class), (T, K)-> processNotificationMessage(T, K.get()));
 	}
 
-	public static class SoundMessageHandler implements IMessageHandler<HordeSoundMessage, IMessage> {
-
-		public SoundMessageHandler() {}
-
-		@Override
-		public IMessage onMessage(HordeSoundMessage message, MessageContext ctx) {
-
-			if (ctx.side == Side.CLIENT) {
-				Minecraft mc = Minecraft.getMinecraft();
-
-				mc.addScheduledTask(() -> {
-					ClientHandler.playHordeSound(message.getDirection(), message.getSound());
-
-				});
-			}
-			return null;
-		}
+	public static void processSoundMessage(HordeSoundMessage message, Context ctx) {
+		ctx.enqueueWork(() ->  DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> ClientHandler.playHordeSound(message.getDirection(), message.getSound())));
+		ctx.setPacketHandled(true);
 	}
 
-	public static class NotificationMessageHandler implements IMessageHandler<SimpleStringMessage, IMessage> {
-
-		public NotificationMessageHandler() {}
-
-		@Override
-		public IMessage onMessage(SimpleStringMessage message, MessageContext ctx) {
-
-			if (ctx.side == Side.CLIENT) {
-				Minecraft mc = Minecraft.getMinecraft();
-
-				mc.addScheduledTask(() -> {
-					ClientHandler.displayMessage(message.getText());
-
-				});
-			}
-			return null;
-		}
+	public static void processNotificationMessage(SimpleStringMessage message, Context ctx) {
+		ctx.enqueueWork(() ->  DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> ClientHandler.displayMessage(message.getText())));
+		ctx.setPacketHandled(true);
 	}
 }

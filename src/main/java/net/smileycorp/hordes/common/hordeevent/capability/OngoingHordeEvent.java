@@ -25,6 +25,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fml.network.NetworkDirection;
 import net.smileycorp.atlas.api.entity.ai.GoToEntityPositionGoal;
 import net.smileycorp.atlas.api.network.SimpleStringMessage;
 import net.smileycorp.atlas.api.recipe.WeightedOutputs;
@@ -157,7 +158,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 		}
 		if (count > 0) {
 			if (player instanceof ServerPlayerEntity) {
-				HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new HordeSoundMessage(basedir, startEvent.getSound()), (ServerPlayerEntity) player);
+				HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new HordeSoundMessage(basedir, startEvent.getSound()), ((ServerPlayerEntity) player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 			}
 		} else {
 			logInfo("Stopping wave spawn because count is " + count);
@@ -304,7 +305,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 	}
 
 	private void sendMessage(String str) {
-		HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new SimpleStringMessage(str), (ServerPlayerEntity) player);
+		HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new SimpleStringMessage(str), ((ServerPlayerEntity) player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 	}
 
 	@Override
@@ -358,5 +359,14 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 			result.add(builder.toString());
 		}
 		return result;
+	}
+
+	@Override
+	public void reset() {
+		entitiesSpawned.clear();
+		if (world instanceof ServerWorld) {
+			HordeWorldData data = HordeWorldData.getData((ServerWorld) world);
+			nextDay = data.getNextDay();
+		}
 	}
 }

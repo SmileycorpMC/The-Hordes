@@ -44,6 +44,8 @@ public class CommonConfigHandler {
 
 	//misc
 	public static ConfigValue<Boolean> zombieGraves;
+	public static ConfigValue<Boolean> drownedGraves;
+	public static ConfigValue<Boolean> drownedPlayers;
 
 	//load config properties
 	static {
@@ -77,13 +79,15 @@ public class CommonConfigHandler {
 		infectHunger = builder.comment("Whether later levels of infected should depleet hunger quicker? ").define("infectHunger", true);
 		playerInfectChance = builder.comment("Chance out of 100 for a player to get infected").define("playerInfectChance", 75);
 		ticksForEffectStage = builder.comment("How long do each of the 4 effect phases last for before the next phase is activated?").define("ticksForEffectStage", 6000);
-		infectionEntities = builder.comment("Mobs which are based on entities in this list can cause the infection effect.")
+		infectionEntities = builder.comment("Mobs which are based on entities in this list can cause the infection effect. (the default zombie covers zombies, husks, zombie villagers and drowned, as well ad the player zombie/drowned)")
 				.define("infectionEntities", Lists.newArrayList("minecraft:zombie"));
-		cureItemList = builder.comment("A list of items which can cure infection when 'consumed' use '*' to specify any metadata, can accept nbt tags. eg.minecraft:golden_apple:*, minecraft:potion{Potion: \"minecraft:strong_regeneration\"}")
-			.define("cureItemList", Lists.newArrayList("minecraft:golden_apple:*"));
+		cureItemList = builder.comment("A list of items which can cure infection when 'consumed' or used on an entity can accept nbt tags. eg.minecraft:golden_apple, minecraft:potion{Potion: \"minecraft:strong_regeneration\"}")
+			.define("cureItemList", Lists.newArrayList("minecraft:golden_apple", "minecraft:enchanted_golden_apple"));
 		//misc
 		builder.push("Misc");
 		zombieGraves = builder.comment("Whether to use zombie players as graves all the time. (Even if infection is disabled)").define("zombieGraves", false);
+		drownedGraves = builder.comment("Whether to always spawn a drowned if a player dies underwater. (Even if infection or zombieGraves are disabled)").define("drownedGraves", false);
+		drownedPlayers = builder.comment("Whether to spawn drowned players when a player dies underwater instead of a zombie player. (Whether the zombie is spawned from infection or zombieGraves being true)").define("drownedPlayers", true);
 		builder.pop();
 		config = builder.build();
 	}

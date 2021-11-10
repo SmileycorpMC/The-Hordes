@@ -1,6 +1,6 @@
 {
   "compatibilityLevel": "JAVA_8",
-  "package": "net.smileycorp.hordes.infection.mixin",
+  "package": "net.smileycorp.hordes.common.infection.mixin",
   "refmap": "mixins.hordes.refmap.json",
   "mixins": [
     "MixinMobEntity"

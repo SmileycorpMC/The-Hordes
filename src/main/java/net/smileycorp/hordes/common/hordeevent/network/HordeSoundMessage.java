@@ -1,48 +1,54 @@
 package net.smileycorp.hordes.common.hordeevent.network;
 
-import io.netty.buffer.ByteBuf;
+import java.io.IOException;
+
+import net.minecraft.network.INetHandler;
+import net.minecraft.network.IPacket;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraft.util.math.vector.Vector3d;
 
-public class HordeSoundMessage implements IMessage {
+public class HordeSoundMessage implements IPacket<INetHandler> {
 
-	protected Vec3d direction;
+	protected Vector3d direction;
 	protected ResourceLocation sound;
 
 	public HordeSoundMessage() {}
 
-	public HordeSoundMessage(Vec3d direction, ResourceLocation sound) {
+	public HordeSoundMessage(Vector3d direction, ResourceLocation sound) {
 		this.direction=direction;
 		this.sound=sound;
 	}
 
 	@Override
-	public void fromBytes(ByteBuf buf) {
+	public void read(PacketBuffer buf) throws IOException {
 		double x = buf.readDouble();
 		double z = buf.readDouble();
-		direction = new Vec3d(x, 0, z);
-		sound = new ResourceLocation(ByteBufUtils.readUTF8String(buf));
+		direction = new Vector3d(x, 0, z);
+		sound = new ResourceLocation(buf.readUtf());
 	}
 
 	@Override
-	public void toBytes(ByteBuf buf) {
+	public void write(PacketBuffer buf) throws IOException {
 		if (direction!=null) {
 			buf.writeDouble(direction.x);
 			buf.writeDouble(direction.z);
 		}
 		if (sound!=null) {
-			ByteBufUtils.writeUTF8String(buf, sound.toString());
+			buf.writeUtf(sound.toString());
 		}
 	}
 
 
-	public Vec3d getDirection() {
+	public Vector3d getDirection() {
 		return direction;
 	}
 
 	public ResourceLocation getSound() {
 		return sound;
 	}
+
+	@Override
+	public void handle(INetHandler handler) {}
+
 }
