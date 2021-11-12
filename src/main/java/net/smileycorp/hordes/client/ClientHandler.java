@@ -1,5 +1,6 @@
 package net.smileycorp.hordes.client;
 
+import java.awt.Color;
 import java.util.Random;
 
 import net.minecraft.client.Minecraft;
@@ -13,21 +14,34 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.Color;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.smileycorp.hordes.common.ModDefinitions;
+import net.smileycorp.hordes.common.entities.DrownedPlayerEntity;
+import net.smileycorp.hordes.common.entities.ZombiePlayerEntity;
+import net.smileycorp.hordes.common.infection.HordesInfection;
 import net.smileycorp.hordes.common.infection.network.CureEntityMessage;
 
-@EventBusSubscriber(modid = ModDefinitions.MODID, value = Dist.CLIENT)
+@EventBusSubscriber(modid = ModDefinitions.MODID, value = Dist.CLIENT, bus = Bus.MOD)
 public class ClientHandler {
 
-	private static Color TEXT_COLOUR = Color.fromRgb(0x440002);
+	@SubscribeEvent
+	public static void clientSetup(FMLClientSetupEvent event){
+		MinecraftForge.EVENT_BUS.register(new ClientHandler());
+		MinecraftForge.EVENT_BUS.register(new ClientInfectionEventHandler());
+		RenderingRegistry.registerEntityRenderingHandler(HordesInfection.ZOMBIE_PLAYER.get(), m -> new ZombiePlayerRenderer<ZombiePlayerEntity>(m, new Color(121, 156, 101)));
+		RenderingRegistry.registerEntityRenderingHandler(HordesInfection.DROWNED_PLAYER.get(), m -> new ZombiePlayerRenderer<DrownedPlayerEntity>(m, new Color(144, 255, 255)));
+	}
 
 	public static void playHordeSound(Vector3d dir, ResourceLocation sound) {
 		if (ClientConfigHandler.hordeSpawnSound.get()) {
@@ -36,18 +50,14 @@ public class ClientHandler {
 			PlayerEntity player = mc.player;
 			BlockPos pos = new BlockPos(player.getX() + (5*dir.x), player.getY(), player.getZ() + (5*dir.z));
 			float pitch = 1+((world.random.nextInt(6)-3)/10);
-			world.playSound(player, pos, new SoundEvent(sound), SoundCategory.HOSTILE, 0.3f, pitch);
+			world.playSound(player, pos, new SoundEvent(sound), SoundCategory.HOSTILE, 0.6f, pitch);
 		}
-	}
-
-	public static PlayerEntity getPlayer() {
-		return Minecraft.getInstance().player;
 	}
 
 	public static void displayMessage(String text) {
 		IngameGui gui = Minecraft.getInstance().gui;
 		TextComponent message = new TranslationTextComponent(text);
-		message.setStyle(Style.EMPTY.withColor(TEXT_COLOUR));
+		message.setStyle(Style.EMPTY.withColor(ClientConfigHandler.getHordeMessageColour()));
 		if (ClientConfigHandler.eventNotifyMode.get() == 1) {
 			gui.getChat().addMessage(message);
 		} else if (ClientConfigHandler.eventNotifyMode.get() == 2) {
@@ -67,7 +77,7 @@ public class ClientHandler {
 			Minecraft mc = Minecraft.getInstance();
 			World world = mc.level;
 			PlayerEntity player = mc.player;
-			world.playSound(player, player.blockPosition(), SoundEvents.ZOMBIE_VILLAGER_CONVERTED, SoundCategory.HOSTILE, 0.75f, world.random.nextFloat());
+			world.playSound(player, player.blockPosition(), SoundEvents.ZOMBIE_VILLAGER_CONVERTED, SoundCategory.HOSTILE, 1f, world.random.nextFloat());
 		}
 	}
 

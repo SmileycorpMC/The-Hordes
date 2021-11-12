@@ -1,25 +1,10 @@
 package net.smileycorp.hordes.client;
 
-import java.awt.Color;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
-import net.minecraftforge.client.event.RenderLivingEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.smileycorp.hordes.common.infection.HordesInfection;
-
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.platform.GlStateManager;
 
 
 public class ClientInfectionEventHandler {
 
-	@SubscribeEvent
+	/*@SubscribeEvent
 	public <T extends LivingEntity, M extends EntityModel<T>> void  preRenderEntity(RenderLivingEvent.Pre<T, M> event){
 		if (ClientConfigHandler.playerInfectionVisuals.get()) {
 			Minecraft mc = Minecraft.getInstance();
@@ -72,6 +57,6 @@ public class ClientInfectionEventHandler {
 				}
 			}
 		}
-	}
+	}*/
 
 }

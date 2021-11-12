@@ -81,7 +81,6 @@ public class MiscEventHandler {
 
 	@SubscribeEvent
 	public static void registerAttributes(EntityAttributeCreationEvent event) {
-		Hordes.logInfo("sussy sussy amonus");
 		event.put(HordesInfection.ZOMBIE_PLAYER.get(), ZombieEntity.createAttributes().build());
 		event.put(HordesInfection.DROWNED_PLAYER.get(),DrownedEntity.createAttributes().build());
 	}

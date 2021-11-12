@@ -70,6 +70,7 @@ public class CommonConfigHandler {
 				+ "Leave the last value to 0 to set no max day, entities can have nbt attached to them.(e.g. minecraft:zombie-20-0-0{ActiveEffects:[{Id:12,Amplifier:0,Duration:10000}]})")
 				.define("spawnList", Lists.newArrayList("minecraft:zombie-20-0-20", "minecraft:zombie_villager-5-0-20", "minecraft:husk-20-30-0", "minecraft:drowned-5-30-0"));
 		//infection
+		builder.pop();
 		builder.push("Infection");
 		enableMobInfection = builder.comment("Set to false to completely disable mob infection and anything related to it.").define("enableMobInfection", true);
 		infectVillagers = builder.comment("Can villagers be infected.").define("infectVillagers", true);
@@ -84,6 +85,7 @@ public class CommonConfigHandler {
 		cureItemList = builder.comment("A list of items which can cure infection when 'consumed' or used on an entity can accept nbt tags. eg.minecraft:golden_apple, minecraft:potion{Potion: \"minecraft:strong_regeneration\"}")
 			.define("cureItemList", Lists.newArrayList("minecraft:golden_apple", "minecraft:enchanted_golden_apple"));
 		//misc
+		builder.pop();
 		builder.push("Misc");
 		zombieGraves = builder.comment("Whether to use zombie players as graves all the time. (Even if infection is disabled)").define("zombieGraves", false);
 		drownedGraves = builder.comment("Whether to always spawn a drowned if a player dies underwater. (Even if infection or zombieGraves are disabled)").define("drownedGraves", false);

@@ -10,11 +10,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.thread.SidedThreadGroups;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.smileycorp.atlas.api.util.RecipeUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.infection.jei.JEIPluginInfection;
 
 import com.google.common.collect.Lists;
 
@@ -77,7 +79,7 @@ public class InfectionRegister {
 		} catch (Exception e) {
 			Hordes.logError("Failed to read data from server, " + e.getCause() + " " + e.getMessage(), e);
 		}
-		//if (Loader.isModLoaded("jei")) JEIPluginInfection.setRecipes(curesClient);
+		if (ModList.get().isLoaded("jei")) JEIPluginInfection.setRecipes(curesClient);
 	}
 
 	public static String getCurePacketData() {

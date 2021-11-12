@@ -1,29 +1,20 @@
 package net.smileycorp.hordes.common;
 
-import java.awt.Color;
-
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.smileycorp.hordes.client.ClientConfigHandler;
-import net.smileycorp.hordes.client.ClientHandler;
-import net.smileycorp.hordes.client.ClientInfectionEventHandler;
-import net.smileycorp.hordes.client.ZombiePlayerRenderer;
 import net.smileycorp.hordes.common.capability.IZombifyPlayer;
 import net.smileycorp.hordes.common.capability.ZombifyPlayer;
-import net.smileycorp.hordes.common.entities.DrownedPlayerEntity;
-import net.smileycorp.hordes.common.entities.ZombiePlayerEntity;
 import net.smileycorp.hordes.common.hordeevent.HordeEventHandler;
 import net.smileycorp.hordes.common.hordeevent.HordeEventRegister;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeSpawn;
@@ -97,14 +88,6 @@ public class Hordes {
 		if (CommonConfigHandler.enableMobInfection.get()) {
 			InfectionRegister.readConfig();
 		}
-	}
-
-	@SubscribeEvent
-	public static void clientSetup(FMLClientSetupEvent event){
-		MinecraftForge.EVENT_BUS.register(new ClientHandler());
-		MinecraftForge.EVENT_BUS.register(new ClientInfectionEventHandler());
-		RenderingRegistry.registerEntityRenderingHandler(HordesInfection.ZOMBIE_PLAYER.get(), m -> new ZombiePlayerRenderer<ZombiePlayerEntity>(m, new Color(121, 156, 101)));
-		RenderingRegistry.registerEntityRenderingHandler(HordesInfection.DROWNED_PLAYER.get(), m -> new ZombiePlayerRenderer<DrownedPlayerEntity>(m, new Color(144, 255, 255)));
 	}
 
 	public static void logInfo(Object message) {

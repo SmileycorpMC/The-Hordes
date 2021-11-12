@@ -14,7 +14,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.smileycorp.hordes.common.ModDefinitions;
-import net.smileycorp.hordes.common.infection.InfectedEffect;
 
 public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapper> {
 
@@ -27,7 +26,7 @@ public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapp
 
 	public InfectionCureCategory(IGuiHelper guiHelper) {
 		this.background = guiHelper.createDrawable(TEXTURE, 0, 0, 167, 113);
-		this.icon = guiHelper.createDrawable(InfectedEffect.TEXTURE, 1, 200, 16, 16);
+		this.icon = guiHelper.createDrawable(TEXTURE, 168, 0, 18, 18);
 	}
 
 	@Override

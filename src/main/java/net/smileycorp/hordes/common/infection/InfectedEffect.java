@@ -14,7 +14,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.EffectType;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.smileycorp.hordes.common.CommonConfigHandler;
@@ -23,8 +22,6 @@ import net.smileycorp.hordes.common.ModDefinitions;
 import com.mojang.blaze3d.matrix.MatrixStack;
 
 public class InfectedEffect extends Effect {
-
-	public static final ResourceLocation TEXTURE = ModDefinitions.getResource("textures/gui/potions.png");
 
 	private final UUID SPEED_MOD_UUID = UUID.fromString("05d68949-cb8b-4031-92a6-bd75e42b5cdd");
 	private final String SPEED_MOD_NAME = ModDefinitions.getName("Infected");
