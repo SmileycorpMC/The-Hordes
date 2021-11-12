@@ -20,26 +20,14 @@ import net.minecraft.util.text.TextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.smileycorp.hordes.common.ModDefinitions;
-import net.smileycorp.hordes.common.entities.DrownedPlayerEntity;
-import net.smileycorp.hordes.common.entities.ZombiePlayerEntity;
-import net.smileycorp.hordes.common.infection.HordesInfection;
 import net.smileycorp.hordes.common.infection.network.CureEntityMessage;
 
 @EventBusSubscriber(modid = ModDefinitions.MODID, value = Dist.CLIENT)
 public class ClientHandler {
 
 	private static Color TEXT_COLOUR = Color.fromRgb(0x440002);
-
-	@SubscribeEvent
-	public static void registerModels(ModelRegistryEvent event) {
-		RenderingRegistry.registerEntityRenderingHandler(HordesInfection.ZOMBIE_PLAYER.get(), m -> new RenderZombiePlayer<ZombiePlayerEntity>(m));
-		RenderingRegistry.registerEntityRenderingHandler(HordesInfection.DROWNED_PLAYER.get(), m -> new RenderZombiePlayer<DrownedPlayerEntity>(m));
-	}
 
 	public static void playHordeSound(Vector3d dir, ResourceLocation sound) {
 		if (ClientConfigHandler.hordeSpawnSound.get()) {

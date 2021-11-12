@@ -1,6 +1,5 @@
 package net.smileycorp.hordes.common.entities;
 
-import java.awt.Color;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,13 +35,20 @@ public class ZombiePlayerEntity extends ZombieEntity implements IZombiePlayer {
 
 	protected static final DataParameter<Optional<UUID>> PLAYER_UUID = EntityDataManager.defineId(ZombiePlayerEntity.class, DataSerializers.OPTIONAL_UUID);
 
-	protected Color COLOUR = new Color(0x799C65);
-
 	protected NonNullList<ItemStack> playerItems = NonNullList.<ItemStack>create();
 	protected UUID uuid;
 
 	public ZombiePlayerEntity(EntityType<? extends ZombiePlayerEntity> type, World world) {
 		super(type, world);
+	}
+
+	public ZombiePlayerEntity(World world) {
+		this(HordesInfection.ZOMBIE_PLAYER.get() ,world);
+	}
+
+	public ZombiePlayerEntity(PlayerEntity player) {
+		this(player.level);
+		setPlayer(player);
 	}
 
 	@Override
@@ -161,11 +167,6 @@ public class ZombiePlayerEntity extends ZombieEntity implements IZombiePlayer {
 		textcomponentstring.getStyle().withHoverEvent(this.createHoverEvent());
 		textcomponentstring.getStyle().withInsertion(this.getEncodeId());
 		return textcomponentstring;
-	}
-
-	@Override
-	public Color getColour() {
-		return COLOUR;
 	}
 
 }

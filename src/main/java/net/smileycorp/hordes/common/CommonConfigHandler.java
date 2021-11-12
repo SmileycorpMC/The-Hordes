@@ -68,7 +68,7 @@ public class CommonConfigHandler {
 		pauseEventServer = builder.comment("Do the daylight cycle (and active horde events get paused while there are no players online.).").define("pauseEventServer", true);
 		hordeSpawnList = builder.comment("A list of entities to spawn followed by the spawn weight then the day they first appear on then the last day. Higher weight is more common. "
 				+ "Leave the last value to 0 to set no max day, entities can have nbt attached to them.(e.g. minecraft:zombie-20-0-0{ActiveEffects:[{Id:12,Amplifier:0,Duration:10000}]})")
-				.define("spawnList", Lists.newArrayList("minecraft:zombie-20-0-20", "minecraft:zombie_villager-5-0-10", "minecraft:husk-20-30-0"));
+				.define("spawnList", Lists.newArrayList("minecraft:zombie-20-0-20", "minecraft:zombie_villager-5-0-20", "minecraft:husk-20-30-0", "minecraft:drowned-5-30-0"));
 		//infection
 		builder.push("Infection");
 		enableMobInfection = builder.comment("Set to false to completely disable mob infection and anything related to it.").define("enableMobInfection", true);

@@ -1,6 +1,5 @@
 package net.smileycorp.hordes.common.entities;
 
-import java.awt.Color;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -30,8 +29,6 @@ public interface IZombiePlayer {
 	public void setInventory(NonNullList<ItemStack> drops);
 
 	public NonNullList<ItemStack> getInventory();
-
-	public Color getColour();
 
 	public default void copyFrom(IZombiePlayer entity) {
 		setPlayer(entity.getPlayerUUID());

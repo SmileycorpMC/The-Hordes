@@ -1,6 +1,5 @@
 package net.smileycorp.hordes.common.entities;
 
-import java.awt.Color;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,6 +24,7 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.smileycorp.hordes.common.infection.HordesInfection;
 
 import com.mojang.authlib.GameProfile;
 
@@ -33,13 +33,20 @@ public class DrownedPlayerEntity extends DrownedEntity implements IZombiePlayer 
 
 	protected static final DataParameter<Optional<UUID>> PLAYER_UUID = EntityDataManager.defineId(DrownedPlayerEntity.class, DataSerializers.OPTIONAL_UUID);
 
-	protected Color COLOUR = new Color(0x689E93);
-
 	protected NonNullList<ItemStack> playerItems = NonNullList.<ItemStack>create();
 	protected UUID uuid;
 
 	public DrownedPlayerEntity(EntityType<? extends DrownedPlayerEntity> type, World world) {
 		super(type, world);
+	}
+
+	public DrownedPlayerEntity(World world) {
+		this(HordesInfection.DROWNED_PLAYER.get() ,world);
+	}
+
+	public DrownedPlayerEntity(PlayerEntity player) {
+		this(player.level);
+		setPlayer(player);
 	}
 
 	@Override
@@ -142,11 +149,6 @@ public class DrownedPlayerEntity extends DrownedEntity implements IZombiePlayer 
 		textcomponentstring.getStyle().withHoverEvent(this.createHoverEvent());
 		textcomponentstring.getStyle().withInsertion(this.getEncodeId());
 		return textcomponentstring;
-	}
-
-	@Override
-	public Color getColour() {
-		return COLOUR;
 	}
 
 }

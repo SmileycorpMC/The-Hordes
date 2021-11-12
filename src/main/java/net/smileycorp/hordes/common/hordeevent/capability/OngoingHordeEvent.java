@@ -17,7 +17,6 @@ import net.minecraft.entity.ai.goal.PrioritizedGoal;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IServerWorld;
@@ -51,14 +50,12 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 	private Set<WeakReference<MobEntity>> entitiesSpawned = new HashSet<WeakReference<MobEntity>>();
 	private int timer = 0;
 	private int day = 0;
-	private int nextDay;
+	private int nextDay = -1;
 	private boolean hasChanged = false;
 
-	public OngoingHordeEvent(){}
-
-	public OngoingHordeEvent(World world) {
-		if (world instanceof ServerWorld) {
-			HordeWorldData data = HordeWorldData.getData((ServerWorld) world);
+	public OngoingHordeEvent(){
+		if (Thread.currentThread().getThreadGroup() == SidedThreadGroups.SERVER) {
+			HordeWorldData data = HordeWorldData.getData(ServerLifecycleHooks.getCurrentServer().overworld());
 			nextDay = data.getNextDay();
 		}
 	}
@@ -107,7 +104,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 	public void update(PlayerEntity player) {
 		World world = player.level;
 		if (!world.isClientSide && player!=null) {
-			if (player.level.dimension().getRegistryName() == new ResourceLocation("overworld")) {
+			if (world.dimension() == World.OVERWORLD) {
 				if ((timer % CommonConfigHandler.hordeSpawnInterval.get()) == 0) {
 					int amount = (int)(CommonConfigHandler.hordeSpawnAmount.get() * (1+(day/CommonConfigHandler.hordeSpawnDays.get()) * (CommonConfigHandler.hordeSpawnMultiplier.get()-1)));
 					List<? extends PlayerEntity>players = world.players();
@@ -227,7 +224,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 	@Override
 	public boolean isHordeDay(PlayerEntity player) {
 		World world = player.level;
-		if (world.isClientSide |!(world.dimension().getRegistryName() == new ResourceLocation("overworld"))) return false;
+		if (world.isClientSide |!(world.dimension() == World.OVERWORLD)) return false;
 		return isActive(player) || Math.floor(world.getDayTime()/CommonConfigHandler.dayLength.get())>=nextDay;
 	}
 
@@ -268,7 +265,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 	public void tryStartEvent(PlayerEntity player, int duration, boolean isCommand) {
 		if (player!=null) {
 			World world = player.level;
-			if (world.dimension().getRegistryName() == new ResourceLocation("overworld")) {
+			if (world.dimension() == World.OVERWORLD) {
 				HordeStartEvent startEvent = new HordeStartEvent(player, this, isCommand);
 				MinecraftForge.EVENT_BUS.post(startEvent);
 				if (startEvent.isCanceled()) return;
@@ -326,7 +323,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 	}
 
 	public String toString(PlayerEntity player) {
-		return "OngoingHordeEvent@" + Integer.toHexString(hashCode()) + "[player=" + (player == null ? "null" : player.getName()) + ", isActive=" + (timer > 0) +
+		return "OngoingHordeEvent@" + Integer.toHexString(hashCode()) + "[player=" + (player == null ? "null" : player.getName().getString()) + ", isActive=" + (timer > 0) +
 				", ticksLeft=" + timer +", entityCount="+ entitiesSpawned.size()+", nextDay="+nextDay + ", day="+day+"]";
 	}
 
@@ -357,9 +354,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 	@Override
 	public void reset(ServerWorld world) {
 		entitiesSpawned.clear();
-		if (world instanceof ServerWorld) {
-			HordeWorldData data = HordeWorldData.getData((ServerWorld) world);
-			nextDay = data.getNextDay();
-		}
+		HordeWorldData data = HordeWorldData.getData((ServerWorld) world);
+		nextDay = data.getNextDay();
 	}
 }

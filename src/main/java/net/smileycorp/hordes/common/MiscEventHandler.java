@@ -6,19 +6,25 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.monster.DrownedEntity;
+import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.smileycorp.hordes.common.capability.IZombifyPlayer;
 import net.smileycorp.hordes.common.entities.IZombiePlayer;
 import net.smileycorp.hordes.common.infection.HordesInfection;
 
+@EventBusSubscriber(modid = ModDefinitions.MODID, bus = Bus.MOD)
 public class MiscEventHandler {
 
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -72,4 +78,12 @@ public class MiscEventHandler {
 			event.addCapability(ModDefinitions.getResource("Infection"), new IZombifyPlayer.Provider());
 		}
 	}
+
+	@SubscribeEvent
+	public static void registerAttributes(EntityAttributeCreationEvent event) {
+		Hordes.logInfo("sussy sussy amonus");
+		event.put(HordesInfection.ZOMBIE_PLAYER.get(), ZombieEntity.createAttributes().build());
+		event.put(HordesInfection.DROWNED_PLAYER.get(),DrownedEntity.createAttributes().build());
+	}
+
 }
