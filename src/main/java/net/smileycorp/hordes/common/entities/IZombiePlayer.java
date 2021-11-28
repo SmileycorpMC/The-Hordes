@@ -33,11 +33,9 @@ public interface IZombiePlayer {
 	public default void copyFrom(IZombiePlayer entity) {
 		setPlayer(entity.getPlayerUUID());
 		setInventory(entity.getInventory());
-		if (this instanceof MobEntity && entity instanceof MobEntity) {
-			for (EquipmentSlotType slot : EquipmentSlotType.values()) {
-				ItemStack stack = ((MobEntity) entity).getItemBySlot(slot);
-				((MobEntity)this).setItemSlot(slot, stack);
-			}
+		for (EquipmentSlotType slot : EquipmentSlotType.values()) {
+			ItemStack stack = ((MobEntity) entity).getItemBySlot(slot);
+			((MobEntity)this).setItemSlot(slot, stack);
 		}
 	}
 

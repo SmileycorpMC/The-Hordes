@@ -122,7 +122,7 @@ public class ZombiePlayerEntity extends ZombieEntity implements IZombiePlayer {
 	@Override
 	protected void doUnderWaterConversion() {
 		if (CommonConfigHandler.drownedPlayers.get()) {
-			ZombieEntity drowned = this.convertTo(HordesInfection.DROWNED_PLAYER.get(), true);
+			ZombieEntity drowned = convertTo(HordesInfection.DROWNED_PLAYER.get(), true);
 			if (drowned != null) {
 				drowned.handleAttributes(drowned.level.getCurrentDifficultyAt(drowned.blockPosition()).getSpecialMultiplier());
 	         	drowned.setCanBreakDoors(drowned.supportsBreakDoorGoal() && this.canBreakDoors());
