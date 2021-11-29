@@ -202,11 +202,8 @@ public class HordeEventHandler {
 			LazyOptional<IOngoingHordeEvent> optionalp = player.getCapability(Hordes.HORDE_EVENT, null);
 			LazyOptional<IOngoingHordeEvent> optionalo = original.getCapability(Hordes.HORDE_EVENT, null);
 			if (optionalp.isPresent() && optionalo.isPresent()) {
-				Hordes.logInfo("Copying horde data from " + original + " to " + player);
 				IOngoingHordeEvent horde = optionalp.resolve().get();
-				CompoundNBT nbt = optionalo.resolve().get().writeToNBT(new CompoundNBT());
-				Hordes.logInfo(nbt);
-				horde.readFromNBT(nbt);
+				horde.readFromNBT(optionalo.resolve().get().writeToNBT(new CompoundNBT()));
 				horde.setPlayer(player);
 			}
 		}

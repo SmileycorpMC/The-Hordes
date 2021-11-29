@@ -1,6 +1,5 @@
 package net.smileycorp.hordes.common.hordeevent.capability;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -46,7 +45,7 @@ import net.smileycorp.hordes.common.hordeevent.network.HordeSoundMessage;
 
 public class OngoingHordeEvent implements IOngoingHordeEvent {
 
-	private Set<WeakReference<MobEntity>> entitiesSpawned = new HashSet<WeakReference<MobEntity>>();
+	private Set<MobEntity> entitiesSpawned = new HashSet<MobEntity>();
 	private int timer = 0;
 	private int day = 0;
 	private int nextDay = -1;
@@ -77,7 +76,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 				World world = ServerLifecycleHooks.getCurrentServer().overworld();
 				for (int id : nbt.getIntArray("entities")) {
 					Entity entity = world.getEntity(id);
-					if (entity instanceof MobEntity) entitiesSpawned.add(new WeakReference<MobEntity>((MobEntity) entity));
+					if (entity instanceof MobEntity) entitiesSpawned.add((MobEntity) entity);
 				}
 			}
 		}
@@ -88,7 +87,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 		nbt.putInt("timer", timer);
 		nbt.putInt("nextDay", nextDay);
 		nbt.putInt("day", day);
-		nbt.putIntArray("entities", entitiesSpawned.stream().mapToInt((ref)->ref.get() == null ? -1 : ref.get().getId()).toArray());
+		nbt.putIntArray("entities", entitiesSpawned.stream().mapToInt((entity)->entity.getId()).toArray());
 		hasChanged = false;
 		return nbt;
 	}
@@ -133,7 +132,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 			basepos = DirectionUtils.getClosestLoadedPos(world, player.blockPosition(), basedir, 75, 7, 0);
 			i++;
 			if (i==20) {
-				logInfo("Unable to find unlight pos ");
+				logInfo("Unable to find unlit pos for horde " + this + " ignoring light level");
 				basepos = DirectionUtils.getClosestLoadedPos(world, player.blockPosition(), basedir, 75);
 				break;
 			}
@@ -195,20 +194,15 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 	}
 
 	private void cleanSpawns() {
-		List<WeakReference<MobEntity>> toRemove = new ArrayList<>();
-		for (WeakReference<MobEntity> ref : entitiesSpawned) {
-			if (ref != null && ref.get() != null) {
-				MobEntity entity = ref.get();
-				if (!entity.isDeadOrDying()) {
-					LazyOptional<IHordeSpawn> optional = entity.getCapability(Hordes.HORDESPAWN, null);
-					if (optional.isPresent()) {
-						IHordeSpawn cap = optional.resolve().get();
-						cap.setPlayerUUID("");
-						toRemove.add(ref);
-					}
+		List<MobEntity> toRemove = new ArrayList<MobEntity>();
+		for (MobEntity entity : entitiesSpawned) {
+			if (!entity.isDeadOrDying()) {
+				LazyOptional<IHordeSpawn> optional = entity.getCapability(Hordes.HORDESPAWN, null);
+				if (optional.isPresent()) {
+					IHordeSpawn cap = optional.resolve().get();
+					cap.setPlayerUUID("");
+					toRemove.add(entity);
 				}
-			} else {
-				toRemove.add(ref);
 			}
 		}
 		entitiesSpawned.removeAll(toRemove);
@@ -233,9 +227,8 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 
 	@Override
 	public void setPlayer(PlayerEntity player) {
-		Set<WeakReference<MobEntity>> toRemove = new HashSet<WeakReference<MobEntity>>();
-		for (WeakReference<MobEntity> ref : entitiesSpawned) {
-			MobEntity entity = ref.get();
+		Set<MobEntity> toRemove = new HashSet<MobEntity>();
+		for (MobEntity entity : entitiesSpawned) {
 			if (entity!=null) {
 				GoToEntityPositionGoal task = null;
 				for (PrioritizedGoal entry : entity.goalSelector.getRunningGoals().toArray(PrioritizedGoal[]::new)) {
@@ -248,7 +241,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 					entity.goalSelector.removeGoal(task);
 					entity.goalSelector.addGoal(6, new GoToEntityPositionGoal(entity, player));
 				}
-			} else toRemove.add(ref);
+			} else toRemove.add(entity);
 		}
 		entitiesSpawned.removeAll(toRemove);
 		hasChanged = true;
@@ -309,10 +302,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 
 	@Override
 	public void registerEntity(MobEntity entity) {
-		WeakReference<MobEntity> ref = new WeakReference<MobEntity>(entity);
-		if (!entitiesSpawned.contains(ref)) {
-			entitiesSpawned.add(ref);
-		}
+		if (!entitiesSpawned.contains(entity)) entitiesSpawned.add(entity);
 	}
 
 	public String toString(PlayerEntity player) {
@@ -327,16 +317,15 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 	public List<String> getEntityStrings() {
 		List<String> result = new ArrayList<String>();
 		result.add("	entities: {");
-		List<WeakReference<MobEntity>> entitylist = new ArrayList<WeakReference<MobEntity>>(entitiesSpawned);
+		List<MobEntity> entitylist = new ArrayList<MobEntity>(entitiesSpawned);
 		for (int i = 0; i < entitylist.size(); i += 10) {
-			List<WeakReference<MobEntity>> sublist = entitylist.subList(i, Math.min(i+9, entitylist.size()-1));
+			List<MobEntity> sublist = entitylist.subList(i, Math.min(i+9, entitylist.size()-1));
 			StringBuilder builder = new StringBuilder();
 			builder.append("		");
-			for (WeakReference<MobEntity> ref : sublist) {
-				MobEntity entity = ref.get();
+			for (MobEntity entity : sublist) {
 				builder.append(entity.getClass().getSimpleName() + "@");
 				builder.append(Integer.toHexString(entity.hashCode()));
-				if (entitylist.indexOf(ref) < entitylist.size()-1) builder.append(", ");
+				if (entitylist.indexOf(entity) < entitylist.size()-1) builder.append(", ");
 			}
 			builder.append("}");
 			result.add(builder.toString());

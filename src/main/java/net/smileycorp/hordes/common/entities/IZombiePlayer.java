@@ -3,10 +3,8 @@ package net.smileycorp.hordes.common.entities;
 import java.util.Collection;
 import java.util.UUID;
 
-import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 
@@ -30,13 +28,6 @@ public interface IZombiePlayer {
 
 	public NonNullList<ItemStack> getInventory();
 
-	public default void copyFrom(IZombiePlayer entity) {
-		setPlayer(entity.getPlayerUUID());
-		setInventory(entity.getInventory());
-		for (EquipmentSlotType slot : EquipmentSlotType.values()) {
-			ItemStack stack = ((MobEntity) entity).getItemBySlot(slot);
-			((MobEntity)this).setItemSlot(slot, stack);
-		}
-	}
+	public void copyFrom(IZombiePlayer entity);
 
 }

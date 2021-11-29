@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -167,6 +168,16 @@ public class ZombiePlayerEntity extends ZombieEntity implements IZombiePlayer {
 		textcomponentstring.getStyle().withHoverEvent(this.createHoverEvent());
 		textcomponentstring.getStyle().withInsertion(this.getEncodeId());
 		return textcomponentstring;
+	}
+
+	@Override
+	public void copyFrom(IZombiePlayer entity) {
+		setPlayer(entity.getPlayerUUID());
+		setInventory(entity.getInventory());
+		for (EquipmentSlotType slot : EquipmentSlotType.values()) {
+			ItemStack stack = ((MobEntity) entity).getItemBySlot(slot);
+			setItemSlot(slot, stack);
+		}
 	}
 
 }
