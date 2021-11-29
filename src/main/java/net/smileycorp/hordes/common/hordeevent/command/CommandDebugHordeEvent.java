@@ -5,9 +5,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.smileycorp.hordes.common.hordeevent.capability.HordeWorldData;
 
 import com.mojang.brigadier.CommandDispatcher;
@@ -32,6 +34,7 @@ public class CommandDebugHordeEvent {
 		try {
 			Files.write(path, out, StandardCharsets.UTF_8);
 		} catch (Exception e) {}
+		source.getEntity().sendMessage(new TranslationTextComponent("commands.hordes.HordeDebug.success", path.toAbsolutePath().toString()), UUID.fromString("1512ce82-00e5-441a-9774-f46d9b7badfb"));
 		return 1;
 	}
 

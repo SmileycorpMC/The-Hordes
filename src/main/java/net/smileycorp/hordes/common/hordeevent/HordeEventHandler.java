@@ -22,7 +22,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
@@ -109,27 +109,29 @@ public class HordeEventHandler {
 	}
 
 	@SubscribeEvent(priority=EventPriority.LOWEST)
-	public void onJoin(EntityJoinWorldEvent event) {
-		World world = event.getWorld();
-		if (!world.isClientSide && event.getEntity() instanceof MobEntity) {
+	public void update(LivingUpdateEvent event) {
+		World world = event.getEntity().level;
+		if (!world.isClientSide && event.getEntity() instanceof MobEntity && world.dimension() == World.OVERWORLD && event.getEntity().tickCount%5==0) {
 			MobEntity entity = (MobEntity) event.getEntity();
 			LazyOptional<IHordeSpawn> optional = entity.getCapability(Hordes.HORDESPAWN, null);
 			if (optional.isPresent()) {
 				IHordeSpawn cap = optional.resolve().get();
-				if (cap.isHordeSpawned() && DataUtils.isValidUUID(cap.getPlayerUUID())) {
-					entity.targetSelector.getRunningGoals().forEach((goal) -> goal.stop());
-					if (entity instanceof CreatureEntity) {
-						entity.targetSelector.addGoal(1, new HurtByTargetGoal((CreatureEntity) entity));
-					}
-					entity.targetSelector.addGoal(2, new NearestAttackableTargetGoal<PlayerEntity>(entity, PlayerEntity.class, true));
-
+				if (cap.isHordeSpawned() &! cap.isSynced()) {
 					String uuid = cap.getPlayerUUID();
-					PlayerEntity player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(UUID.fromString(uuid));
-					if (player!=null) {
-						LazyOptional<IOngoingHordeEvent> optionalp = player.getCapability(Hordes.HORDE_EVENT, null);
-						if (optionalp.isPresent()) {
-							optionalp.resolve().get().registerEntity(entity);
-							entity.goalSelector.addGoal(6, new GoToEntityPositionGoal(entity, player));
+					if (DataUtils.isValidUUID(uuid)) {
+						PlayerEntity player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(UUID.fromString(uuid));
+						if (player!=null) {
+							entity.targetSelector.getRunningGoals().forEach((goal) -> goal.stop());
+							if (entity instanceof CreatureEntity) {
+								entity.targetSelector.addGoal(1, new HurtByTargetGoal((CreatureEntity) entity));
+							}
+							entity.targetSelector.addGoal(2, new NearestAttackableTargetGoal<PlayerEntity>(entity, PlayerEntity.class, true));
+							LazyOptional<IOngoingHordeEvent> optionalp = player.getCapability(Hordes.HORDE_EVENT, null);
+							if (optionalp.isPresent()) {
+								optionalp.resolve().get().registerEntity(entity);
+								entity.goalSelector.addGoal(6, new GoToEntityPositionGoal(entity, player));
+							}
+							cap.setSynced();
 						}
 					}
 				}
@@ -198,10 +200,13 @@ public class HordeEventHandler {
 		PlayerEntity original = event.getOriginal();
 		if (player != null && original != null &!(player instanceof FakePlayer || original instanceof FakePlayer)) {
 			LazyOptional<IOngoingHordeEvent> optionalp = player.getCapability(Hordes.HORDE_EVENT, null);
-			LazyOptional<IOngoingHordeEvent> optionalo = player.getCapability(Hordes.HORDE_EVENT, null);
+			LazyOptional<IOngoingHordeEvent> optionalo = original.getCapability(Hordes.HORDE_EVENT, null);
 			if (optionalp.isPresent() && optionalo.isPresent()) {
+				Hordes.logInfo("Copying horde data from " + original + " to " + player);
 				IOngoingHordeEvent horde = optionalp.resolve().get();
-				horde.readFromNBT(optionalo.resolve().get().writeToNBT(new CompoundNBT()));
+				CompoundNBT nbt = optionalo.resolve().get().writeToNBT(new CompoundNBT());
+				Hordes.logInfo(nbt);
+				horde.readFromNBT(nbt);
 				horde.setPlayer(player);
 			}
 		}

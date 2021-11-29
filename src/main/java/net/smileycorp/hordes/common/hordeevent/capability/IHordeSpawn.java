@@ -17,6 +17,10 @@ public interface IHordeSpawn {
 
 	public String getPlayerUUID();
 
+	public boolean isSynced();
+
+	public void setSynced();
+
 	public static class Storage implements IStorage<IHordeSpawn> {
 
 		@Override
@@ -35,6 +39,7 @@ public interface IHordeSpawn {
 	public static class HordeSpawn implements IHordeSpawn {
 
 		private String uuid = "";
+		private boolean isSynced;
 
 		@Override
 		public boolean isHordeSpawned() {
@@ -49,6 +54,16 @@ public interface IHordeSpawn {
 		@Override
 		public String getPlayerUUID() {
 			return uuid;
+		}
+
+		@Override
+		public boolean isSynced() {
+			return isSynced;
+		}
+
+		@Override
+		public void setSynced() {
+			isSynced = true;
 		}
 
 	}

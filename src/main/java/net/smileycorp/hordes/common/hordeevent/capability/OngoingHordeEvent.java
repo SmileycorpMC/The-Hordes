@@ -4,6 +4,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import net.minecraft.entity.CreatureEntity;
@@ -43,8 +44,6 @@ import net.smileycorp.hordes.common.hordeevent.HordeSpawnEntry;
 import net.smileycorp.hordes.common.hordeevent.network.HordeEventPacketHandler;
 import net.smileycorp.hordes.common.hordeevent.network.HordeSoundMessage;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 public class OngoingHordeEvent implements IOngoingHordeEvent {
 
 	private Set<WeakReference<MobEntity>> entitiesSpawned = new HashSet<WeakReference<MobEntity>>();
@@ -52,6 +51,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 	private int day = 0;
 	private int nextDay = -1;
 	private boolean hasChanged = false;
+	private Random rand = new Random();
 
 	public OngoingHordeEvent(){
 		if (Thread.currentThread().getThreadGroup() == SidedThreadGroups.SERVER) {
@@ -88,14 +88,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 		nbt.putInt("timer", timer);
 		nbt.putInt("nextDay", nextDay);
 		nbt.putInt("day", day);
-		int[] entities = new int[]{};
-		for (WeakReference<MobEntity> ref : entitiesSpawned) {
-			if (ref != null) {
-				MobEntity entity = ref.get();
-				if (entity!=null) if (entity.isAddedToWorld() &! entity.isDeadOrDying()) ArrayUtils.add(entities, entity.getId());
-			}
-		}
-		nbt.putIntArray("entities", entities);
+		nbt.putIntArray("entities", entitiesSpawned.stream().mapToInt((ref)->ref.get() == null ? -1 : ref.get().getId()).toArray());
 		hasChanged = false;
 		return nbt;
 	}
@@ -132,11 +125,11 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 		MinecraftForge.EVENT_BUS.post(startEvent);
 		if (startEvent.isCanceled()) return;
 		count = startEvent.getCount();
-		Vector3d basedir = DirectionUtils.getRandomDirectionVecXZ(world.random);
+		Vector3d basedir = DirectionUtils.getRandomDirectionVecXZ(rand);
 		BlockPos basepos = DirectionUtils.getClosestLoadedPos(world, player.blockPosition(), basedir, 75, 7, 0);
 		int i = 0;
 		while (basepos.equals(player.blockPosition())) {
-			basedir = DirectionUtils.getRandomDirectionVecXZ(world.random);
+			basedir = DirectionUtils.getRandomDirectionVecXZ(rand);
 			basepos = DirectionUtils.getClosestLoadedPos(world, player.blockPosition(), basedir, 75, 7, 0);
 			i++;
 			if (i==20) {
@@ -164,9 +157,9 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 				logInfo("Can't spawn wave because max cap has been reached");
 				return;
 			}
-			Vector3d dir = DirectionUtils.getRandomDirectionVecXZ(world.random);
-			BlockPos pos = DirectionUtils.getClosestLoadedPos(world, basepos, dir, world.random.nextInt(10));
-			HordeSpawnEntry entry = spawntable.getResult(world.random);
+			Vector3d dir = DirectionUtils.getRandomDirectionVecXZ(rand);
+			BlockPos pos = DirectionUtils.getClosestLoadedPos(world, basepos, dir, rand.nextInt(10));
+			HordeSpawnEntry entry = spawntable.getResult(rand);
 			EntityType<?> type = entry.getEntity();
 			try {
 				MobEntity entity = (MobEntity) type.create(world);
