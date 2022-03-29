@@ -38,8 +38,6 @@ import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.ModDefinitions;
 
-import com.google.common.base.Predicate;
-
 @EventBusSubscriber(modid=ModDefinitions.modid)
 public class HordeEventHandler {
 
@@ -96,9 +94,11 @@ public class HordeEventHandler {
 				String uuid = cap.getPlayerUUID();
 				if (DataUtils.isValidUUID(uuid)) {
 					EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(UUID.fromString(uuid));
-					if (player.hasCapability(Hordes.HORDE_EVENT, null)) {
-						if (player.getCapability(Hordes.HORDE_EVENT, null).isActive(world)) {
-							event.setResult(Result.DENY);
+					if (player != null) {
+						if (player.hasCapability(Hordes.HORDE_EVENT, null)) {
+							if (player.getCapability(Hordes.HORDE_EVENT, null).isActive(world)) {
+								event.setResult(Result.DENY);
+							}
 						}
 					}
 				}
