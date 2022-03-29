@@ -119,11 +119,7 @@ public class HordeEventHandler {
 						entity.targetTasks.addTask(1, new EntityAIHurtByTarget((EntityCreature) entity, true));
 						entity.targetTasks.addTask(2, new EntityAINearestAttackableTarget<EntityPlayer>((EntityCreature) entity, EntityPlayer.class, false));
 					} else {
-						entity.targetTasks.addTask(1, new EntityAIFindNearestTargetPredicate(entity, new Predicate<EntityLivingBase>(){
-							@Override
-							public boolean apply(EntityLivingBase entity) {
-								return entity instanceof EntityPlayer;
-							}}));
+						entity.targetTasks.addTask(1, new EntityAIFindNearestTargetPredicate(entity, (e)-> e instanceof EntityPlayer));
 					}
 					String uuid = cap.getPlayerUUID();
 					EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(UUID.fromString(uuid));
