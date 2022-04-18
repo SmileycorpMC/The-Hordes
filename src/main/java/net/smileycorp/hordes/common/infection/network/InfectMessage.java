@@ -1,22 +1,20 @@
 package net.smileycorp.hordes.common.infection.network;
 
-import java.io.IOException;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.PacketListener;
+import net.smileycorp.atlas.api.network.SimpleAbstractMessage;
 
-import net.minecraft.network.INetHandler;
-import net.minecraft.network.IPacket;
-import net.minecraft.network.PacketBuffer;
-
-public class InfectMessage implements IPacket<INetHandler> {
+public class InfectMessage extends SimpleAbstractMessage {
 
 	public InfectMessage(){}
 
 	@Override
-	public void read(PacketBuffer buf) throws IOException {}
+	public void read(FriendlyByteBuf buf) {}
 
 	@Override
-	public void write(PacketBuffer buf) throws IOException {}
+	public void write(FriendlyByteBuf buf) {}
 
 	@Override
-	public void handle(INetHandler handler) {}
+	public void handle(PacketListener handler) {}
 
 }

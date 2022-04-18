@@ -1,7 +1,7 @@
 package net.smileycorp.hordes.common.event;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.smileycorp.hordes.common.ModDefinitions;
 import net.smileycorp.hordes.common.hordeevent.capability.IOngoingHordeEvent;
@@ -12,7 +12,7 @@ public class HordeStartWaveEvent extends HordeEvent {
 	protected ResourceLocation sound = ModDefinitions.HORDE_SOUND;
 	protected int count;
 
-	public HordeStartWaveEvent(PlayerEntity player, IOngoingHordeEvent horde, int count) {
+	public HordeStartWaveEvent(Player player, IOngoingHordeEvent horde, int count) {
 		super(player, horde);
 		this.count = count;
 	}

@@ -3,22 +3,22 @@ package net.smileycorp.hordes.common.infection;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.util.ResourceLocation;
+import com.google.common.collect.Lists;
+
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.TagParser;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.common.thread.SidedThreadGroups;
+import net.minecraftforge.fml.util.thread.SidedThreadGroups;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.smileycorp.atlas.api.util.RecipeUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.infection.jei.JEIPluginInfection;
-
-import com.google.common.collect.Lists;
 
 public class InfectionRegister {
 
@@ -97,12 +97,12 @@ public class InfectionRegister {
 	public static List<ItemStack> parseCureData(List<String> data) throws Exception {
 		List<ItemStack> stacks = new ArrayList<ItemStack>();
 		for (String name : data) {
-			CompoundNBT nbt = null;
+			CompoundTag nbt = null;
 			if (name.contains("{")) {
 				String nbtstring = name.substring(name.indexOf("{"));
 				name = name.substring(0, name.indexOf("{"));
 				try {
-					CompoundNBT parsed = JsonToNBT.parseTag(nbtstring);
+					CompoundTag parsed = TagParser.parseTag(nbtstring);
 					if (parsed != null) nbt = parsed;
 				} catch (Exception e) {
 					Hordes.logError("Error parsing nbt for entity " + name + " " + e.getMessage(), e);
@@ -155,7 +155,7 @@ public class InfectionRegister {
 	}
 
 	public static boolean canCauseInfection(Entity entity) {
-		if (entity instanceof MobEntity) {
+		if (entity instanceof Mob) {
 			for (EntityType<?> type : infectionEntities) {
 				if (entity.getType() == type) return true;
 			}

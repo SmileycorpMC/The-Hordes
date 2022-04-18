@@ -5,14 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.TagParser;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.recipe.WeightedOutputs;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
@@ -36,7 +36,7 @@ public class HordeEventRegister {
 				int weight=0;
 				int minDay=0;
 				int maxDay=0;
-				CompoundNBT nbt = null;
+				CompoundTag nbt = null;
 				//check if it matches the syntax for a registry name
 				if (name.contains(":")) {
 					String[] nameSplit = name.split("-");
@@ -89,10 +89,10 @@ public class HordeEventRegister {
 		}
 	}
 
-	private static CompoundNBT parseNBT(String name, String nbtstring) {
-		CompoundNBT nbt = null;
+	private static CompoundTag parseNBT(String name, String nbtstring) {
+		CompoundTag nbt = null;
 		try {
-			CompoundNBT parsed = JsonToNBT.parseTag(nbtstring);
+			CompoundTag parsed = TagParser.parseTag(nbtstring);
 			if (parsed != null) nbt = parsed;
 			else throw new NullPointerException("Parsed NBT is null.");
 		} catch (Exception e) {
@@ -113,7 +113,7 @@ public class HordeEventRegister {
 		return new WeightedOutputs<HordeSpawnEntry>(1, spawnmap);
 	}
 
-	public static List<HordeSpawnEntry> getEntriesFor(MobEntity entity) {
+	public static List<HordeSpawnEntry> getEntriesFor(Mob entity) {
 		return getEntriesFor(entity.getType());
 	}
 
@@ -123,7 +123,7 @@ public class HordeEventRegister {
 		return list;
 	}
 
-	public static HordeSpawnEntry getEntryFor(MobEntity entity, int day) {
+	public static HordeSpawnEntry getEntryFor(Mob entity, int day) {
 		if (!tested) testEntries();
 		for (HordeSpawnEntry entry : getEntriesFor(entity)) {
 			if (entry.getMinDay() <= day && (entry.getMaxDay() == 0 || entry.getMaxDay() >= day)) {
@@ -138,7 +138,7 @@ public class HordeEventRegister {
 		for (HordeSpawnEntry entry : spawnlist) {
 			try {
 				Entity entity = entry.getEntity().create(ServerLifecycleHooks.getCurrentServer().overworld());
-				if (!(entity instanceof MobEntity)) toRemove.add(entry);
+				if (!(entity instanceof Mob)) toRemove.add(entry);
 			} catch(Exception e) {
 				e.printStackTrace();
 			}

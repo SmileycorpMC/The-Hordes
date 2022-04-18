@@ -1,39 +1,37 @@
 package net.smileycorp.hordes.common.infection.network;
 
-import java.io.IOException;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.PacketListener;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.level.Level;
+import net.smileycorp.atlas.api.network.SimpleAbstractMessage;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.network.INetHandler;
-import net.minecraft.network.IPacket;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.world.World;
 
-public class CureEntityMessage implements IPacket<INetHandler> {
+public class CureEntityMessage extends SimpleAbstractMessage {
 
 	private int entity;
 
 	public CureEntityMessage() {}
 
-	public CureEntityMessage(Entity entity) {
+	public CureEntityMessage(Mob entity) {
 		this.entity = entity.getId();
 	}
 
 	@Override
-	public void read(PacketBuffer buf) throws IOException {
+	public void read(FriendlyByteBuf buf) {
 		entity = buf.readInt();
 	}
 
 	@Override
-	public void write(PacketBuffer buf) throws IOException {
+	public void write(FriendlyByteBuf buf) {
 		buf.writeInt(entity);
 	}
 
-	public MobEntity getEntity(World world) {
-		return (MobEntity) world.getEntity(entity);
+	public Mob getEntity(Level level) {
+		return (Mob) level.getEntity(entity);
 	}
 
 	@Override
-	public void handle(INetHandler handler) {}
+	public void handle(PacketListener handler) {}
 
 }

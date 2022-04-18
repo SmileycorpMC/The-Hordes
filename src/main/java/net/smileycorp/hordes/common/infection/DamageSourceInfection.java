@@ -1,6 +1,6 @@
 package net.smileycorp.hordes.common.infection;
 
-import net.minecraft.util.DamageSource;
+import net.minecraft.world.damagesource.DamageSource;
 
 public class DamageSourceInfection extends DamageSource {
 

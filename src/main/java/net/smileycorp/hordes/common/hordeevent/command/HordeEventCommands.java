@@ -1,13 +1,13 @@
 package net.smileycorp.hordes.common.hordeevent.command;
 
-import net.minecraft.command.CommandSource;
+import com.mojang.brigadier.CommandDispatcher;
+
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.ModDefinitions;
-
-import com.mojang.brigadier.CommandDispatcher;
 
 @EventBusSubscriber(modid=ModDefinitions.MODID)
 public class HordeEventCommands {
@@ -15,7 +15,7 @@ public class HordeEventCommands {
 	@SubscribeEvent
 	public static void registerCommands(RegisterCommandsEvent event) {
 		if (CommonConfigHandler.enableHordeEvent.get()) {
-			CommandDispatcher<CommandSource> dispatcher = event.getDispatcher();
+			CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
 			/*CommandSpawnWave.register(dispatcher);
 			CommandStartHordeEvent.register(dispatcher);
 			CommandStopHordeEvent.register(dispatcher);*/

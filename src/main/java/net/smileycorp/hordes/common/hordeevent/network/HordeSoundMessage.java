@@ -1,35 +1,33 @@
 package net.smileycorp.hordes.common.hordeevent.network;
 
-import java.io.IOException;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.PacketListener;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec3;
+import net.smileycorp.atlas.api.network.SimpleAbstractMessage;
 
-import net.minecraft.network.INetHandler;
-import net.minecraft.network.IPacket;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3d;
+public class HordeSoundMessage extends SimpleAbstractMessage {
 
-public class HordeSoundMessage implements IPacket<INetHandler> {
-
-	protected Vector3d direction;
+	protected Vec3 direction;
 	protected ResourceLocation sound;
 
 	public HordeSoundMessage() {}
 
-	public HordeSoundMessage(Vector3d direction, ResourceLocation sound) {
+	public HordeSoundMessage(Vec3 direction, ResourceLocation sound) {
 		this.direction=direction;
 		this.sound=sound;
 	}
 
 	@Override
-	public void read(PacketBuffer buf) throws IOException {
+	public void read(FriendlyByteBuf buf) {
 		double x = buf.readDouble();
 		double z = buf.readDouble();
-		direction = new Vector3d(x, 0, z);
+		direction = new Vec3(x, 0, z);
 		sound = new ResourceLocation(buf.readUtf());
 	}
 
 	@Override
-	public void write(PacketBuffer buf) throws IOException {
+	public void write(FriendlyByteBuf buf) {
 		if (direction!=null) {
 			buf.writeDouble(direction.x);
 			buf.writeDouble(direction.z);
@@ -40,7 +38,7 @@ public class HordeSoundMessage implements IPacket<INetHandler> {
 	}
 
 
-	public Vector3d getDirection() {
+	public Vec3 getDirection() {
 		return direction;
 	}
 
@@ -49,6 +47,6 @@ public class HordeSoundMessage implements IPacket<INetHandler> {
 	}
 
 	@Override
-	public void handle(INetHandler handler) {}
+	public void handle(PacketListener handler) {}
 
 }

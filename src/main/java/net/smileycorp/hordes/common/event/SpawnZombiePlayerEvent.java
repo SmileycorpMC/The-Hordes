@@ -1,7 +1,7 @@
 package net.smileycorp.hordes.common.event;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.smileycorp.hordes.common.entities.IZombiePlayer;
@@ -11,7 +11,7 @@ public class SpawnZombiePlayerEvent extends PlayerEvent {
 
 	private EntityType<? extends IZombiePlayer> type;
 
-	public SpawnZombiePlayerEvent(PlayerEntity player, EntityType<? extends IZombiePlayer> type) {
+	public SpawnZombiePlayerEvent(Player player, EntityType<? extends IZombiePlayer> type) {
 		super(player);
 		this.type = type;
 	}

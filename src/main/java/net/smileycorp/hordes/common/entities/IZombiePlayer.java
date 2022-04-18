@@ -3,16 +3,16 @@ package net.smileycorp.hordes.common.entities;
 import java.util.Collection;
 import java.util.UUID;
 
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-
 import com.mojang.authlib.GameProfile;
+
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 public interface IZombiePlayer {
 
-	public void setPlayer(PlayerEntity player);
+	public void setPlayer(Player player);
 
 	public void setPlayer(String username);
 

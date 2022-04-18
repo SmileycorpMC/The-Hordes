@@ -11,9 +11,9 @@ import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.runtime.IJeiRuntime;
 import mezz.jei.recipes.RecipeManager;
 import mezz.jei.recipes.RecipeManagerInternal;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import net.smileycorp.hordes.common.ModDefinitions;
 
 @JeiPlugin
@@ -45,7 +45,7 @@ public class JEIPluginInfection implements IModPlugin {
 		if (recipeManager != null) {
 			RecipeManagerInternal manager = ObfuscationReflectionHelper.getPrivateValue(RecipeManager.class, recipeManager , "internal");
 			if (manager!=null) {
-				for (InfectionCureWrapper recipe : recipes) manager.hideRecipe(recipe, InfectionCureCategory.ID);
+				for (InfectionCureWrapper recipe : recipes) manager.hideRecipe(InfectionCureCategory.ID, recipe);
 				recipes.clear();
 				List<ItemStack> items = new ArrayList<ItemStack>();
 				for (ItemStack stack : cures) {

@@ -1,10 +1,9 @@
 package net.smileycorp.hordes.common.hordeevent.capability;
 
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.StringNBT;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.Capability.IStorage;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.smileycorp.hordes.common.Hordes;
@@ -21,20 +20,9 @@ public interface IHordeSpawn {
 
 	public void setSynced();
 
-	public static class Storage implements IStorage<IHordeSpawn> {
+	public Tag writeNBT();
 
-		@Override
-		public INBT writeNBT(Capability<IHordeSpawn> capability, IHordeSpawn instance, Direction side) {
-			return StringNBT.valueOf(instance.getPlayerUUID());
-		}
-
-		@Override
-		public void readNBT(Capability<IHordeSpawn> capability, IHordeSpawn instance, Direction side, INBT nbt) {
-			instance.setPlayerUUID(((StringNBT) nbt).getAsString());
-		}
-
-
-	}
+	public void readNBT(Tag nbt);
 
 	public static class HordeSpawn implements IHordeSpawn {
 
@@ -66,11 +54,21 @@ public interface IHordeSpawn {
 			isSynced = true;
 		}
 
+		@Override
+		public Tag writeNBT() {
+			return StringTag.valueOf(uuid);
+		}
+
+		@Override
+		public void readNBT(Tag nbt) {
+			uuid = ((StringTag) nbt).getAsString();
+		}
+
 	}
 
-	public static class Provider implements ICapabilitySerializable<INBT> {
+	public static class Provider implements ICapabilitySerializable<Tag> {
 
-		protected IHordeSpawn impl = Hordes.HORDESPAWN.getDefaultInstance();
+		protected IHordeSpawn impl = new HordeSpawn();
 
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction facing) {
@@ -78,13 +76,13 @@ public interface IHordeSpawn {
 		}
 
 		@Override
-		public INBT serializeNBT() {
-			return Hordes.HORDESPAWN.getStorage().writeNBT(Hordes.HORDESPAWN, impl, null);
+		public Tag serializeNBT() {
+			return impl.writeNBT();
 		}
 
 		@Override
-		public void deserializeNBT(INBT nbt) {
-			Hordes.HORDESPAWN.getStorage().readNBT(Hordes.HORDESPAWN, impl, null, nbt);
+		public void deserializeNBT(Tag nbt) {
+			impl.readNBT(nbt);
 		}
 
 	}

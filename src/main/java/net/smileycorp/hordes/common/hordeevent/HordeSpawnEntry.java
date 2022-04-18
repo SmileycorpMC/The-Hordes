@@ -1,7 +1,7 @@
 package net.smileycorp.hordes.common.hordeevent;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.EntityType;
 
 public class HordeSpawnEntry {
 
@@ -9,7 +9,7 @@ public class HordeSpawnEntry {
 	protected final int weight;
 	protected final int minDay;
 	protected final int maxDay;
-	protected CompoundNBT nbt = null;
+	protected CompoundTag nbt = null;
 
 	public HordeSpawnEntry(EntityType<?> type) {
 		this(type, 0, 0, 0);
@@ -38,11 +38,11 @@ public class HordeSpawnEntry {
 		return type;
 	}
 
-	public CompoundNBT getNBT() {
-		return nbt == null ? new CompoundNBT() : nbt;
+	public CompoundTag getNBT() {
+		return nbt == null ? new CompoundTag() : nbt;
 	}
 
-	public void setNBT(CompoundNBT nbt) {
+	public void setNBT(CompoundTag nbt) {
 		this.nbt=nbt;
 	}
 

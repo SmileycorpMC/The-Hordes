@@ -1,33 +1,29 @@
 package net.smileycorp.hordes.common.infection.mixin;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.PacketDistributor;
-import net.smileycorp.hordes.common.infection.HordesInfection;
-import net.smileycorp.hordes.common.infection.InfectionRegister;
-import net.smileycorp.hordes.common.infection.network.CureEntityMessage;
-import net.smileycorp.hordes.common.infection.network.InfectionPacketHandler;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.network.PacketDistributor;
+import net.smileycorp.hordes.common.infection.HordesInfection;
+import net.smileycorp.hordes.common.infection.InfectionRegister;
+import net.smileycorp.hordes.common.infection.network.CureEntityMessage;
+import net.smileycorp.hordes.common.infection.network.InfectionPacketHandler;
+
 @Mixin(MobEntity.class)
 public abstract class MixinMobEntity extends LivingEntity {
 
-	public MixinMobEntity(World world) {
-		super(null, world);
+	public MixinMobEntity(Level level) {
+		super(null, level);
 	}
 
 	@Inject(at=@At("HEAD"), method = "checkAndHandleImportantInteractions(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResultType;", cancellable = true)
-	public void interact(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResultType> callback) {
+	public void interact(Player player, Hand hand, CallbackInfoReturnable<ActionResultType> callback) {
 		ItemStack stack = player.getItemInHand(hand);
 		if (hasEffect(HordesInfection.INFECTED.get())) {
 			if (InfectionRegister.isCure(stack)) {

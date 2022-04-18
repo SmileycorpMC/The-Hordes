@@ -9,10 +9,10 @@ import mezz.jei.api.gui.ingredient.IGuiItemStackGroup;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.smileycorp.hordes.common.ModDefinitions;
 
 public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapper> {
@@ -25,8 +25,8 @@ public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapp
 	public static final ResourceLocation TEXTURE = ModDefinitions.getResource("textures/gui/jei/cure_list.png");
 
 	public InfectionCureCategory(IGuiHelper guiHelper) {
-		this.background = guiHelper.createDrawable(TEXTURE, 0, 0, 167, 113);
-		this.icon = guiHelper.createDrawable(TEXTURE, 168, 0, 18, 18);
+		background = guiHelper.createDrawable(TEXTURE, 0, 0, 167, 113);
+		icon = guiHelper.createDrawable(TEXTURE, 168, 0, 18, 18);
 	}
 
 	@Override
@@ -50,13 +50,8 @@ public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapp
 	}
 
 	@Override
-	public ITextComponent getTitleAsTextComponent() {
-		return new TranslationTextComponent("jei.category.hordes.InfectionCures");
-	}
-
-	@Override
-	public String getTitle() {
-		return "jei.category.hordes.InfectionCures";
+	public Component getTitle() {
+		return new TranslatableComponent("jei.category.hordes.InfectionCures");
 	}
 
 	@Override

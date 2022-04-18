@@ -2,12 +2,12 @@ package net.smileycorp.hordes.client;
 
 import java.util.List;
 
-import net.minecraft.util.text.Color;
+import com.google.common.collect.Lists;
+
+import net.minecraft.network.chat.TextColor;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 import net.smileycorp.hordes.common.Hordes;
-
-import com.google.common.collect.Lists;
 
 
 public class ClientConfigHandler {
@@ -15,7 +15,7 @@ public class ClientConfigHandler {
 	public static final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
 	public static final ForgeConfigSpec config;
 
-	private static Color hordeMessageColour = null;
+	private static TextColor hordeMessageColour = null;
 
 	//horde event
 	public static ConfigValue<Integer> eventNotifyMode;
@@ -46,11 +46,11 @@ public class ClientConfigHandler {
 		config = builder.build();
 	}
 
-	public static Color getHordeMessageColour() {
+	public static TextColor getHordeMessageColour() {
 		if (hordeMessageColour == null) {
 			List<? extends Integer> rgb = configHordeMessageColour.get();
-			if (rgb.size() >= 3) hordeMessageColour = Color.fromRgb((rgb.get(0) << 16) + (rgb.get(1) << 8) + rgb.get(2));
-			else hordeMessageColour = Color.fromRgb(0);
+			if (rgb.size() >= 3) hordeMessageColour = TextColor.fromRgb((rgb.get(0) << 16) + (rgb.get(1) << 8) + rgb.get(2));
+			else hordeMessageColour = TextColor.fromRgb(0);
 		}
 		return hordeMessageColour;
 	}
