@@ -61,7 +61,7 @@ public class ZombiePlayerEntity extends ZombieEntity implements IZombiePlayer {
 	@Override
 	public void setPlayer(PlayerEntity player) {
 		for (EquipmentSlotType slot : EquipmentSlotType.values()) {
-			ItemStack stack = slot.getType() == EquipmentSlotType.Group.ARMOR ? player.inventory.getArmor(slot.getIndex()) :
+			ItemStack stack = slot.getType() == EquipmentSlotType.Group.ARMOR ? player.inventory.armor.get(slot.getIndex()) :
 				slot == EquipmentSlotType.MAINHAND ? player.getMainHandItem() : player.getOffhandItem();
 				setItemSlot(slot, stack);
 		}
