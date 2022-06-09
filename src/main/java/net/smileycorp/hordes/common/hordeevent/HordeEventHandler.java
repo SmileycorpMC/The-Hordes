@@ -49,9 +49,8 @@ public class HordeEventHandler {
 			World world = server.getWorld(0);
 			if ((world.getGameRules().getBoolean("doDaylightCycle") |! ConfigHandler.pauseEventServer)) {
 				int day = (int) Math.floor(world.getWorldTime()/ConfigHandler.dayLength);
-				int time = Math.round(world.getWorldTime()%ConfigHandler.dayLength);
 				WorldDataHordeEvent data = WorldDataHordeEvent.getData(world);
-				if (((time >= ConfigHandler.hordeStartTime && day == data.getNextDay()) || day > data.getNextDay())) {
+				if ( day >= data.getNextDay()) {
 					data.setNextDay(world.rand.nextInt(ConfigHandler.hordeSpawnVariation + 1) + ConfigHandler.hordeSpawnDays + data.getNextDay());
 				}
 				data.save();
@@ -162,6 +161,9 @@ public class HordeEventHandler {
 	@SubscribeEvent
 	public void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
 		Entity entity = event.getObject();
+		if (entity == null) return;
+		if (entity.world == null) return;
+		if (entity.world.isRemote) return;
 		if (!entity.hasCapability(Hordes.HORDESPAWN, null) && entity instanceof EntityLiving && !(entity instanceof EntityPlayer)) {
 			event.addCapability(ModDefinitions.getResource("HordeSpawn"), new IHordeSpawn.Provider());
 		}

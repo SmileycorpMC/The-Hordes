@@ -24,18 +24,18 @@ import com.mojang.authlib.GameProfile;
 public class WorldDataHordeEvent extends WorldSavedData {
 
 	public static final String DATA = ModDefinitions.modid + "_HordeEvent";
-	
+
 	//stores legacy event data until it's needed to be loaded by a player capability
 	private Map<String, NBTTagCompound> legacyEventData = new HashMap<String, NBTTagCompound>();
-	
+
 	private int nextDay = 0;
-	
+
 	protected World world = null;
-	
+
 	public WorldDataHordeEvent() {
 		this(DATA);
 	}
-	
+
 	public WorldDataHordeEvent(String data) {
 		super(data);
 	}
@@ -50,7 +50,7 @@ public class WorldDataHordeEvent extends WorldSavedData {
 		}
 		if (nbt.hasKey("nextDay")) {
 			int next = nbt.getInteger("nextDay");
-			if (nextDay == 0 || next > nextDay) {
+			if (next > nextDay) {
 				nextDay = next;
 			}
 		}
@@ -64,15 +64,15 @@ public class WorldDataHordeEvent extends WorldSavedData {
 		nbt.setInteger("nextDay", nextDay);
 		return nbt;
 	}
-	
+
 	public int getNextDay() {
 		return nextDay;
-	}	
-	
+	}
+
 	public void setNextDay(int nextDay) {
 		this.nextDay = nextDay;
 	}
-	
+
 	//legacy function -- use capabilities instead
 	@Deprecated
 	public Set<OngoingHordeEvent> getEvents() {
@@ -86,7 +86,7 @@ public class WorldDataHordeEvent extends WorldSavedData {
 		}
 		return events;
 	}
-	
+
 	//legacy function -- use capabilities instead
 	@Deprecated
 	public OngoingHordeEvent getEventForPlayer(EntityPlayer player) {
@@ -95,22 +95,22 @@ public class WorldDataHordeEvent extends WorldSavedData {
 		}
 		return null;
 	}
-	
+
 	//legacy function -- use capabilities instead
 	@Deprecated
 	public OngoingHordeEvent getEventForPlayer(GameProfile profile) {
 		return getEventForPlayer(profile.getId());
 	}
-	
+
 	//legacy function -- use capabilities instead
 	@Deprecated
 	public  OngoingHordeEvent getEventForPlayer(String uuid) {
 		if (DataUtils.isValidUUID(uuid)) {
 			return getEventForPlayer(UUID.fromString(uuid));
-		} 
+		}
 		return null;
 	}
-	
+
 	//legacy function -- use capabilities instead
 	@Deprecated
 	public OngoingHordeEvent getEventForPlayer(UUID uuid) {
@@ -121,18 +121,18 @@ public class WorldDataHordeEvent extends WorldSavedData {
 		}
 		return null;
 	}
-	
+
 	public boolean hasLegacyData(UUID uuid) {
 		return legacyEventData.containsKey(uuid.toString());
 	}
-	
+
 	public NBTTagCompound getLegacyData(UUID uuid) {
 		NBTTagCompound nbt = legacyEventData.get(uuid.toString());
 		legacyEventData.remove(uuid.toString());
 		if (nbt == null) nbt = new NBTTagCompound();
 		return nbt;
 	}
-	
+
 	public void save() {
 		markDirty();
 	}
@@ -141,13 +141,9 @@ public class WorldDataHordeEvent extends WorldSavedData {
 		WorldDataHordeEvent data = (WorldDataHordeEvent) world.getMapStorage().getOrLoadData(WorldDataHordeEvent.class, DATA);
 		if (data == null) {
 			return getCleanData(world);
-		} 
+		}
 		if (data.world == null) {
 			data.world = world;
-			int day = Math.round(world.getWorldTime()/ConfigHandler.dayLength);
-			if (!ConfigHandler.spawnFirstDay && day <1) day  = 1;
-			int multiplier = (int) Math.ceil(day / ConfigHandler.hordeSpawnDays);
-			data.setNextDay((day * multiplier) + world.rand.nextInt(ConfigHandler.hordeSpawnVariation + 1));
 		}
 		return data;
 	}
@@ -164,10 +160,10 @@ public class WorldDataHordeEvent extends WorldSavedData {
 		data.save();
 		return data;
 	}
-	
+
 	public List<String> getDebugText() {
 		List<String> out = new ArrayList<String>();
-		out.add(this.toString());
+		out.add(toString());
 		out.add("Existing events: {");
 		for (OngoingHordeEvent event : getEvents()) {
 			out.add("	" +event.toString());
@@ -176,10 +172,10 @@ public class WorldDataHordeEvent extends WorldSavedData {
 		out.add("}");
 		return out;
 	}
-	
+
 	@Override
 	public String toString() {
 		return super.toString() + "[worldTime: " + world.getWorldTime() + ", nextDay="+nextDay+"]";
 	}
-	
+
 }

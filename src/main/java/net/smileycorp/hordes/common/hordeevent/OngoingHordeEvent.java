@@ -310,6 +310,16 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 		timer = 0;
 		cleanSpawns();
 		sendMessage(endEvent.getMessage());
+		List<WeakReference<EntityLiving>> toRemove = new ArrayList<>();
+		for (WeakReference<EntityLiving> ref : entitiesSpawned) {
+				EntityLiving entity = ref.get();
+				if (entity.hasCapability(Hordes.HORDESPAWN, null)) {
+					IHordeSpawn cap = entity.getCapability(Hordes.HORDESPAWN, null);
+					cap.setPlayerUUID("");
+					toRemove.add(ref);
+				}
+			}
+		entitiesSpawned.removeAll(toRemove);
 		hasChanged = true;
 	}
 
