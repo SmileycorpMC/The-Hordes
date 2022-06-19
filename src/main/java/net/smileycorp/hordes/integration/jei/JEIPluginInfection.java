@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.infection.jei;
+package net.smileycorp.hordes.integration.jei;
 
 import java.util.ArrayList;
 import java.util.List;

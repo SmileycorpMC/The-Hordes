@@ -20,6 +20,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.Loader;
 import net.smileycorp.atlas.api.SimpleStringMessage;
 import net.smileycorp.atlas.api.entity.ai.EntityAIFindNearestTargetPredicate;
 import net.smileycorp.atlas.api.entity.ai.EntityAIGoToEntityPos;
@@ -32,6 +33,7 @@ import net.smileycorp.hordes.common.event.HordeEndEvent;
 import net.smileycorp.hordes.common.event.HordeSpawnEntityEvent;
 import net.smileycorp.hordes.common.event.HordeStartEvent;
 import net.smileycorp.hordes.common.event.HordeStartWaveEvent;
+import net.smileycorp.hordes.integration.mobspropertiesrandomness.MPRIntegration;
 
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -176,8 +178,9 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 					pos = spawnEntityEvent.pos;
 					entity.onInitialSpawn(world.getDifficultyForLocation(pos), null);
 					entity.setPosition(pos.getX(), pos.getY(), pos.getZ());
-					entity.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(100.0D);
 					if (!world.spawnEntity(entity)) Hordes.logError("Unable to spawn entity from " + clazz, new Exception());
+					entity.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(100.0D);
+					if (Loader.isModLoaded("mpr")) MPRIntegration.addFollowAttribute(entity);
 					entity.getCapability(Hordes.HORDESPAWN, null).setPlayerUUID(player.getUniqueID().toString());
 					entity.enablePersistence();
 					registerEntity(entity);
@@ -312,13 +315,13 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 		sendMessage(endEvent.getMessage());
 		List<WeakReference<EntityLiving>> toRemove = new ArrayList<>();
 		for (WeakReference<EntityLiving> ref : entitiesSpawned) {
-				EntityLiving entity = ref.get();
-				if (entity.hasCapability(Hordes.HORDESPAWN, null)) {
-					IHordeSpawn cap = entity.getCapability(Hordes.HORDESPAWN, null);
-					cap.setPlayerUUID("");
-					toRemove.add(ref);
-				}
+			EntityLiving entity = ref.get();
+			if (entity.hasCapability(Hordes.HORDESPAWN, null)) {
+				IHordeSpawn cap = entity.getCapability(Hordes.HORDESPAWN, null);
+				cap.setPlayerUUID("");
+				toRemove.add(ref);
 			}
+		}
 		entitiesSpawned.removeAll(toRemove);
 		hasChanged = true;
 	}

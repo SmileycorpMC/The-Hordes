@@ -18,7 +18,7 @@ import net.minecraftforge.oredict.OreDictionary;
 import net.smileycorp.atlas.api.util.RecipeUtils;
 import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
-import net.smileycorp.hordes.infection.jei.JEIPluginInfection;
+import net.smileycorp.hordes.integration.jei.JEIPluginInfection;
 
 public class InfectionRegister {
 
