@@ -5,6 +5,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -23,7 +25,7 @@ public abstract class MixinMobEntity extends LivingEntity {
 	}
 
 	@Inject(at=@At("HEAD"), method = "checkAndHandleImportantInteractions(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResultType;", cancellable = true)
-	public void interact(Player player, Hand hand, CallbackInfoReturnable<ActionResultType> callback) {
+	public void interact(Player player, InteractionHand hand, CallbackInfoReturnable<ActionResultType> callback) {
 		ItemStack stack = player.getItemInHand(hand);
 		if (hasEffect(HordesInfection.INFECTED.get())) {
 			if (InfectionRegister.isCure(stack)) {
@@ -31,8 +33,8 @@ public abstract class MixinMobEntity extends LivingEntity {
 				if (!player.level.isClientSide) InfectionPacketHandler.NETWORK_INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(()->player.level.getChunkAt(getOnPos())), new CureEntityMessage(this));
 				if (!player.isCreative()) {
 					ItemStack container = stack.getItem().getContainerItem(stack);
-					if (stack.isDamageableItem() && player instanceof ServerPlayerEntity) {
-						stack.hurt(1, player.level.random, (ServerPlayerEntity) player);
+					if (stack.isDamageableItem() && player instanceof ServerPlayer) {
+						stack.hurt(1, player.level.random, (ServerPlayer) player);
 					} else {
 						stack.shrink(1);
 					}
