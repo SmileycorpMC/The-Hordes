@@ -5,6 +5,8 @@ import java.util.Random;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
 import net.minecraft.entity.merchant.villager.VillagerEntity;
 import net.minecraft.entity.monster.ZombieVillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -18,6 +20,7 @@ import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
@@ -41,6 +44,20 @@ import net.smileycorp.hordes.common.infection.network.InfectionPacketHandler;
 public class InfectionEventHandler {
 
 	@SubscribeEvent
+	public void onEntityAdded(EntityJoinWorldEvent event) {
+		Entity entity = event.getEntity();
+		if (entity != null) {
+			if (!entity.level.isClientSide) {
+				if (CommonConfigHandler.infectionEntitiesAggroConversions.get()) {
+					if (InfectionRegister.canCauseInfection(entity) && entity instanceof MobEntity) {
+						((MobEntity)entity).targetSelector.addGoal(3, new NearestAttackableTargetGoal<>((MobEntity)entity, LivingEntity.class, 10, true, false, InfectionRegister::canBeInfected));
+					}
+				}
+			}
+		}
+	}
+
+	@SubscribeEvent
 	public void playerJoin(PlayerLoggedInEvent event) {
 		PlayerEntity player = event.getPlayer();
 		if (player != null) {
@@ -60,33 +77,6 @@ public class InfectionEventHandler {
 			}
 		}
 	}
-
-	/*@SubscribeEvent(priority = EventPriority.HIGHEST)
-	public void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
-		PlayerEntity player = event.getEntityPlayer();
-		ItemStack stack = event.getItemStack();
-		if (event.getTarget() instanceof LivingEntity) {
-			LivingEntity entity = (LivingEntity) event.getTarget();
-			if (entity.isPotionActive(HordesInfection.INFECTED.get())) {
-				if (InfectionRegister.isCure(stack)) {
-					entity.removePotionEffect(HordesInfection.INFECTED.get());
-					if (!player.capabilities.isCreativeMode) {
-						ItemStack container = stack.getItem().getContainerItem(stack);
-						if (stack.isItemStackDamageable()) {
-							stack.damageItem(1, player);
-						} else {
-							stack.splitStack(1);
-						}
-						if (stack.isEmpty() && !container.isEmpty()) {
-							player.setItemStackToSlot(event.getHand() == EnumHand.OFF_HAND ? EntityEquipmentSlot.OFFHAND : EntityEquipmentSlot.MAINHAND, stack);
-						}
-					}
-					event.setCanceled(true);
-					event.setCancellationResult(EnumActionResult.FAIL);
-				}
-			}
-		}
-	}*/
 
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onItemUse(PlayerInteractEvent.RightClickItem event) {
@@ -118,7 +108,6 @@ public class InfectionEventHandler {
 					int c = rand.nextInt(100);
 					if (c <= CommonConfigHandler.playerInfectChance.get()) {
 						entity.addEffect(new EffectInstance(HordesInfection.INFECTED.get(), 10000, 0));
-						//PacketHandler.NETWORK_INSTANCE.sendTo(new DenyFollowMessage(entity), ((ServerPlayerEntity)user).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 						InfectionPacketHandler.NETWORK_INSTANCE.sendTo(new InfectMessage(), ((ServerPlayerEntity) entity).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 					}
 				} else if ((entity instanceof VillagerEntity && CommonConfigHandler.infectVillagers.get())) {
@@ -126,6 +115,8 @@ public class InfectionEventHandler {
 					if (c <= CommonConfigHandler.villagerInfectChance.get()) {
 						entity.addEffect(new EffectInstance(HordesInfection.INFECTED.get(), 10000, 0));
 					}
+				} else if (InfectionRegister.canBeInfected(entity)) {
+					InfectionRegister.tryToInfect(entity);
 				}
 			}
 		}
@@ -161,6 +152,9 @@ public class InfectionEventHandler {
 			}
 			world.addFreshEntity(zombie);
 			entity.kill();
+			event.setResult(Result.DENY);
+		} else if (InfectionRegister.canBeInfected(entity))  {
+			InfectionRegister.convertEntity(entity);
 			event.setResult(Result.DENY);
 		}
 	}

@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.mojang.authlib.GameProfile;
+
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MobEntity;
@@ -25,17 +27,24 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.infection.HordesInfection;
-
-import com.mojang.authlib.GameProfile;
 
 
 public class DrownedPlayerEntity extends DrownedEntity implements IZombiePlayer {
 
 	protected static final DataParameter<Optional<UUID>> PLAYER_UUID = EntityDataManager.defineId(DrownedPlayerEntity.class, DataSerializers.OPTIONAL_UUID);
+	protected static final DataParameter<Boolean> SHOW_CAPE = EntityDataManager.defineId(DrownedPlayerEntity.class, DataSerializers.BOOLEAN);
 
 	protected NonNullList<ItemStack> playerItems = NonNullList.<ItemStack>create();
 	protected UUID uuid;
+
+	public double xCloakO;
+	public double yCloakO;
+	public double zCloakO;
+	public double xCloak;
+	public double yCloak;
+	public double zCloak;
 
 	public DrownedPlayerEntity(EntityType<? extends DrownedPlayerEntity> type, World world) {
 		super(type, world);
@@ -54,6 +63,7 @@ public class DrownedPlayerEntity extends DrownedEntity implements IZombiePlayer 
 	protected void defineSynchedData(){
 		super.defineSynchedData();
 		entityData.define(PLAYER_UUID, Optional.of(UUID.fromString("1512ce82-00e5-441a-9774-f46d9b7badfb")));
+		entityData.define(SHOW_CAPE, true);
 	}
 
 	@Override
@@ -61,7 +71,7 @@ public class DrownedPlayerEntity extends DrownedEntity implements IZombiePlayer 
 		for (EquipmentSlotType slot : EquipmentSlotType.values()) {
 			ItemStack stack = slot.getType() == EquipmentSlotType.Group.ARMOR ? player.inventory.armor.get(slot.getIndex()) :
 				slot == EquipmentSlotType.MAINHAND ? player.getMainHandItem() : player.getOffhandItem();
-				setItemSlot(slot, stack);
+			setItemSlot(slot, stack);
 		}
 		setPlayer(player.getGameProfile());
 	}
@@ -120,7 +130,12 @@ public class DrownedPlayerEntity extends DrownedEntity implements IZombiePlayer 
 
 	@Override
 	public boolean isSunSensitive() {
-		return false;
+		return CommonConfigHandler.zombiePlayersBurn.get();
+	}
+
+	@Override
+	public boolean fireImmune() {
+		return CommonConfigHandler.zombiePlayersFireImmune.get();
 	}
 
 	@Override
@@ -160,6 +175,83 @@ public class DrownedPlayerEntity extends DrownedEntity implements IZombiePlayer 
 			ItemStack stack = ((MobEntity) entity).getItemBySlot(slot);
 			setItemSlot(slot, stack);
 		}
+		entityData.set(SHOW_CAPE, entity.displayCape());
+	}
+
+	@Override
+	public void tick() {
+		super.tick();
+		moveCloak(this);
+	}
+
+	@Override
+	public boolean displayCape() {
+		return entityData.get(SHOW_CAPE);
+	}
+
+	@Override
+	public void setDisplayCape(boolean display) {
+		entityData.set(SHOW_CAPE, display);
+	}
+
+	@Override
+	public double getXCloakO() {
+		return xCloakO;
+	}
+
+	@Override
+	public double getYCloakO() {
+		return yCloakO;
+	}
+
+	@Override
+	public double getZCloakO() {
+		return zCloakO;
+	}
+
+	@Override
+	public double getXCloak() {
+		return xCloak;
+	}
+
+	@Override
+	public double getYCloak() {
+		return yCloak;
+	}
+
+	@Override
+	public double getZCloak() {
+		return zCloak;
+	}
+
+	@Override
+	public void setXCloakO(double value) {
+		xCloakO = value;
+	}
+
+	@Override
+	public void setYCloakO(double value) {
+		yCloakO = value;
+	}
+
+	@Override
+	public void setZCloakO(double value) {
+		zCloakO = value;
+	}
+
+	@Override
+	public void setXCloak(double value) {
+		xCloak = value;
+	}
+
+	@Override
+	public void setYCloak(double value) {
+		yCloak = value;
+	}
+
+	@Override
+	public void setZCloak(double value) {
+		zCloak = value;
 	}
 
 }

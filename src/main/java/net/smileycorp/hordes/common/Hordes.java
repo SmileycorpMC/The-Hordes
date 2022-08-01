@@ -1,5 +1,8 @@
 package net.smileycorp.hordes.common;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -17,18 +20,14 @@ import net.smileycorp.hordes.common.capability.IZombifyPlayer;
 import net.smileycorp.hordes.common.capability.ZombifyPlayer;
 import net.smileycorp.hordes.common.hordeevent.HordeEventHandler;
 import net.smileycorp.hordes.common.hordeevent.HordeEventRegister;
+import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeSpawn;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeSpawn.HordeSpawn;
-import net.smileycorp.hordes.common.hordeevent.capability.IOngoingHordeEvent;
-import net.smileycorp.hordes.common.hordeevent.capability.OngoingHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.network.HordeEventPacketHandler;
 import net.smileycorp.hordes.common.infection.HordesInfection;
 import net.smileycorp.hordes.common.infection.InfectionEventHandler;
 import net.smileycorp.hordes.common.infection.InfectionRegister;
 import net.smileycorp.hordes.common.infection.network.InfectionPacketHandler;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @Mod(value = ModDefinitions.MODID)
 @Mod.EventBusSubscriber(modid = ModDefinitions.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -36,8 +35,8 @@ public class Hordes {
 
 	private static Logger logger = LogManager.getLogger(ModDefinitions.NAME);
 
-	@CapabilityInject(IOngoingHordeEvent.class)
-	public final static Capability<IOngoingHordeEvent> HORDE_EVENT = null;
+	@CapabilityInject(IHordeEvent.class)
+	public final static Capability<IHordeEvent> HORDE_EVENT = null;
 
 	@CapabilityInject(IHordeSpawn.class)
 	public final static Capability<IHordeSpawn> HORDESPAWN = null;
@@ -73,9 +72,9 @@ public class Hordes {
 
 	@SubscribeEvent
 	public static void commonSetup(FMLCommonSetupEvent event) {
-		CapabilityManager.INSTANCE.register(IZombifyPlayer.class, new IZombifyPlayer.Storage(), () -> new ZombifyPlayer());
-		CapabilityManager.INSTANCE.register(IHordeSpawn.class, new IHordeSpawn.Storage(), () -> new HordeSpawn());
-		CapabilityManager.INSTANCE.register(IOngoingHordeEvent.class, new IOngoingHordeEvent.Storage(), () -> new OngoingHordeEvent());
+		CapabilityManager.INSTANCE.register(IZombifyPlayer.class, new IZombifyPlayer.Storage(), ZombifyPlayer::new);
+		CapabilityManager.INSTANCE.register(IHordeSpawn.class, new IHordeSpawn.Storage(), HordeSpawn::new);
+		CapabilityManager.INSTANCE.register(IHordeEvent.class, new IHordeEvent.Storage(), IHordeEvent::createEvent);
 	}
 
 	@SubscribeEvent

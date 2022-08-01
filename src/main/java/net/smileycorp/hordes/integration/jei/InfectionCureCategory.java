@@ -1,6 +1,8 @@
-package net.smileycorp.hordes.common.infection.jei;
+package net.smileycorp.hordes.integration.jei;
 
 import java.util.List;
+
+import com.mojang.blaze3d.matrix.MatrixStack;
 
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.IRecipeLayout;
@@ -9,9 +11,14 @@ import mezz.jei.api.gui.ingredient.IGuiItemStackGroup;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.category.IRecipeCategory;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.Color;
+import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.smileycorp.hordes.common.ModDefinitions;
 
@@ -77,6 +84,15 @@ public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapp
 			items.set(i, stacks.get(i));
 		}
 
+	}
+
+	@Override
+	public void draw(InfectionCureWrapper recipe, MatrixStack matrixStack, double mouseX, double mouseY) {
+		Minecraft mc = Minecraft.getInstance();
+		FontRenderer font = mc.font;
+		IFormattableTextComponent text = new TranslationTextComponent("jei.category.hordes.InfectionCures").setStyle(Style.EMPTY.withBold(true).withColor(Color.fromRgb(0x440002)));
+		font.draw(matrixStack, text, 0, 0, 0);
+		font.drawShadow(matrixStack, text, 0, 0, 0);
 	}
 
 }

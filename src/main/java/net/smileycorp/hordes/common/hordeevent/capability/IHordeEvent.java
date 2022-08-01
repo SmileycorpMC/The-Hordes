@@ -13,7 +13,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.smileycorp.atlas.api.IOngoingEvent;
 import net.smileycorp.hordes.common.Hordes;
 
-public interface IOngoingHordeEvent extends IOngoingEvent<PlayerEntity> {
+public interface IHordeEvent extends IOngoingEvent<PlayerEntity> {
 
 	public void spawnWave(PlayerEntity player, int count);
 
@@ -37,15 +37,19 @@ public interface IOngoingHordeEvent extends IOngoingEvent<PlayerEntity> {
 
 	public void reset(ServerWorld world);
 
-	public static class Storage implements IStorage<IOngoingHordeEvent> {
+	public static IHordeEvent createEvent() {
+		return new HordeEvent();
+	}
+
+	public static class Storage implements IStorage<IHordeEvent> {
 
 		@Override
-		public INBT writeNBT(Capability<IOngoingHordeEvent> capability, IOngoingHordeEvent instance, Direction side) {
+		public INBT writeNBT(Capability<IHordeEvent> capability, IHordeEvent instance, Direction side) {
 			return instance.writeToNBT(new CompoundNBT());
 		}
 
 		@Override
-		public void readNBT(Capability<IOngoingHordeEvent> capability, IOngoingHordeEvent instance, Direction side, INBT nbt) {
+		public void readNBT(Capability<IHordeEvent> capability, IHordeEvent instance, Direction side, INBT nbt) {
 			instance.readFromNBT((CompoundNBT) nbt);
 		}
 
@@ -53,7 +57,7 @@ public interface IOngoingHordeEvent extends IOngoingEvent<PlayerEntity> {
 
 	public static class Provider implements ICapabilitySerializable<INBT> {
 
-		protected IOngoingHordeEvent impl = new OngoingHordeEvent();
+		protected IHordeEvent impl = new HordeEvent();
 
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction facing) {

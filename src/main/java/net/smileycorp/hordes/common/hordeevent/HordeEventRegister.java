@@ -9,17 +9,17 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.smileycorp.atlas.api.recipe.WeightedOutputs;
 import net.smileycorp.hordes.common.CommonConfigHandler;
+import net.smileycorp.hordes.common.CommonUtils;
 import net.smileycorp.hordes.common.Hordes;
 
 public class HordeEventRegister {
 
-	protected static List<HordeSpawnEntry> spawnlist = new ArrayList<HordeSpawnEntry>();
+	protected static List<HordeSpawnEntry> spawnlist = new ArrayList<>();
 	private static boolean tested = false;
 
 	public static void readConfig() {
@@ -42,10 +42,9 @@ public class HordeEventRegister {
 					String[] nameSplit = name.split("-");
 					if (nameSplit.length>1) {
 						if (nameSplit[0].contains("{")) {
-
 							String nbtstring = nameSplit[0].substring(nameSplit[0].indexOf("{"));
 							nameSplit[0] = nameSplit[0].substring(0, nameSplit[0].indexOf("{"));
-							nbt = parseNBT(name, nbtstring);
+							nbt = CommonUtils.parseNBT(name, nbtstring);
 						}
 						ResourceLocation loc = new ResourceLocation(nameSplit[0]);
 						if (ForgeRegistries.ENTITIES.containsKey(loc)) {
@@ -89,28 +88,15 @@ public class HordeEventRegister {
 		}
 	}
 
-	private static CompoundNBT parseNBT(String name, String nbtstring) {
-		CompoundNBT nbt = null;
-		try {
-			CompoundNBT parsed = JsonToNBT.parseTag(nbtstring);
-			if (parsed != null) nbt = parsed;
-			else throw new NullPointerException("Parsed NBT is null.");
-		} catch (Exception e) {
-			Hordes.logError("Failed to read config, " + e.getCause() + " " + e.getMessage(), e);
-			Hordes.logError("Error parsing nbt for entity " + name + " " + e.getMessage(), e);
-		}
-		return nbt;
-	}
-
 	public static WeightedOutputs<HordeSpawnEntry> getSpawnTable(int day) {
-		List<Entry<HordeSpawnEntry, Integer>> spawnmap = new ArrayList<Entry<HordeSpawnEntry, Integer>>();
+		List<Entry<HordeSpawnEntry, Integer>> spawnmap = new ArrayList<>();
 		for(HordeSpawnEntry entry : spawnlist) {
 			if (entry.getMinDay() <= day && (entry.getMaxDay() == 0 || entry.getMaxDay() >= day)) {
-				spawnmap.add(new SimpleEntry<HordeSpawnEntry, Integer>(entry, entry.getWeight()));
+				spawnmap.add(new SimpleEntry<>(entry, entry.getWeight()));
 				Hordes.logInfo("Adding entry " + entry.toString() + " to hordespawn on day " + day);
 			}
 		}
-		return new WeightedOutputs<HordeSpawnEntry>(1, spawnmap);
+		return new WeightedOutputs<>(1, spawnmap);
 	}
 
 	public static List<HordeSpawnEntry> getEntriesFor(MobEntity entity) {
@@ -118,7 +104,7 @@ public class HordeEventRegister {
 	}
 
 	public static List<HordeSpawnEntry> getEntriesFor(EntityType<?> type) {
-		List<HordeSpawnEntry> list = new ArrayList<HordeSpawnEntry>();
+		List<HordeSpawnEntry> list = new ArrayList<>();
 		for (HordeSpawnEntry entry : spawnlist) if (entry.getEntity() == type) list.add(entry);
 		return list;
 	}
@@ -134,7 +120,7 @@ public class HordeEventRegister {
 	}
 
 	private static void testEntries() {
-		List<HordeSpawnEntry> toRemove = new ArrayList<HordeSpawnEntry>();
+		List<HordeSpawnEntry> toRemove = new ArrayList<>();
 		for (HordeSpawnEntry entry : spawnlist) {
 			try {
 				Entity entity = entry.getEntity().create(ServerLifecycleHooks.getCurrentServer().overworld());

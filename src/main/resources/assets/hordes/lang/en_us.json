@@ -29,5 +29,6 @@
 	"effect.hordes.infected":"Infected",
 	"death.attack.infection":"%1$s succumbed to their infection.",
 
-	"jei.category.hordes.InfectionCures":"Infection Cures"
+	"jei.category.hordes.InfectionCures":"Infection Cures",
+	"jei.description.hordes.InfectionCures":"Use on infected entities or consume to remove infection"
 }

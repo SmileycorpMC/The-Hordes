@@ -37,7 +37,7 @@ public class HordeWorldData extends WorldSavedData {
 	public void load(CompoundNBT nbt) {
 		if (nbt.contains("nextDay")) {
 			int next = nbt.getInt("nextDay");
-			if (nextDay == 0 || next > nextDay) {
+			if (next > nextDay) {
 				nextDay = next;
 			}
 		}
@@ -57,29 +57,47 @@ public class HordeWorldData extends WorldSavedData {
 		this.nextDay = nextDay;
 	}
 
-	public Map<PlayerEntity, OngoingHordeEvent> getEvents() {
-		Map<PlayerEntity, OngoingHordeEvent> events = new HashMap<PlayerEntity, OngoingHordeEvent>();
+	public Map<PlayerEntity, HordeEvent> getEvents() {
+		Map<PlayerEntity, HordeEvent> events = new HashMap<>();
 		if (!world.isClientSide) {
 			for (PlayerEntity player : ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers()) {
-				LazyOptional<IOngoingHordeEvent> optional = player.getCapability(Hordes.HORDE_EVENT, null);
+				LazyOptional<IHordeEvent> optional = player.getCapability(Hordes.HORDE_EVENT, null);
 				if (optional.isPresent() &! player.isDeadOrDying()) {
-					events.put(player, (OngoingHordeEvent) player.getCapability(Hordes.HORDE_EVENT, null).resolve().get());
+					events.put(player, (HordeEvent) player.getCapability(Hordes.HORDE_EVENT, null).resolve().get());
 				}
 			}
 		}
 		return events;
 	}
 
+	public void save() {
+		setDirty();
+		if (world instanceof ServerWorld) ((ServerWorld)world).getChunkSource().getDataStorage().set(this);
+	}
+
+	public List<String> getDebugText() {
+		List<String> out = new ArrayList<>();
+		out.add(toString());
+		out.add("Existing events: {");
+		for (Entry<PlayerEntity,HordeEvent> entry : getEvents().entrySet()) {
+			out.add("	" +entry.getValue().toString(entry.getKey()));
+			out.addAll(entry.getValue().getEntityStrings());
+		}
+		out.add("}");
+		return out;
+	}
+
+	@Override
+	public String toString() {
+		return super.toString() + "[worldTime: " + world.getDayTime() + ", nextDay="+nextDay+"]";
+	}
+
 	public static HordeWorldData getData(ServerWorld world) {
 		HordeWorldData data = (HordeWorldData) world.getChunkSource().getDataStorage().computeIfAbsent(() -> getCleanData(world), DATA);
-		if (data.world == null) {
-			data.world = world;
-			int day = Math.round(world.getDayTime()/CommonConfigHandler.dayLength.get());
-			if (!CommonConfigHandler.spawnFirstDay.get() && day <1) day  = 1;
-			int multiplier = (int) Math.ceil(day / CommonConfigHandler.hordeSpawnDays.get());
-			data.setNextDay((day * multiplier) + world.random.nextInt(CommonConfigHandler.hordeSpawnVariation.get() + 1));
-			data.setDirty();
+		if (data == null) {
+			data = getCleanData(world);
 		}
+		world.getChunkSource().getDataStorage().set(data);
 		return data;
 	}
 
@@ -94,21 +112,5 @@ public class HordeWorldData extends WorldSavedData {
 		return data;
 	}
 
-	public List<String> getDebugText() {
-		List<String> out = new ArrayList<String>();
-		out.add(this.toString());
-		out.add("Existing events: {");
-		for (Entry<PlayerEntity,OngoingHordeEvent> entry : getEvents().entrySet()) {
-			out.add("	" +entry.getValue().toString(entry.getKey()));
-			out.addAll(entry.getValue().getEntityStrings());
-		}
-		out.add("}");
-		return out;
-	}
-
-	@Override
-	public String toString() {
-		return super.toString() + "[worldTime: " + world.getDayTime() + ", nextDay="+nextDay+"]";
-	}
 
 }

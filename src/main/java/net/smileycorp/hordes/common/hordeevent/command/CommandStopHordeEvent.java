@@ -1,17 +1,16 @@
 package net.smileycorp.hordes.common.hordeevent.command;
 
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraftforge.common.util.LazyOptional;
-import net.smileycorp.hordes.common.Hordes;
-import net.smileycorp.hordes.common.hordeevent.capability.IOngoingHordeEvent;
-
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraftforge.common.util.LazyOptional;
+import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 
 public class CommandStopHordeEvent {
 
@@ -24,9 +23,9 @@ public class CommandStopHordeEvent {
 
 	public static int execute(CommandContext<CommandSource> ctx) throws CommandSyntaxException {
 		CommandSource source = ctx.getSource();
-		if (source.getEntity() instanceof Entity) {
+		if (source.getEntity() instanceof PlayerEntity) {
 			PlayerEntity player = (PlayerEntity) source.getEntity();
-			LazyOptional<IOngoingHordeEvent> optional = player.getCapability(Hordes.HORDE_EVENT, null);
+			LazyOptional<IHordeEvent> optional = player.getCapability(Hordes.HORDE_EVENT, null);
 			if (optional.isPresent()) {
 				optional.resolve().get().stopEvent(player, true);
 				return 1;

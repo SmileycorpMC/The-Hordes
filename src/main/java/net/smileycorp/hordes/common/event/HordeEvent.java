@@ -4,16 +4,16 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.smileycorp.hordes.common.CommonConfigHandler;
-import net.smileycorp.hordes.common.hordeevent.capability.IOngoingHordeEvent;
+import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 
 public class HordeEvent extends PlayerEvent {
 
 	protected final World world;
-	protected final IOngoingHordeEvent horde;
+	protected final IHordeEvent horde;
 
 	protected final int day;
 
-	public HordeEvent(PlayerEntity player, IOngoingHordeEvent horde) {
+	public HordeEvent(PlayerEntity player, IHordeEvent horde) {
 		super(player);
 		world = player.level;
 		this.horde = horde;
@@ -24,7 +24,7 @@ public class HordeEvent extends PlayerEvent {
 		return world;
 	}
 
-	public IOngoingHordeEvent getHorde() {
+	public IHordeEvent getHorde() {
 		return horde;
 	}
 

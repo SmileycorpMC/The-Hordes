@@ -1,6 +1,5 @@
 package net.smileycorp.hordes.client;
 
-import java.awt.Color;
 import java.util.Random;
 
 import net.minecraft.client.Minecraft;
@@ -26,9 +25,8 @@ import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.smileycorp.hordes.client.render.ZombiePlayerRenderer;
 import net.smileycorp.hordes.common.ModDefinitions;
-import net.smileycorp.hordes.common.entities.DrownedPlayerEntity;
-import net.smileycorp.hordes.common.entities.ZombiePlayerEntity;
 import net.smileycorp.hordes.common.infection.HordesInfection;
 import net.smileycorp.hordes.common.infection.network.CureEntityMessage;
 
@@ -39,8 +37,8 @@ public class ClientHandler {
 	public static void clientSetup(FMLClientSetupEvent event){
 		MinecraftForge.EVENT_BUS.register(new ClientHandler());
 		MinecraftForge.EVENT_BUS.register(new ClientInfectionEventHandler());
-		RenderingRegistry.registerEntityRenderingHandler(HordesInfection.ZOMBIE_PLAYER.get(), m -> new ZombiePlayerRenderer<ZombiePlayerEntity>(m, new Color(121, 156, 101)));
-		RenderingRegistry.registerEntityRenderingHandler(HordesInfection.DROWNED_PLAYER.get(), m -> new ZombiePlayerRenderer<DrownedPlayerEntity>(m, new Color(144, 255, 255)));
+		RenderingRegistry.registerEntityRenderingHandler(HordesInfection.ZOMBIE_PLAYER.get(), m -> new ZombiePlayerRenderer<>(m, ClientConfigHandler.getZombiePlayerColour()));
+		RenderingRegistry.registerEntityRenderingHandler(HordesInfection.DROWNED_PLAYER.get(), m -> new ZombiePlayerRenderer<>(m, ClientConfigHandler.getDrownedPlayerColour()));
 	}
 
 	public static void playHordeSound(Vector3d dir, ResourceLocation sound) {
@@ -55,15 +53,16 @@ public class ClientHandler {
 	}
 
 	public static void displayMessage(String text) {
-		IngameGui gui = Minecraft.getInstance().gui;
+		Minecraft mc = Minecraft.getInstance();
+		IngameGui gui = mc.gui;
 		TextComponent message = new TranslationTextComponent(text);
 		message.setStyle(Style.EMPTY.withColor(ClientConfigHandler.getHordeMessageColour()));
 		if (ClientConfigHandler.eventNotifyMode.get() == 1) {
 			gui.getChat().addMessage(message);
 		} else if (ClientConfigHandler.eventNotifyMode.get() == 2) {
-			gui.overlayMessageString=message;
-			gui.overlayMessageTime=ClientConfigHandler.eventNotifyDuration.get();
-			gui.animateOverlayMessageColor=false;
+			gui.overlayMessageString = message;
+			gui.overlayMessageTime = ClientConfigHandler.eventNotifyDuration.get();
+			gui.animateOverlayMessageColor = false;
 		} else if (ClientConfigHandler.eventNotifyMode.get() == 3) {
 			gui.setTitles(null, null, 5, ClientConfigHandler.eventNotifyDuration.get(), 5);
 			gui.setTitles(new StringTextComponent(" "), null, 0, 0, 0);

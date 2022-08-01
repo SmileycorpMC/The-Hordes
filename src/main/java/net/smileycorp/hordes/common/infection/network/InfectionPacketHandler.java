@@ -19,24 +19,24 @@ public class InfectionPacketHandler {
 	public static void initPackets() {
 		NETWORK_INSTANCE = NetworkRegistry.newSimpleChannel(ModDefinitions.getResource("Infection"), ()-> "1", "1"::equals, "1"::equals);
 		NETWORK_INSTANCE.registerMessage(0, SimpleStringMessage.class, new SimpleMessageEncoder<SimpleStringMessage>(),
-				new SimpleMessageDecoder<SimpleStringMessage>(SimpleStringMessage.class), (T, K)-> processCureMessage(T, K.get()));
+				new SimpleMessageDecoder<>(SimpleStringMessage.class), (T, K)-> processCureMessage(T, K.get()));
 		NETWORK_INSTANCE.registerMessage(1, InfectMessage.class, new SimpleMessageEncoder<InfectMessage>(),
-				new SimpleMessageDecoder<InfectMessage>(InfectMessage.class), (T, K)-> processInfectMessage(T, K.get()));
+				new SimpleMessageDecoder<>(InfectMessage.class), (T, K)-> processInfectMessage(T, K.get()));
 		NETWORK_INSTANCE.registerMessage(2, CureEntityMessage.class, new SimpleMessageEncoder<CureEntityMessage>(),
-				new SimpleMessageDecoder<CureEntityMessage>(CureEntityMessage.class), (T, K)-> processCureEntityMessage(T, K.get()));
+				new SimpleMessageDecoder<>(CureEntityMessage.class), (T, K)-> processCureEntityMessage(T, K.get()));
 	}
 
-	public static void processCureMessage(SimpleStringMessage message, Context ctx) {
+	private static void processCureMessage(SimpleStringMessage message, Context ctx) {
 		ctx.enqueueWork(() ->  DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> InfectionRegister.readCurePacketData(message.getText())));
 		ctx.setPacketHandled(true);
 	}
 
-	public static void processInfectMessage(InfectMessage message, Context ctx) {
+	private static void processInfectMessage(InfectMessage message, Context ctx) {
 		ctx.enqueueWork(() ->  DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> ClientHandler.onInfect()));
 		ctx.setPacketHandled(true);
 	}
 
-	public static void processCureEntityMessage(CureEntityMessage message, Context ctx) {
+	private static void processCureEntityMessage(CureEntityMessage message, Context ctx) {
 		ctx.enqueueWork(() ->  DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> ClientHandler.processCureEntity(message)));
 		ctx.setPacketHandled(true);
 	}
