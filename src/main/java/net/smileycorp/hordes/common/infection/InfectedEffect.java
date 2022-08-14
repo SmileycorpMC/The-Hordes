@@ -43,7 +43,7 @@ public class InfectedEffect extends MobEffect {
 	}
 
 	@Override
-	public void addAttributeModifiers(LivingEntity entity,  AttributeMap map, int amplifier) {
+	public void addAttributeModifiers(LivingEntity entity, AttributeMap map, int amplifier) {
 		if (amplifier > 0 && CommonConfigHandler.infectSlowness.get()) {
 			AttributeInstance attribute = map.getInstance(Attributes.MOVEMENT_SPEED);
 			if (attribute != null) {

@@ -4,27 +4,27 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.smileycorp.hordes.common.CommonConfigHandler;
-import net.smileycorp.hordes.common.hordeevent.capability.IOngoingHordeEvent;
+import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 
 public class HordeEvent extends PlayerEvent {
 
 	protected final Level level;
-	protected final IOngoingHordeEvent horde;
+	protected final IHordeEvent horde;
 
 	protected final int day;
 
-	public HordeEvent(Player player, IOngoingHordeEvent horde) {
+	public HordeEvent(Player player, IHordeEvent horde) {
 		super(player);
 		level = player.level;
 		this.horde = horde;
 		day = (int) Math.floor(level.getDayTime()/CommonConfigHandler.dayLength.get());
 	}
 
-	public Level getEntityLevel() {
+	public Level getEntityWorld() {
 		return level;
 	}
 
-	public IOngoingHordeEvent getHorde() {
+	public IHordeEvent getHorde() {
 		return horde;
 	}
 

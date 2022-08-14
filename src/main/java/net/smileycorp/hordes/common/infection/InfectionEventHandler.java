@@ -10,6 +10,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.ZombieVillager;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
@@ -18,6 +20,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
@@ -39,6 +42,20 @@ import net.smileycorp.hordes.common.infection.network.InfectionPacketHandler;
 
 @EventBusSubscriber(modid=ModDefinitions.MODID)
 public class InfectionEventHandler {
+
+	@SubscribeEvent
+	public void onEntityAdded(EntityJoinWorldEvent event) {
+		Entity entity = event.getEntity();
+		if (entity != null) {
+			if (!entity.level.isClientSide) {
+				if (CommonConfigHandler.infectionEntitiesAggroConversions.get()) {
+					if (InfectionRegister.canCauseInfection(entity) && entity instanceof Mob) {
+						((Mob)entity).targetSelector.addGoal(3, new NearestAttackableTargetGoal<>((Mob)entity, LivingEntity.class, 10, true, false, InfectionRegister::canBeInfected));
+					}
+				}
+			}
+		}
+	}
 
 	@SubscribeEvent
 	public void playerJoin(PlayerLoggedInEvent event) {
@@ -91,7 +108,6 @@ public class InfectionEventHandler {
 					int c = rand.nextInt(100);
 					if (c <= CommonConfigHandler.playerInfectChance.get()) {
 						entity.addEffect(new MobEffectInstance(HordesInfection.INFECTED.get(), 10000, 0));
-						//PacketHandler.NETWORK_INSTANCE.sendTo(new DenyFollowMessage(entity), ((ServerPlayerEntity)user).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 						InfectionPacketHandler.NETWORK_INSTANCE.sendTo(new InfectMessage(), ((ServerPlayer) entity).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 					}
 				} else if ((entity instanceof Villager && CommonConfigHandler.infectVillagers.get())) {
@@ -99,6 +115,8 @@ public class InfectionEventHandler {
 					if (c <= CommonConfigHandler.villagerInfectChance.get()) {
 						entity.addEffect(new MobEffectInstance(HordesInfection.INFECTED.get(), 10000, 0));
 					}
+				} else if (InfectionRegister.canBeInfected(entity)) {
+					InfectionRegister.tryToInfect(entity);
 				}
 			}
 		}
@@ -134,6 +152,9 @@ public class InfectionEventHandler {
 			}
 			level.addFreshEntity(zombie);
 			entity.kill();
+			event.setResult(Result.DENY);
+		} else if (InfectionRegister.canBeInfected(entity))  {
+			InfectionRegister.convertEntity(entity);
 			event.setResult(Result.DENY);
 		}
 	}

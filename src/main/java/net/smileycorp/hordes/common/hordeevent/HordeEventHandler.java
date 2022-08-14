@@ -22,6 +22,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -38,40 +39,52 @@ import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.ModDefinitions;
-import net.smileycorp.hordes.common.hordeevent.capability.HordeLevelData;
+import net.smileycorp.hordes.common.hordeevent.capability.HordeSavedData;
+import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeSpawn;
-import net.smileycorp.hordes.common.hordeevent.capability.IOngoingHordeEvent;
 
 @EventBusSubscriber(modid=ModDefinitions.MODID)
 public class HordeEventHandler {
 
+	//attach required entity capabilities for event to function
+	@SubscribeEvent
+	public void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
+		Entity entity = event.getObject();
+		if (entity instanceof Mob) {
+			event.addCapability(ModDefinitions.getResource("HordeSpawn"), new IHordeSpawn.Provider());
+		}
+		if (entity instanceof Player && !(entity instanceof FakePlayer)) {
+			event.addCapability(ModDefinitions.getResource("HordeEvent"), new IHordeEvent.Provider());
+		}
+	}
 
+	//update the next day in the horde level data
 	@SubscribeEvent
 	public void serverTick(ServerTickEvent event) {
-		if (event.phase == Phase.END) {
+		if (event.phase == Phase.START) {
 			MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
 			ServerLevel level = server.overworld();
-			if ((level.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT) || !CommonConfigHandler.pauseEventServer.get())) {
-				int day = (int) Math.floor(level.getGameTime()/CommonConfigHandler.dayLength.get());
-				int time = Math.round(level.getGameTime()%CommonConfigHandler.dayLength.get());
-				HordeLevelData data = HordeLevelData.getData(level);
-				if (((time >= CommonConfigHandler.hordeStartTime.get() && day == data.getNextDay()) || day > data.getNextDay())) {
+			if ((level.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT) |! CommonConfigHandler.pauseEventServer.get())) {
+				int day = (int) Math.floor(level.getDayTime() / CommonConfigHandler.dayLength.get());
+				HordeSavedData data = HordeSavedData.getData(level);
+				if (day >= data.getNextDay()) {
 					data.setNextDay(level.random.nextInt(CommonConfigHandler.hordeSpawnVariation.get() + 1) + CommonConfigHandler.hordeSpawnDays.get() + data.getNextDay());
 				}
-				data.setDirty();
+				data.save();
 			}
 		}
 	}
 
+	//spawn the horde at the correct time
 	@SubscribeEvent
 	public void playerTick(PlayerTickEvent event) {
 		Player player = event.player;
 		if (event.phase == Phase.END && player != null && !(player instanceof FakePlayer)) {
 			Level level = player.level;
 			if (!level.isClientSide && (level.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT) || !CommonConfigHandler.pauseEventServer.get())) {
-				LazyOptional<IOngoingHordeEvent> optional = player.getCapability(Hordes.HORDE_EVENT, null);
+				LazyOptional<IHordeEvent> optional = player.getCapability(Hordes.HORDE_EVENT, null);
 				if (optional.isPresent()) {
-					IOngoingHordeEvent horde = optional.resolve().get();
+					IHordeEvent horde = optional.resolve().get();
 					int day = (int) Math.floor(level.getDayTime() / CommonConfigHandler.dayLength.get());
 					int time = Math.round(level.getDayTime() % CommonConfigHandler.dayLength.get());
 					if (horde != null && !horde.isActive(player)) {
@@ -87,9 +100,11 @@ public class HordeEventHandler {
 		}
 	}
 
+	//prevent despawning of entities in an active horde
 	@SubscribeEvent
 	public void tryDespawn(LivingSpawnEvent.AllowDespawn event) {
 		LivingEntity entity = event.getEntityLiving();
+		if (entity.level.isClientSide) return;
 		LazyOptional<IHordeSpawn> optional = entity.getCapability(Hordes.HORDESPAWN, null);
 		if (optional.isPresent()) {
 			IHordeSpawn cap = optional.resolve().get();
@@ -97,10 +112,12 @@ public class HordeEventHandler {
 				String uuid = cap.getPlayerUUID();
 				if (DataUtils.isValidUUID(uuid)) {
 					Player player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(UUID.fromString(uuid));
-					LazyOptional<IOngoingHordeEvent> optionalp = player.getCapability(Hordes.HORDE_EVENT, null);
-					if (optionalp.isPresent()) {
-						if (optionalp.resolve().get().isActive(player)) {
-							event.setResult(Result.DENY);
+					if (player != null) {
+						LazyOptional<IHordeEvent> optionalp = player.getCapability(Hordes.HORDE_EVENT, null);
+						if (optionalp.isPresent()) {
+							if (optionalp.resolve().get().isActive(player)) {
+								event.setResult(Result.DENY);
+							}
 						}
 					}
 				}
@@ -108,6 +125,30 @@ public class HordeEventHandler {
 		}
 	}
 
+	//remove entities from horde when they die
+	@SubscribeEvent
+	public void  onDeath(LivingDeathEvent event) {
+		if (event.getEntity() instanceof Mob) {
+			Mob entity = (Mob) event.getEntity();
+			if (entity.level.isClientSide) return;
+			LazyOptional<IHordeSpawn> optional = entity.getCapability(Hordes.HORDESPAWN, null);
+			if (optional.isPresent()) {
+				IHordeSpawn cap = optional.resolve().get();
+				if (cap.isHordeSpawned()) {
+					String uuid = cap.getPlayerUUID();
+					if (DataUtils.isValidUUID(uuid)) {
+						Player player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(UUID.fromString(uuid));
+						LazyOptional<IHordeEvent> optionalp = player.getCapability(Hordes.HORDE_EVENT, null);
+						if (optionalp.isPresent()) {
+							optionalp.resolve().get().removeEntity(entity);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	//sync entity capabilities when added to level
 	@SubscribeEvent(priority=EventPriority.LOWEST)
 	public void update(LivingUpdateEvent event) {
 		Level level = event.getEntity().level;
@@ -125,8 +166,8 @@ public class HordeEventHandler {
 							if (entity instanceof PathfinderMob) {
 								entity.targetSelector.addGoal(1, new HurtByTargetGoal((PathfinderMob) entity));
 							}
-							entity.targetSelector.addGoal(2, new NearestAttackableTargetGoal<Player>(entity, Player.class, true));
-							LazyOptional<IOngoingHordeEvent> optionalp = player.getCapability(Hordes.HORDE_EVENT, null);
+							entity.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(entity, Player.class, true));
+							LazyOptional<IHordeEvent> optionalp = player.getCapability(Hordes.HORDE_EVENT, null);
 							if (optionalp.isPresent()) {
 								optionalp.resolve().get().registerEntity(entity);
 								entity.goalSelector.addGoal(6, new GoToEntityPositionGoal(entity, player));
@@ -139,18 +180,7 @@ public class HordeEventHandler {
 		}
 	}
 
-	@SubscribeEvent
-	public void playerJoin(PlayerLoggedInEvent event) {
-		MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-		if (CommonConfigHandler.pauseEventServer.get()) {
-			server.getAllLevels().forEach( (level) -> {
-				if (level.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT) == false) {
-					level.getGameRules().getRule(GameRules.RULE_DAYLIGHT).set(true, server);
-				}
-			});
-		}
-	}
-
+	//pause server day cycle if no players are logged on
 	@SubscribeEvent
 	public void playerLeave(PlayerLoggedOutEvent event) {
 		if (CommonConfigHandler.pauseEventServer.get()) {
@@ -165,26 +195,29 @@ public class HordeEventHandler {
 		}
 	}
 
+	//resume server day cycle when a player joins
 	@SubscribeEvent
-	public void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
-		Entity entity = event.getObject();
-		if (entity instanceof Mob && !(entity instanceof Player)) {
-			event.addCapability(ModDefinitions.getResource("HordeSpawn"), new IHordeSpawn.Provider());
-		}
-		if (entity instanceof Player && !(entity instanceof FakePlayer)) {
-			event.addCapability(ModDefinitions.getResource("HordeEvent"), new IOngoingHordeEvent.Provider());
+	public void playerJoin(PlayerLoggedInEvent event) {
+		MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+		if (CommonConfigHandler.pauseEventServer.get()) {
+			server.getAllLevels().forEach( (level) -> {
+				if (level.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT) == false) {
+					level.getGameRules().getRule(GameRules.RULE_DAYLIGHT).set(true, server);
+				}
+			});
 		}
 	}
 
+	//prevent sleeping on horde nights
 	@SubscribeEvent
 	public void trySleep(PlayerSleepInBedEvent event) {
 		Player player = event.getPlayer();
 		Level level = player.level;
 		if (!CommonConfigHandler.canSleepDuringHorde.get()) {
 			if (!level.isClientSide) {
-				LazyOptional<IOngoingHordeEvent> optional = player.getCapability(Hordes.HORDE_EVENT, null);
+				LazyOptional<IHordeEvent> optional = player.getCapability(Hordes.HORDE_EVENT, null);
 				if (optional.isPresent()) {
-					IOngoingHordeEvent horde = optional.resolve().get();
+					IHordeEvent horde = optional.resolve().get();
 					if ((horde.isHordeDay(player) && level.dimensionType().bedWorks() &! level.isDay()) || horde.isActive(player)) {
 						event.setResult(BedSleepingProblem.OTHER_PROBLEM);
 						player.displayClientMessage(new TranslatableComponent(ModDefinitions.hordeTrySleep), true);
@@ -194,18 +227,20 @@ public class HordeEventHandler {
 		}
 	}
 
+	//copy horde event capability to new player instance on death
 	@SubscribeEvent(receiveCanceled = true)
 	public void playerClone(PlayerEvent.Clone event) {
 		Player player = event.getPlayer();
 		Player original = event.getOriginal();
 		if (player != null && original != null &!(player instanceof FakePlayer || original instanceof FakePlayer)) {
-			LazyOptional<IOngoingHordeEvent> optionalp = player.getCapability(Hordes.HORDE_EVENT, null);
-			LazyOptional<IOngoingHordeEvent> optionalo = original.getCapability(Hordes.HORDE_EVENT, null);
+			LazyOptional<IHordeEvent> optionalp = player.getCapability(Hordes.HORDE_EVENT, null);
+			LazyOptional<IHordeEvent> optionalo = original.getCapability(Hordes.HORDE_EVENT, null);
 			if (optionalp.isPresent() && optionalo.isPresent()) {
-				IOngoingHordeEvent horde = optionalp.resolve().get();
+				IHordeEvent horde = optionalp.resolve().get();
 				horde.readFromNBT(optionalo.resolve().get().writeToNBT(new CompoundTag()));
 				horde.setPlayer(player);
 			}
 		}
 	}
+
 }

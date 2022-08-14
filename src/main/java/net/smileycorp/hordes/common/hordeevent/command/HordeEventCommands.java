@@ -16,9 +16,9 @@ public class HordeEventCommands {
 	public static void registerCommands(RegisterCommandsEvent event) {
 		if (CommonConfigHandler.enableHordeEvent.get()) {
 			CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
-			/*CommandSpawnWave.register(dispatcher);
+			CommandSpawnWave.register(dispatcher);
 			CommandStartHordeEvent.register(dispatcher);
-			CommandStopHordeEvent.register(dispatcher);*/
+			CommandStopHordeEvent.register(dispatcher);
 			CommandDebugHordeEvent.register(dispatcher);
 		}
 	}

@@ -2,10 +2,9 @@ package net.smileycorp.hordes.common.infection.network;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.PacketListener;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.Level;
 import net.smileycorp.atlas.api.network.SimpleAbstractMessage;
-
 
 public class CureEntityMessage extends SimpleAbstractMessage {
 
@@ -13,7 +12,7 @@ public class CureEntityMessage extends SimpleAbstractMessage {
 
 	public CureEntityMessage() {}
 
-	public CureEntityMessage(LivingEntity entity) {
+	public CureEntityMessage(Mob entity) {
 		this.entity = entity.getId();
 	}
 
@@ -27,8 +26,8 @@ public class CureEntityMessage extends SimpleAbstractMessage {
 		buf.writeInt(entity);
 	}
 
-	public LivingEntity getEntity(Level level) {
-		return (LivingEntity) level.getEntity(entity);
+	public Mob getEntity(Level level) {
+		return (Mob) level.getEntity(entity);
 	}
 
 	@Override

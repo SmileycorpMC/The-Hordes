@@ -1,5 +1,6 @@
 package net.smileycorp.hordes.client;
 
+import java.awt.Color;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -16,12 +17,16 @@ public class ClientConfigHandler {
 	public static final ForgeConfigSpec config;
 
 	private static TextColor hordeMessageColour = null;
+	private static Color zombiePlayerColour = null;
+	private static Color drownedPlayerColour = null;
 
 	//horde event
 	public static ConfigValue<Integer> eventNotifyMode;
 	public static ConfigValue<Integer> eventNotifyDuration;
 	public static ConfigValue<Boolean> hordeSpawnSound;
 	private static ConfigValue<List<? extends Integer>> configHordeMessageColour;
+	private static ConfigValue<List<? extends Integer>> configZombiePlayerColour;
+	private static ConfigValue<List<? extends Integer>> configDrownedPlayerColour;
 
 	//infection
 	//public static ConfigValue<Boolean> playerInfectionVisuals;
@@ -37,6 +42,10 @@ public class ClientConfigHandler {
 		hordeSpawnSound = builder.comment("Play a sound when a horde wave spawns.").define("hordeSpawnSound", true);
 		configHordeMessageColour = builder.comment("Colour of horde notification messages in the rgb format.")
 				.defineList("hordeMessageColour", Lists.newArrayList(135, 0, 0), (x) -> (int)x >= 0 && (int)x < 256);
+		configZombiePlayerColour = builder.comment("Colour tint for zombie players.")
+				.defineList("zombiePlayerColour", Lists.newArrayList(121, 156, 101), (x) -> (int)x >= 0 && (int)x < 256);
+		configDrownedPlayerColour = builder.comment("Colour tint for drowned players.")
+				.defineList("drownedPlayerColour", Lists.newArrayList(144, 255, 255), (x) -> (int)x >= 0 && (int)x < 256);
 		//infection
 		builder.pop();
 		builder.push("Infection");
@@ -53,6 +62,24 @@ public class ClientConfigHandler {
 			else hordeMessageColour = TextColor.fromRgb(0);
 		}
 		return hordeMessageColour;
+	}
+
+	public static Color getZombiePlayerColour() {
+		if (zombiePlayerColour == null) {
+			List<? extends Integer> rgb = configZombiePlayerColour.get();
+			if (rgb.size() >= 3) zombiePlayerColour = new Color(rgb.get(0), rgb.get(1), + rgb.get(2));
+			else zombiePlayerColour = new Color(121, 156, 101);
+		}
+		return zombiePlayerColour;
+	}
+
+	public static Color getDrownedPlayerColour() {
+		if (drownedPlayerColour == null) {
+			List<? extends Integer> rgb = configDrownedPlayerColour.get();
+			if (rgb.size() >= 3) drownedPlayerColour = new Color(rgb.get(0), rgb.get(1), + rgb.get(2));
+			else drownedPlayerColour = new Color(144, 255, 255);
+		}
+		return drownedPlayerColour;
 	}
 
 }

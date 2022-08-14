@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.common.infection.jei;
+package net.smileycorp.hordes.integration.jei;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +40,7 @@ public class JEIPluginInfection implements IModPlugin {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings("removal")
 	public static void setRecipes(List<ItemStack> cures) {
 		if (recipeManager != null) {
 			RecipeManagerInternal manager = ObfuscationReflectionHelper.getPrivateValue(RecipeManager.class, recipeManager , "internal");

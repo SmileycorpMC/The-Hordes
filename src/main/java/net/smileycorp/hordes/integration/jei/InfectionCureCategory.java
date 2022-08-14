@@ -1,6 +1,8 @@
-package net.smileycorp.hordes.common.infection.jei;
+package net.smileycorp.hordes.integration.jei;
 
 import java.util.List;
+
+import com.mojang.blaze3d.vertex.PoseStack;
 
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.IRecipeLayout;
@@ -9,12 +11,18 @@ import mezz.jei.api.gui.ingredient.IGuiItemStackGroup;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import net.minecraft.network.chat.Component;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.network.chat.BaseComponent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.smileycorp.hordes.common.ModDefinitions;
 
+@SuppressWarnings("removal")
 public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapper> {
 
 	public static final ResourceLocation ID = ModDefinitions.getResource("infection");
@@ -50,7 +58,7 @@ public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapp
 	}
 
 	@Override
-	public Component getTitle() {
+	public BaseComponent getTitle() {
 		return new TranslatableComponent("jei.category.hordes.InfectionCures");
 	}
 
@@ -72,6 +80,15 @@ public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapp
 			items.set(i, stacks.get(i));
 		}
 
+	}
+
+	@Override
+	public void draw(InfectionCureWrapper recipe, PoseStack matrixStack, double mouseX, double mouseY) {
+		Minecraft mc = Minecraft.getInstance();
+		Font font = mc.font;
+		MutableComponent text = new TranslatableComponent("jei.category.hordes.InfectionCures").setStyle(Style.EMPTY.withBold(true).withColor(TextColor.fromRgb(0x440002)));
+		font.draw(matrixStack, text, 0, 0, 0);
+		font.drawShadow(matrixStack, text, 0, 0, 0);
 	}
 
 }

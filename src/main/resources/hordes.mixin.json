@@ -1,10 +1,17 @@
 {
 	"required": true,
-	"package": "net.smileycorp.hordes.common.infection.mixin",
-	"compatibilityLevel": "JAVA_8",
-	"refmap": "hordes.refmap.json",
+	"package": "net.smileycorp.hordes.mixin",
+	"compatibilityLevel": "JAVA_17",
+	"refmap": "hordes.mixin.refmap.json",
 	"mixins": [
-		"MixinMobEntity"
+		"MixinMob",
+		"MixinZombie",
+		"MixinZombieVillager",
+		"MixinZombieHorse",
+		"MixinAbstractHorse"
 	],
+	"injector": {
+		"defaultRequire": 1
+	},
 	"minVersion": "0.8"
 }

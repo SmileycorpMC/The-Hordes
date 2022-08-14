@@ -2,7 +2,6 @@ package net.smileycorp.hordes.common.hordeevent.capability;
 
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
@@ -20,9 +19,11 @@ public interface IHordeSpawn {
 
 	public void setSynced();
 
-	public Tag writeNBT();
+	public StringTag writeNBT();
 
-	public void readNBT(Tag nbt);
+	public void readNBT(StringTag tag);
+
+
 
 	public static class HordeSpawn implements IHordeSpawn {
 
@@ -55,33 +56,32 @@ public interface IHordeSpawn {
 		}
 
 		@Override
-		public Tag writeNBT() {
+		public StringTag writeNBT() {
 			return StringTag.valueOf(uuid);
 		}
 
 		@Override
-		public void readNBT(Tag nbt) {
-			uuid = ((StringTag) nbt).getAsString();
+		public void readNBT(StringTag tag) {
+			uuid = tag.getAsString();
 		}
 
 	}
 
-	public static class Provider implements ICapabilitySerializable<Tag> {
+	public static class Provider implements ICapabilitySerializable<StringTag> {
 
 		protected IHordeSpawn impl = new HordeSpawn();
-
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction facing) {
 			return cap == Hordes.HORDESPAWN ? LazyOptional.of(() -> impl).cast() : LazyOptional.empty();
 		}
 
 		@Override
-		public Tag serializeNBT() {
+		public StringTag serializeNBT() {
 			return impl.writeNBT();
 		}
 
 		@Override
-		public void deserializeNBT(Tag nbt) {
+		public void deserializeNBT(StringTag nbt) {
 			impl.readNBT(nbt);
 		}
 

@@ -11,7 +11,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.smileycorp.atlas.api.IOngoingEvent;
 import net.smileycorp.hordes.common.Hordes;
 
-public interface IOngoingHordeEvent extends IOngoingEvent<Player> {
+public interface IHordeEvent extends IOngoingEvent<Player> {
 
 	public void spawnWave(Player player, int count);
 
@@ -33,11 +33,15 @@ public interface IOngoingHordeEvent extends IOngoingEvent<Player> {
 
 	public void registerEntity(Mob entity);
 
-	public void reset(ServerLevel level);
+	public void reset(ServerLevel world);
+
+	public static IHordeEvent createEvent() {
+		return new HordeEvent();
+	}
 
 	public static class Provider implements ICapabilitySerializable<CompoundTag> {
 
-		protected IOngoingHordeEvent impl = new OngoingHordeEvent();
+		protected IHordeEvent impl = new HordeEvent();
 
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction facing) {

@@ -18,8 +18,8 @@ import net.smileycorp.hordes.client.ClientConfigHandler;
 import net.smileycorp.hordes.common.capability.IZombifyPlayer;
 import net.smileycorp.hordes.common.hordeevent.HordeEventHandler;
 import net.smileycorp.hordes.common.hordeevent.HordeEventRegister;
+import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeSpawn;
-import net.smileycorp.hordes.common.hordeevent.capability.IOngoingHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.network.HordeEventPacketHandler;
 import net.smileycorp.hordes.common.infection.HordesInfection;
 import net.smileycorp.hordes.common.infection.InfectionEventHandler;
@@ -32,7 +32,7 @@ public class Hordes {
 
 	private static Logger logger = LogManager.getLogger(ModDefinitions.NAME);
 
-	public final static Capability<IOngoingHordeEvent> HORDE_EVENT = CapabilityManager.get(new CapabilityToken<IOngoingHordeEvent>(){});
+	public final static Capability<IHordeEvent> HORDE_EVENT = CapabilityManager.get(new CapabilityToken<IHordeEvent>(){});
 	public final static Capability<IHordeSpawn> HORDESPAWN = CapabilityManager.get(new CapabilityToken<IHordeSpawn>(){});
 	public final static Capability<IZombifyPlayer> ZOMBIFY_PLAYER = CapabilityManager.get(new CapabilityToken<IZombifyPlayer>(){});
 
