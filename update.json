@@ -1,11 +1,10 @@
 {
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/the-hordes",
-  "1.16.5": {
-	"1.1.4": "first version for 1.16.5",
-	"1.1.4a": "fix issues that caused event data to be lost between world reloads and respawns, and zombie players to not convert properly"
+  "1.18.2": {
+	"1.1.5": "first version for 1.18.2"
   },
   "promos": {
-    "1.16.5-latest": "1.1.4a",
-    "1.16.5-recommended": "1.1.4a"
+    "1.18.2-latest": "1.1.5",
+    "1.18.2-recommended": "1.1.5"
   }
 }
