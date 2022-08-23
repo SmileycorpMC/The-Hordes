@@ -1,10 +1,11 @@
 {
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/the-hordes",
   "1.18.2": {
-	"1.1.5": "first version for 1.18.2"
+	"1.1.5": "first version for 1.18.2",
+	"1.1.5a": "fix crash on servers when a player is offline"
   },
   "promos": {
-    "1.18.2-latest": "1.1.5",
-    "1.18.2-recommended": "1.1.5"
+    "1.18.2-latest": "1.1.5a",
+    "1.18.2-recommended": "1.1.5a"
   }
 }
