@@ -127,7 +127,7 @@ public class HordeEventHandler {
 
 	//remove entities from horde when they die
 	@SubscribeEvent
-	public void  onDeath(LivingDeathEvent event) {
+	public void onDeath(LivingDeathEvent event) {
 		if (event.getEntity() instanceof MobEntity) {
 			MobEntity entity = (MobEntity) event.getEntity();
 			if (entity.level.isClientSide) return;
@@ -138,9 +138,11 @@ public class HordeEventHandler {
 					String uuid = cap.getPlayerUUID();
 					if (DataUtils.isValidUUID(uuid)) {
 						PlayerEntity player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(UUID.fromString(uuid));
-						LazyOptional<IHordeEvent> optionalp = player.getCapability(Hordes.HORDE_EVENT, null);
-						if (optionalp.isPresent()) {
-							optionalp.resolve().get().removeEntity(entity);
+						if (player != null) {
+							LazyOptional<IHordeEvent> optionalp = player.getCapability(Hordes.HORDE_EVENT, null);
+							if (optionalp.isPresent()) {
+								optionalp.resolve().get().removeEntity(entity);
+							}
 						}
 					}
 				}
