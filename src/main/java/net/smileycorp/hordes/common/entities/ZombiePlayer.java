@@ -34,11 +34,10 @@ import net.smileycorp.hordes.common.infection.HordesInfection;
 
 public class ZombiePlayer extends Zombie implements IZombiePlayer {
 
-	protected static final EntityDataAccessor<Optional<UUID>> PLAYER_UUID = SynchedEntityData.defineId(ZombiePlayer.class, EntityDataSerializers.OPTIONAL_UUID);
+	protected static final EntityDataAccessor<Optional<UUID>> PLAYER = SynchedEntityData.defineId(ZombiePlayer.class, EntityDataSerializers.OPTIONAL_UUID);
 	protected static final EntityDataAccessor<Boolean> SHOW_CAPE = SynchedEntityData.defineId(ZombiePlayer.class, EntityDataSerializers.BOOLEAN);
 
 	protected NonNullList<ItemStack> playerItems = NonNullList.<ItemStack>create();
-	protected UUID uuid;
 
 	public double xCloakO;
 	public double yCloakO;
@@ -63,7 +62,7 @@ public class ZombiePlayer extends Zombie implements IZombiePlayer {
 	@Override
 	protected void defineSynchedData(){
 		super.defineSynchedData();
-		entityData.define(PLAYER_UUID, Optional.empty());
+		entityData.define(PLAYER, Optional.empty());
 		entityData.define(SHOW_CAPE, true);
 	}
 
@@ -75,6 +74,7 @@ public class ZombiePlayer extends Zombie implements IZombiePlayer {
 			setItemSlot(slot, stack);
 		}
 		setPlayer(player.getGameProfile());
+		setCustomName(player.getName());
 	}
 
 	@Override
@@ -91,14 +91,13 @@ public class ZombiePlayer extends Zombie implements IZombiePlayer {
 
 	@Override
 	public void setPlayer(GameProfile profile) {
-		uuid=profile.getId();
-		this.setCustomName(new TextComponent(profile.getName()));
-		entityData.set(PLAYER_UUID, Optional.of(uuid));
+		if (profile.getName() != null) setCustomName(new TextComponent(profile.getName()));
+		entityData.set(PLAYER, Optional.of(profile.getId()));
 	}
 
 	@Override
 	public Optional<UUID> getPlayerUUID() {
-		return entityData.get(PLAYER_UUID);
+		return entityData.get(PLAYER);
 	}
 
 	@Override
@@ -160,8 +159,9 @@ public class ZombiePlayer extends Zombie implements IZombiePlayer {
 	@Override
 	public void addAdditionalSaveData(CompoundTag compound) {
 		super.addAdditionalSaveData(compound);
-		if (uuid != null) {
-			compound.putString("player", uuid.toString());
+		Optional<UUID> optional = entityData.get(PLAYER);
+		if (optional.isPresent()) {
+			compound.putUUID("player", optional.get());
 		}
 		ContainerHelper.saveAllItems(compound, playerItems);
 	}
@@ -170,7 +170,7 @@ public class ZombiePlayer extends Zombie implements IZombiePlayer {
 	public void readAdditionalSaveData(CompoundTag compound) {
 		super.readAdditionalSaveData(compound);
 		if (compound.contains("player")) {
-			uuid = UUID.fromString(compound.getString("player"));
+			entityData.set(PLAYER, Optional.of(compound.getUUID("player")));
 		}
 		NonNullList<ItemStack> read = NonNullList.<ItemStack>withSize(compound.getList("Items", 10).size(), ItemStack.EMPTY);
 		ContainerHelper.loadAllItems(compound, read);
