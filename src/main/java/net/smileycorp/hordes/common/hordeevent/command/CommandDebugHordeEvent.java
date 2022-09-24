@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.UUID;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -16,9 +15,10 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.contents.LiteralContents;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.smileycorp.hordes.common.hordeevent.capability.HordeSavedData;
 
 public class CommandDebugHordeEvent {
@@ -41,10 +41,10 @@ public class CommandDebugHordeEvent {
 			return 0;
 		}
 		String file = path.toAbsolutePath().toString();
-		TextComponent text = new TextComponent(file);
+		MutableComponent text = MutableComponent.create(new LiteralContents(file));
 		text.setStyle(Style.EMPTY.withUnderlined(true).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file))
-				.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent(file))));
-		source.getEntity().sendMessage(new TranslatableComponent("commands.hordes.HordeDebug.success", text), UUID.fromString("1512ce82-00e5-441a-9774-f46d9b7badfb"));
+				.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, MutableComponent.create(new LiteralContents(file)))));
+		source.getEntity().sendSystemMessage(MutableComponent.create(new TranslatableContents("commands.hordes.HordeDebug.success", text)));
 		return 1;
 	}
 

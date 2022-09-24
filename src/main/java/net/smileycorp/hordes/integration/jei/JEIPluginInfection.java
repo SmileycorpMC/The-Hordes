@@ -9,8 +9,8 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.helpers.IJeiHelpers;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.runtime.IJeiRuntime;
-import mezz.jei.recipes.RecipeManager;
-import mezz.jei.recipes.RecipeManagerInternal;
+import mezz.jei.common.recipes.RecipeManager;
+import mezz.jei.common.recipes.RecipeManagerInternal;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
@@ -35,7 +35,7 @@ public class JEIPluginInfection implements IModPlugin {
 
 	@Override
 	public void onRuntimeAvailable(IJeiRuntime runtime) {
-		if (runtime.getRecipeManager() instanceof RecipeManager ) {
+		if (runtime.getRecipeManager() instanceof RecipeManager) {
 			recipeManager = (RecipeManager) runtime.getRecipeManager();
 		}
 	}
@@ -45,7 +45,7 @@ public class JEIPluginInfection implements IModPlugin {
 		if (recipeManager != null) {
 			RecipeManagerInternal manager = ObfuscationReflectionHelper.getPrivateValue(RecipeManager.class, recipeManager , "internal");
 			if (manager!=null) {
-				for (InfectionCureWrapper recipe : recipes) manager.hideRecipe(InfectionCureCategory.ID, recipe);
+				manager.hideRecipes(InfectionCureCategory.TYPE, recipes);
 				recipes.clear();
 				List<ItemStack> items = new ArrayList<ItemStack>();
 				for (ItemStack stack : cures) {
@@ -58,9 +58,7 @@ public class JEIPluginInfection implements IModPlugin {
 				if (!items.isEmpty()) {
 					recipes.add(new InfectionCureWrapper(items));
 				}
-				for (InfectionCureWrapper recipe : recipes) {
-					recipeManager.addRecipe(recipe, InfectionCureCategory.ID);
-				}
+				recipeManager.addRecipes(InfectionCureCategory.TYPE, recipes);
 			}
 		}
 	}

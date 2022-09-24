@@ -47,8 +47,8 @@ public class HordeEventRegister {
 							nbt = CommonUtils.parseNBT(name, nbtstring);
 						}
 						ResourceLocation loc = new ResourceLocation(nameSplit[0]);
-						if (ForgeRegistries.ENTITIES.containsKey(loc)) {
-							type = ForgeRegistries.ENTITIES.getValue(loc);
+						if (ForgeRegistries.ENTITY_TYPES.containsKey(loc)) {
+							type = ForgeRegistries.ENTITY_TYPES.getValue(loc);
 							try {
 								weight = Integer.valueOf(nameSplit[1]);
 							} catch (Exception e) {

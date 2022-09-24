@@ -30,21 +30,8 @@ public abstract class MixinAbstractHorse extends Animal {
 
 	@Inject(at=@At("HEAD"), method = "aiStep()V", cancellable = true)
 	public void aiStep(CallbackInfo callback) {
-		if ((Animal)this instanceof ZombieHorse) {
-			if (CommonConfigHandler.aggressiveZombieHorses.get()) {
-				updateSwingTime();
-				float f = getBrightness();
-				if (f > 0.5F) noActionTime += 2;
-			}
-			if (CommonConfigHandler.zombieHorsesBurn.get()) {
-				tryBurn();
-			}
-		}
-		else if ((Animal)this instanceof SkeletonHorse) {
-			if (CommonConfigHandler.skeletonHorsesBurn.get()) {
-				tryBurn();
-			}
-		}
+		if ((Animal)this instanceof ZombieHorse && CommonConfigHandler.zombieHorsesBurn.get()) tryBurn();
+		else if ((Animal)this instanceof SkeletonHorse && CommonConfigHandler.skeletonHorsesBurn.get()) tryBurn();
 	}
 
 	protected void tryBurn() {

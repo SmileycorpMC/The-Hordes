@@ -52,8 +52,8 @@ public class InfectionRegister {
 				String[] nameSplit = name.split(":");
 				if (nameSplit.length>=2) {
 					ResourceLocation loc = new ResourceLocation(nameSplit[0], nameSplit[1]);
-					if (ForgeRegistries.ENTITIES.containsKey(loc)) {
-						EntityType<?> type = ForgeRegistries.ENTITIES.getValue(loc);
+					if (ForgeRegistries.ENTITY_TYPES.containsKey(loc)) {
+						EntityType<?> type = ForgeRegistries.ENTITY_TYPES.getValue(loc);
 						if (type != null) {
 							infectionEntities.add(type);
 						}
@@ -101,8 +101,8 @@ public class InfectionRegister {
 					try {
 						if (nameSplit[0].contains("{")) nameSplit[0] = nameSplit[0].substring(0, nameSplit[0].indexOf("{"));
 						ResourceLocation entity = new ResourceLocation(nameSplit[0]);
-						if (!ForgeRegistries.ENTITIES.containsKey(entity)) throw new Exception("Entity " + entity + " is not registered");
-						type = ForgeRegistries.ENTITIES.getValue(entity);
+						if (!ForgeRegistries.ENTITY_TYPES.containsKey(entity)) throw new Exception("Entity " + entity + " is not registered");
+						type = ForgeRegistries.ENTITY_TYPES.getValue(entity);
 					} catch (Exception e) {
 						throw new Exception(nameSplit[0] + " is not a resourcelocation");
 					}
@@ -118,8 +118,8 @@ public class InfectionRegister {
 					}
 					try {
 						ResourceLocation entity = new ResourceLocation(nameSplit[2]);
-						if (!ForgeRegistries.ENTITIES.containsKey(entity)) throw new Exception("Entity " + entity + " is not registered");
-						result = ForgeRegistries.ENTITIES.getValue(entity);
+						if (!ForgeRegistries.ENTITY_TYPES.containsKey(entity)) throw new Exception("Entity " + entity + " is not registered");
+						result = ForgeRegistries.ENTITY_TYPES.getValue(entity);
 					} catch (Exception e) {
 						throw new Exception(nameSplit[2] + " is not a resourcelocation");
 					}
@@ -152,7 +152,7 @@ public class InfectionRegister {
 	public static String getCurePacketData() {
 		StringBuilder builder = new StringBuilder();
 		for (ItemStack stack : cures) {
-			builder.append(stack.getItem().getRegistryName());
+			builder.append(ForgeRegistries.ITEMS.getKey(stack.getItem()));
 			if (stack.getTag() != null) {
 				builder.append(stack.getTag().toString());
 			}

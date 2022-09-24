@@ -2,21 +2,28 @@ package net.smileycorp.hordes.integration.jei;
 
 import java.util.List;
 
-import mezz.jei.api.constants.VanillaTypes;
-import mezz.jei.api.ingredients.IIngredients;
+import com.google.common.collect.Lists;
+
 import net.minecraft.world.item.ItemStack;
 
-@SuppressWarnings("removal")
 public class InfectionCureWrapper {
 
-	private final List<ItemStack> items;
+	private final List<List<ItemStack>> items = Lists.newArrayList();
 
 	public InfectionCureWrapper(List<ItemStack> items) {
-		this.items = items;
+		for (int i = 0; i < items.size() / 9f; i++) {
+			this.items.add(items.subList(i, Math.min(i+8, items.size())));
+		}
 	}
 
-	public void getIngredients(IIngredients ingredients) {
-		ingredients.setInputs(VanillaTypes.ITEM, items);
+	public ItemStack getItem(int x, int y) {
+		if (items.size() < y) {
+			List<ItemStack> sublist = items.get(y);
+			if (sublist.size() < x) {
+				return sublist.get(x);
+			}
+		}
+		return ItemStack.EMPTY;
 	}
 
 }

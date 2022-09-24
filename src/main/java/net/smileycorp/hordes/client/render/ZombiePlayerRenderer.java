@@ -25,7 +25,7 @@ public class ZombiePlayerRenderer<T extends Zombie & IZombiePlayer> extends Huma
 	public static final ModelLayerLocation MAIN_LAYER = new ModelLayerLocation(ModDefinitions.getResource("zombie_player"), "main");
 
 	public ZombiePlayerRenderer(EntityRendererProvider.Context ctx, Color colour) {
-		super(ctx, new ZombiePlayerModel<T>(ctx.bakeLayer(MAIN_LAYER)), 0.5F);
+		super(ctx, new ZombiePlayerModel<T>(ctx.bakeLayer(MAIN_LAYER), colour), 0.5F);
 		addLayer(new HumanoidArmorLayer<>(this, new ZombieModel<T>(ctx.bakeLayer(ModelLayers.ZOMBIE_INNER_ARMOR)),
 				new ZombieModel<T>(ctx.bakeLayer(ModelLayers.ZOMBIE_OUTER_ARMOR))));
 		addLayer(new ZombiePlayerCapeLayer<>(this));

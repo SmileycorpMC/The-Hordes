@@ -8,9 +8,9 @@ import com.mojang.authlib.GameProfile;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.BaseComponent;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.LiteralContents;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -92,7 +92,7 @@ public class ZombiePlayer extends Zombie implements IZombiePlayer {
 	@Override
 	public void setPlayer(GameProfile profile) {
 		uuid=profile.getId();
-		this.setCustomName(new TextComponent(profile.getName()));
+		setCustomName(MutableComponent.create(new LiteralContents(profile.getName())));
 		entityData.set(PLAYER_UUID, Optional.of(uuid));
 	}
 
@@ -178,12 +178,12 @@ public class ZombiePlayer extends Zombie implements IZombiePlayer {
 	}
 
 	@Override
-	public BaseComponent getDisplayName() {
-		TranslatableComponent textcomponentstring = new TranslatableComponent(
-				PlayerTeam.formatNameForTeam(getTeam(), new TranslatableComponent("entity.hordes.ZombiePlayer.chat")).getString(),
-				PlayerTeam.formatNameForTeam(getTeam(), getName()));
-		textcomponentstring.getStyle().withHoverEvent(this.createHoverEvent());
-		textcomponentstring.getStyle().withInsertion(this.getEncodeId());
+	public MutableComponent getDisplayName() {
+		MutableComponent textcomponentstring = MutableComponent.create(new TranslatableContents(
+				PlayerTeam.formatNameForTeam(getTeam(),  MutableComponent.create(new TranslatableContents("entity.hordes.ZombiePlayer.chat"))).getString(),
+				PlayerTeam.formatNameForTeam(getTeam(), getName())));
+		textcomponentstring.getStyle().withHoverEvent(createHoverEvent());
+		textcomponentstring.getStyle().withInsertion(getEncodeId());
 		return textcomponentstring;
 	}
 

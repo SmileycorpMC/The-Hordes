@@ -1,8 +1,7 @@
 package net.smileycorp.hordes.common.infection;
 
-import java.util.Random;
-
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -20,11 +19,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
-import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
+import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
@@ -44,7 +43,7 @@ import net.smileycorp.hordes.common.infection.network.InfectionPacketHandler;
 public class InfectionEventHandler {
 
 	@SubscribeEvent
-	public void onEntityAdded(EntityJoinWorldEvent event) {
+	public void onEntityAdded(EntityJoinLevelEvent event) {
 		Entity entity = event.getEntity();
 		if (entity != null) {
 			if (!entity.level.isClientSide) {
@@ -59,7 +58,7 @@ public class InfectionEventHandler {
 
 	@SubscribeEvent
 	public void playerJoin(PlayerLoggedInEvent event) {
-		Player player = event.getPlayer();
+		Player player = event.getEntity();
 		if (player != null) {
 			if (player instanceof ServerPlayer) {
 				InfectionPacketHandler.NETWORK_INSTANCE.sendTo(new SimpleStringMessage(InfectionRegister.getCurePacketData()), ((ServerPlayer) player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
@@ -69,7 +68,7 @@ public class InfectionEventHandler {
 
 	@SubscribeEvent
 	public void onItemStackConsume(LivingEntityUseItemEvent.Finish event) {
-		LivingEntity entity = event.getEntityLiving();
+		LivingEntity entity = event.getEntity();
 		ItemStack stack = event.getItem();
 		if (entity.hasEffect(HordesInfection.INFECTED.get())) {
 			if (InfectionRegister.isCure(stack)) {
@@ -81,7 +80,7 @@ public class InfectionEventHandler {
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onItemUse(PlayerInteractEvent.RightClickItem event) {
 		ItemStack stack = event.getItemStack();
-		HitResult ray = DirectionUtils.getEntityRayTrace(event.getWorld(), event.getPlayer(), 5);
+		HitResult ray = DirectionUtils.getEntityRayTrace(event.getLevel(), event.getEntity(), 5);
 		if (ray instanceof EntityHitResult) {
 			if (((EntityHitResult) ray).getEntity() instanceof LivingEntity) {
 				LivingEntity entity = (LivingEntity) ((EntityHitResult) ray).getEntity();
@@ -98,10 +97,10 @@ public class InfectionEventHandler {
 
 	@SubscribeEvent
 	public void onDamage(LivingDamageEvent event) {
-		LivingEntity entity = event.getEntityLiving();
+		LivingEntity entity = event.getEntity();
 		Entity attacker = event.getSource().getDirectEntity();
 		Level level = entity.level;
-		Random rand = level.random;
+		RandomSource rand = level.random;
 		if (!level.isClientSide && InfectionRegister.canCauseInfection(attacker)) {
 			if (!entity.hasEffect(HordesInfection.INFECTED.get())) {
 				if ((entity instanceof Player && CommonConfigHandler.infectPlayers.get())) {
@@ -124,7 +123,7 @@ public class InfectionEventHandler {
 
 	@SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled=true)
 	public void onDeath(LivingDeathEvent event) {
-		LivingEntity entity = event.getEntityLiving();
+		LivingEntity entity = event.getEntity();
 		DamageSource source = event.getSource();
 		Level level = entity.level;
 		if (!level.isClientSide && (source == HordesInfection.INFECTION_DAMAGE || entity.hasEffect(HordesInfection.INFECTED.get()))) {
@@ -136,7 +135,7 @@ public class InfectionEventHandler {
 
 	@SubscribeEvent
 	public void onInfectDeath(InfectionDeathEvent event) {
-		LivingEntity entity = event.getEntityLiving();
+		LivingEntity entity = event.getEntity();
 		Level level = entity.level;
 		if (entity instanceof Villager) {
 			Villager villager = (Villager) entity;
@@ -160,8 +159,8 @@ public class InfectionEventHandler {
 	}
 
 	@SubscribeEvent
-	public static void onTick(LivingUpdateEvent event) {
-		LivingEntity entity = event.getEntityLiving();
+	public static void onTick(LivingTickEvent event) {
+		LivingEntity entity = event.getEntity();
 		Level level = entity.level;
 		if (!level.isClientSide && entity.hasEffect(HordesInfection.INFECTED.get())) {
 			MobEffectInstance effect = entity.getEffect(HordesInfection.INFECTED.get());

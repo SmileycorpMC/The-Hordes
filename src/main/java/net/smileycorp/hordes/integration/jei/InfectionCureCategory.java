@@ -1,31 +1,27 @@
 package net.smileycorp.hordes.integration.jei;
 
-import java.util.List;
-
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import mezz.jei.api.constants.VanillaTypes;
-import mezz.jei.api.gui.IRecipeLayout;
+import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
-import mezz.jei.api.gui.ingredient.IGuiItemStackGroup;
+import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
-import mezz.jei.api.ingredients.IIngredients;
+import mezz.jei.api.recipe.IFocusGroup;
+import mezz.jei.api.recipe.RecipeIngredientRole;
+import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.network.chat.BaseComponent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 import net.smileycorp.hordes.common.ModDefinitions;
 
-@SuppressWarnings("removal")
 public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapper> {
 
-	public static final ResourceLocation ID = ModDefinitions.getResource("infection");
+	public static final RecipeType<InfectionCureWrapper> TYPE = RecipeType.create(ModDefinitions.MODID, "infection_cures", InfectionCureWrapper.class);
 
 	private final IDrawable background;
 	private final IDrawable icon;
@@ -43,23 +39,8 @@ public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapp
 	}
 
 	@Override
-	public Class<? extends InfectionCureWrapper> getRecipeClass() {
-		return InfectionCureWrapper.class;
-	}
-
-	@Override
-	public ResourceLocation getUid() {
-		return ID;
-	}
-
-	@Override
-	public void setIngredients(InfectionCureWrapper wrapper, IIngredients ingredients) {
-		wrapper.getIngredients(ingredients);
-	}
-
-	@Override
-	public BaseComponent getTitle() {
-		return new TranslatableComponent("jei.category.hordes.InfectionCures");
+	public MutableComponent getTitle() {
+		return MutableComponent.create(new TranslatableContents("jei.category.hordes.InfectionCures"));
 	}
 
 	@Override
@@ -68,27 +49,28 @@ public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapp
 	}
 
 	@Override
-	public void setRecipe(IRecipeLayout recipeLayout, InfectionCureWrapper recipeWrapper, IIngredients ingredients) {
-		IGuiItemStackGroup items = recipeLayout.getItemStacks();
-		for (int i = 0; i <6; i++) {
-			for (int j = 0; j <9; j++) {
-				items.init((i*9)+j, false, j*18+3, i*18+3);
+	public void setRecipe(IRecipeLayoutBuilder recipeLayout, InfectionCureWrapper recipe, IFocusGroup focuses) {
+		for (int i = 0; i <9; i++) {
+			for (int j = 0; j <6; j++) {
+				recipeLayout.addSlot(RecipeIngredientRole.INPUT, i*18+3, j*18+3).addItemStack(recipe.getItem(i, j));
 			}
 		}
-		List<List<ItemStack>> stacks = ingredients.getInputs(VanillaTypes.ITEM);
-		for (int i = 0; i < stacks.size(); i++) {
-			items.set(i, stacks.get(i));
-		}
-
 	}
 
 	@Override
-	public void draw(InfectionCureWrapper recipe, PoseStack matrixStack, double mouseX, double mouseY) {
+	public void draw(InfectionCureWrapper recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
 		Minecraft mc = Minecraft.getInstance();
 		Font font = mc.font;
-		MutableComponent text = new TranslatableComponent("jei.category.hordes.InfectionCures").setStyle(Style.EMPTY.withBold(true).withColor(TextColor.fromRgb(0x440002)));
-		font.draw(matrixStack, text, 0, 0, 0);
-		font.drawShadow(matrixStack, text, 0, 0, 0);
+		MutableComponent text = MutableComponent.create(new TranslatableContents("jei.category.hordes.InfectionCures"))
+				.setStyle(Style.EMPTY.withBold(true).withColor(TextColor.fromRgb(0x440002)));
+		font.draw(stack, text, 0, 0, 0);
+		font.drawShadow(stack, text, 0, 0, 0);
+	}
+
+	@Override
+	public RecipeType<InfectionCureWrapper> getRecipeType() {
+
+		return null;
 	}
 
 }

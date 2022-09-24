@@ -3,7 +3,8 @@ package net.smileycorp.hordes.common.hordeevent;
 import java.util.UUID;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -23,7 +24,7 @@ import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
+import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
@@ -103,7 +104,7 @@ public class HordeEventHandler {
 	//prevent despawning of entities in an active horde
 	@SubscribeEvent
 	public void tryDespawn(LivingSpawnEvent.AllowDespawn event) {
-		LivingEntity entity = event.getEntityLiving();
+		LivingEntity entity = event.getEntity();
 		if (entity.level.isClientSide) return;
 		LazyOptional<IHordeSpawn> optional = entity.getCapability(Hordes.HORDESPAWN, null);
 		if (optional.isPresent()) {
@@ -150,7 +151,7 @@ public class HordeEventHandler {
 
 	//sync entity capabilities when added to level
 	@SubscribeEvent(priority=EventPriority.LOWEST)
-	public void update(LivingUpdateEvent event) {
+	public void update(LivingTickEvent event) {
 		Level level = event.getEntity().level;
 		if (!level.isClientSide && event.getEntity() instanceof Mob && level.dimension() == Level.OVERWORLD && event.getEntity().tickCount%5==0) {
 			Mob entity = (Mob) event.getEntity();
@@ -211,7 +212,7 @@ public class HordeEventHandler {
 	//prevent sleeping on horde nights
 	@SubscribeEvent
 	public void trySleep(PlayerSleepInBedEvent event) {
-		Player player = event.getPlayer();
+		Player player = event.getEntity();
 		Level level = player.level;
 		if (!CommonConfigHandler.canSleepDuringHorde.get()) {
 			if (!level.isClientSide) {
@@ -220,7 +221,7 @@ public class HordeEventHandler {
 					IHordeEvent horde = optional.resolve().get();
 					if ((horde.isHordeDay(player) && level.dimensionType().bedWorks() &! level.isDay()) || horde.isActive(player)) {
 						event.setResult(BedSleepingProblem.OTHER_PROBLEM);
-						player.displayClientMessage(new TranslatableComponent(ModDefinitions.hordeTrySleep), true);
+						player.displayClientMessage(MutableComponent.create(new TranslatableContents(ModDefinitions.hordeTrySleep)), true);
 					}
 				}
 			}
@@ -230,7 +231,7 @@ public class HordeEventHandler {
 	//copy horde event capability to new player instance on death
 	@SubscribeEvent(receiveCanceled = true)
 	public void playerClone(PlayerEvent.Clone event) {
-		Player player = event.getPlayer();
+		Player player = event.getEntity();
 		Player original = event.getOriginal();
 		if (player != null && original != null &!(player instanceof FakePlayer || original instanceof FakePlayer)) {
 			LazyOptional<IHordeEvent> optionalp = player.getCapability(Hordes.HORDE_EVENT, null);

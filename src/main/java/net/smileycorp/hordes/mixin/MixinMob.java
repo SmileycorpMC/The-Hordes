@@ -49,7 +49,7 @@ public abstract class MixinMob extends LivingEntity {
 				removeEffect(HordesInfection.INFECTED.get());
 				if (!player.level.isClientSide) InfectionPacketHandler.NETWORK_INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(()->player.level.getChunkAt(getOnPos())), new CureEntityMessage((Mob)(LivingEntity)this));
 				if (!player.isCreative()) {
-					ItemStack container = stack.getItem().getContainerItem(stack);
+					ItemStack container = stack.getItem().getCraftingRemainingItem(stack);
 					if (stack.isDamageableItem() && player instanceof ServerPlayer) {
 						stack.hurt(1, player.level.random, (ServerPlayer) player);
 					} else {
@@ -68,7 +68,7 @@ public abstract class MixinMob extends LivingEntity {
 	//disables skeletons burning based on the config
 	@Inject(at=@At("HEAD"), method = "isSunBurnTick()Z", cancellable = true)
 	public void isSunBurnTick(CallbackInfoReturnable<Boolean> callback) {
-		if (((LivingEntity)this) instanceof AbstractSkeleton &! CommonConfigHandler.skeletonsBurn.get()) {
+		if ((LivingEntity)this instanceof AbstractSkeleton &! CommonConfigHandler.skeletonsBurn.get()) {
 			callback.setReturnValue(false);
 			callback.cancel();
 		}
@@ -77,7 +77,7 @@ public abstract class MixinMob extends LivingEntity {
 	//despawns zombie horses in peaceful if they are set as aggressive in the config
 	@Inject(at=@At("HEAD"), method = "shouldDespawnInPeaceful()Z", cancellable = true)
 	public void shouldDespawnInPeaceful(CallbackInfoReturnable<Boolean> callback) {
-		if (((LivingEntity)this) instanceof ZombieHorse && CommonConfigHandler.aggressiveZombieHorses.get()) {
+		if ((LivingEntity)this instanceof ZombieHorse && CommonConfigHandler.aggressiveZombieHorses.get()) {
 			callback.setReturnValue(true);
 			callback.cancel();
 		}

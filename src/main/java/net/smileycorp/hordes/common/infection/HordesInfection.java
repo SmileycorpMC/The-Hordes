@@ -14,7 +14,7 @@ import net.smileycorp.hordes.common.entities.ZombiePlayer;
 public class HordesInfection {
 
 	public static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, ModDefinitions.MODID);
-	public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(ForgeRegistries.ENTITIES, ModDefinitions.MODID);
+	public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, ModDefinitions.MODID);
 
 	public static RegistryObject<MobEffect> INFECTED = EFFECTS.register("infected", () -> new InfectedEffect());
 

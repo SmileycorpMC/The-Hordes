@@ -33,7 +33,7 @@ public class MiscEventHandler {
 	//determine if zombie entity should spawn, and if so create the correct entity and set properties
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onDeath(LivingDeathEvent event) {
-		LivingEntity entity = event.getEntityLiving();
+		LivingEntity entity = event.getEntity();
 		if (entity!=null) {
 			Level level = entity.level;
 			if (!level.isClientSide) {
@@ -89,7 +89,7 @@ public class MiscEventHandler {
 	//copy horse inventories if they convert to another entity, useful for copying armor and saddles to zombie horses
 	@SubscribeEvent
 	public void entityConvert(LivingConversionEvent.Post event) {
-		LivingEntity before = event.getEntityLiving();
+		LivingEntity before = event.getEntity();
 		if (before.level.isClientSide) return;
 		LivingEntity after = event.getOutcome();
 		if (before instanceof AbstractHorse && after instanceof AbstractHorse) {
