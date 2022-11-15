@@ -11,10 +11,12 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.smileycorp.hordes.client.ClientConfigHandler;
+import net.smileycorp.hordes.client.ClientHandler;
 import net.smileycorp.hordes.common.capability.IZombifyPlayer;
 import net.smileycorp.hordes.common.hordeevent.HordeEventHandler;
 import net.smileycorp.hordes.common.hordeevent.HordeEventRegister;
@@ -72,6 +74,11 @@ public class Hordes {
 		if (CommonConfigHandler.enableMobInfection.get()) {
 			InfectionRegister.readConfig();
 		}
+	}
+
+	@SubscribeEvent
+	public static void loadComplete(FMLClientSetupEvent event) {
+		MinecraftForge.EVENT_BUS.register(new ClientHandler());
 	}
 
 	public static void logInfo(Object message) {

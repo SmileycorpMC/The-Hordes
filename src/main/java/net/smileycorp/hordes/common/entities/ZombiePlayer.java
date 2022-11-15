@@ -9,6 +9,7 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.BaseComponent;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -74,7 +75,6 @@ public class ZombiePlayer extends Zombie implements IZombiePlayer {
 			setItemSlot(slot, stack);
 		}
 		setPlayer(player.getGameProfile());
-		setCustomName(player.getName());
 	}
 
 	@Override
@@ -179,12 +179,10 @@ public class ZombiePlayer extends Zombie implements IZombiePlayer {
 
 	@Override
 	public BaseComponent getDisplayName() {
-		TranslatableComponent textcomponentstring = new TranslatableComponent(
-				PlayerTeam.formatNameForTeam(getTeam(), new TranslatableComponent("entity.hordes.ZombiePlayer.chat")).getString(),
-				PlayerTeam.formatNameForTeam(getTeam(), getName()));
+		MutableComponent textcomponentstring = PlayerTeam.formatNameForTeam(getTeam(), new TranslatableComponent("entity.hordes.ZombiePlayer.chat", getCustomName()));
 		textcomponentstring.getStyle().withHoverEvent(this.createHoverEvent());
 		textcomponentstring.getStyle().withInsertion(this.getEncodeId());
-		return textcomponentstring;
+		return (BaseComponent) textcomponentstring;
 	}
 
 	@Override

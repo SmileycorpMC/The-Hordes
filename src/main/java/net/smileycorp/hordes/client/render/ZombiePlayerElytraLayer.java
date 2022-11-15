@@ -15,7 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.ItemStack;
-import net.smileycorp.atlas.api.client.RenderingUtils;
+import net.smileycorp.atlas.api.client.PlayerTextureRenderer;
 import net.smileycorp.hordes.common.entities.IZombiePlayer;
 
 public class ZombiePlayerElytraLayer<T extends Zombie & IZombiePlayer> extends ElytraLayer<T, ZombiePlayerModel<T>> {
@@ -30,9 +30,9 @@ public class ZombiePlayerElytraLayer<T extends Zombie & IZombiePlayer> extends E
 		if (shouldRender(itemstack, entity)) {
 			ResourceLocation loc = getElytraTexture(itemstack, entity);
 			if (entity.displayCape()) {
-				loc = RenderingUtils.getPlayerTexture(entity.getPlayerUUID(), Type.ELYTRA);
+				ResourceLocation texture = PlayerTextureRenderer.getTexture(entity.getPlayerUUID(), Type.ELYTRA);
+				if (texture != null) loc = texture;
 			}
-
 			poseStack.pushPose();
 			poseStack.translate(0.0D, 0.0D, 0.125D);
 			getParentModel().copyPropertiesTo(elytraModel);
