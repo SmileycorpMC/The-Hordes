@@ -54,7 +54,7 @@ public class ClientHandler {
 	}
 
 	@SubscribeEvent
-	public void registerLayers(RenderNameplateEvent event) {
+	public void renderNameplate(RenderNameplateEvent event) {
 		if (event.getEntity() instanceof IZombiePlayer) {
 			event.setContent(event.getEntity().getCustomName());
 		}
