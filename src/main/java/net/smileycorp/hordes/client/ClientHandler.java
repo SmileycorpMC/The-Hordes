@@ -19,6 +19,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent.RegisterRenderers;
+import net.minecraftforge.client.event.RenderNameTagEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -26,6 +27,7 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.smileycorp.hordes.client.render.ZombiePlayerRenderer;
 import net.smileycorp.hordes.common.ModDefinitions;
+import net.smileycorp.hordes.common.entities.IZombiePlayer;
 import net.smileycorp.hordes.common.infection.HordesInfection;
 import net.smileycorp.hordes.common.infection.network.CureEntityMessage;
 
@@ -46,7 +48,15 @@ public class ClientHandler {
 
 	@SubscribeEvent
 	public static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
-		event.registerLayerDefinition(ZombiePlayerRenderer.MAIN_LAYER, ZombiePlayerRenderer::createMainLayer);
+		event.registerLayerDefinition(ZombiePlayerRenderer.DEFAULT, () -> ZombiePlayerRenderer.createLayer(false));
+		event.registerLayerDefinition(ZombiePlayerRenderer.SLIM, () -> ZombiePlayerRenderer.createLayer(true));
+	}
+
+	@SubscribeEvent
+	public void renderNameplate(RenderNameTagEvent event) {
+		if (event.getEntity() instanceof IZombiePlayer) {
+			event.setContent(event.getEntity().getCustomName());
+		}
 	}
 
 	public static void playHordeSound(Vec3 vec3, ResourceLocation sound) {
