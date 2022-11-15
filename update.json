@@ -3,7 +3,7 @@
   "1.18.2": {
 	"1.1.5": "First version for 1.18.2",
 	"1.1.5a": "Fix crash on servers when a player is offline",
-	"1.1.5b": "Add support for slim player models on zombie players, fix elytra rendering and nametag bugs"
+	"1.1.5b": "Add support for slim player models, fix elytra rendering and nametag bugs for zombie players"
   },
   "promos": {
     "1.18.2-latest": "1.1.5b",
