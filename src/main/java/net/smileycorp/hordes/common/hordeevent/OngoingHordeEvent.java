@@ -1,10 +1,11 @@
 package net.smileycorp.hordes.common.hordeevent;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
@@ -35,11 +36,9 @@ import net.smileycorp.hordes.common.event.HordeStartEvent;
 import net.smileycorp.hordes.common.event.HordeStartWaveEvent;
 import net.smileycorp.hordes.integration.mobspropertiesrandomness.MPRIntegration;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 public class OngoingHordeEvent implements IOngoingHordeEvent {
 
-	private Set<WeakReference<EntityLiving>> entitiesSpawned = new HashSet<WeakReference<EntityLiving>>();
+	private Set<EntityLiving> entitiesSpawned = new HashSet<>();
 	private int timer = 0;
 	private int day = 0;
 	private int nextDay;
@@ -79,7 +78,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 			if (world!=null) {
 				for (int id : nbt.getIntArray("entities")) {
 					Entity entity = world.getEntityByID(id);
-					if (entity instanceof EntityLiving) entitiesSpawned.add(new WeakReference<EntityLiving>((EntityLiving) entity));
+					if (entity instanceof EntityLiving) entitiesSpawned.add((EntityLiving) entity);
 				}
 			}
 		}
@@ -91,11 +90,8 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 		nbt.setInteger("nextDay", nextDay);
 		nbt.setInteger("day", day);
 		int[] entities = new int[]{};
-		for (WeakReference<EntityLiving> ref : entitiesSpawned) {
-			if (ref != null) {
-				EntityLiving entity = ref.get();
-				if (entity!=null) if (entity.isAddedToWorld() &! entity.isDead) ArrayUtils.add(entities, entity.getEntityId());
-			}
+		for (EntityLiving entity : entitiesSpawned) {
+			if (entity!=null) if (entity.isAddedToWorld() &! entity.isDead) ArrayUtils.add(entities, entity.getEntityId());
 		}
 		nbt.setIntArray("entities", entities);
 		hasChanged = false;
@@ -108,7 +104,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 			if (player.world.provider.getDimension()==0) {
 				if ((timer % ConfigHandler.hordeSpawnInterval) == 0) {
 					int amount = (int)(ConfigHandler.hordeSpawnAmount * (1+(day/ConfigHandler.hordeSpawnDays) * (ConfigHandler.hordeSpawnMultiplier-1)));
-					List<EntityPlayer>players = world.getEntities(EntityPlayer.class, (p) -> p != player);
+					List<EntityPlayer>players = world.getEntities(EntityPlayer.class, p -> p != player);
 					for (EntityPlayer entity : players) {
 						if (player.getDistance(entity)<=25) {
 							amount = (int) Math.floor(amount * ConfigHandler.hordeMultiplayerScaling);
@@ -179,20 +175,22 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 					entity.onInitialSpawn(world.getDifficultyForLocation(pos), null);
 					entity.setPosition(pos.getX(), pos.getY(), pos.getZ());
 					if (!world.spawnEntity(entity)) Hordes.logError("Unable to spawn entity from " + clazz, new Exception());
-					entity.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(100.0D);
-					if (Loader.isModLoaded("mpr")) MPRIntegration.addFollowAttribute(entity);
-					entity.getCapability(Hordes.HORDESPAWN, null).setPlayerUUID(player.getUniqueID().toString());
-					entity.enablePersistence();
-					registerEntity(entity);
-					hasChanged = true;
-					entity.targetTasks.taskEntries.clear();
-					if (entity instanceof EntityCreature) {
-						entity.targetTasks.addTask(1, new EntityAIHurtByTarget((EntityCreature) entity, true));
-						entity.targetTasks.addTask(2, new EntityAINearestAttackableTarget<EntityPlayer>((EntityCreature) entity, EntityPlayer.class, false));
-					} else {
-						entity.targetTasks.addTask(1, new EntityAIFindNearestTargetPredicate(entity, (e) -> e instanceof EntityPlayer));
+					else {
+						entity.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(100.0D);
+						if (Loader.isModLoaded("mpr")) MPRIntegration.addFollowAttribute(entity);
+						entity.getCapability(Hordes.HORDESPAWN, null).setPlayerUUID(player.getUniqueID().toString());
+						entity.enablePersistence();
+						registerEntity(entity);
+						hasChanged = true;
+						entity.targetTasks.taskEntries.clear();
+						if (entity instanceof EntityCreature) {
+							entity.targetTasks.addTask(1, new EntityAIHurtByTarget((EntityCreature) entity, true));
+							entity.targetTasks.addTask(2, new EntityAINearestAttackableTarget<>((EntityCreature) entity, EntityPlayer.class, false));
+						} else {
+							entity.targetTasks.addTask(1, new EntityAIFindNearestTargetPredicate(entity, (e) -> e instanceof EntityPlayer));
+						}
+						entity.tasks.addTask(6, new EntityAIGoToEntityPos(entity, player));
 					}
-					entity.tasks.addTask(6, new EntityAIGoToEntityPos(entity, player));
 				} else {
 					logInfo("Entity spawn event has been cancelled, not spawning entity  of class " + clazz);
 				}
@@ -204,19 +202,18 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 	}
 
 	private void cleanSpawns() {
-		List<WeakReference<EntityLiving>> toRemove = new ArrayList<>();
-		for (WeakReference<EntityLiving> ref : entitiesSpawned) {
-			if (ref != null && ref.get() != null) {
-				EntityLiving entity = ref.get();
+		List<EntityLiving> toRemove = new ArrayList<>();
+		for (EntityLiving entity : entitiesSpawned) {
+			if (entity != null) {
 				if (entity.isDead) {
 					if (entity.hasCapability(Hordes.HORDESPAWN, null)) {
 						IHordeSpawn cap = entity.getCapability(Hordes.HORDESPAWN, null);
 						cap.setPlayerUUID("");
-						toRemove.add(ref);
+						toRemove.add(entity);
 					}
 				}
 			} else {
-				toRemove.add(ref);
+				toRemove.add(entity);
 			}
 		}
 		entitiesSpawned.removeAll(toRemove);
@@ -247,9 +244,8 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 	@Override
 	public void setPlayer(EntityPlayer player) {
 		this.player=player;
-		Set<WeakReference<EntityLiving>> toRemove = new HashSet<WeakReference<EntityLiving>>();
-		for (WeakReference<EntityLiving> ref : entitiesSpawned) {
-			EntityLiving entity = ref.get();
+		Set<EntityLiving> toRemove = new HashSet<>();
+		for (EntityLiving entity : entitiesSpawned) {
 			if (entity!=null) {
 				EntityAIGoToEntityPos task = null;
 				for (EntityAITaskEntry entry : entity.tasks.taskEntries) {
@@ -262,7 +258,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 					entity.tasks.removeTask(task);
 					entity.tasks.addTask(6, new EntityAIGoToEntityPos(entity, player));
 				}
-			} else toRemove.add(ref);
+			} else toRemove.add(entity);
 		}
 		entitiesSpawned.removeAll(toRemove);
 		hasChanged = true;
@@ -313,13 +309,12 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 		timer = 0;
 		cleanSpawns();
 		sendMessage(endEvent.getMessage());
-		List<WeakReference<EntityLiving>> toRemove = new ArrayList<>();
-		for (WeakReference<EntityLiving> ref : entitiesSpawned) {
-			EntityLiving entity = ref.get();
+		List<EntityLiving> toRemove = new ArrayList<>();
+		for (EntityLiving entity : entitiesSpawned) {
 			if (entity.hasCapability(Hordes.HORDESPAWN, null)) {
 				IHordeSpawn cap = entity.getCapability(Hordes.HORDESPAWN, null);
 				cap.setPlayerUUID("");
-				toRemove.add(ref);
+				toRemove.add(entity);
 			}
 		}
 		entitiesSpawned.removeAll(toRemove);
@@ -333,9 +328,8 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 
 	@Override
 	public void registerEntity(EntityLiving entity) {
-		WeakReference<EntityLiving> ref = new WeakReference<EntityLiving>(entity);
-		if (!entitiesSpawned.contains(ref)) {
-			entitiesSpawned.add(ref);
+		if (!entitiesSpawned.contains(entity) && entity != null) {
+			if (entity.isAddedToWorld() &! entity.isDead) entitiesSpawned.add(entity);
 		}
 	}
 
@@ -350,18 +344,17 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 	}
 
 	public List<String> getEntityStrings() {
-		List<String> result = new ArrayList<String>();
+		List<String> result = new ArrayList<>();
 		result.add("	entities: {");
-		List<WeakReference<EntityLiving>> entitylist = new ArrayList<WeakReference<EntityLiving>>(entitiesSpawned);
+		List<EntityLiving> entitylist = new ArrayList<>(entitiesSpawned);
 		for (int i = 0; i < entitylist.size(); i += 10) {
-			List<WeakReference<EntityLiving>> sublist = entitylist.subList(i, Math.min(i+9, entitylist.size()-1));
+			List<EntityLiving> sublist = entitylist.subList(i, Math.min(i+9, entitylist.size()-1));
 			StringBuilder builder = new StringBuilder();
 			builder.append("		");
-			for (WeakReference<EntityLiving> ref : sublist) {
-				EntityLiving entity = ref.get();
+			for (EntityLiving entity : sublist) {
 				builder.append(entity.getClass().getSimpleName() + "@");
 				builder.append(Integer.toHexString(entity.hashCode()));
-				if (entitylist.indexOf(ref) < entitylist.size()-1) builder.append(", ");
+				if (entitylist.indexOf(entity) < entitylist.size()-1) builder.append(", ");
 			}
 			builder.append("}");
 			result.add(builder.toString());

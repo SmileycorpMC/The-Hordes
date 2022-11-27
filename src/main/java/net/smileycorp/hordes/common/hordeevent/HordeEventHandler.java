@@ -116,7 +116,7 @@ public class HordeEventHandler {
 					entity.targetTasks.taskEntries.clear();
 					if (entity instanceof EntityCreature) {
 						entity.targetTasks.addTask(1, new EntityAIHurtByTarget((EntityCreature) entity, true));
-						entity.targetTasks.addTask(2, new EntityAINearestAttackableTarget<EntityPlayer>((EntityCreature) entity, EntityPlayer.class, false));
+						entity.targetTasks.addTask(2, new EntityAINearestAttackableTarget<>((EntityCreature) entity, EntityPlayer.class, false));
 					} else {
 						entity.targetTasks.addTask(1, new EntityAIFindNearestTargetPredicate(entity, (e)-> e instanceof EntityPlayer));
 					}
