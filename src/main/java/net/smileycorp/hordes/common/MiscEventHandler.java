@@ -70,6 +70,7 @@ public class MiscEventHandler {
 							drops.clear();
 							cap.clearZombie();
 							event.setCanceled(true);
+							player.removeEffect(HordesInfection.INFECTED.get());
 						}
 					}
 				}

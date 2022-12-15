@@ -40,7 +40,6 @@ public class JEIPluginInfection implements IModPlugin {
 		}
 	}
 
-	@SuppressWarnings("removal")
 	public static void setRecipes(List<ItemStack> cures) {
 		if (recipeManager != null) {
 			RecipeManagerInternal manager = ObfuscationReflectionHelper.getPrivateValue(RecipeManager.class, recipeManager , "internal");
