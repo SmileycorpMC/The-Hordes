@@ -1,10 +1,11 @@
 {
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/the-hordes",
   "1.19.2": {
-	"1.1.5": "first version for 1.19.2"
+	"1.1.5": "first version for 1.19.2",
+	"1.1.5a": "fix incompatibility with some mods that change respawning"
   },
   "promos": {
-    "1.19.2-latest": "1.1.5",
-    "1.19.2-recommended": "1.1.5"
+    "1.19.2-latest": "1.1.5a",
+    "1.19.2-recommended": "1.1.5a"
   }
 }
