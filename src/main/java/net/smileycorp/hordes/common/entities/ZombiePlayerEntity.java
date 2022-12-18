@@ -69,6 +69,7 @@ public class ZombiePlayerEntity extends ZombieEntity implements IZombiePlayer {
 
 	@Override
 	public void setPlayer(PlayerEntity player) {
+		if (player == null) return;
 		for (EquipmentSlotType slot : EquipmentSlotType.values()) {
 			ItemStack stack = slot.getType() == EquipmentSlotType.Group.ARMOR ? player.inventory.armor.get(slot.getIndex()) :
 				slot == EquipmentSlotType.MAINHAND ? player.getMainHandItem() : player.getOffhandItem();
@@ -89,6 +90,7 @@ public class ZombiePlayerEntity extends ZombieEntity implements IZombiePlayer {
 
 	@Override
 	public void setPlayer(GameProfile profile) {
+		if (profile == null) return;
 		this.uuid=profile.getId();
 		this.setCustomName(new StringTextComponent(profile.getName()));
 		entityData.set(PLAYER_UUID, Optional.of(uuid));

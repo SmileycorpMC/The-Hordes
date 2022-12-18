@@ -118,7 +118,7 @@ public abstract class MixinMobEntity extends LivingEntity {
 				String uuid = optional.resolve().get().getPlayerUUID();
 				if (DataUtils.isValidUUID(uuid)) {
 					PlayerEntity player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(UUID.fromString(uuid));
-					converted.goalSelector.addGoal(6, new GoToEntityPositionGoal(converted, player));
+					if (player != null) converted.goalSelector.addGoal(6, new GoToEntityPositionGoal(converted, player));
 				}
 			}
 		}
