@@ -6,10 +6,11 @@
 	"1.1.4b": "fix crash when spawning player zombies and drowned players on servers",
 	"1.1.5": "general fixes and more configurable tweaks",
 	"1.1.5a": "fix crash on servers when a player is offline",
-	"1.1.5b": "fix incompatibility with some mods that change respawning"
+	"1.1.5b": "fix incompatibility with some mods that change respawning",
+	"1.1.5c": "fix crashes caused by a null pointer exception with zombie players and conversions"
   },
   "promos": {
-    "1.16.5-latest": "1.1.5b",
-    "1.16.5-recommended": "1.1.5b"
+    "1.16.5-latest": "1.1.5c",
+    "1.16.5-recommended": "1.1.5c"
   }
 }
