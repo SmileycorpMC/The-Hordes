@@ -67,6 +67,7 @@ public class DrownedPlayer extends Drowned implements IZombiePlayer {
 
 	@Override
 	public void setPlayer(Player player) {
+		if (player == null) return;
 		for (EquipmentSlot slot : EquipmentSlot.values()) {
 			ItemStack stack = slot.getType() == EquipmentSlot.Type.ARMOR ? player.getInventory().armor.get(slot.getIndex()) :
 				slot == EquipmentSlot.MAINHAND ? player.getMainHandItem() : player.getOffhandItem();
@@ -89,6 +90,7 @@ public class DrownedPlayer extends Drowned implements IZombiePlayer {
 
 	@Override
 	public void setPlayer(GameProfile profile) {
+		if (profile == null) return;
 		if (profile.getName() == null) setCustomName(MutableComponent.create(new LiteralContents(profile.getName())));
 		entityData.set(PLAYER, Optional.of(profile.getId()));
 	}
