@@ -2,10 +2,11 @@
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/the-hordes",
   "1.19.2": {
 	"1.1.5": "first version for 1.19.2",
-	"1.1.5a": "fix incompatibility with some mods that change respawning"
+	"1.1.5a": "fix incompatibility with some mods that change respawning",
+	"1.1.5b": "fix crashes caused by a null pointer exception with zombie players and conversions"
   },
   "promos": {
-    "1.19.2-latest": "1.1.5a",
-    "1.19.2-recommended": "1.1.5a"
+    "1.19.2-latest": "1.1.5b",
+    "1.19.2-recommended": "1.1.5b"
   }
 }
