@@ -92,7 +92,7 @@ public class DrownedPlayer extends Drowned implements IZombiePlayer {
 	@Override
 	public void setPlayer(GameProfile profile) {
 		if (profile == null) return;
-		if (profile.getName() == null) setCustomName(new TextComponent(profile.getName()));
+		if (profile.getName() != null) setCustomName(new TextComponent(profile.getName()));
 		entityData.set(PLAYER, Optional.of(profile.getId()));
 	}
 
@@ -164,7 +164,7 @@ public class DrownedPlayer extends Drowned implements IZombiePlayer {
 
 	@Override
 	public BaseComponent getDisplayName() {
-		MutableComponent textcomponentstring = PlayerTeam.formatNameForTeam(getTeam(), new TranslatableComponent("entity.hordes.ZombiePlayer.chat", getCustomName()));
+		MutableComponent textcomponentstring = PlayerTeam.formatNameForTeam(getTeam(), new TranslatableComponent("entity.hordes.DrownedPlayer.chat", getCustomName()));
 		textcomponentstring.getStyle().withHoverEvent(this.createHoverEvent());
 		textcomponentstring.getStyle().withInsertion(this.getEncodeId());
 		return (BaseComponent) textcomponentstring;
@@ -189,13 +189,13 @@ public class DrownedPlayer extends Drowned implements IZombiePlayer {
 	}
 
 	@Override
-	public boolean displayCape() {
-		return entityData.get(SHOW_CAPE);
+	public void setDisplayCape(boolean display) {
+		entityData.set(SHOW_CAPE, display);
 	}
 
 	@Override
-	public void setDisplayCape(boolean display) {
-		entityData.set(SHOW_CAPE, display);
+	public boolean displayCape() {
+		return entityData.get(SHOW_CAPE);
 	}
 
 	@Override
