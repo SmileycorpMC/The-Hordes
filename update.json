@@ -5,10 +5,11 @@
 	"1.1.5a": "Fix crash on servers when a player is offline",
 	"1.1.5b": "Add support for slim player models, fix elytra rendering and nametag bugs for zombie players",
 	"1.1.5c": "fix incompatibility with some mods that change respawning",
-	"1.1.5d": "fix crashes caused by a null pointer exception with zombie players and conversions"
+	"1.1.5d": "fix crashes caused by a null pointer exception with zombie players and conversions",
+	"1.1.5e": "fix crash when zombie players can't properly select which player model to use, fix issues with drowned player names"
   },
   "promos": {
-    "1.18.2-latest": "1.1.5d",
-    "1.18.2-recommended": "1.1.5d"
+    "1.18.2-latest": "1.1.5e",
+    "1.18.2-recommended": "1.1.5e"
   }
 }
