@@ -29,7 +29,7 @@ public class ClientConfigHandler {
 	private static ConfigValue<List<? extends Integer>> configDrownedPlayerColour;
 
 	//infection
-	//public static ConfigValue<Boolean> playerInfectionVisuals;
+	public static ConfigValue<Boolean> playerInfectionVisuals;
 	public static ConfigValue<Boolean> playerInfectSound;
 
 	//load config properties
@@ -49,7 +49,7 @@ public class ClientConfigHandler {
 		//infection
 		builder.pop();
 		builder.push("Infection");
-		//playerInfectionVisuals = builder.comment("Tint the player's screen and display other visual effects if they are infected.").define("playerInfectionVisuals", true);
+		playerInfectionVisuals = builder.comment("Tint the player's screen and display other visual effects if they are infected.").define("playerInfectionVisuals", true);
 		playerInfectSound = builder.comment("Play a sound when the player beomes infected.").define("playerInfectSound", true);
 		builder.pop();
 		config = builder.build();

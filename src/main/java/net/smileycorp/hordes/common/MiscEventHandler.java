@@ -38,8 +38,8 @@ public class MiscEventHandler {
 			Level level = entity.level;
 			if (!level.isClientSide) {
 				if (entity instanceof Player &!(entity instanceof FakePlayer)) {
-					if ((entity.hasEffect(HordesInfection.INFECTED.get()) && CommonConfigHandler.enableMobInfection.get()) || CommonConfigHandler.zombieGraves.get() ||
-							(entity.isUnderWater() && CommonConfigHandler.drownedGraves.get())) {
+					if ((entity.hasEffect(HordesInfection.INFECTED.get()) && CommonConfigHandler.enableMobInfection.get() && CommonConfigHandler.infectionSpawnsZombiePlayers.get())
+							|| CommonConfigHandler.zombieGraves.get() || (entity.isUnderWater() && CommonConfigHandler.drownedGraves.get())) {
 						LazyOptional<IZombifyPlayer> optional = entity.getCapability(Hordes.ZOMBIFY_PLAYER, null);
 						if (optional.isPresent()) {
 							optional.resolve().get().createZombie((Player) entity);
@@ -57,7 +57,8 @@ public class MiscEventHandler {
 			Player player = (Player) event.getEntity();
 			Level level = player.level;
 			if (!level.isClientSide &!(player instanceof FakePlayer)) {
-				if ((player.hasEffect(HordesInfection.INFECTED.get()) && CommonConfigHandler.enableMobInfection.get()) || CommonConfigHandler.zombieGraves.get()) {
+				if ((player.hasEffect(HordesInfection.INFECTED.get()) && CommonConfigHandler.enableMobInfection.get() && CommonConfigHandler.infectionSpawnsZombiePlayers.get())
+						|| CommonConfigHandler.zombieGraves.get() || (player.isUnderWater() && CommonConfigHandler.drownedGraves.get())) {
 					LazyOptional<IZombifyPlayer> optional = player.getCapability(Hordes.ZOMBIFY_PLAYER, null);
 					if (optional.isPresent()) {
 						IZombifyPlayer cap = optional.resolve().get();

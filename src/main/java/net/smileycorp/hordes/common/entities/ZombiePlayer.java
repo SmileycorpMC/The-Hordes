@@ -159,6 +159,12 @@ public class ZombiePlayer extends Zombie implements IZombiePlayer {
 	}
 
 	@Override
+	public boolean hurt(DamageSource source, float amount) {
+		if (CommonConfigHandler.zombiePlayersOnlyHurtByPlayers.get() &! (source.getEntity() instanceof Player)) return false;
+		return super.hurt(source, amount);
+	}
+
+	@Override
 	public void addAdditionalSaveData(CompoundTag compound) {
 		super.addAdditionalSaveData(compound);
 		Optional<UUID> optional = entityData.get(PLAYER);

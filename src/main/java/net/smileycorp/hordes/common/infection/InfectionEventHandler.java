@@ -24,7 +24,6 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
-import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
@@ -107,13 +106,13 @@ public class InfectionEventHandler {
 				if ((entity instanceof Player && CommonConfigHandler.infectPlayers.get())) {
 					int c = rand.nextInt(100);
 					if (c <= CommonConfigHandler.playerInfectChance.get()) {
-						entity.addEffect(new MobEffectInstance(HordesInfection.INFECTED.get(), 10000, 0));
+						entity.addEffect(new MobEffectInstance(HordesInfection.INFECTED.get(), CommonConfigHandler.ticksForEffectStage.get(), 0));
 						InfectionPacketHandler.NETWORK_INSTANCE.sendTo(new InfectMessage(), ((ServerPlayer) entity).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 					}
 				} else if ((entity instanceof Villager && CommonConfigHandler.infectVillagers.get())) {
 					int c = rand.nextInt(100);
 					if (c <= CommonConfigHandler.villagerInfectChance.get()) {
-						entity.addEffect(new MobEffectInstance(HordesInfection.INFECTED.get(), 10000, 0));
+						entity.addEffect(new MobEffectInstance(HordesInfection.INFECTED.get(), CommonConfigHandler.ticksForEffectStage.get(), 0));
 					}
 				} else if (InfectionRegister.canBeInfected(entity)) {
 					InfectionRegister.tryToInfect(entity);
@@ -156,23 +155,6 @@ public class InfectionEventHandler {
 		} else if (InfectionRegister.canBeInfected(entity))  {
 			InfectionRegister.convertEntity(entity);
 			event.setResult(Result.DENY);
-		}
-	}
-
-	@SubscribeEvent
-	public static void onTick(LivingUpdateEvent event) {
-		LivingEntity entity = event.getEntityLiving();
-		Level level = entity.level;
-		if (!level.isClientSide && entity.hasEffect(HordesInfection.INFECTED.get())) {
-			MobEffectInstance effect = entity.getEffect(HordesInfection.INFECTED.get());
-			if (effect.getDuration() < 10000 - CommonConfigHandler.ticksForEffectStage.get()) {
-				int a = effect.getAmplifier();
-				if (a < 3) {
-					entity.addEffect(new MobEffectInstance(HordesInfection.INFECTED.get(), 10000, a+1));
-				} else {
-					entity.hurt(HordesInfection.INFECTION_DAMAGE, Float.MAX_VALUE);
-				}
-			}
 		}
 	}
 

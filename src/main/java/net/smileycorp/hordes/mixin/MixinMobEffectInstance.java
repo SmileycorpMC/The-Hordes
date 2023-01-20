@@ -1,0 +1,51 @@
+package net.smileycorp.hordes.mixin;
+
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraftforge.network.NetworkDirection;
+import net.smileycorp.hordes.common.CommonConfigHandler;
+import net.smileycorp.hordes.common.infection.HordesInfection;
+import net.smileycorp.hordes.common.infection.network.InfectMessage;
+import net.smileycorp.hordes.common.infection.network.InfectionPacketHandler;
+
+@Mixin(MobEffectInstance.class)
+public class MixinMobEffectInstance {
+
+	@Shadow
+	private MobEffect effect;
+
+	@Shadow
+	private int duration;
+
+	@Shadow
+	private int amplifier;
+
+	@Inject(at=@At("HEAD"), method = "tick(Lnet/minecraft/world/entity/LivingEntity;Ljava/lang/Runnable;)Z", cancellable = true)
+	public void tick(LivingEntity entity, Runnable onUpdate, CallbackInfoReturnable<Boolean> callback) {
+		if (duration <= 1 && effect == HordesInfection.INFECTED.get()) {
+			if (amplifier < 3) {
+				amplifier = amplifier + 1;
+				duration = CommonConfigHandler.ticksForEffectStage.get();
+				if (entity instanceof ServerPlayer) InfectionPacketHandler.NETWORK_INSTANCE.sendTo(new InfectMessage(), ((ServerPlayer) entity).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+				callback.setReturnValue(true);
+				callback.cancel();
+				return;
+			}
+			else {
+				entity.hurt(HordesInfection.INFECTION_DAMAGE, Float.MAX_VALUE);
+				callback.setReturnValue(false);
+				callback.cancel();
+				return;
+			}
+		}
+	}
+
+}

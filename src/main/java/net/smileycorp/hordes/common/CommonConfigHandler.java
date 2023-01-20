@@ -39,6 +39,7 @@ public class CommonConfigHandler {
 	public static ConfigValue<Boolean> infectHunger;
 	public static ConfigValue<Integer> playerInfectChance;
 	public static ConfigValue<Integer> ticksForEffectStage;
+	public static ConfigValue<Boolean> infectionSpawnsZombiePlayers;
 	public static ConfigValue<List<String>> infectionEntities;
 	public static ConfigValue<List<String>> cureItemList;
 	public static ConfigValue<List<String>> infectionConversionList;
@@ -50,6 +51,7 @@ public class CommonConfigHandler {
 	public static ConfigValue<Boolean> drownedPlayers;
 	public static ConfigValue<Boolean> zombiePlayersFireImmune;
 	public static ConfigValue<Boolean> zombiePlayersBurn;
+	public static ConfigValue<Boolean> zombiePlayersOnlyHurtByPlayers;
 	public static ConfigValue<Boolean> zombiesBurn;
 	public static ConfigValue<Boolean> skeletonsBurn;
 	public static ConfigValue<Boolean> zombieVillagersCanBeCured;
@@ -79,7 +81,7 @@ public class CommonConfigHandler {
 		pauseEventServer = builder.comment("Do the daylight cycle (and active horde events get paused while there are no players online.).").define("pauseEventServer", true);
 		hordeSpawnList = builder.comment("A list of entities to spawn followed by the spawn weight then the day they first appear on then the last day. Higher weight is more common. "
 				+ "Leave the last value to 0 to set no max day, entities can have nbt attached to them.(e.g. minecraft:zombie{ActiveEffects:[{Id:12,Amplifier:0,Duration:10000}]}-20-0-0)")
-				.define("spawnList", Lists.newArrayList("minecraft:zombie-30-0-20", "minecraft:zombie_villager-3-0-20", "minecraft:husk-30-30-0", "minecraft:drowned{HandItems:[{id:trident,Count:1}]}-1-30-0"));
+				.define("spawnList", Lists.newArrayList("minecraft:zombie-35-0-20", "minecraft:zombie_villager-1-0-20", "minecraft:husk-40-30-0", "minecraft:drowned{HandItems:[{id:trident,Count:1}]}-1-40-0", "minecraft:zombie_horse-3-30-0"));
 		//infection
 		builder.pop();
 		builder.push("Infection");
@@ -91,6 +93,7 @@ public class CommonConfigHandler {
 		infectHunger = builder.comment("Whether later levels of infected should depleet hunger quicker? ").define("infectHunger", true);
 		playerInfectChance = builder.comment("Chance out of 100 for a player to get infected").define("playerInfectChance", 75);
 		ticksForEffectStage = builder.comment("How long do each of the 4 effect phases last for before the next phase is activated?").define("ticksForEffectStage", 6000);
+		infectionSpawnsZombiePlayers = builder.comment("Do players who die to infection spawn a zombie?").define("infectionSpawnsZombiePlayers", true);
 		infectionEntities = builder.comment("Mobs in this list can cause the infection effect.)")
 				.define("infectionEntities", Lists.newArrayList("minecraft:zombie", "minecraft:zombie_villager", "minecraft:husk", "minecraft:drowned", "minecraft:zombie_horse", "hordes:zombie_player", "hordes:drowned_player"));
 		cureItemList = builder.comment("A list of items which can cure infection when 'consumed' or used on an entity can accept nbt tags. eg.minecraft:golden_apple, minecraft:potion{Potion: \"minecraft:strong_regeneration\"}")
@@ -109,6 +112,7 @@ public class CommonConfigHandler {
 		drownedPlayers = builder.comment("Whether to spawn drowned players when a player dies underwater instead of a zombie player. (Whether the zombie is spawned from infection or zombieGraves being true)").define("drownedPlayers", true);
 		zombiePlayersFireImmune = builder.comment("Whether zombie players and drowned players should be immune to fire damage").define("zombiePlayersFireImmune", false);
 		zombiePlayersBurn = builder.comment("Whether zombie players and drowned players burn in sunlight.").define("zombiePlayersBurn", false);
+		zombiePlayersOnlyHurtByPlayers = builder.comment("Whether zombie players and drowned players are immune to all damage from non player sources.").define("zombiePlayersOnlyHurtByPlayers", false);
 		zombiesBurn = builder.comment("Whether zombies and drowneds burn in sunlight.").define("zombiesBurn", true);
 		skeletonsBurn = builder.comment("Whether skeletons and strays burn in sunlight.").define("skeletonsBurn", true);
 		zombieVillagersCanBeCured = builder.comment("Whether zombie villagers have vanilla curing mechanics or not").define("zombieVillagersCanBeCured", false);
