@@ -15,7 +15,7 @@ apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.19.2-1.1.5c'
+version = '1.19.2-1.1.5d'
 group = 'net.smileycorp.hordes' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'The-Hordes'
 
@@ -85,7 +85,7 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.19.2-43.1.2'
+    minecraft 'net.minecraftforge:forge:1.19.2-43.2.4'
 	compileOnly fileTree(dir: 'libs', include: ['*.jar'])
 	annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
