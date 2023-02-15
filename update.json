@@ -8,12 +8,12 @@
 	"1.1.5d": "fix null pointer crash during horde events"
   },
   "1.19.3": {
-	"1.1.5d": "fix null pointer crash during horde events"
+	"1.1.5e": "update to 1.19.3"
   }
   "promos": {
     "1.19.2-latest": "1.1.5d",
     "1.19.2-recommended": "1.1.5d",
-	"1.19.3-latest": "1.1.5d",
-    "1.19.3-recommended": "1.1.5d"
+	"1.19.3-latest": "1.1.5e",
+    "1.19.3-recommended": "1.1.5e"
   }
 }
