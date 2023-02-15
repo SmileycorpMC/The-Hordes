@@ -3,7 +3,7 @@ package net.smileycorp.hordes.client.render;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture.Type;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -53,10 +53,9 @@ public class ZombiePlayerCapeLayer<T extends Zombie & IZombiePlayer> extends Ren
 					if (entity.isCrouching()) {
 						f1 += 25.0F;
 					}
-
-					poseStack.mulPose(Vector3f.XP.rotationDegrees(6.0F + f2 / 2.0F + f1));
-					poseStack.mulPose(Vector3f.ZP.rotationDegrees(f3 / 2.0F));
-					poseStack.mulPose(Vector3f.YP.rotationDegrees(180.0F - f3 / 2.0F));
+					poseStack.m_252781_(Axis.f_252529_.m_252977_(6.0F + f2 / 2.0F + f1));
+					poseStack.m_252781_(Axis.f_252403_.m_252977_(f3 / 2.0F));
+					poseStack.m_252781_(Axis.f_252436_.m_252977_(180.0F - f3 / 2.0F));
 					VertexConsumer ivertexbuilder = buffer.getBuffer(RenderType.entitySolid(loc));
 					this.getParentModel().renderCloak(poseStack, ivertexbuilder, size, OverlayTexture.NO_OVERLAY);
 					poseStack.popPose();
