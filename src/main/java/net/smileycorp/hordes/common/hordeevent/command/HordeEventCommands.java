@@ -7,9 +7,9 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.smileycorp.hordes.common.CommonConfigHandler;
-import net.smileycorp.hordes.common.ModDefinitions;
+import net.smileycorp.hordes.common.Constants;
 
-@EventBusSubscriber(modid=ModDefinitions.MODID)
+@EventBusSubscriber(modid=Constants.MODID)
 public class HordeEventCommands {
 
 	@SubscribeEvent

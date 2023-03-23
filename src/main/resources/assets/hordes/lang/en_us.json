@@ -28,6 +28,7 @@
 
 	"effect.hordes.infected":"Infected",
 	"death.attack.infection":"%1$s succumbed to their infection.",
+	"death.attack.infection.player":"%1$s succumbed to their infection.",
 
 	"jei.category.hordes.InfectionCures":"Infection Cures"
 }

@@ -2,13 +2,13 @@ package net.smileycorp.hordes.common.event;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
-import net.smileycorp.hordes.common.ModDefinitions;
+import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 
 public class HordeEndEvent extends HordeEvent {
 
 	protected final BlockPos pos;
-	protected String message = ModDefinitions.hordeEventEnd;
+	protected String message = Constants.hordeEventEnd;
 	protected final boolean wasCommand;
 
 	public HordeEndEvent(Player player, IHordeEvent horde, boolean wasCommand) {

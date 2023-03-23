@@ -164,7 +164,7 @@ public class DrownedPlayer extends Drowned implements IZombiePlayer {
 	@Override
 	public MutableComponent getDisplayName() {
 		MutableComponent textcomponentstring = PlayerTeam.formatNameForTeam(getTeam(),
-				MutableComponent.create(new TranslatableContents("entity.hordes.ZombiePlayer.chat", getCustomName())));
+				MutableComponent.create(new TranslatableContents("entity.hordes.ZombiePlayer.chat", null, new Object[]{getCustomName()})));
 		textcomponentstring.getStyle().withHoverEvent(this.createHoverEvent());
 		textcomponentstring.getStyle().withInsertion(this.getEncodeId());
 		return textcomponentstring;

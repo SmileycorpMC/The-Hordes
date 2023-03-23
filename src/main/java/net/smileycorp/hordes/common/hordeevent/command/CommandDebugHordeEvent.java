@@ -44,7 +44,7 @@ public class CommandDebugHordeEvent {
 		MutableComponent text = MutableComponent.create(new LiteralContents(file));
 		text.setStyle(Style.EMPTY.withUnderlined(true).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file))
 				.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, MutableComponent.create(new LiteralContents(file)))));
-		source.getEntity().sendSystemMessage(MutableComponent.create(new TranslatableContents("commands.hordes.HordeDebug.success", text)));
+		source.getEntity().sendSystemMessage(MutableComponent.create(new TranslatableContents("commands.hordes.HordeDebug.success", null, new Object[]{text})));
 		return 1;
 	}
 

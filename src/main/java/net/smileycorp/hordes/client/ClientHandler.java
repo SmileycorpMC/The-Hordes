@@ -26,12 +26,12 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.smileycorp.hordes.client.render.ZombiePlayerRenderer;
-import net.smileycorp.hordes.common.ModDefinitions;
+import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.entities.IZombiePlayer;
 import net.smileycorp.hordes.common.infection.HordesInfection;
 import net.smileycorp.hordes.common.infection.network.CureEntityMessage;
 
-@EventBusSubscriber(modid = ModDefinitions.MODID, value = Dist.CLIENT, bus = Bus.MOD)
+@EventBusSubscriber(modid = Constants.MODID, value = Dist.CLIENT, bus = Bus.MOD)
 public class ClientHandler {
 
 	@SubscribeEvent
@@ -64,7 +64,7 @@ public class ClientHandler {
 			Minecraft mc = Minecraft.getInstance();
 			Level level = mc.level;
 			Player player = mc.player;
-			BlockPos pos = new BlockPos(player.getX() + (5*vec3.x), player.getY(), player.getZ() + (5*vec3.z));
+			BlockPos pos = BlockPos.m_274561_(player.getX() + (5*vec3.x), player.getY(), player.getZ() + (5*vec3.z));
 			float pitch = 1+((level.random.nextInt(6)-3)/10);
 			level.playSound(player, pos, SoundEvent.m_262824_(sound), SoundSource.HOSTILE, 0.6f, pitch);
 		}
@@ -73,7 +73,7 @@ public class ClientHandler {
 	public static void displayMessage(String text) {
 		Minecraft mc = Minecraft.getInstance();
 		Gui gui = mc.gui;
-		MutableComponent message = MutableComponent.create(new TranslatableContents(text));
+		MutableComponent message = MutableComponent.create(new TranslatableContents(text, null, new Object[]{}));
 		message.setStyle(Style.EMPTY.withColor(ClientConfigHandler.getHordeMessageColour()));
 		if (ClientConfigHandler.eventNotifyMode.get() == 1) {
 			gui.getChat().addMessage(message);

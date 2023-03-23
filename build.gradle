@@ -15,7 +15,16 @@ apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.19.3-1.1.5e'
+repositories {
+	maven {
+        url "https://www.cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
+}
+
+version = '1.19.4-1.1.5f'
 group = 'net.smileycorp.hordes' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'The-Hordes'
 
@@ -85,8 +94,9 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.19.3-44.1.16'
-	compileOnly fileTree(dir: 'libs', include: ['*.jar'])
+    minecraft 'net.minecraftforge:forge:1.19.4-45.0.9'
+	implementation fg.deobf('curse.maven:jei-238222:4434399')
+	implementation fg.deobf('curse.maven:atlaslib-463826:4396918')
 	annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 

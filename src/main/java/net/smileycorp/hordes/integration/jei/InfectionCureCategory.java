@@ -17,16 +17,16 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
-import net.smileycorp.hordes.common.ModDefinitions;
+import net.smileycorp.hordes.common.Constants;
 
 public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapper> {
 
-	public static final RecipeType<InfectionCureWrapper> TYPE = RecipeType.create(ModDefinitions.MODID, "infection_cures", InfectionCureWrapper.class);
+	public static final RecipeType<InfectionCureWrapper> TYPE = RecipeType.create(Constants.MODID, "infection_cures", InfectionCureWrapper.class);
 
 	private final IDrawable background;
 	private final IDrawable icon;
 
-	public static final ResourceLocation TEXTURE = ModDefinitions.getResource("textures/gui/jei/cure_list.png");
+	public static final ResourceLocation TEXTURE = Constants.loc("textures/gui/jei/cure_list.png");
 
 	public InfectionCureCategory(IGuiHelper guiHelper) {
 		background = guiHelper.createDrawable(TEXTURE, 0, 0, 167, 113);
@@ -40,7 +40,7 @@ public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapp
 
 	@Override
 	public MutableComponent getTitle() {
-		return MutableComponent.create(new TranslatableContents("jei.category.hordes.InfectionCures"));
+		return MutableComponent.create(new TranslatableContents("jei.category.hordes.InfectionCures", null, new Object[]{}));
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapp
 	public void draw(InfectionCureWrapper recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
 		Minecraft mc = Minecraft.getInstance();
 		Font font = mc.font;
-		MutableComponent text = MutableComponent.create(new TranslatableContents("jei.category.hordes.InfectionCures"))
+		MutableComponent text = MutableComponent.create(new TranslatableContents("jei.category.hordes.InfectionCures", null, new Object[]{}))
 				.setStyle(Style.EMPTY.withBold(true).withColor(TextColor.fromRgb(0x440002)));
 		font.draw(stack, text, 0, 0, 0);
 		font.drawShadow(stack, text, 0, 0, 0);
@@ -69,7 +69,6 @@ public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapp
 
 	@Override
 	public RecipeType<InfectionCureWrapper> getRecipeType() {
-
 		return null;
 	}
 

@@ -19,13 +19,13 @@ import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.monster.Zombie;
 import net.smileycorp.atlas.api.client.PlayerTextureRenderer;
-import net.smileycorp.hordes.common.ModDefinitions;
+import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.entities.IZombiePlayer;
 
 public class ZombiePlayerRenderer<T extends Zombie & IZombiePlayer> extends HumanoidMobRenderer<T, ZombiePlayerModel<T>> {
 
-	public static final ModelLayerLocation DEFAULT = new ModelLayerLocation(ModDefinitions.getResource("zombie_player"), "default");
-	public static final ModelLayerLocation SLIM = new ModelLayerLocation(ModDefinitions.getResource("zombie_player"), "slim");
+	public static final ModelLayerLocation DEFAULT = new ModelLayerLocation(Constants.loc("zombie_player"), "default");
+	public static final ModelLayerLocation SLIM = new ModelLayerLocation(Constants.loc("zombie_player"), "slim");
 
 	protected final ZombiePlayerModel<T> defaultModel;
 	protected final ZombiePlayerModel<T> slimModel;
@@ -33,7 +33,7 @@ public class ZombiePlayerRenderer<T extends Zombie & IZombiePlayer> extends Huma
 	public ZombiePlayerRenderer(EntityRendererProvider.Context ctx, Color colour) {
 		super(ctx, new ZombiePlayerModel<T>(ctx.bakeLayer(DEFAULT), colour), 0.5F);
 		addLayer(new HumanoidArmorLayer<>(this, new ZombieModel<T>(ctx.bakeLayer(ModelLayers.ZOMBIE_INNER_ARMOR)),
-				new ZombieModel<T>(ctx.bakeLayer(ModelLayers.ZOMBIE_OUTER_ARMOR))));
+				new ZombieModel<T>(ctx.bakeLayer(ModelLayers.ZOMBIE_OUTER_ARMOR)), ctx.m_266367_()));
 		addLayer(new ZombiePlayerCapeLayer<>(this));
 		addLayer(new ZombiePlayerElytraLayer<T>(this, ctx.getModelSet()));
 		defaultModel = model;

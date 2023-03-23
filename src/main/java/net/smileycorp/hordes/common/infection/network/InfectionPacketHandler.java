@@ -9,7 +9,7 @@ import net.smileycorp.atlas.api.network.SimpleMessageDecoder;
 import net.smileycorp.atlas.api.network.SimpleMessageEncoder;
 import net.smileycorp.atlas.api.network.SimpleStringMessage;
 import net.smileycorp.hordes.client.ClientHandler;
-import net.smileycorp.hordes.common.ModDefinitions;
+import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.infection.InfectionRegister;
 
 public class InfectionPacketHandler {
@@ -17,7 +17,7 @@ public class InfectionPacketHandler {
 	public static SimpleChannel NETWORK_INSTANCE;
 
 	public static void initPackets() {
-		NETWORK_INSTANCE = NetworkRegistry.newSimpleChannel(ModDefinitions.getResource("Infection"), ()-> "1", "1"::equals, "1"::equals);
+		NETWORK_INSTANCE = NetworkRegistry.newSimpleChannel(Constants.loc("Infection"), ()-> "1", "1"::equals, "1"::equals);
 		NETWORK_INSTANCE.registerMessage(0, SimpleStringMessage.class, new SimpleMessageEncoder<SimpleStringMessage>(),
 				new SimpleMessageDecoder<>(SimpleStringMessage.class), (T, K)-> processCureMessage(T, K.get()));
 		NETWORK_INSTANCE.registerMessage(1, InfectMessage.class, new SimpleMessageEncoder<InfectMessage>(),
