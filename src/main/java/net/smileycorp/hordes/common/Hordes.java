@@ -26,6 +26,7 @@ import net.smileycorp.hordes.common.hordeevent.network.HordeEventPacketHandler;
 import net.smileycorp.hordes.common.infection.HordesInfection;
 import net.smileycorp.hordes.common.infection.InfectionEventHandler;
 import net.smileycorp.hordes.common.infection.InfectionRegister;
+import net.smileycorp.hordes.common.infection.capability.IInfection;
 import net.smileycorp.hordes.common.infection.network.InfectionPacketHandler;
 
 @Mod(value = ModDefinitions.MODID)
@@ -37,6 +38,7 @@ public class Hordes {
 	public final static Capability<IHordeEvent> HORDE_EVENT = CapabilityManager.get(new CapabilityToken<IHordeEvent>(){});
 	public final static Capability<IHordeSpawn> HORDESPAWN = CapabilityManager.get(new CapabilityToken<IHordeSpawn>(){});
 	public final static Capability<IZombifyPlayer> ZOMBIFY_PLAYER = CapabilityManager.get(new CapabilityToken<IZombifyPlayer>(){});
+	public final static Capability<IInfection> INFECTION = CapabilityManager.get(new CapabilityToken<IInfection>(){});
 
 	public Hordes() {
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CommonConfigHandler.config);

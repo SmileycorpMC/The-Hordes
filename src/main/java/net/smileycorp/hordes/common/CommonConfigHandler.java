@@ -44,6 +44,7 @@ public class CommonConfigHandler {
 	public static ConfigValue<List<String>> cureItemList;
 	public static ConfigValue<List<String>> infectionConversionList;
 	public static ConfigValue<Boolean> infectionEntitiesAggroConversions;
+	public static ConfigValue<Double> effectStageTickReduction;
 
 	//misc
 	public static ConfigValue<Boolean> zombieGraves;
@@ -103,6 +104,7 @@ public class CommonConfigHandler {
 				+ "note: players and villagers have special code accociated with them, and should not be in this list")
 				.define("customConversionList", Lists.newArrayList("minecraft:horse-65-minecraft:zombie_horse"));
 		infectionEntitiesAggroConversions = builder.comment("Do entities on the infectionEntities list automatically target entities on the infectionConversionList").define("infectionEntitiesAggroConversions", true);
+		effectStageTickReduction = builder.comment("What factor should the infection potion effect timer be multiplied by for each cured infection? (Resets on death, set to 1 to disable scaling)").define("effectStageTickReduction", 0.95);
 
 		//misc
 		builder.pop();
