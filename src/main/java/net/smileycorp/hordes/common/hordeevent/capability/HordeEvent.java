@@ -10,6 +10,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
@@ -156,21 +157,12 @@ class HordeEvent implements IHordeEvent {
 				MinecraftForge.EVENT_BUS.post(spawnEntityEvent);
 				if (!spawnEntityEvent.isCanceled()) {
 					entity = spawnEntityEvent.entity;
-					entity.readAdditionalSaveData(entry.getNBT());
 					pos = spawnEntityEvent.pos;
 					entity.finalizeSpawn((ServerLevelAccessor) level, level.getCurrentDifficultyAt(pos), null, null, null);
+					entity.readAdditionalSaveData(entry.getNBT());
 					entity.setPos(pos.getX(), pos.getY(), pos.getZ());
-					entity.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(100.0D);
 					if (!level.addFreshEntity(entity)) Hordes.logError("Unable to spawn entity from " + type, new Exception());
-					entity.getCapability(Hordes.HORDESPAWN, null).resolve().get().setPlayerUUID(player.getUUID().toString());
-					registerEntity(entity);
-					hasChanged = true;
-					entity.targetSelector.getRunningGoals().forEach((goal) -> goal.stop());
-					if (entity instanceof PathfinderMob) {
-						entity.targetSelector.addGoal(1, new HurtByTargetGoal((PathfinderMob) entity));
-					}
-					entity.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(entity, Player.class, true));
-					entity.goalSelector.addGoal(6, new GoToEntityPositionGoal(entity, player)); //TODO: debug ai not working correctly on drowned mobs that aren't in water
+					finalizeEntity(entity, level, player);
 				} else {
 					logInfo("Entity spawn event has been cancelled, not spawning entity  of class " + type);
 				}
@@ -179,6 +171,22 @@ class HordeEvent implements IHordeEvent {
 				Hordes.logError("Unable to spawn entity from " + type, e);
 			}
 		}
+	}
+
+	private void finalizeEntity(Mob entity, Level level, Player player) {
+		entity.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(100.0D);
+		LazyOptional<IHordeSpawn> optional = entity.getCapability(Hordes.HORDESPAWN);
+		if (optional.isPresent()) { optional.resolve().get().setPlayerUUID(player.getUUID().toString());
+		registerEntity(entity);
+		hasChanged = true;
+		}
+		entity.targetSelector.getRunningGoals().forEach((goal) -> goal.stop());
+		if (entity instanceof PathfinderMob) {
+			entity.targetSelector.addGoal(1, new HurtByTargetGoal((PathfinderMob) entity));
+		}
+		entity.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(entity, Player.class, true));
+		entity.goalSelector.addGoal(6, new GoToEntityPositionGoal(entity, player)); //TODO: debug ai not working correctly on drowned mobs that aren't in water
+		for (Entity passenger : entity.getPassengers()) if (passenger instanceof Mob) finalizeEntity((Mob) passenger, level, player);
 	}
 
 	private void cleanSpawns() {
