@@ -38,12 +38,12 @@ import net.smileycorp.atlas.api.entity.ai.GoToEntityPositionGoal;
 import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
-import net.smileycorp.hordes.common.ModDefinitions;
+import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.hordeevent.capability.HordeSavedData;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeSpawn;
 
-@EventBusSubscriber(modid=ModDefinitions.MODID)
+@EventBusSubscriber(modid=Constants.MODID)
 public class HordeEventHandler {
 
 	//attach required entity capabilities for event to function
@@ -51,10 +51,10 @@ public class HordeEventHandler {
 	public void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
 		Entity entity = event.getObject();
 		if (entity instanceof Mob) {
-			event.addCapability(ModDefinitions.getResource("HordeSpawn"), new IHordeSpawn.Provider());
+			event.addCapability(Constants.loc("HordeSpawn"), new IHordeSpawn.Provider());
 		}
 		if (entity instanceof Player && !(entity instanceof FakePlayer)) {
-			event.addCapability(ModDefinitions.getResource("HordeEvent"), new IHordeEvent.Provider());
+			event.addCapability(Constants.loc("HordeEvent"), new IHordeEvent.Provider());
 		}
 	}
 
@@ -222,7 +222,7 @@ public class HordeEventHandler {
 					IHordeEvent horde = optional.resolve().get();
 					if ((horde.isHordeDay(player) && level.dimensionType().bedWorks() &! level.isDay()) || horde.isActive(player)) {
 						event.setResult(BedSleepingProblem.OTHER_PROBLEM);
-						player.displayClientMessage(new TranslatableComponent(ModDefinitions.hordeTrySleep), true);
+						player.displayClientMessage(new TranslatableComponent(Constants.hordeTrySleep), true);
 					}
 				}
 			}

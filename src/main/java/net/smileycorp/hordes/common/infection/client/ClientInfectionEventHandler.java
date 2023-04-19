@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.client;
+package net.smileycorp.hordes.common.infection.client;
 
 import java.awt.Color;
 
@@ -12,6 +12,7 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.smileycorp.hordes.client.ClientConfigHandler;
 import net.smileycorp.hordes.common.infection.HordesInfection;
 
 @EventBusSubscriber(Dist.CLIENT)

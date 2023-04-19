@@ -15,11 +15,11 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
-import net.smileycorp.hordes.common.ModDefinitions;
+import net.smileycorp.hordes.common.Constants;
 
 public class HordeSavedData extends SavedData {
 
-	public static final String DATA = ModDefinitions.MODID + "_HordeEvent";
+	public static final String DATA = Constants.MODID + "_HordeEvent";
 
 	private int nextDay = 0;
 

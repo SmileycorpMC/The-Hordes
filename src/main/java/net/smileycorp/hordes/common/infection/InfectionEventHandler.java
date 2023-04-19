@@ -38,13 +38,13 @@ import net.smileycorp.atlas.api.network.SimpleStringMessage;
 import net.smileycorp.atlas.api.util.DirectionUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
-import net.smileycorp.hordes.common.ModDefinitions;
+import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.event.InfectionDeathEvent;
 import net.smileycorp.hordes.common.infection.capability.IInfection;
 import net.smileycorp.hordes.common.infection.network.InfectMessage;
 import net.smileycorp.hordes.common.infection.network.InfectionPacketHandler;
 
-@EventBusSubscriber(modid=ModDefinitions.MODID)
+@EventBusSubscriber(modid=Constants.MODID)
 public class InfectionEventHandler {
 
 	//attach required entity capabilities for event to function
@@ -52,7 +52,7 @@ public class InfectionEventHandler {
 	public void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
 		Entity entity = event.getObject();
 		if (entity instanceof Player && !(entity instanceof FakePlayer) || entity instanceof Villager || InfectionRegister.canBeInfected(entity)) {
-			event.addCapability(ModDefinitions.getResource("InfectionCounter"), new IInfection.Provider());
+			event.addCapability(Constants.loc("InfectionCounter"), new IInfection.Provider());
 		}
 	}
 

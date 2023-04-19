@@ -29,11 +29,11 @@ import net.smileycorp.hordes.common.infection.InfectionRegister;
 import net.smileycorp.hordes.common.infection.capability.IInfection;
 import net.smileycorp.hordes.common.infection.network.InfectionPacketHandler;
 
-@Mod(value = ModDefinitions.MODID)
-@Mod.EventBusSubscriber(modid = ModDefinitions.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod(value = Constants.MODID)
+@Mod.EventBusSubscriber(modid = Constants.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class Hordes {
 
-	private static Logger logger = LogManager.getLogger(ModDefinitions.NAME);
+	private static Logger logger = LogManager.getLogger(Constants.NAME);
 
 	public final static Capability<IHordeEvent> HORDE_EVENT = CapabilityManager.get(new CapabilityToken<IHordeEvent>(){});
 	public final static Capability<IHordeSpawn> HORDESPAWN = CapabilityManager.get(new CapabilityToken<IHordeSpawn>(){});

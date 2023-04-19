@@ -27,7 +27,7 @@ import net.smileycorp.hordes.common.capability.IZombifyPlayer;
 import net.smileycorp.hordes.common.entities.IZombiePlayer;
 import net.smileycorp.hordes.common.infection.HordesInfection;
 
-@EventBusSubscriber(modid = ModDefinitions.MODID, bus = Bus.MOD)
+@EventBusSubscriber(modid = Constants.MODID, bus = Bus.MOD)
 public class MiscEventHandler {
 
 	//determine if zombie entity should spawn, and if so create the correct entity and set properties
@@ -84,7 +84,7 @@ public class MiscEventHandler {
 	public void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
 		Entity entity = event.getObject();
 		if (entity instanceof Player &!(entity instanceof FakePlayer)) {
-			event.addCapability(ModDefinitions.getResource("Zombify"), new IZombifyPlayer.Provider());
+			event.addCapability(Constants.loc("Zombify"), new IZombifyPlayer.Provider());
 		}
 	}
 

@@ -9,14 +9,14 @@ import net.smileycorp.atlas.api.network.SimpleMessageDecoder;
 import net.smileycorp.atlas.api.network.SimpleMessageEncoder;
 import net.smileycorp.atlas.api.network.SimpleStringMessage;
 import net.smileycorp.hordes.client.ClientHandler;
-import net.smileycorp.hordes.common.ModDefinitions;
+import net.smileycorp.hordes.common.Constants;
 
 public class HordeEventPacketHandler {
 
 	public static SimpleChannel NETWORK_INSTANCE;
 
 	public static void initPackets() {
-		NETWORK_INSTANCE = NetworkRegistry.newSimpleChannel(ModDefinitions.getResource("HordeEvent"), ()-> "1", "1"::equals, "1"::equals);
+		NETWORK_INSTANCE = NetworkRegistry.newSimpleChannel(Constants.loc("HordeEvent"), ()-> "1", "1"::equals, "1"::equals);
 		NETWORK_INSTANCE.registerMessage(0, HordeSoundMessage.class, new SimpleMessageEncoder<HordeSoundMessage>(),
 				new SimpleMessageDecoder<HordeSoundMessage>(HordeSoundMessage.class), (T, K)-> processSoundMessage(T, K.get()));
 		NETWORK_INSTANCE.registerMessage(1, SimpleStringMessage.class, new SimpleMessageEncoder<SimpleStringMessage>(),

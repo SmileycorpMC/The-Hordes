@@ -20,17 +20,17 @@ import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.smileycorp.hordes.common.ModDefinitions;
+import net.smileycorp.hordes.common.Constants;
 
 @SuppressWarnings("removal")
 public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapper> {
 
-	public static final ResourceLocation ID = ModDefinitions.getResource("infection");
+	public static final ResourceLocation ID = Constants.loc("infection");
 
 	private final IDrawable background;
 	private final IDrawable icon;
 
-	public static final ResourceLocation TEXTURE = ModDefinitions.getResource("textures/gui/jei/cure_list.png");
+	public static final ResourceLocation TEXTURE = Constants.loc("textures/gui/jei/cure_list.png");
 
 	public InfectionCureCategory(IGuiHelper guiHelper) {
 		background = guiHelper.createDrawable(TEXTURE, 0, 0, 167, 113);
