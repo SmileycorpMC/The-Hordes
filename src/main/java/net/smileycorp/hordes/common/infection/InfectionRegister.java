@@ -16,6 +16,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.util.thread.SidedThreadGroups;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -23,6 +24,7 @@ import net.smileycorp.atlas.api.util.RecipeUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.CommonUtils;
 import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.infection.capability.IInfection;
 import net.smileycorp.hordes.integration.jei.JEIPluginInfection;
 
 public class InfectionRegister {
@@ -238,12 +240,20 @@ public class InfectionRegister {
 	public static void tryToInfect(LivingEntity entity) {
 		int c = entity.level.random.nextInt(100);
 		if (c <= conversionTable.get(entity.getType()).getInfectChance()) {
-			entity.addEffect(new MobEffectInstance(HordesInfection.INFECTED.get(), 10000, 0));
+			entity.addEffect(new MobEffectInstance(HordesInfection.INFECTED.get(), getInfectionTime(entity), 0));
 		}
 	}
 
 	public static void convertEntity(LivingEntity entity) {
 		conversionTable.get(entity.getType()).convertEntity(entity);
 	}
+
+	public static int getInfectionTime(LivingEntity entity) {
+		int time = CommonConfigHandler.ticksForEffectStage.get();
+		LazyOptional<IInfection> optional = entity.getCapability(Hordes.INFECTION);
+		if (optional.isPresent()) time = (int)((double)time * Math.pow(CommonConfigHandler.effectStageTickReduction.get(), optional.resolve().get().getInfectionCount()));
+		return time;
+	}
+
 
 }

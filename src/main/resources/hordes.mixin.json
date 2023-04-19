@@ -4,11 +4,12 @@
 	"compatibilityLevel": "JAVA_17",
 	"refmap": "hordes.mixin.refmap.json",
 	"mixins": [
+		"MixinAbstractHorse",
 		"MixinMob",
+		"MixinMobEffectInstance"
 		"MixinZombie",
-		"MixinZombieVillager",
 		"MixinZombieHorse",
-		"MixinAbstractHorse"
+		"MixinZombieVillager"
 	],
 	"injector": {
 		"defaultRequire": 1

@@ -29,6 +29,7 @@ import net.smileycorp.hordes.client.render.ZombiePlayerRenderer;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.entities.IZombiePlayer;
 import net.smileycorp.hordes.common.infection.HordesInfection;
+import net.smileycorp.hordes.common.infection.client.ClientInfectionEventHandler;
 import net.smileycorp.hordes.common.infection.network.CureEntityMessage;
 
 @EventBusSubscriber(modid = Constants.MODID, value = Dist.CLIENT, bus = Bus.MOD)
@@ -93,7 +94,7 @@ public class ClientHandler {
 			Minecraft mc = Minecraft.getInstance();
 			Level level = mc.level;
 			Player player = mc.player;
-			level.playSound(player, player.blockPosition(), SoundEvents.ZOMBIE_VILLAGER_CONVERTED, SoundSource.HOSTILE, 1f, level.random.nextFloat());
+			level.playSound(player, player.blockPosition(), SoundEvents.ZOMBIE_VILLAGER_CONVERTED, SoundSource.HOSTILE, 0.75f, level.random.nextFloat());
 		}
 	}
 
