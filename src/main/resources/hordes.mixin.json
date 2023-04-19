@@ -6,7 +6,7 @@
 	"mixins": [
 		"MixinAbstractHorse",
 		"MixinMob",
-		"MixinMobEffectInstance"
+		"MixinMobEffectInstance",
 		"MixinZombie",
 		"MixinZombieHorse",
 		"MixinZombieVillager"
