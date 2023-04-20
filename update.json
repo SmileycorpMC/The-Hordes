@@ -11,14 +11,17 @@
 	"1.1.5e": "update to 1.19.3"
   },
   "1.19.4": {
-	"1.1.5f": "update to 1.19.4"
+	"1.1.5f": "update to 1.19.4",
+	"1.1.6": "add additional config options",
+	"1.1.6a": "fix mixin config preventing mod load",
+	"1.1.6b": "update to use latest forge"
   }
   "promos": {
     "1.19.2-latest": "1.1.5d",
     "1.19.2-recommended": "1.1.5d",
 	"1.19.3-latest": "1.1.5e",
     "1.19.3-recommended": "1.1.5e",
-	"1.19.4-latest": "1.1.5f",
-    "1.19.4-recommended": "1.1.5f"
+	"1.19.4-latest": "1.1.6b",
+    "1.19.4-recommended": "1.1.6b"
   }
 }
