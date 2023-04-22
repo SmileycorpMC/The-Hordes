@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.common.hordeevent;
+package net.smileycorp.hordes.hordeevent;
 
 import java.util.UUID;
 
@@ -36,9 +36,9 @@ import net.smileycorp.atlas.api.entity.ai.EntityAIGoToEntityPos;
 import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
-import net.smileycorp.hordes.common.ModDefinitions;
+import net.smileycorp.hordes.common.Constants;
 
-@EventBusSubscriber(modid=ModDefinitions.modid)
+@EventBusSubscriber(modid=Constants.modid)
 public class HordeEventHandler {
 
 
@@ -165,10 +165,10 @@ public class HordeEventHandler {
 		if (entity.world == null) return;
 		if (entity.world.isRemote) return;
 		if (!entity.hasCapability(Hordes.HORDESPAWN, null) && entity instanceof EntityLiving && !(entity instanceof EntityPlayer)) {
-			event.addCapability(ModDefinitions.getResource("HordeSpawn"), new IHordeSpawn.Provider());
+			event.addCapability(Constants.loc("HordeSpawn"), new IHordeSpawn.Provider());
 		}
 		if (!entity.hasCapability(Hordes.HORDE_EVENT, null) && entity instanceof EntityPlayer && !(entity instanceof FakePlayer)) {
-			event.addCapability(ModDefinitions.getResource("HordeEvent"), new IOngoingHordeEvent.Provider((EntityPlayer) entity));
+			event.addCapability(Constants.loc("HordeEvent"), new IOngoingHordeEvent.Provider((EntityPlayer) entity));
 		}
 	}
 
@@ -183,7 +183,7 @@ public class HordeEventHandler {
 					if ((horde.isHordeDay(world) && world.provider.canSleepAt(player, event.getPos()) == WorldSleepResult.ALLOW &! world.isDaytime())
 							|| horde.isActive(world)) {
 						event.setResult(SleepResult.OTHER_PROBLEM);
-						player.sendMessage(new TextComponentTranslation(ModDefinitions.hordeTrySleep));
+						player.sendMessage(new TextComponentTranslation(Constants.hordeTrySleep));
 					}
 				}
 			}

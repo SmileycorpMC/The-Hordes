@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.common.hordeevent;
+package net.smileycorp.hordes.hordeevent;
 
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagString;

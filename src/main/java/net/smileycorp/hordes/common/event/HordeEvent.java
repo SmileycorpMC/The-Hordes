@@ -4,7 +4,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.smileycorp.hordes.common.ConfigHandler;
-import net.smileycorp.hordes.common.hordeevent.IOngoingHordeEvent;
+import net.smileycorp.hordes.hordeevent.IOngoingHordeEvent;
 
 public class HordeEvent extends PlayerEvent {
 

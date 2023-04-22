@@ -4,7 +4,7 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;
-import net.smileycorp.hordes.common.hordeevent.IOngoingHordeEvent;
+import net.smileycorp.hordes.hordeevent.IOngoingHordeEvent;
 
 @Cancelable
 public class HordeSpawnEntityEvent extends HordeEvent {

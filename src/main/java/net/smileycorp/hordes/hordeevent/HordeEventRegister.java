@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.common.hordeevent;
+package net.smileycorp.hordes.hordeevent;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import net.minecraft.entity.EntityLiving;
-import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.GameData;
 import net.smileycorp.atlas.api.recipe.WeightedOutputs;
+import net.smileycorp.hordes.common.CommonUtils;
 import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
 
@@ -42,7 +42,7 @@ public class HordeEventRegister {
 
 							String nbtstring = nameSplit[0].substring(nameSplit[0].indexOf("{"));
 							nameSplit[0] = nameSplit[0].substring(0, nameSplit[0].indexOf("{"));
-							nbt = parseNBT(name, nbtstring);
+							nbt = CommonUtils.parseNBT(name, nbtstring);
 						}
 						ResourceLocation loc = new ResourceLocation(nameSplit[0]);
 						if (GameData.getEntityRegistry().containsKey(loc)) {
@@ -89,19 +89,6 @@ public class HordeEventRegister {
 				continue;
 			}
 		}
-	}
-
-
-	private static NBTTagCompound parseNBT(String name, String nbtstring) {
-		NBTTagCompound nbt = null;
-		try {
-			NBTTagCompound parsed = JsonToNBT.getTagFromJson(nbtstring);
-			if (parsed != null) nbt = parsed;
-			else throw new NullPointerException("Parsed NBT is null.");
-		} catch (Exception e) {
-			Hordes.logError("Error parsing nbt for entity " + name + " " + e.getMessage(), e);
-		}
-		return nbt;
 	}
 
 

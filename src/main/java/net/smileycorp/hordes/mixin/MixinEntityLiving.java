@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.infection.mixin;
+package net.smileycorp.hordes.mixin;
 
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;

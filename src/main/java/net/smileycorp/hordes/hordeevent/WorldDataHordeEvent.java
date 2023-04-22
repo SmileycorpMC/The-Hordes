@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.common.hordeevent;
+package net.smileycorp.hordes.hordeevent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,13 +17,13 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
-import net.smileycorp.hordes.common.ModDefinitions;
+import net.smileycorp.hordes.common.Constants;
 
 import com.mojang.authlib.GameProfile;
 
 public class WorldDataHordeEvent extends WorldSavedData {
 
-	public static final String DATA = ModDefinitions.modid + "_HordeEvent";
+	public static final String DATA = Constants.modid + "_HordeEvent";
 
 	//stores legacy event data until it's needed to be loaded by a player capability
 	private Map<String, NBTTagCompound> legacyEventData = new HashMap<String, NBTTagCompound>();

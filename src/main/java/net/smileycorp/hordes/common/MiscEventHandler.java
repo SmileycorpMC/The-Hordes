@@ -17,7 +17,7 @@ import net.smileycorp.hordes.common.entities.EntityZombiePlayer;
 import net.smileycorp.hordes.infection.HordesInfection;
 
 public class MiscEventHandler {
-	
+
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onDeath(LivingDeathEvent event) {
 		EntityLivingBase entity = event.getEntityLiving();
@@ -25,7 +25,7 @@ public class MiscEventHandler {
 			World world = entity.world;
 			if (!world.isRemote) {
 				if (entity instanceof EntityPlayer &!(entity instanceof FakePlayer)) {
-					if ((entity.isPotionActive(HordesInfection.INFECTED) && ConfigHandler.enableMobInfection) || ConfigHandler.zombieGraves) {	
+					if ((entity.isPotionActive(HordesInfection.INFECTED) && ConfigHandler.enableMobInfection && ConfigHandler.infectionSpawnsZombiePlayers) || ConfigHandler.zombieGraves) {
 						if (entity.hasCapability(Hordes.ZOMBIFY_PLAYER, null)) {
 							entity.getCapability(Hordes.ZOMBIFY_PLAYER, null).createZombie();
 						}
@@ -34,14 +34,14 @@ public class MiscEventHandler {
 			}
 		}
 	}
-	
+
 	@SubscribeEvent(receiveCanceled = true)
 	public void onDrop(PlayerDropsEvent event) {
 		EntityPlayer player = event.getEntityPlayer();
 		if (player!=null &!(player instanceof FakePlayer)) {
 			World world = player.world;
 			if (!world.isRemote) {
-				if ((player.isPotionActive(HordesInfection.INFECTED) && ConfigHandler.enableMobInfection) || ConfigHandler.zombieGraves) {
+				if ((player.isPotionActive(HordesInfection.INFECTED) && ConfigHandler.enableMobInfection && ConfigHandler.infectionSpawnsZombiePlayers) || ConfigHandler.zombieGraves) {
 					if (player.hasCapability(Hordes.ZOMBIFY_PLAYER, null)) {
 						IZombifyPlayer cap = player.getCapability(Hordes.ZOMBIFY_PLAYER, null);
 						EntityZombiePlayer zombie = cap.getZombie();
@@ -52,18 +52,19 @@ public class MiscEventHandler {
 							world.spawnEntity(zombie);
 							drops.clear();
 							cap.clearZombie();
+							player.removePotionEffect(HordesInfection.INFECTED);
 						}
 					}
 				}
 			}
 		}
 	}
-	
+
 	@SubscribeEvent
 	public void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
 		Entity entity = event.getObject();
 		if (!entity.hasCapability(Hordes.HORDESPAWN, null) && entity instanceof EntityPlayer &!(entity instanceof FakePlayer)) {
-			event.addCapability(ModDefinitions.getResource("Infection"), new IZombifyPlayer.Provider((EntityPlayer) entity));
+			event.addCapability(Constants.loc("Infection"), new IZombifyPlayer.Provider((EntityPlayer) entity));
 		}
 	}
 }

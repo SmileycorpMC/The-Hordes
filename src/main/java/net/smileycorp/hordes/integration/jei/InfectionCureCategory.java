@@ -11,18 +11,18 @@ import mezz.jei.api.recipe.IRecipeCategory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.translation.I18n;
-import net.smileycorp.hordes.common.ModDefinitions;
+import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.infection.PotionInfected;
 
 @SuppressWarnings("deprecation")
 public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapper> {
 
-	public static final String ID = ModDefinitions.getName("infection");
+	public static final String ID = Constants.name("infection");
 	
 	private final IDrawable background;
 	private final IDrawable icon;
 	
-	public static final ResourceLocation TEXTURE = ModDefinitions.getResource("textures/gui/jei/cure_list.png");
+	public static final ResourceLocation TEXTURE = Constants.loc("textures/gui/jei/cure_list.png");
 	
 	public InfectionCureCategory(IGuiHelper guiHelper) {
 		this.background = guiHelper.createDrawable(TEXTURE, 0, 0, 167, 113);
@@ -36,7 +36,7 @@ public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapp
 
 	@Override
 	public String getModName() {
-		return ModDefinitions.modid;
+		return Constants.modid;
 	}
 
 	@Override

@@ -1,9 +1,16 @@
 {
   "compatibilityLevel": "JAVA_8",
-  "package": "net.smileycorp.hordes.infection.mixin",
+  "package": "net.smileycorp.hordes.mixin",
   "refmap": "mixins.hordes.refmap.json",
   "mixins": [
-    "MixinEntityLiving"
+	"MixinAbstractHorse",
+	"MixinAbstractSkeleton",
+	"MixinEntityAnimal",
+    "MixinEntityLiving",
+	"MixinEntityZombie",
+	"MixinEntityZombieHorse",
+	"MixinEntityZombieVillager",
+	"MixinPotionEffect"
   ],
   "client": [],
   "server": []

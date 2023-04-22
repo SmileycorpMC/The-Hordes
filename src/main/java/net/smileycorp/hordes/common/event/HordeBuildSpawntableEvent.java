@@ -2,8 +2,8 @@ package net.smileycorp.hordes.common.event;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.smileycorp.atlas.api.recipe.WeightedOutputs;
-import net.smileycorp.hordes.common.hordeevent.HordeSpawnEntry;
-import net.smileycorp.hordes.common.hordeevent.IOngoingHordeEvent;
+import net.smileycorp.hordes.hordeevent.HordeSpawnEntry;
+import net.smileycorp.hordes.hordeevent.IOngoingHordeEvent;
 
 public class HordeBuildSpawntableEvent extends HordeEvent {
 

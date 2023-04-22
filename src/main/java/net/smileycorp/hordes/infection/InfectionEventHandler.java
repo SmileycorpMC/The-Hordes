@@ -3,7 +3,10 @@ package net.smileycorp.hordes.infection;
 import java.util.Random;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.monster.EntityZombieVillager;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
@@ -16,10 +19,12 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
-import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
@@ -29,12 +34,36 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.smileycorp.atlas.api.SimpleStringMessage;
 import net.smileycorp.atlas.api.util.DirectionUtils;
 import net.smileycorp.hordes.common.ConfigHandler;
-import net.smileycorp.hordes.common.ModDefinitions;
+import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.event.InfectionDeathEvent;
 import net.smileycorp.hordes.infection.InfectionPacketHandler.InfectMessage;
+import net.smileycorp.hordes.infection.capability.IInfection;
 
-@EventBusSubscriber(modid=ModDefinitions.modid)
+@EventBusSubscriber(modid=Constants.modid)
 public class InfectionEventHandler {
+
+	//attach required entity capabilities for event to function
+	@SubscribeEvent
+	public void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
+		Entity entity = event.getObject();
+		if (entity instanceof EntityPlayer && !(entity instanceof FakePlayer) || entity instanceof EntityVillager || InfectionRegister.canBeInfected(entity)) {
+			event.addCapability(Constants.loc("InfectionCounter"), new IInfection.Provider());
+		}
+	}
+
+	@SubscribeEvent
+	public void onEntityAdded(EntityJoinWorldEvent event) {
+		Entity entity = event.getEntity();
+		if (entity != null) {
+			if (!entity.world.isRemote) {
+				if (ConfigHandler.infectionEntitiesAggroConversions) {
+					if (InfectionRegister.canCauseInfection(entity) && entity instanceof EntityCreature) {
+						((EntityLiving)entity).tasks.addTask(3, new EntityAINearestAttackableTarget<>((EntityCreature)entity, EntityLivingBase.class, 10, true, false, InfectionRegister::canBeInfected));
+					}
+				}
+			}
+		}
+	}
 
 	@SubscribeEvent
 	public void playerJoin(PlayerLoggedInEvent event) {
@@ -56,33 +85,6 @@ public class InfectionEventHandler {
 			}
 		}
 	}
-
-	/*@SubscribeEvent(priority = EventPriority.HIGHEST)
-	public void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
-		EntityPlayer player = event.getEntityPlayer();
-		ItemStack stack = event.getItemStack();
-		if (event.getTarget() instanceof EntityLivingBase) {
-			EntityLivingBase entity = (EntityLivingBase) event.getTarget();
-			if (entity.isPotionActive(HordesInfection.INFECTED)) {
-				if (InfectionRegister.isCure(stack)) {
-					entity.removePotionEffect(HordesInfection.INFECTED);
-					if (!player.capabilities.isCreativeMode) {
-						ItemStack container = stack.getItem().getContainerItem(stack);
-						if (stack.isItemStackDamageable()) {
-							stack.damageItem(1, player);
-						} else {
-							stack.splitStack(1);
-						}
-						if (stack.isEmpty() && !container.isEmpty()) {
-							player.setItemStackToSlot(event.getHand() == EnumHand.OFF_HAND ? EntityEquipmentSlot.OFFHAND : EntityEquipmentSlot.MAINHAND, stack);
-						}
-					}
-					event.setCanceled(true);
-					event.setCancellationResult(EnumActionResult.FAIL);
-				}
-			}
-		}
-	}*/
 
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onItemUse(PlayerInteractEvent.RightClickItem event) {
@@ -156,23 +158,6 @@ public class InfectionEventHandler {
 			world.spawnEntity(zombie);
 			entity.setDead();
 			event.setResult(Result.DENY);
-		}
-	}
-
-	@SubscribeEvent
-	public static void onTick(LivingUpdateEvent event) {
-		EntityLivingBase entity = event.getEntityLiving();
-		World world = entity.world;
-		if (!world.isRemote && entity.isPotionActive(HordesInfection.INFECTED)) {
-			PotionEffect effect = entity.getActivePotionEffect(HordesInfection.INFECTED);
-			if (effect.getDuration() < 10000 - ConfigHandler.ticksForEffectStage) {
-				int a = effect.getAmplifier();
-				if (a < 3) {
-					entity.addPotionEffect(new PotionEffect(HordesInfection.INFECTED, 10000, a+1));
-				} else {
-					entity.attackEntityFrom(HordesInfection.INFECTION_DAMAGE, Float.MAX_VALUE);
-				}
-			}
 		}
 	}
 

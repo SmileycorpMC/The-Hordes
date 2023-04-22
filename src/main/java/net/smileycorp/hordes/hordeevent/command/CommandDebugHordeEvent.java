@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.common.hordeevent.command;
+package net.smileycorp.hordes.hordeevent.command;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -10,8 +10,8 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
-import net.smileycorp.hordes.common.ModDefinitions;
-import net.smileycorp.hordes.common.hordeevent.WorldDataHordeEvent;
+import net.smileycorp.hordes.common.Constants;
+import net.smileycorp.hordes.hordeevent.WorldDataHordeEvent;
 
 public class CommandDebugHordeEvent extends CommandBase {
 
@@ -22,7 +22,7 @@ public class CommandDebugHordeEvent extends CommandBase {
 
 	@Override
 	public String getUsage(ICommandSender sender) {
-		return "commands."+ModDefinitions.modid+".HordeDebug.usage";
+		return "commands."+Constants.modid+".HordeDebug.usage";
 	}
 
 	@Override
@@ -41,7 +41,7 @@ public class CommandDebugHordeEvent extends CommandBase {
 			} catch (Exception e) {}
 			data.save();
 		});
-		notifyCommandListener(sender, this, "commands."+ModDefinitions.modid+".HordeDebug.success", path.toAbsolutePath().toString());
+		notifyCommandListener(sender, this, "commands."+Constants.modid+".HordeDebug.success", path.toAbsolutePath().toString());
 	}
 
 }

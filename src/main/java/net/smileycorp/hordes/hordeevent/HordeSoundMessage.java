@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.common.hordeevent;
+package net.smileycorp.hordes.hordeevent;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.util.ResourceLocation;

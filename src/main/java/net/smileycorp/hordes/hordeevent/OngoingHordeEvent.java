@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.common.hordeevent;
+package net.smileycorp.hordes.hordeevent;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -166,30 +166,17 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 			Class<? extends EntityLiving> clazz = entry.getEntity();
 			try {
 				EntityLiving entity = clazz.getConstructor(World.class).newInstance(world);
-				entity.readFromNBT(entry.getTagCompound());
 				HordeSpawnEntityEvent spawnEntityEvent = new HordeSpawnEntityEvent(player, entity, pos, this);
 				MinecraftForge.EVENT_BUS.post(spawnEntityEvent);
 				if (!spawnEntityEvent.isCanceled()) {
 					entity = spawnEntityEvent.entity;
 					pos = spawnEntityEvent.pos;
 					entity.onInitialSpawn(world.getDifficultyForLocation(pos), null);
+					entity.readFromNBT(entry.getTagCompound());
 					entity.setPosition(pos.getX(), pos.getY(), pos.getZ());
 					if (!world.spawnEntity(entity)) Hordes.logError("Unable to spawn entity from " + clazz, new Exception());
 					else {
-						entity.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(100.0D);
-						if (Loader.isModLoaded("mpr")) MPRIntegration.addFollowAttribute(entity);
-						entity.getCapability(Hordes.HORDESPAWN, null).setPlayerUUID(player.getUniqueID().toString());
-						entity.enablePersistence();
-						registerEntity(entity);
-						hasChanged = true;
-						entity.targetTasks.taskEntries.clear();
-						if (entity instanceof EntityCreature) {
-							entity.targetTasks.addTask(1, new EntityAIHurtByTarget((EntityCreature) entity, true));
-							entity.targetTasks.addTask(2, new EntityAINearestAttackableTarget<>((EntityCreature) entity, EntityPlayer.class, false));
-						} else {
-							entity.targetTasks.addTask(1, new EntityAIFindNearestTargetPredicate(entity, (e) -> e instanceof EntityPlayer));
-						}
-						entity.tasks.addTask(6, new EntityAIGoToEntityPos(entity, player));
+						finalizeEntity(entity, world, player);
 					}
 				} else {
 					logInfo("Entity spawn event has been cancelled, not spawning entity  of class " + clazz);
@@ -199,6 +186,24 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 				Hordes.logError("Unable to spawn entity from " + clazz, e);
 			}
 		}
+	}
+
+	private void finalizeEntity(EntityLiving entity, World world2, EntityPlayer player2) {
+		entity.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(100.0D);
+		if (Loader.isModLoaded("mpr")) MPRIntegration.addFollowAttribute(entity);
+		entity.getCapability(Hordes.HORDESPAWN, null).setPlayerUUID(player.getUniqueID().toString());
+		entity.enablePersistence();
+		registerEntity(entity);
+		hasChanged = true;
+		entity.targetTasks.taskEntries.clear();
+		if (entity instanceof EntityCreature) {
+			entity.targetTasks.addTask(1, new EntityAIHurtByTarget((EntityCreature) entity, true));
+			entity.targetTasks.addTask(2, new EntityAINearestAttackableTarget<>((EntityCreature) entity, EntityPlayer.class, false));
+		} else {
+			entity.targetTasks.addTask(1, new EntityAIFindNearestTargetPredicate(entity, e -> e instanceof EntityPlayer));
+		}
+		entity.tasks.addTask(6, new EntityAIGoToEntityPos(entity, player));
+		for (Entity passenger : entity.getPassengers()) if (passenger instanceof EntityLiving) finalizeEntity((EntityLiving) passenger, world, player);
 	}
 
 	private void cleanSpawns() {

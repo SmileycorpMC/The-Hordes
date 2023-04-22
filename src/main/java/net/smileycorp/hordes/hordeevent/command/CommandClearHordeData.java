@@ -1,12 +1,12 @@
-package net.smileycorp.hordes.common.hordeevent.command;
+package net.smileycorp.hordes.hordeevent.command;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
-import net.smileycorp.hordes.common.ModDefinitions;
-import net.smileycorp.hordes.common.hordeevent.WorldDataHordeEvent;
+import net.smileycorp.hordes.common.Constants;
+import net.smileycorp.hordes.hordeevent.WorldDataHordeEvent;
 
 public class CommandClearHordeData extends CommandBase {
 
@@ -17,7 +17,7 @@ public class CommandClearHordeData extends CommandBase {
 
 	@Override
 	public String getUsage(ICommandSender sender) {
-		 return "commands."+ModDefinitions.modid+".HordeClean.usage";
+		 return "commands."+Constants.modid+".HordeClean.usage";
 	}
 	
 	@Override
@@ -31,7 +31,7 @@ public class CommandClearHordeData extends CommandBase {
 		server.addScheduledTask(() -> {
 			WorldDataHordeEvent.getCleanData(world);
 		});
-		notifyCommandListener(sender, this, "commands."+ModDefinitions.modid+".HordeClean.success", new Object[]{});
+		notifyCommandListener(sender, this, "commands."+Constants.modid+".HordeClean.success", new Object[]{});
     }
  
 }

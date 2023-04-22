@@ -3,14 +3,14 @@ package net.smileycorp.hordes.common.event;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;
-import net.smileycorp.hordes.common.ModDefinitions;
-import net.smileycorp.hordes.common.hordeevent.IOngoingHordeEvent;
+import net.smileycorp.hordes.common.Constants;
+import net.smileycorp.hordes.hordeevent.IOngoingHordeEvent;
 
 @Cancelable
 public class HordeStartEvent extends HordeEvent {
 
 	protected final BlockPos pos;
-	protected String message = ModDefinitions.hordeEventStart;
+	protected String message = Constants.hordeEventStart;
 	protected final boolean wasCommand;
 
 	public HordeStartEvent(EntityPlayer player, IOngoingHordeEvent horde, boolean wasCommand) {

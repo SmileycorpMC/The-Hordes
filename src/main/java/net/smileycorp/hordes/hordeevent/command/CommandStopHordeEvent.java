@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.common.hordeevent.command;
+package net.smileycorp.hordes.hordeevent.command;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -6,7 +6,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.smileycorp.hordes.common.Hordes;
-import net.smileycorp.hordes.common.ModDefinitions;
+import net.smileycorp.hordes.common.Constants;
 
 public class CommandStopHordeEvent extends CommandBase {
 
@@ -17,7 +17,7 @@ public class CommandStopHordeEvent extends CommandBase {
 
 	@Override
 	public String getUsage(ICommandSender sender) {
-		return "commands."+ModDefinitions.modid+".StopHorde.usage";
+		return "commands."+Constants.modid+".StopHorde.usage";
 	}
 
 	@Override
@@ -31,6 +31,6 @@ public class CommandStopHordeEvent extends CommandBase {
 			EntityPlayer player = (EntityPlayer) sender.getCommandSenderEntity();
 			if (player.hasCapability(Hordes.HORDE_EVENT, null)) player.getCapability(Hordes.HORDE_EVENT, null).stopEvent(sender.getEntityWorld(), true);
 		});
-		notifyCommandListener(sender, this, "commands."+ModDefinitions.modid+".StopHorde.success", new Object[] {});
+		notifyCommandListener(sender, this, "commands."+Constants.modid+".StopHorde.success", new Object[] {});
 	}
 }

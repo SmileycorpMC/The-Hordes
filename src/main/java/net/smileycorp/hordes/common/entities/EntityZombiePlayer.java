@@ -3,6 +3,9 @@ package net.smileycorp.hordes.common.entities;
 import java.util.List;
 import java.util.UUID;
 
+import com.google.common.base.Optional;
+import com.mojang.authlib.GameProfile;
+
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityZombie;
@@ -15,14 +18,13 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.scoreboard.ScorePlayerTeam;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-
-import com.google.common.base.Optional;
-import com.mojang.authlib.GameProfile;
+import net.smileycorp.hordes.common.ConfigHandler;
 
 
 public class EntityZombiePlayer extends EntityZombie {
@@ -52,7 +54,7 @@ public class EntityZombiePlayer extends EntityZombie {
 		for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
 			ItemStack stack = slot.getSlotType() == EntityEquipmentSlot.Type.ARMOR ? player.inventory.armorInventory.get(slot.getIndex()) :
 				slot == EntityEquipmentSlot.MAINHAND ? player.getHeldItemMainhand() : player.getHeldItemOffhand();
-				setItemStackToSlot(slot, stack);
+			setItemStackToSlot(slot, stack);
 		}
 		setPlayer(player.getGameProfile());
 	}
@@ -94,8 +96,20 @@ public class EntityZombiePlayer extends EntityZombie {
 	}
 
 	@Override
+	public boolean isImmuneToFire() {
+		return ConfigHandler.zombiePlayersFireImmune ? true : super.isImmuneToFire();
+	}
+
+	@Override
 	public boolean shouldBurnInDay() {
-		return false;
+		damageEntity(getLastDamageSource(), lastDamage);
+		return ConfigHandler.zombiePlayersBurn;
+	}
+
+	@Override
+	public boolean attackEntityFrom(DamageSource source, float amount) {
+		if (ConfigHandler.zombiePlayersOnlyHurtByPlayers &! (source.getTrueSource() instanceof EntityPlayer)) return false;
+		return super.attackEntityFrom(source, amount);
 	}
 
 	@Override

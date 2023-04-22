@@ -17,21 +17,21 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.smileycorp.hordes.common.ConfigHandler;
-import net.smileycorp.hordes.common.ModDefinitions;
+import net.smileycorp.hordes.common.Constants;
 
 public class PotionInfected extends Potion {
 	
-	public static final ResourceLocation TEXTURE = ModDefinitions.getResource("textures/gui/potions.png");
+	public static final ResourceLocation TEXTURE = Constants.loc("textures/gui/potions.png");
 	
 	private final UUID SPEED_MOD_UUID = UUID.fromString("05d68949-cb8b-4031-92a6-bd75e42b5cdd");
-	private final String SPEED_MOD_NAME = ModDefinitions.getName("Infected");
+	private final String SPEED_MOD_NAME = Constants.name("Infected");
 	private final AttributeModifier SPEED_MOD = new AttributeModifier(SPEED_MOD_NAME, -0.1f, 2);
 	
 	public PotionInfected() {
 		super(true, 0x00440002);
 		String name = "Infected";
-		setPotionName("effect." + ModDefinitions.getName(name));
-		setRegistryName(ModDefinitions.getResource(name));
+		setPotionName("effect." + Constants.name(name));
+		setRegistryName(Constants.loc(name));
 		setIconIndex(0, 0);
 	}
 	

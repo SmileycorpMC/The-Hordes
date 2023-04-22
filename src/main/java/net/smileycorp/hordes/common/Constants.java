@@ -2,7 +2,7 @@ package net.smileycorp.hordes.common;
 
 import net.minecraft.util.ResourceLocation;
 
-public class ModDefinitions {
+public class Constants {
 
 	public static final String modid = "hordes";
 	public static final String name = "The Hordes";
@@ -19,20 +19,20 @@ public class ModDefinitions {
 	public static final String deathMessageFighting = "message.hordes.DeathMessageFighting";
 	public static final String deathMessageOther = "message.hordes.DeathMessageOther";
 
-	public static String getName(String name) {
-		return getName(modid, name);
+	public static String name(String name) {
+		return name(modid, name);
 	}
 
-	public static String getName(String modid, String name) {
+	public static String name(String modid, String name) {
 		return modid + "." + name.replace("_", "");
 	}
 
-	public static ResourceLocation getResource(String name) {
+	public static ResourceLocation loc(String name) {
 		return new ResourceLocation(modid, name.toLowerCase());
 	}
 
-	public static String getResourceName(String string) {
-		return getResource(string).toString();
+	public static String locName(String string) {
+		return loc(string).toString();
 	}
 
 }

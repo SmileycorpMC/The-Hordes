@@ -11,10 +11,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.smileycorp.hordes.common.CommonProxy;
 import net.smileycorp.hordes.common.ConfigHandler;
-import net.smileycorp.hordes.common.ModDefinitions;
+import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.entities.EntityZombiePlayer;
 
-@EventBusSubscriber(value = Side.CLIENT, modid = ModDefinitions.modid)
+@EventBusSubscriber(value = Side.CLIENT, modid = Constants.modid)
 public class ClientProxy extends CommonProxy {
 	
 	@Override
