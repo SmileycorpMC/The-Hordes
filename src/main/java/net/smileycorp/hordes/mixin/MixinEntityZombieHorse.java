@@ -23,7 +23,7 @@ public abstract class MixinEntityZombieHorse extends AbstractHorse implements IM
 	protected void applyEntityAttributes(CallbackInfo callback) {
 		if (ConfigHandler.aggressiveZombieHorses) {
 			getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(35.0D);
-			getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(3.0D);
+			getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(3.0D);
 		}
 	}
 

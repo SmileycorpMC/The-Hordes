@@ -7,6 +7,7 @@
 	"MixinAbstractSkeleton",
 	"MixinEntityAnimal",
     "MixinEntityLiving",
+	"MixinEntityLivingBase",
 	"MixinEntityZombie",
 	"MixinEntityZombieHorse",
 	"MixinEntityZombieVillager",

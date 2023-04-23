@@ -20,7 +20,7 @@ public abstract class MixinAbstractSkeleton extends EntityMob implements IRanged
 
 	@Inject(at=@At("HEAD"), method = "onLivingUpdate()V", cancellable = true)
 	public void onLivingUpdate(CallbackInfo callback) {
-		if (ConfigHandler.skeletonsBurn) {
+		if (!ConfigHandler.skeletonsBurn) {
 			super.onLivingUpdate();
 			callback.cancel();
 		}

@@ -35,6 +35,7 @@ import net.smileycorp.atlas.api.SimpleStringMessage;
 import net.smileycorp.atlas.api.util.DirectionUtils;
 import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.Constants;
+import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.event.InfectionDeathEvent;
 import net.smileycorp.hordes.infection.InfectionPacketHandler.InfectMessage;
 import net.smileycorp.hordes.infection.capability.IInfection;
@@ -58,7 +59,7 @@ public class InfectionEventHandler {
 			if (!entity.world.isRemote) {
 				if (ConfigHandler.infectionEntitiesAggroConversions) {
 					if (InfectionRegister.canCauseInfection(entity) && entity instanceof EntityCreature) {
-						((EntityLiving)entity).tasks.addTask(3, new EntityAINearestAttackableTarget<>((EntityCreature)entity, EntityLivingBase.class, 10, true, false, InfectionRegister::canBeInfected));
+						((EntityLiving)entity).targetTasks.addTask(3, new EntityAINearestAttackableTarget<>((EntityCreature)entity, EntityLivingBase.class, 10, true, false, InfectionRegister::canBeInfected));
 					}
 				}
 			}
@@ -82,6 +83,8 @@ public class InfectionEventHandler {
 		if (entity.isPotionActive(HordesInfection.INFECTED)) {
 			if (InfectionRegister.isCure(stack)) {
 				entity.removePotionEffect(HordesInfection.INFECTED);
+				IInfection cap = entity.getCapability(Hordes.INFECTION, null);
+				if (cap != null) cap.increaseInfection();
 			}
 		}
 	}
@@ -89,13 +92,15 @@ public class InfectionEventHandler {
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onItemUse(PlayerInteractEvent.RightClickItem event) {
 		ItemStack stack = event.getItemStack();
-		RayTraceResult ray = DirectionUtils.getPlayerRayTrace(event.getWorld(), event.getEntityPlayer(), 5);
+		RayTraceResult ray = DirectionUtils.rayTrace(event.getWorld(), event.getEntityPlayer(), 5);
 		if (ray != null) {
 			if (ray.entityHit instanceof EntityLivingBase) {
 				EntityLivingBase entity = (EntityLivingBase) ray.entityHit;
 				if (entity.isPotionActive(HordesInfection.INFECTED)) {
 					if (InfectionRegister.isCure(stack)) {
 						entity.removePotionEffect(HordesInfection.INFECTED);
+						IInfection cap = entity.getCapability(Hordes.INFECTION, null);
+						if (cap != null) cap.increaseInfection();
 						event.setCanceled(true);
 						event.setCancellationResult(EnumActionResult.FAIL);
 					}
@@ -115,14 +120,16 @@ public class InfectionEventHandler {
 				if ((entity instanceof EntityPlayer && ConfigHandler.infectPlayers)) {
 					int c = rand.nextInt(100);
 					if (c <= ConfigHandler.playerInfectChance) {
-						entity.addPotionEffect(new PotionEffect(HordesInfection.INFECTED, 10000, 0));
+						entity.addPotionEffect(new PotionEffect(HordesInfection.INFECTED, InfectionRegister.getInfectionTime(entity), 0));
 						InfectionPacketHandler.NETWORK_INSTANCE.sendTo(new InfectMessage(), (EntityPlayerMP) entity);
 					}
 				} else if ((entity instanceof EntityVillager && ConfigHandler.infectVillagers)) {
 					int c = rand.nextInt(100);
 					if (c <= ConfigHandler.villagerInfectChance) {
-						entity.addPotionEffect(new PotionEffect(HordesInfection.INFECTED, 10000, 0));
+						entity.addPotionEffect(new PotionEffect(HordesInfection.INFECTED, InfectionRegister.getInfectionTime(entity), 0));
 					}
+				} else if (InfectionRegister.canBeInfected(entity)) {
+					InfectionRegister.tryToInfect(entity);
 				}
 			}
 		}
@@ -157,6 +164,9 @@ public class InfectionEventHandler {
 			}
 			world.spawnEntity(zombie);
 			entity.setDead();
+			event.setResult(Result.DENY);
+		} else if (InfectionRegister.canBeInfected(entity))  {
+			InfectionRegister.convertEntity(entity);
 			event.setResult(Result.DENY);
 		}
 	}
