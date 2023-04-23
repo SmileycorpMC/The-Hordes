@@ -82,6 +82,7 @@ public class ConfigHandler {
 			hordeSpawnList = config.get("Horde Spawn Event", "spawnList",
 					new String[]{"minecraft:zombie-35-0-20", "minecraft:zombie_villager-1-0-10", "minecraft:husk-45-30-0", "minecraft:zombie_horse-3-30-0"},
 					"A list of entities to spawn followed by the spawn weight then the day they first appear on then the last day. Higher weight is more common. Leave the last value to 0 to set no max day, entities can have nbt attached to them.(e.g. minecraft:zombie-20-0-0{ActiveEffects:[{Id:12,Amplifier:0,Duration:10000}]})").getStringList();
+
 			//infection
 			enableMobInfection = config.get("Infection", "enableMobInfection", true, "Set to false to completely disable mob infection and anything related to it.").getBoolean();
 			infectVillagers = config.get("Infection", "infectVillagers", true, "Can villagers be infected.").getBoolean();
@@ -107,6 +108,7 @@ public class ConfigHandler {
 							+ "note: players and villagers have special code accociated with them, and should not be in this list").getStringList();
 			infectionEntitiesAggroConversions = config.get("Infection", "infectionEntitiesAggroConversions", true, "Do entities on the infectionEntities list automatically target entities on the infectionConversionList").getBoolean();
 			effectStageTickReduction = config.get("Infection", "effectStageTickReduction", 0.95, "What factor should the infection potion effect timer be multiplied by for each cured infection? (Resets on death, set to 1 to disable scaling)").getDouble();
+
 			//misc
 			zombieGraves = config.get("Misc", "zombieGraves", false, "Whether to use zombie players as graves all the time. (Even if infection is disabled)").getBoolean();
 			zombiePlayersFireImmune = config.get("Misc", "zombiePlayersFireImmune", false, "Whether zombie players should be immune to fire damage").getBoolean();

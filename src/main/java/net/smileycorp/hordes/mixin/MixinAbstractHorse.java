@@ -45,19 +45,19 @@ public abstract class MixinAbstractHorse extends EntityAnimal {
 	@Inject(at=@At("TAIL"), method = "initEntityAI()V", cancellable = true)
 	protected void initEntityAI(CallbackInfo callback) {
 		if (ConfigHandler.aggressiveZombieHorses && ((EntityAnimal)this) instanceof EntityZombieHorse) {
-			this.tasks.addTask(0, new EntityAISwimming(this));
-			this.tasks.addTask(2, new EntityAIAttackMelee(this, 1.0D, false));
-			this.tasks.addTask(5, new EntityAIMoveTowardsRestriction(this, 1.0D));
-			this.tasks.addTask(7, new EntityAIWanderAvoidWater(this, 1.0D));
-			this.tasks.addTask(8, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F));
-			this.tasks.addTask(8, new EntityAILookIdle(this));
-			this.tasks.addTask(6, new EntityAIMoveThroughVillage(this, 1.0D, false));
-			this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, true, new Class[] {EntityPigZombie.class}));
-			this.targetTasks.addTask(2, new EntityAINearestAttackableTarget<>(this, EntityPlayer.class, true));
-			this.targetTasks.addTask(3, new EntityAINearestAttackableTarget<>(this, EntityVillager.class, false));
-			this.targetTasks.addTask(3, new EntityAINearestAttackableTarget<>(this, EntityIronGolem.class, true));
-			this.tasks.taskEntries.removeIf(g->g.action instanceof EntityAIPanic);
-			this.tasks.taskEntries.removeIf(g->g.action instanceof EntityAIPanic);
+			tasks.addTask(0, new EntityAISwimming(this));
+			tasks.addTask(2, new EntityAIAttackMelee(this, 1.0D, false));
+			tasks.addTask(5, new EntityAIMoveTowardsRestriction(this, 1.0D));
+			tasks.addTask(7, new EntityAIWanderAvoidWater(this, 1.0D));
+			tasks.addTask(8, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F));
+			tasks.addTask(8, new EntityAILookIdle(this));
+			tasks.addTask(6, new EntityAIMoveThroughVillage(this, 1.0D, false));
+			targetTasks.addTask(1, new EntityAIHurtByTarget(this, true, new Class[] {EntityPigZombie.class}));
+			targetTasks.addTask(2, new EntityAINearestAttackableTarget<>(this, EntityPlayer.class, true));
+			targetTasks.addTask(3, new EntityAINearestAttackableTarget<>(this, EntityVillager.class, false));
+			targetTasks.addTask(3, new EntityAINearestAttackableTarget<>(this, EntityIronGolem.class, true));
+			tasks.taskEntries.removeIf(g->g.action instanceof EntityAIPanic);
+			tasks.taskEntries.removeIf(g->g.action instanceof EntityAIPanic);
 		}
 		if (getCreatureAttribute() != EnumCreatureAttribute.UNDEAD && ConfigHandler.zombiesScareHorses) {
 			tasks.addTask(1, new HorseFleeTask(this));

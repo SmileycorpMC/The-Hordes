@@ -29,7 +29,7 @@ public class FleeEntityTask extends EntityAIBase {
 		super();
 		this.entity=entity;
 		world = entity.world;
-		pather=entity.getNavigator();
+		pather = entity.getNavigator();
 		this.predicate = predicate;
 		this.speed = speed;
 		this.range = range;
@@ -62,7 +62,7 @@ public class FleeEntityTask extends EntityAIBase {
 		if (--this.timeToRecalcPath <= 0)  {
 			this.timeToRecalcPath = 5;
 			BlockPos pos = findSafePos();
-			pather.tryMoveToXYZ(pos.getX(), pos.getY(), pos.getZ(), 1f);
+			pather.tryMoveToXYZ(pos.getX(), pos.getY(), pos.getZ(), speed);
 		}
 	}
 
@@ -73,11 +73,11 @@ public class FleeEntityTask extends EntityAIBase {
 			Vec3d dir = DirectionUtils.getDirectionVecXZ(this.entity, entity);
 			resultDir = new Vec3d((dir.x + resultDir.x)/2, (dir.y + resultDir.y)/2, (dir.z + resultDir.z)/2);
 		}
-		return world.getHeight(new BlockPos(pos.add(resultDir)));
+		return new BlockPos(pos.add(resultDir));
 	}
 
 	private List<EntityLivingBase> getEntities() {
-		return world.getEntitiesWithinAABB(EntityLivingBase.class, new AxisAlignedBB(entity.posX-range, entity.posY-range, entity.posZ-range, entity.posX+range, entity.posZ+range, entity.posZ+range), predicate);
+		return world.getEntitiesWithinAABB(EntityLivingBase.class, new AxisAlignedBB(entity.posX-range, entity.posY-range, entity.posZ-range, entity.posX+range, entity.posY+range, entity.posZ+range), predicate);
 	}
 
 }

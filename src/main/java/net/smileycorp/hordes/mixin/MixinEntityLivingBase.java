@@ -28,7 +28,7 @@ public abstract class MixinEntityLivingBase extends Entity {
 	@Shadow
 	public abstract IAttributeInstance getEntityAttribute(IAttribute attribute);
 
-	@Inject(at=@At("HEAD"), method = "processInitialInteract(Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/EnumHand;)Z", cancellable = true)
+	@Inject(at=@At("HEAD"), method = "attackEntityAsMob(Lnet/minecraft/entity/Entity;)Z", cancellable = true)
 	public void attackEntityAsMob(Entity entityIn, CallbackInfoReturnable<Boolean> callback) {
 		if (((Entity)this) instanceof EntityZombieHorse && ConfigHandler.aggressiveZombieHorses) {
 			float f = (float)this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
