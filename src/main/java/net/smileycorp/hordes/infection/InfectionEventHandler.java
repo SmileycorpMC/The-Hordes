@@ -6,7 +6,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.monster.EntityZombieVillager;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
@@ -36,6 +35,7 @@ import net.smileycorp.atlas.api.util.DirectionUtils;
 import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.ai.EntityAINearestAttackableConversion;
 import net.smileycorp.hordes.common.event.InfectionDeathEvent;
 import net.smileycorp.hordes.infection.InfectionPacketHandler.InfectMessage;
 import net.smileycorp.hordes.infection.capability.IInfection;
@@ -59,7 +59,7 @@ public class InfectionEventHandler {
 			if (!entity.world.isRemote) {
 				if (ConfigHandler.infectionEntitiesAggroConversions) {
 					if (InfectionRegister.canCauseInfection(entity) && entity instanceof EntityCreature) {
-						((EntityLiving)entity).targetTasks.addTask(3, new EntityAINearestAttackableTarget<>((EntityCreature)entity, EntityLivingBase.class, 10, true, false, InfectionRegister::canBeInfected));
+						((EntityLiving)entity).targetTasks.addTask(3, new EntityAINearestAttackableConversion((EntityCreature)entity, 10, true, true));
 					}
 				}
 			}

@@ -110,7 +110,7 @@ public class InfectionRegister {
 						throw new Exception(nameSplit[0] + " is not a resourcelocation");
 					}
 					try {
-						infectChance = Integer.valueOf(nameSplit[1]);
+						infectChance = Integer.parseInt(nameSplit[1]);
 					} catch (Exception e) {
 						throw new Exception(nameSplit[1] + " is not an integer");
 					}
@@ -186,7 +186,7 @@ public class InfectionRegister {
 				ResourceLocation loc = new ResourceLocation(nameSplit[0], nameSplit[1]);
 				int meta;
 				try {
-					meta = nameSplit.length > 2 ? (nameSplit[2].equals("*") ? OreDictionary.WILDCARD_VALUE : Integer.valueOf(nameSplit[2])) : 0;
+					meta = nameSplit.length > 2 ? (nameSplit[2].equals("*") ? OreDictionary.WILDCARD_VALUE : Integer.parseInt(nameSplit[2])) : 0;
 				} catch (Exception e) {
 					meta = 0;
 					Hordes.logError("Entry" + name + " has a non integer, non wildcard metadata value", e);
@@ -245,6 +245,7 @@ public class InfectionRegister {
 
 	public static boolean canBeInfected(Entity entity) {
 		if (!(entity instanceof EntityLivingBase)) return false;
+		if (canCauseInfection(entity)) return false;
 		return conversionTable.containsKey(entity.getClass());
 	}
 
