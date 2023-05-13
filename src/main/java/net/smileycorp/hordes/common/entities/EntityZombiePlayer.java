@@ -102,7 +102,6 @@ public class EntityZombiePlayer extends EntityZombie {
 
 	@Override
 	public boolean shouldBurnInDay() {
-		damageEntity(getLastDamageSource(), lastDamage);
 		return ConfigHandler.zombiePlayersBurn;
 	}
 
