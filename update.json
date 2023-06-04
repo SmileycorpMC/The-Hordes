@@ -9,6 +9,7 @@
 	"1.1.5e": "fix crash when zombie players can't properly select which player model to use, fix issues with drowned player names",
 	"1.1.6": "add additional config options",
 	"1.1.6a": "fix mixin config preventing mod load"
+  },
   "promos": {
     "1.18.2-latest": "1.1.6a",
     "1.18.2-recommended": "1.1.6a"
