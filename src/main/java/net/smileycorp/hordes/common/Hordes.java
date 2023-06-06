@@ -1,5 +1,6 @@
 package net.smileycorp.hordes.common;
 
+import net.smileycorp.hordes.common.hordeevent.data.DefaultDataGenerator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -41,8 +42,12 @@ public class Hordes {
 	public final static Capability<IInfection> INFECTION = CapabilityManager.get(new CapabilityToken<IInfection>(){});
 
 	public Hordes() {
+		//register configs
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CommonConfigHandler.config);
 		ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfigHandler.config);
+		//generate data files
+		if (DefaultDataGenerator.tryGenerateDataFiles()) logInfo("Generated default config files.");
+		else logInfo("Config files exist, skipping generation");
 	}
 
 	@SubscribeEvent
@@ -79,7 +84,7 @@ public class Hordes {
 	}
 
 	@SubscribeEvent
-	public static void loadComplete(FMLClientSetupEvent event) {
+	public static void loadClient(FMLClientSetupEvent event) {
 		MinecraftForge.EVENT_BUS.register(new ClientHandler());
 	}
 
