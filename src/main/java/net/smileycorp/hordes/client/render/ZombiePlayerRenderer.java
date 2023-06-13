@@ -19,13 +19,13 @@ import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.monster.Zombie;
 import net.smileycorp.atlas.api.client.PlayerTextureRenderer;
-import net.smileycorp.hordes.common.ModDefinitions;
+import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.entities.IZombiePlayer;
 
 public class ZombiePlayerRenderer<T extends Zombie & IZombiePlayer> extends HumanoidMobRenderer<T, ZombiePlayerModel<T>> {
 
-	public static final ModelLayerLocation DEFAULT = new ModelLayerLocation(ModDefinitions.getResource("zombie_player"), "default");
-	public static final ModelLayerLocation SLIM = new ModelLayerLocation(ModDefinitions.getResource("zombie_player"), "slim");
+	public static final ModelLayerLocation DEFAULT = new ModelLayerLocation(Constants.loc("zombie_player"), "default");
+	public static final ModelLayerLocation SLIM = new ModelLayerLocation(Constants.loc("zombie_player"), "slim");
 
 	protected final ZombiePlayerModel<T> defaultModel;
 	protected final ZombiePlayerModel<T> slimModel;

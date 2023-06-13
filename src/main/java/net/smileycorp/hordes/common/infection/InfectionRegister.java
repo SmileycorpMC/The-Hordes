@@ -225,10 +225,13 @@ public class InfectionRegister {
 
 	public static boolean canCauseInfection(Entity entity) {
 		if (entity instanceof Mob) {
-			for (EntityType<?> type : infectionEntities) {
-				if (entity.getType() == type) return true;
-			}
+			return canCauseInfection(entity.getType());
 		}
+		return false;
+	}
+
+	public static boolean canCauseInfection(EntityType<?> entity) {
+		for (EntityType<?> type : infectionEntities) if (entity == type) return true;
 		return false;
 	}
 

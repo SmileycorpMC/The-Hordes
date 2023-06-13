@@ -5,11 +5,16 @@
 	"refmap": "hordes.mixin.refmap.json",
 	"mixins": [
 		"MixinAbstractHorse",
+		"MixinAbstractPiglin",
+		"MixinHoglin",
 		"MixinMob",
 		"MixinMobEffectInstance",
+		"MixinPiglinAi",
+		"MixinZoglin",
 		"MixinZombie",
 		"MixinZombieHorse",
-		"MixinZombieVillager"
+		"MixinZombieVillager",
+		"MixinZombifiedPiglin"
 	],
 	"injector": {
 		"defaultRequire": 1

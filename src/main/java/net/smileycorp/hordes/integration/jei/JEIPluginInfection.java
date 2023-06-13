@@ -14,7 +14,7 @@ import mezz.jei.recipes.RecipeManagerInternal;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
-import net.smileycorp.hordes.common.ModDefinitions;
+import net.smileycorp.hordes.common.Constants;
 
 @JeiPlugin
 public class JEIPluginInfection implements IModPlugin {
@@ -67,7 +67,7 @@ public class JEIPluginInfection implements IModPlugin {
 
 	@Override
 	public ResourceLocation getPluginUid() {
-		return ModDefinitions.getResource("infection");
+		return Constants.loc("infection");
 	}
 
 

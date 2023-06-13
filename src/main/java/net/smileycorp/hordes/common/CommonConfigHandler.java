@@ -56,10 +56,14 @@ public class CommonConfigHandler {
 	public static ConfigValue<Boolean> zombiesBurn;
 	public static ConfigValue<Boolean> skeletonsBurn;
 	public static ConfigValue<Boolean> zombieVillagersCanBeCured;
+	public static ConfigValue<Boolean> piglinsHoglinsConvert;
 	public static ConfigValue<Boolean> aggressiveZombieHorses;
 	public static ConfigValue<Boolean> zombieHorsesBurn;
 	public static ConfigValue<Boolean> skeletonHorsesBurn;
 	public static ConfigValue<Boolean> zombiesScareHorses;
+	public static ConfigValue<Boolean> aggressiveZombiePiglins;
+	public static ConfigValue<Boolean> piglinsHuntZombies;
+	public static ConfigValue<Boolean> zoglinsAttackUndead;
 
 	//load config properties
 	static {
@@ -82,7 +86,7 @@ public class CommonConfigHandler {
 		pauseEventServer = builder.comment("Do the daylight cycle (and active horde events get paused while there are no players online.).").define("pauseEventServer", true);
 		/*hordeSpawnList = builder.comment("A list of entities to spawn followed by the spawn weight then the day they first appear on then the last day. Higher weight is more common. "
 				+ "Leave the last value to 0 to set no max day, entities can have nbt attached to them.(e.g. minecraft:zombie{ActiveEffects:[{Id:12,Amplifier:0,Duration:10000}]}-20-0-0)")
-				.define("spawnList", Lists.newArrayList("minecraft:zombie-35-0-20", "minecraft:zombie_villager-1-0-20", "minecraft:husk-40-30-0", "minecraft:drowned{HandItems:[{id:trident,Count:1}]}-1-40-0", "minecraft:zombie_horse-3-30-0"));*/
+				.define("spawnList", Lists.newArrayList("minecraft:zombie-35-0-20", "minecraft:zombie_villager-1-0-20", "minecraft:zombie_horse-3-20-0", "minecraft:husk-40-30-50", "minecraft:drowned{HandItems:[{id:trident,Count:1}]}-1-40-0", "minecraft:zoglin-2-40-0", "minecraft:zombified_piglin-25-50-0"));*/
 		//infection
 		builder.pop();
 		builder.push("Infection");
@@ -96,13 +100,13 @@ public class CommonConfigHandler {
 		ticksForEffectStage = builder.comment("How long do each of the 4 effect phases last for before the next phase is activated?").define("ticksForEffectStage", 6000);
 		infectionSpawnsZombiePlayers = builder.comment("Do players who die to infection spawn a zombie?").define("infectionSpawnsZombiePlayers", true);
 		infectionEntities = builder.comment("Mobs in this list can cause the infection effect.)")
-				.define("infectionEntities", Lists.newArrayList("minecraft:zombie", "minecraft:zombie_villager", "minecraft:husk", "minecraft:drowned", "minecraft:zombie_horse", "hordes:zombie_player", "hordes:drowned_player"));
-		cureItemList = builder.comment("A list of items which can cure infection when 'consumed' or used on an entity can accept nbt tags. eg.minecraft:golden_apple, minecraft:potion{Potion: \"minecraft:strong_regeneration\"}")
+				.define("infectionEntities", Lists.newArrayList("minecraft:zombie", "minecraft:zombie_villager", "minecraft:husk", "minecraft:drowned", "minecraft:zombie_horse", "minecraft:zombified_piglin", "minecraft:zoglin", "hordes:zombie_player", "hordes:drowned_player"));
+		cureItemList = builder.comment("A list of items which can cure infection when 'consumed' or used on an entity can accept nbt tags. eg.minecraft:golden_apple, minecraft:potion{Potion: \\\"minecraft:strong_regeneration\\\"}")
 				.define("cureItemList", Lists.newArrayList("minecraft:golden_apple", "minecraft:enchanted_golden_apple"));
 		infectionConversionList = builder.comment("A list of entities that can be infected, followed by the chance out of 100 to infect, then the entity to convert them to, " +
 				"entities can have nbt attached to them.(e.g. minecraft:villager-85-minecraft:zombie_villager{ActiveEffects:[{Id:12,Amplifier:0,Duration:10000}]}), "
 				+ "note: players and villagers have special code accociated with them, and should not be in this list")
-				.define("customConversionList", Lists.newArrayList("minecraft:horse-65-minecraft:zombie_horse"));
+				.define("customConversionList", Lists.newArrayList("minecraft:horse-65-minecraft:zombie_horse", "minecraft:piglin-75-minecraft:zombified_piglin", "minecraft:piglin_brute-35-minecraft:zombified_piglin", "minecraft:hoglin-35-minecraft:zoglin"));
 		infectionEntitiesAggroConversions = builder.comment("Do entities on the infectionEntities list automatically target entities on the infectionConversionList").define("infectionEntitiesAggroConversions", true);
 		effectStageTickReduction = builder.comment("What factor should the infection potion effect timer be multiplied by for each cured infection? (Resets on death, set to 1 to disable scaling)").define("effectStageTickReduction", 0.95);
 
@@ -118,10 +122,14 @@ public class CommonConfigHandler {
 		zombiesBurn = builder.comment("Whether zombies and drowneds burn in sunlight.").define("zombiesBurn", true);
 		skeletonsBurn = builder.comment("Whether skeletons and strays burn in sunlight.").define("skeletonsBurn", true);
 		zombieVillagersCanBeCured = builder.comment("Whether zombie villagers have vanilla curing mechanics or not").define("zombieVillagersCanBeCured", false);
+		piglinsHoglinsConvert = builder.comment("Whether piglins and hoglins automatically convert to zombies in the overworld").define("piglinsHoglinsConvert", false);
 		aggressiveZombieHorses = builder.comment("Whether zombie horses are aggressive or not.").define("aggressiveZombieHorses", true);
 		zombieHorsesBurn = builder.comment("Whether zombie horses burn in sunlight.").define("zombieHorsesBurn", true);
 		skeletonHorsesBurn = builder.comment("Whether skeleton horses burn in sunlight.").define("skeletonHorsesBurn", true);
 		zombiesScareHorses = builder.comment("Whether unmounted horses are scared of zombies.").define("zombiesScareHorses", true);
+		aggressiveZombiePiglins = builder.comment("Whether zombie piglins are hostile by default").define("zombiePiglinsHostile", true);
+		piglinsHuntZombies = builder.comment("Whether piglins kill zombie mobs").define("piglinsHuntZombies", true);
+		zoglinsAttackUndead = builder.comment("Whether zoglins are agressive towards other undead mobs").define("zoglinsAttackUndead", false);
 		builder.pop();
 		config = builder.build();
 	}
