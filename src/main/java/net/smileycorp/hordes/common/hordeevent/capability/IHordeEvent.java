@@ -10,6 +10,7 @@ import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.smileycorp.atlas.api.IOngoingEvent;
 import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.hordeevent.HordeSpawnTable;
 
 public interface IHordeEvent extends IOngoingEvent<Player> {
 
@@ -22,6 +23,8 @@ public interface IHordeEvent extends IOngoingEvent<Player> {
 	public void setPlayer(Player player);
 
 	public void tryStartEvent(Player player, int duration, boolean isCommand);
+
+	public void setSpawntable(HordeSpawnTable table);
 
 	public void setNextDay(int day);
 

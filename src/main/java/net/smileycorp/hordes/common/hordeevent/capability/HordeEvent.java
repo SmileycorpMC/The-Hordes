@@ -2,6 +2,7 @@ package net.smileycorp.hordes.common.hordeevent.capability;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -30,6 +31,8 @@ import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.event.*;
 import net.smileycorp.hordes.common.hordeevent.HordeEventRegister;
 import net.smileycorp.hordes.common.hordeevent.HordeSpawnEntry;
+import net.smileycorp.hordes.common.hordeevent.HordeSpawnTable;
+import net.smileycorp.hordes.common.hordeevent.data.HordeTableLoader;
 import net.smileycorp.hordes.common.hordeevent.network.HordeEventPacketHandler;
 import net.smileycorp.hordes.common.hordeevent.network.HordeSoundMessage;
 
@@ -43,6 +46,8 @@ class HordeEvent implements IHordeEvent {
 	private int nextDay = -1;
 	private boolean hasChanged = false;
 	private Random rand = new Random();
+
+	private HordeSpawnTable loadedTable;
 
 	public HordeEvent(){
 		if (Thread.currentThread().getThreadGroup() == SidedThreadGroups.SERVER) {
@@ -63,6 +68,9 @@ class HordeEvent implements IHordeEvent {
 		if (nbt.contains("day")) {
 			day = nbt.getInt("day");
 		}
+		if (nbt.contains("loadedTable")) {
+			loadedTable = HordeTableLoader.INSTANCE.getTable(new ResourceLocation(nbt.getString("loadedTable")));
+		}
 	}
 
 	@Override
@@ -70,6 +78,7 @@ class HordeEvent implements IHordeEvent {
 		nbt.putInt("timer", timer);
 		nbt.putInt("nextDay", nextDay);
 		nbt.putInt("day", day);
+		if (loadedTable != null) nbt.putString("loadedTable", loadedTable.getName().toString());
 		hasChanged = false;
 		return nbt;
 	}
@@ -119,7 +128,7 @@ class HordeEvent implements IHordeEvent {
 				break;
 			}
 		}
-		HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, HordeEventRegister.getSpawnTable(day), this);
+		HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, loadedTable.getSpawnTable(day), this);
 		MinecraftForge.EVENT_BUS.post(buildTableEvent);
 		WeightedOutputs<HordeSpawnEntry> spawntable = buildTableEvent.spawntable;
 		if (spawntable.isEmpty()) {
@@ -144,7 +153,7 @@ class HordeEvent implements IHordeEvent {
 			EntityType<?> type = entry.getEntity();
 			try {
 				Mob entity = (Mob) type.create(level);
-				entity.readAdditionalSaveData(HordeEventRegister.getEntryFor(entity, day).getNBT());
+				entity.readAdditionalSaveData(entry.getNBT());
 				HordeSpawnEntityEvent spawnEntityEvent = new HordeSpawnEntityEvent(player, entity, pos, this);
 				MinecraftForge.EVENT_BUS.post(spawnEntityEvent);
 				if (!spawnEntityEvent.isCanceled()) {
@@ -243,7 +252,8 @@ class HordeEvent implements IHordeEvent {
 				HordeStartEvent startEvent = new HordeStartEvent(player, this, isCommand);
 				MinecraftForge.EVENT_BUS.post(startEvent);
 				if (startEvent.isCanceled()) return;
-				HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, HordeEventRegister.getSpawnTable((int) Math.floor(level.getDayTime()/CommonConfigHandler.dayLength.get())), this);
+				loadedTable = HordeEventRegister.getSpawnTable(level, player, level.random);
+				HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, loadedTable.getSpawnTable(day), this);
 				MinecraftForge.EVENT_BUS.post(buildTableEvent);
 				if (!buildTableEvent.spawntable.isEmpty()) {
 					timer = duration;
@@ -252,11 +262,16 @@ class HordeEvent implements IHordeEvent {
 					if (isCommand) day = (int) Math.floor(level.getDayTime()/CommonConfigHandler.dayLength.get());
 					else day = nextDay;
 				} else {
+					loadedTable = null;
 					logInfo("Spawntable is empty, canceling event start.");
 				}
 				if (!isCommand) nextDay = HordeSavedData.getData((ServerLevel) level).getNextDay();
 			}
 		} else Hordes.logError("player is null for " + toString(), new NullPointerException());
+	}
+
+	public void setSpawntable(HordeSpawnTable table) {
+		loadedTable = table;
 	}
 
 	@Override
