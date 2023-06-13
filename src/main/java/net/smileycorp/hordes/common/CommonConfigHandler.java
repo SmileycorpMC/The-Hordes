@@ -84,9 +84,9 @@ public class CommonConfigHandler {
 		canSleepDuringHorde = builder.comment("Set to false to disable the use of beds during a horde event.").define("canSleepDuringHorde", false);
 		hordeMultiplayerScaling = builder.comment("How much should the size of each horde scale down by when multiple players are near each other?").define("hordeMultiplayerScaling", 0.8);
 		pauseEventServer = builder.comment("Do the daylight cycle (and active horde events get paused while there are no players online.).").define("pauseEventServer", true);
-		hordeSpawnList = builder.comment("A list of entities to spawn followed by the spawn weight then the day they first appear on then the last day. Higher weight is more common. "
+		/*hordeSpawnList = builder.comment("A list of entities to spawn followed by the spawn weight then the day they first appear on then the last day. Higher weight is more common. "
 				+ "Leave the last value to 0 to set no max day, entities can have nbt attached to them.(e.g. minecraft:zombie{ActiveEffects:[{Id:12,Amplifier:0,Duration:10000}]}-20-0-0)")
-				.define("spawnList", Lists.newArrayList("minecraft:zombie-35-0-20", "minecraft:zombie_villager-1-0-20", "minecraft:zombie_horse-3-20-0", "minecraft:husk-40-30-50", "minecraft:drowned{HandItems:[{id:trident,Count:1}]}-1-40-0", "minecraft:zoglin-2-40-0", "minecraft:zombified_piglin-25-50-0"));
+				.define("spawnList", Lists.newArrayList("minecraft:zombie-35-0-20", "minecraft:zombie_villager-1-0-20", "minecraft:zombie_horse-3-20-0", "minecraft:husk-40-30-50", "minecraft:drowned{HandItems:[{id:trident,Count:1}]}-1-40-0", "minecraft:zoglin-2-40-0", "minecraft:zombified_piglin-25-50-0"));*/
 		//infection
 		builder.pop();
 		builder.push("Infection");

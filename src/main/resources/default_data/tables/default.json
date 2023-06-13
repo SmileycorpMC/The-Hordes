@@ -1,0 +1,30 @@
+[
+	"minecraft:zombie-35-0-20",
+	"minecraft:zombie_villager-1-0-20",
+	"minecraft:zombie_horse-3-20-40",
+	"minecraft:husk-40-20-40",
+	{
+		"entity": "minecraft:drowned",
+		"weight": 3,
+		"first_day": 30,
+		"last_day": 40,
+		"nbt": "{HandItems:[{id:trident,Count:1}]}"
+	},
+	"minecraft:zoglin-3-40-40",
+	"minecraft:zombified_piglin-25-40-0"
+	"minecraft:husk-25-50-0",
+	{
+		"entity": "minecraft:zoglin",
+		"weight": 3,
+		"first_day": 50,
+		"last_day": 0,
+		"nbt": "{Passengers:[{id:drowned,HandItems:[{id:trident,Count:1b}]}]}"
+	},
+	{
+		"entity": "minecraft:zombie_horse",
+		"weight": 3,
+		"first_day": 50,
+		"last_day": 0,
+		"nbt": "{Passengers:[{id:drowned,HandItems:[{id:trident,Count:1b}]}]}"
+	}
+]

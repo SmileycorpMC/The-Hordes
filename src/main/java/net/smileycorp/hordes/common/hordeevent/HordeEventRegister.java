@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
+import com.google.common.collect.Lists;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
@@ -16,16 +17,21 @@ import net.smileycorp.atlas.api.recipe.WeightedOutputs;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.CommonUtils;
 import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.hordeevent.data.DataRegistry;
+import net.smileycorp.hordes.common.hordeevent.data.functions.HordeFunction;
 
 public class HordeEventRegister {
 
 	protected static List<HordeSpawnEntry> spawnlist = new ArrayList<>();
+	protected static final List<HordeFunction> FUNCTIONS = Lists.newArrayList();
 	private static boolean tested = false;
 
 	public static void readConfig() {
+		DataRegistry.init();
 		Hordes.logInfo("Trying to read spawn table from config");
 		if (CommonConfigHandler.hordeSpawnList == null) {
 			Hordes.logError("Error reading config.", new NullPointerException("Spawn table has loaded as null"));
+			return;
 		}
 		else if (CommonConfigHandler.hordeSpawnList.get().size()<=0) {
 			Hordes.logError("Error reading config.", new Exception("Spawn table in config is empty"));
