@@ -252,7 +252,11 @@ class HordeEvent implements IHordeEvent {
 				HordeStartEvent startEvent = new HordeStartEvent(player, this, isCommand);
 				MinecraftForge.EVENT_BUS.post(startEvent);
 				if (startEvent.isCanceled()) return;
-				loadedTable = HordeEventRegister.getSpawnTable(level, player, level.random);
+				if (loadedTable == null) loadedTable = HordeEventRegister.getSpawnTable(level, player, level.random);
+				if (loadedTable == null) {
+					logInfo("Spawntable is null, canceling event start.");
+					return;
+				}
 				HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, loadedTable.getSpawnTable(day), this);
 				MinecraftForge.EVENT_BUS.post(buildTableEvent);
 				if (!buildTableEvent.spawntable.isEmpty()) {
@@ -296,6 +300,7 @@ class HordeEvent implements IHordeEvent {
 		cleanSpawns();
 		sendMessage(player, endEvent.getMessage());
 		hasChanged = true;
+		loadedTable = null;
 	}
 
 	@Override
@@ -341,5 +346,7 @@ class HordeEvent implements IHordeEvent {
 		entitiesSpawned.clear();
 		HordeSavedData data = HordeSavedData.getData((ServerLevel) level);
 		nextDay = data.getNextDay();
+		loadedTable = null;
+		timer = 0;
 	}
 }

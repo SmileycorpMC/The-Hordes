@@ -9,6 +9,7 @@
 		"MixinHoglin",
 		"MixinMob",
 		"MixinMobEffectInstance",
+		"MixinPackRepository",
 		"MixinPiglinAi",
 		"MixinZoglin",
 		"MixinZombie",

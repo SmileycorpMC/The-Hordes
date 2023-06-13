@@ -16,10 +16,10 @@ import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 
 import java.util.Collection;
 
-public class CommandStopHordeEvent {
+public class CommandResetHordeEvent {
 
 	public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-		LiteralArgumentBuilder<CommandSourceStack> command = Commands.literal("stopHordeEvent")
+		LiteralArgumentBuilder<CommandSourceStack> command = Commands.literal("resetHordeEvent")
 				.requires((commandSource) -> commandSource.hasPermission(1))
 				.executes(ctx -> execute(ctx))
 				.then(Commands.argument("player", EntityArgument.players())
@@ -35,10 +35,10 @@ public class CommandStopHordeEvent {
 
 	public static int execute(CommandContext<CommandSourceStack> ctx, Collection<ServerPlayer> players) throws CommandSyntaxException {
 		CommandSourceStack source = ctx.getSource();
-		for (Player player : players) {
+		for (ServerPlayer player : players) {
 			LazyOptional<IHordeEvent> optional = player.getCapability(Hordes.HORDE_EVENT, null);
 			if (optional.isPresent()) {
-				optional.resolve().get().stopEvent(player, true);
+				optional.resolve().get().reset(ctx.getSource().getLevel());
 				return 1;
 			}
 		}
