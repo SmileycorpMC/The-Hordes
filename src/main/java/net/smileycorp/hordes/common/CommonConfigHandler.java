@@ -14,6 +14,7 @@ public class CommonConfigHandler {
 
 	//horde event
 	public static ConfigValue<Boolean> enableHordeEvent;
+	public static ConfigValue<Boolean> hordesCommandOnly;
 	public static ConfigValue<Integer> hordeSpawnAmount;
 	public static ConfigValue<Double> hordeSpawnMultiplier;
 	public static ConfigValue<Integer> hordeSpawnMax;
@@ -70,12 +71,13 @@ public class CommonConfigHandler {
 		//horde event
 		builder.push("Horde Event");
 		enableHordeEvent = builder.comment("Set to false to completely disable the horde event and anything relating to it.").define("enableHordeEvent", true);
+		hordesCommandOnly = builder.comment("Set to true to disable natural horde spawns (hordes can only be spawned with commands).").define("hordesCommandOnly", false);
 		hordeSpawnAmount = builder.comment("Amount of mobs to spawn per wave.").define("spawnAmount", 25);
 		hordeSpawnMultiplier = builder.comment("Multiplier by which the spawn amount increases by each time the event naturally spawns. (Set to 1 to disable scaling.)").define("hordeSpawnMultiplier", 1.05);
 		hordeSpawnDuration = builder.comment("Time in ticks the event lasts for").define("hordeSpawnDuration", 6000);
 		hordeSpawnInterval = builder.comment("Time in ticks between spawns for the horde spawn event.").define("hordeSpawnInterval", 1000);
 		hordeStartTime = builder.comment("What time of day does the horde event start? eg 18000 is midnight with default day length.").define("hordeStartTime", 18000);
-		hordeSpawnDays = builder.comment("Amount of days between horde spawns").define("hordeSpawnDays", 10);
+		hordeSpawnDays = builder.comment("Amount of days between horde spawns.").define("hordeSpawnDays", 10);
 		hordeSpawnVariation = builder.comment("Amount of days a horde event can be randomly extended by").define("hordeSpawnVariation", 0);
 		hordeSpawnMax = builder.comment("Max cap for the number of entities that can exist from the horde at once.").define("hordeSpawnMax", 160);
 		dayLength = builder.comment("Length of a day (use only if you have another day that changes the length of the day/night cycle) Default is 24000").define("dayLength", 24000);
@@ -83,9 +85,7 @@ public class CommonConfigHandler {
 		canSleepDuringHorde = builder.comment("Set to false to disable the use of beds during a horde event.").define("canSleepDuringHorde", false);
 		hordeMultiplayerScaling = builder.comment("How much should the size of each horde scale down by when multiple players are near each other?").define("hordeMultiplayerScaling", 0.8);
 		pauseEventServer = builder.comment("Do the daylight cycle (and active horde events get paused while there are no players online.).").define("pauseEventServer", true);
-		/*hordeSpawnList = builder.comment("A list of entities to spawn followed by the spawn weight then the day they first appear on then the last day. Higher weight is more common. "
-				+ "Leave the last value to 0 to set no max day, entities can have nbt attached to them.(e.g. minecraft:zombie{ActiveEffects:[{Id:12,Amplifier:0,Duration:10000}]}-20-0-0)")
-				.define("spawnList", Lists.newArrayList("minecraft:zombie-35-0-20", "minecraft:zombie_villager-1-0-20", "minecraft:zombie_horse-3-20-0", "minecraft:husk-40-30-50", "minecraft:drowned{HandItems:[{id:trident,Count:1}]}-1-40-0", "minecraft:zoglin-2-40-0", "minecraft:zombified_piglin-25-50-0"));*/
+
 		//infection
 		builder.pop();
 		builder.push("Infection");

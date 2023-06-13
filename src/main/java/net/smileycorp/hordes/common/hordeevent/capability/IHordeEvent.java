@@ -26,6 +26,8 @@ public interface IHordeEvent extends IOngoingEvent<Player> {
 
 	public void setSpawntable(HordeSpawnTable table);
 
+	public HordeSpawnTable getSpawntable();
+
 	public void setNextDay(int day);
 
 	public int getNextDay();

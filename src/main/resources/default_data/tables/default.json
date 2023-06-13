@@ -18,13 +18,13 @@
 		"weight": 3,
 		"first_day": 50,
 		"last_day": 0,
-		"nbt": "{Passengers:[{id:drowned,HandItems:[{id:trident,Count:1b}]}]}"
+		"nbt": "{Passengers:[{id:drowned,HandItems:[{id:trident,Count:1}]}]}"
 	},
 	{
 		"entity": "minecraft:zombie_horse",
 		"weight": 3,
 		"first_day": 50,
 		"last_day": 0,
-		"nbt": "{Passengers:[{id:drowned,HandItems:[{id:trident,Count:1b}]}]}"
+		"nbt": "{Passengers:[{id:drowned,HandItems:[{id:trident,Count:1}]}]}"
 	}
 ]

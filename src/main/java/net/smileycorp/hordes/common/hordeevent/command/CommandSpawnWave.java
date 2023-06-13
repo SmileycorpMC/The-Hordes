@@ -15,6 +15,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.util.LazyOptional;
 import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.hordeevent.HordeSpawnTable;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.data.HordeTableLoader;
 
@@ -75,9 +76,10 @@ public class CommandSpawnWave {
 			try {
 				if (optional.isPresent()) {
 					IHordeEvent event = optional.resolve().get();
+					HordeSpawnTable current = event.getSpawntable();
 					event.setSpawntable(HordeTableLoader.INSTANCE.getTable(table));
 					event.spawnWave(player, count);
-					event.setSpawntable(null);
+					event.setSpawntable(current);
 				}
 			} catch (Exception e) {
 				Hordes.logError("Failed to run startHordeEvent command", e);
