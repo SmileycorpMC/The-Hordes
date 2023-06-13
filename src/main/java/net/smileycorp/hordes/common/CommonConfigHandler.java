@@ -1,11 +1,10 @@
 package net.smileycorp.hordes.common;
 
-import java.util.List;
-
 import com.google.common.collect.Lists;
-
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
+
+import java.util.List;
 
 
 public class CommonConfigHandler {

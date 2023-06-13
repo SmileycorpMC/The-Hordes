@@ -8,8 +8,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.Hordes;
-import net.smileycorp.hordes.common.ModDefinitions;
 import net.smileycorp.hordes.common.hordeevent.HordeSpawnTable;
 
 import java.util.Map;
@@ -17,7 +17,7 @@ import java.util.Map;
 public class HordeTableLoader extends SimpleJsonResourceReloadListener {
 
     public static HordeTableLoader INSTANCE = new HordeTableLoader();
-    public static ResourceLocation DEFAULT_TABLE = ModDefinitions.getResource("default");
+    public static ResourceLocation DEFAULT_TABLE = Constants.loc("default");
 
     private final Map<ResourceLocation, HordeSpawnTable> SPAWN_TABLES = Maps.newHashMap();
 

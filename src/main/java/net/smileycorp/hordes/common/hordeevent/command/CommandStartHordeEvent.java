@@ -1,14 +1,11 @@
 package net.smileycorp.hordes.common.hordeevent.command;
 
-import java.util.Collection;
-
 import com.google.common.collect.Lists;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -17,6 +14,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.util.LazyOptional;
 import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
+
+import java.util.Collection;
 
 public class CommandStartHordeEvent {
 

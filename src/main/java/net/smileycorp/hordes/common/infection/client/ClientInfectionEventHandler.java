@@ -1,9 +1,6 @@
 package net.smileycorp.hordes.common.infection.client;
 
-import java.awt.Color;
-
 import com.mojang.blaze3d.platform.Window;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.player.LocalPlayer;
@@ -14,6 +11,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.smileycorp.hordes.client.ClientConfigHandler;
 import net.smileycorp.hordes.common.infection.HordesInfection;
+
+import java.awt.*;
 
 @EventBusSubscriber(Dist.CLIENT)
 public class ClientInfectionEventHandler {

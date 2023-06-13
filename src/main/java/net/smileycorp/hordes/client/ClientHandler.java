@@ -1,7 +1,5 @@
 package net.smileycorp.hordes.client;
 
-import java.util.Random;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.core.BlockPos;
@@ -32,6 +30,8 @@ import net.smileycorp.hordes.common.entities.IZombiePlayer;
 import net.smileycorp.hordes.common.infection.HordesInfection;
 import net.smileycorp.hordes.common.infection.client.ClientInfectionEventHandler;
 import net.smileycorp.hordes.common.infection.network.CureEntityMessage;
+
+import java.util.Random;
 
 @EventBusSubscriber(modid = Constants.MODID, value = Dist.CLIENT, bus = Bus.MOD)
 public class ClientHandler {

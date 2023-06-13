@@ -1,7 +1,5 @@
 package net.smileycorp.hordes.common.hordeevent.data.conditions;
 
-import java.util.Random;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.world.entity.player.Player;
@@ -10,6 +8,8 @@ import net.smileycorp.atlas.api.data.ComparableOperation;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.hordeevent.data.values.ValueGetter;
+
+import java.util.Random;
 
 public class ComparisonCondition<T extends Comparable<T>> implements Condition {
 

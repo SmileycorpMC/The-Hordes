@@ -1,10 +1,5 @@
 package net.smileycorp.hordes.common.ai;
 
-import java.util.EnumSet;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -16,6 +11,11 @@ import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.smileycorp.atlas.api.util.DirectionUtils;
+
+import java.util.EnumSet;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 public class FleeEntityGoal extends Goal  {
 

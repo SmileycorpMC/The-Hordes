@@ -1,12 +1,7 @@
 package net.smileycorp.hordes.client.render;
 
-import java.awt.Color;
-import java.util.Optional;
-import java.util.UUID;
-
 import com.mojang.authlib.minecraft.MinecraftProfileTexture.Type;
 import com.mojang.blaze3d.vertex.PoseStack;
-
 import net.minecraft.client.model.ZombieModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelLayers;
@@ -21,6 +16,10 @@ import net.minecraft.world.entity.monster.Zombie;
 import net.smileycorp.atlas.api.client.PlayerTextureRenderer;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.entities.IZombiePlayer;
+
+import java.awt.*;
+import java.util.Optional;
+import java.util.UUID;
 
 public class ZombiePlayerRenderer<T extends Zombie & IZombiePlayer> extends HumanoidMobRenderer<T, ZombiePlayerModel<T>> {
 

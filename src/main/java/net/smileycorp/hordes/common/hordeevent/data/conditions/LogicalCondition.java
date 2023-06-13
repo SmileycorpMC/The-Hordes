@@ -1,15 +1,15 @@
 package net.smileycorp.hordes.common.hordeevent.data.conditions;
 
-import java.util.List;
-import java.util.Random;
-
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.smileycorp.atlas.api.data.LogicalOperation;
 import net.smileycorp.hordes.common.Hordes;
-import net.smileycorp.hordes.common.hordeevent.data.DataRegistry;
+import net.smileycorp.hordes.common.hordeevent.data.HordeDataRegistry;
+
+import java.util.List;
+import java.util.Random;
 
 public class LogicalCondition implements Condition {
 
@@ -45,7 +45,7 @@ public class LogicalCondition implements Condition {
 			List<Condition> conditions = Lists.newArrayList();
 			for (JsonElement element : json.getAsJsonArray()) {
 				try {
-					conditions.add(DataRegistry.readCondition(element.getAsJsonObject()));
+					conditions.add(HordeDataRegistry.readCondition(element.getAsJsonObject()));
 				} catch(Exception e) {
 					Hordes.logError("Failed to read condition of logical " + element, e);
 				}

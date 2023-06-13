@@ -1,9 +1,5 @@
 package net.smileycorp.hordes.common;
 
-import net.smileycorp.hordes.common.hordeevent.data.DefaultDataGenerator;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -20,15 +16,18 @@ import net.smileycorp.hordes.client.ClientConfigHandler;
 import net.smileycorp.hordes.client.ClientHandler;
 import net.smileycorp.hordes.common.capability.IZombifyPlayer;
 import net.smileycorp.hordes.common.hordeevent.HordeEventHandler;
-import net.smileycorp.hordes.common.hordeevent.HordeEventRegister;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeSpawn;
+import net.smileycorp.hordes.common.hordeevent.data.HordeDataRegistry;
+import net.smileycorp.hordes.common.hordeevent.data.DefaultDataGenerator;
 import net.smileycorp.hordes.common.hordeevent.network.HordeEventPacketHandler;
 import net.smileycorp.hordes.common.infection.HordesInfection;
 import net.smileycorp.hordes.common.infection.InfectionEventHandler;
 import net.smileycorp.hordes.common.infection.InfectionRegister;
 import net.smileycorp.hordes.common.infection.capability.IInfection;
 import net.smileycorp.hordes.common.infection.network.InfectionPacketHandler;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Mod(value = Constants.MODID)
 @Mod.EventBusSubscriber(modid = Constants.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -54,6 +53,7 @@ public class Hordes {
 	public static void constructMod(FMLConstructModEvent event) {
 		//Horde Event
 		if (CommonConfigHandler.enableHordeEvent.get()) {
+			HordeDataRegistry.init();
 			HordeEventPacketHandler.initPackets();
 			MinecraftForge.EVENT_BUS.register(new HordeEventHandler());
 		} else {
@@ -73,10 +73,6 @@ public class Hordes {
 
 	@SubscribeEvent
 	public static void loadComplete(FMLLoadCompleteEvent event) {
-		//Horde Event
-		if (CommonConfigHandler.enableHordeEvent.get()) {
-			HordeEventRegister.readConfig();
-		}
 		//Mob Infection
 		if (CommonConfigHandler.enableMobInfection.get()) {
 			InfectionRegister.readConfig();

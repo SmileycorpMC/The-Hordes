@@ -1,13 +1,13 @@
 package net.smileycorp.hordes.common.hordeevent.data.values;
 
-import java.util.Random;
-
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.data.DataType;
+
+import java.util.Random;
 
 public class LevelNBTGetter<T extends Comparable<T>> extends NBTGetter<T> {
 

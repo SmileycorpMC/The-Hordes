@@ -1,18 +1,17 @@
 package net.smileycorp.hordes.client.render;
 
-import java.awt.Color;
-import java.util.Optional;
-import java.util.UUID;
-
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-
 import net.minecraft.client.model.AnimationUtils;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.world.entity.monster.Zombie;
 import net.smileycorp.hordes.common.entities.IZombiePlayer;
+
+import java.awt.*;
+import java.util.Optional;
+import java.util.UUID;
 
 public class ZombiePlayerModel<T extends Zombie & IZombiePlayer> extends PlayerModel<T> {
 
