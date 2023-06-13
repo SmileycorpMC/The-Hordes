@@ -2,11 +2,22 @@ package net.smileycorp.hordes.common.hordeevent.data.values;
 
 import java.util.Random;
 
+import com.google.gson.JsonElement;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.smileycorp.atlas.api.data.DataType;
+import net.smileycorp.hordes.common.hordeevent.data.DataRegistry;
 
 public interface ValueGetter<T extends Comparable<T>> {
 
-	public T get(Level level, Player player, Random rand);
+    public T get(Level level, Player player, Random rand);
+
+    static ValueGetter readValue(DataType type, JsonElement value) {
+        if (value.isJsonObject()) {
+            return DataRegistry.readValue(type, value.getAsJsonObject());
+        }
+        return new StaticValue(type, value);
+    }
+
 
 }

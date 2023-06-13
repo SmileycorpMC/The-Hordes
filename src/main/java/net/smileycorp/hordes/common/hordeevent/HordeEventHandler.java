@@ -18,6 +18,7 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
@@ -42,6 +43,7 @@ import net.smileycorp.hordes.common.ModDefinitions;
 import net.smileycorp.hordes.common.hordeevent.capability.HordeSavedData;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeSpawn;
+import net.smileycorp.hordes.common.hordeevent.data.HordeTableLoader;
 
 @EventBusSubscriber(modid=ModDefinitions.MODID)
 public class HordeEventHandler {
@@ -56,6 +58,12 @@ public class HordeEventHandler {
 		if (entity instanceof Player && !(entity instanceof FakePlayer)) {
 			event.addCapability(ModDefinitions.getResource("HordeEvent"), new IHordeEvent.Provider());
 		}
+	}
+
+	//register data listeners
+	@SubscribeEvent
+	public void addResourceReload(AddReloadListenerEvent event ) {
+		event.addListener(HordeTableLoader.INSTANCE);
 	}
 
 	//update the next day in the horde level data

@@ -17,6 +17,7 @@ import net.smileycorp.atlas.api.recipe.WeightedOutputs;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.CommonUtils;
 import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.hordeevent.data.DataRegistry;
 import net.smileycorp.hordes.common.hordeevent.data.functions.HordeFunction;
 
 public class HordeEventRegister {
@@ -26,6 +27,7 @@ public class HordeEventRegister {
 	private static boolean tested = false;
 
 	public static void readConfig() {
+		DataRegistry.init();
 		Hordes.logInfo("Trying to read spawn table from config");
 		if (CommonConfigHandler.hordeSpawnList == null) {
 			Hordes.logError("Error reading config.", new NullPointerException("Spawn table has loaded as null"));

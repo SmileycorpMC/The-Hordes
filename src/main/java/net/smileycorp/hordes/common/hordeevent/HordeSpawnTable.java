@@ -1,0 +1,121 @@
+package net.smileycorp.hordes.common.hordeevent;
+
+import com.google.common.collect.Lists;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EntityType;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.smileycorp.atlas.api.recipe.WeightedOutputs;
+import net.smileycorp.hordes.common.CommonUtils;
+import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.hordeevent.HordeSpawnEntry;
+
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+public class HordeSpawnTable {
+
+    private final List<HordeSpawnEntry> spawns;
+    private final ResourceLocation name;
+
+   private HordeSpawnTable(ResourceLocation name, List<HordeSpawnEntry> spawns) {
+    this.name = name;
+    this.spawns=spawns;
+    }
+
+    public ResourceLocation getName() {
+       return name;
+    }
+
+    public WeightedOutputs<HordeSpawnEntry> getSpawnTable(int day) {
+        List<Map.Entry<HordeSpawnEntry, Integer>> spawnmap = new ArrayList<>();
+        for(HordeSpawnEntry entry : spawns) {
+            if (entry.getMinDay() <= day && (entry.getMaxDay() == 0 || entry.getMaxDay() >= day)) {
+                spawnmap.add(new AbstractMap.SimpleEntry<>(entry, entry.getWeight()));
+                Hordes.logInfo("Adding entry " + entry.toString() + " to hordespawn on day " + day);
+            }
+        }
+        return new WeightedOutputs<>(1, spawnmap);
+    }
+
+    public static HordeSpawnTable deserialize(ResourceLocation name, JsonElement json) throws Exception {
+        List<HordeSpawnEntry> spawns = Lists.newArrayList();
+        for (JsonElement element : json.getAsJsonArray()) {
+            try {
+                EntityType<?> type = null;
+                int weight = 0;
+                int minDay = 0;
+                int maxDay = 0;
+                CompoundTag nbt = null;
+                if (element.isJsonObject()) {
+                    JsonObject obj = element.getAsJsonObject();
+                    String entity = obj.get("entity").getAsString();
+                    type = ForgeRegistries.ENTITIES.getValue(new ResourceLocation(entity));
+                    if (obj.has("weight")) weight = obj.get("weight").getAsInt();
+                    if (obj.has("first_day")) minDay = obj.get("first_day").getAsInt();
+                    if (obj.has("last_day")) maxDay = obj.get("last_day").getAsInt();
+                    if (obj.has("nbt")) nbt = CommonUtils.parseNBT(entity, obj.get("nbt").getAsString());
+                } else {
+                    //check if it matches the syntax for a registry name
+                    String data = element.getAsString();
+                    if (data.contains(":")) {
+                        String[] dataSplit = data.split("-");
+                        if (dataSplit.length > 1) {
+                            if (dataSplit[0].contains("{")) {
+                                String nbtstring = dataSplit[0].substring(dataSplit[0].indexOf("{"));
+                                dataSplit[0] = dataSplit[0].substring(0, dataSplit[0].indexOf("{"));
+                                nbt = CommonUtils.parseNBT(data, nbtstring);
+                            }
+                            ResourceLocation loc = new ResourceLocation(dataSplit[0]);
+                            if (ForgeRegistries.ENTITIES.containsKey(loc)) {
+                                type = ForgeRegistries.ENTITIES.getValue(loc);
+                                try {
+                                    weight = Integer.valueOf(dataSplit[1]);
+                                } catch (Exception e) {
+                                    throw new Exception("Entity " + name + " has weight value " + dataSplit[1] + " which is not a valid integer");
+                                }
+                                try {
+                                    minDay = Integer.valueOf(dataSplit[2]);
+                                } catch (Exception e) {
+                                    throw new Exception("Entity " + name + " has min day value " + dataSplit[2] + " which is not a valid integer");
+                                }
+                                if (dataSplit.length > 3) {
+                                    try {
+                                        maxDay = Integer.valueOf(dataSplit[3]);
+                                    } catch (Exception e) {
+                                        throw new Exception("Entity " + name + " has max day value " + dataSplit[3] + " which is not a valid integer");
+                                    }
+                                }
+                            } else {
+                                throw new Exception("Entity " + name + " is not registered");
+                            }
+                        } else {
+                            throw new Exception("Entry " + name + " is not in the correct format");
+                        }
+                    }
+                    if (type == null) {
+                        throw new Exception("Entry " + name + " is not in the correct format");
+                    }
+                    HordeSpawnEntry entry = new HordeSpawnEntry(type, weight, minDay, maxDay);
+                    if (nbt != null) {
+                        entry.setNBT(nbt);
+                    }
+                }
+                Hordes.logInfo("Loaded entity " + name + " as " + type.toString() + " with weight " + weight + ", min day " + minDay + " and max day " + maxDay);
+                HordeSpawnEntry entry = new HordeSpawnEntry(type, weight, minDay, maxDay);
+                if (nbt != null) {
+                    entry.setNBT(nbt);
+                }
+                spawns.add(entry);
+            } catch (Exception e) {
+                Hordes.logError("Error adding entity " + name + " " + e.getCause() + " " + e.getMessage(), e);
+            }
+        }
+       return new HordeSpawnTable(name, spawns);
+    }
+
+}
