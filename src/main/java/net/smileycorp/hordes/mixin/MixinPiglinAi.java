@@ -10,10 +10,12 @@ import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.smileycorp.hordes.common.CommonConfigHandler;
+import net.smileycorp.hordes.common.infection.HordesInfection;
 import net.smileycorp.hordes.common.infection.InfectionRegister;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Optional;
@@ -52,6 +54,15 @@ public abstract class MixinPiglinAi {
 					}
 				}
 			}
+		}
+	}
+
+	@Inject(at=@At("HEAD"), method = "stopHoldingOffHandItem(Lnet/minecraft/world/entity/monster/piglin/Piglin;Z)V", cancellable = true)
+	private static void stopHoldingOffHandItem(Piglin piglin, boolean isCurrency, CallbackInfo callback) {
+		if (!CommonConfigHandler.enableMobInfection.get()) return;
+		if (!isCurrency && piglin.hasEffect(HordesInfection.INFECTED.get())) {
+			ItemStack stack = piglin.getOffhandItem();
+			if (InfectionRegister.isCure(stack)) piglin.removeEffect(HordesInfection.INFECTED.get());
 		}
 	}
 
