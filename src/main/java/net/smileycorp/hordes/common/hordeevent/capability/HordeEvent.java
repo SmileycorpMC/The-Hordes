@@ -276,10 +276,13 @@ class HordeEvent implements IHordeEvent {
 		if (player!=null) {
 			Level level = player.level;
 			if (level.dimension() == Level.OVERWORLD) {
-				HordeStartEvent startEvent = new HordeStartEvent(player, this, isCommand);
-				MinecraftForge.EVENT_BUS.post(startEvent);
-				if (startEvent.isCanceled()) return;
 				if (loadedTable == null) loadedTable = HordeEventRegister.getSpawnTable(level, player, level.random);
+				HordeStartEvent startEvent = new HordeStartEvent(player, this, loadedTable, isCommand);
+				MinecraftForge.EVENT_BUS.post(startEvent);
+				if (startEvent.isCanceled()) {
+					loadedTable = null;
+					return;
+				}
 				if (loadedTable == null) {
 					logInfo("Spawntable is null, canceling event start.");
 					return;

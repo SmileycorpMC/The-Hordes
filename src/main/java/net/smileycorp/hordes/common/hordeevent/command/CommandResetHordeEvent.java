@@ -8,6 +8,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.util.LazyOptional;
@@ -15,6 +16,7 @@ import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 
 import java.util.Collection;
+import java.util.UUID;
 
 public class CommandResetHordeEvent {
 
@@ -39,6 +41,7 @@ public class CommandResetHordeEvent {
 			LazyOptional<IHordeEvent> optional = player.getCapability(Hordes.HORDE_EVENT, null);
 			if (optional.isPresent()) {
 				optional.resolve().get().reset(ctx.getSource().getLevel());
+				source.getEntity().sendMessage(new TranslatableComponent("commands.hordes.HordeReset.success", player.getName()), UUID.fromString("1512ce82-00e5-441a-9774-f46d9b7badfb"));
 				return 1;
 			}
 		}
