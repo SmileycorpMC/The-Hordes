@@ -29,6 +29,7 @@ public class DefaultDataGenerator {
     public static boolean tryGenerateDataFiles() {
         if (CONFIG_FOLDER.toFile().exists()) return false;
         generateHordeTableFile();
+        generateInfectionCuresFile();
         generateMcmetaFile();
         copyFile("assets/hordes/sounds.json");
         copyFile("assets/hordes/sounds/horde_spawn.ogg");
@@ -37,7 +38,9 @@ public class DefaultDataGenerator {
         copyFile("data/hordes/tables/skeletons.json");
         copyFile("data/hordes/tables/mixed_mobs.json");
         copyFile("data/hordes/tables/illagers.json");
-        copyFile("data/hordes/horde_scripts/default.json");
+        copyFile("data/hordes/tags/items/infection_cures.json");
+        copyFile("data/minecraft/tags/items/piglin_loved.json");
+        //TODO: convert infection list to tag
         return true;
     }
 
@@ -86,6 +89,35 @@ public class DefaultDataGenerator {
             writer.close();
         } catch (Exception e) {
             Hordes.logError("Failed to generate horde table file", e);
+        }
+    }
+
+    private static void generateInfectionCuresFile() { //TODO: finish and test cures tag
+        try {
+            List<String> cureEntries = null;
+            File file = CONFIG_FOLDER.resolve("data/hordes/tags/items/infection_cures.json").toFile();
+            file.getParentFile().mkdirs();
+            file.createNewFile();
+            try {
+                ModConfig config = ConfigTracker.INSTANCE.fileMap().get("hordes-common.toml");
+                CommentedFileConfig configData = config.getHandler().reader(FMLPaths.CONFIGDIR.get()).apply(config);
+                cureEntries = configData.get(Lists.newArrayList("Infection", "cureItemList"));
+            } catch (Exception e) {
+                copyFile("data/hordes/tags/items/infection_cures.json");
+                Hordes.logError("Error reading hordes-common.toml, generating fallback cure item list", e);
+                return;
+            }
+            if (cureEntries == null || cureEntries.isEmpty()) {
+                copyFile("data/hordes/tags/items/infection_cures.json");
+                return;
+            }
+            JsonArray json = new JsonArray();
+            for (String entry : cureEntries) json.add(entry);
+            FileWriter writer = new FileWriter(file);
+            writer.write(GSON.toJson(json));
+            writer.close();
+        } catch (Exception e) {
+            Hordes.logError("Failed to generate cure item file", e);
         }
     }
 
