@@ -7,7 +7,7 @@ import net.minecraftforge.eventbus.api.Cancelable;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 
 @Cancelable
-public class HordeSpawnEntityEvent extends HordeEvent {
+public class HordeSpawnEntityEvent extends HordePlayerEvent {
 
 	public Mob entity;
 	public BlockPos pos;

@@ -1,5 +1,7 @@
 {
-	"function": "set_spawntable",
-	"value": "hordes:default",
+	"function": "hordes:set_spawntable",
+	"value": [
+		"hordes:default"
+	],
 	"conditions": []
 }

@@ -8,7 +8,7 @@ import net.smileycorp.hordes.common.hordeevent.HordeSpawnTable;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 
 @Cancelable
-public class HordeStartEvent extends HordeEvent {
+public class HordeStartEvent extends HordePlayerEvent {
 
 	protected final BlockPos pos;
 	protected String message = Constants.hordeEventStart;
@@ -39,6 +39,14 @@ public class HordeStartEvent extends HordeEvent {
 	//set the translation key for the start message
 	public void setMessage(String message) {
 		this.message = message;
+	}
+
+	public HordeSpawnTable getSpawnTable() {
+		return table;
+	}
+
+	public void setSpawnTable(HordeSpawnTable table) {
+		this.table = table;
 	}
 
 }

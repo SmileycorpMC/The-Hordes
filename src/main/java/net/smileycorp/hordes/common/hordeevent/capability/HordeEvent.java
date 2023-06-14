@@ -29,10 +29,11 @@ import net.smileycorp.atlas.api.util.DirectionUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.event.*;
-import net.smileycorp.hordes.common.hordeevent.HordeEventRegister;
 import net.smileycorp.hordes.common.hordeevent.HordeSpawnEntry;
 import net.smileycorp.hordes.common.hordeevent.HordeSpawnTable;
+import net.smileycorp.hordes.common.hordeevent.data.HordeScriptLoader;
 import net.smileycorp.hordes.common.hordeevent.data.HordeTableLoader;
+import net.smileycorp.hordes.common.hordeevent.data.functions.HordeScript;
 import net.smileycorp.hordes.common.hordeevent.network.HordeEventPacketHandler;
 import net.smileycorp.hordes.common.hordeevent.network.HordeSoundMessage;
 
@@ -111,14 +112,16 @@ class HordeEvent implements IHordeEvent {
 	@Override
 	public void spawnWave(Player player, int count) {
 		cleanSpawns();
-		if (loadedTable == null) loadedTable = HordeEventRegister.getSpawnTable(player.level, player, player.level.random);
+		if (loadedTable == null) loadedTable = HordeTableLoader.INSTANCE.getDefaultTable();
+		HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, loadedTable, this);
+		postEvent(buildTableEvent);
 		if (loadedTable == null) {
 			logError("Cannot load wave spawntable, cancelling spawns.", new Exception());
 			return;
 		}
 		Level level = player.level;
 		HordeStartWaveEvent startEvent = new HordeStartWaveEvent(player, this, count);
-		MinecraftForge.EVENT_BUS.post(startEvent);
+		postEvent(startEvent);
 		if (startEvent.isCanceled()) return;
 		count = startEvent.getCount();
 		Vec3 basedir = DirectionUtils.getRandomDirectionVecXZ(rand);
@@ -134,9 +137,7 @@ class HordeEvent implements IHordeEvent {
 				break;
 			}
 		}
-		HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, loadedTable.getSpawnTable(day), this);
-		MinecraftForge.EVENT_BUS.post(buildTableEvent);
-		WeightedOutputs<HordeSpawnEntry> spawntable = buildTableEvent.spawntable;
+		WeightedOutputs<HordeSpawnEntry> spawntable = buildTableEvent.spawntable.getSpawnTable(day);
 		if (spawntable.isEmpty()) {
 			logInfo("Spawntable is empty, stopping wave spawn.");
 			return;
@@ -184,12 +185,10 @@ class HordeEvent implements IHordeEvent {
 	}
 
 	private Entity loadEntity(Level level, Player player, Mob entity, BlockPos pos) {
-		System.out.println(entity);
 		HordeSpawnEntityEvent spawnEntityEvent = new HordeSpawnEntityEvent(player, entity, pos, this);
-		MinecraftForge.EVENT_BUS.post(spawnEntityEvent);
+		postEvent(spawnEntityEvent);
 		if (!spawnEntityEvent.isCanceled()) {
 			entity = spawnEntityEvent.entity;
-			System.out.println(entity);
 			pos = spawnEntityEvent.pos;
 			entity.finalizeSpawn((ServerLevelAccessor) level, level.getCurrentDifficultyAt(pos), null, null, null);
 			entity.setPos(pos.getX(), pos.getY(), pos.getZ());
@@ -276,9 +275,9 @@ class HordeEvent implements IHordeEvent {
 		if (player!=null) {
 			Level level = player.level;
 			if (level.dimension() == Level.OVERWORLD) {
-				if (loadedTable == null) loadedTable = HordeEventRegister.getSpawnTable(level, player, level.random);
+				if (loadedTable == null) loadedTable = HordeTableLoader.INSTANCE.getDefaultTable();
 				HordeStartEvent startEvent = new HordeStartEvent(player, this, loadedTable, isCommand);
-				MinecraftForge.EVENT_BUS.post(startEvent);
+				postEvent(startEvent);
 				if (startEvent.isCanceled()) {
 					loadedTable = null;
 					return;
@@ -287,9 +286,9 @@ class HordeEvent implements IHordeEvent {
 					logInfo("Spawntable is null, canceling event start.");
 					return;
 				}
-				HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, loadedTable.getSpawnTable(day), this);
-				MinecraftForge.EVENT_BUS.post(buildTableEvent);
-				if (!buildTableEvent.spawntable.isEmpty()) {
+				HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, loadedTable, this);
+				postEvent(buildTableEvent);
+				if (!buildTableEvent.spawntable.getSpawnTable(day).isEmpty()) {
 					timer = duration;
 					hasChanged = true;
 					sendMessage(player, startEvent.getMessage());
@@ -329,7 +328,7 @@ class HordeEvent implements IHordeEvent {
 	@Override
 	public void stopEvent(Player player, boolean isCommand) {
 		HordeEndEvent endEvent = new HordeEndEvent(player, this, isCommand);
-		MinecraftForge.EVENT_BUS.post(endEvent);
+		postEvent(endEvent);
 		timer = 0;
 		cleanSpawns();
 		sendMessage(player, endEvent.getMessage());
@@ -377,6 +376,15 @@ class HordeEvent implements IHordeEvent {
 			result.add(builder.toString());
 		}
 		return result;
+	}
+	
+	private void postEvent(HordePlayerEvent event) {
+		for (HordeScript script : HordeScriptLoader.INSTANCE.getScripts(event)) {
+			if (script.shouldApply(event.getEntityWorld(), event.getPlayer(), event.getEntityWorld().random)) {
+				script.apply(event);
+			}
+		}
+		MinecraftForge.EVENT_BUS.post(event);
 	}
 
 	@Override

@@ -6,14 +6,14 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 
-public class HordeEvent extends PlayerEvent {
+public class HordePlayerEvent extends PlayerEvent {
 
 	protected final Level level;
 	protected final IHordeEvent horde;
 
 	protected final int day;
 
-	public HordeEvent(Player player, IHordeEvent horde) {
+	public HordePlayerEvent(Player player, IHordeEvent horde) {
 		super(player);
 		level = player.level;
 		this.horde = horde;

@@ -21,12 +21,12 @@ import java.util.Map;
 
 public class HordeSpawnTable {
 
-    private final List<HordeSpawnEntry> spawns;
+    protected final List<HordeSpawnEntry> spawns;
     private final ResourceLocation name;
 
     private boolean tested;
 
-   private HordeSpawnTable(ResourceLocation name, List<HordeSpawnEntry> spawns) {
+   protected HordeSpawnTable(ResourceLocation name, List<HordeSpawnEntry> spawns) {
     this.name = name;
     this.spawns=spawns;
     }
@@ -83,6 +83,7 @@ public class HordeSpawnTable {
     public static HordeSpawnTable deserialize(ResourceLocation name, JsonElement json) throws Exception {
         List<HordeSpawnEntry> spawns = Lists.newArrayList();
         for (JsonElement element : json.getAsJsonArray()) {
+            String entity = null;
             try {
                 EntityType<?> type = null;
                 int weight = 0;
@@ -91,7 +92,7 @@ public class HordeSpawnTable {
                 CompoundTag nbt = null;
                 if (element.isJsonObject()) {
                     JsonObject obj = element.getAsJsonObject();
-                    String entity = obj.get("entity").getAsString();
+                    entity = obj.get("entity").getAsString();
                     type = ForgeRegistries.ENTITIES.getValue(new ResourceLocation(entity));
                     if (obj.has("weight")) weight = obj.get("weight").getAsInt();
                     if (obj.has("first_day")) minDay = obj.get("first_day").getAsInt();
@@ -108,6 +109,7 @@ public class HordeSpawnTable {
                                 dataSplit[0] = dataSplit[0].substring(0, dataSplit[0].indexOf("{"));
                                 nbt = CommonUtils.parseNBT(data, nbtstring);
                             }
+                            entity = dataSplit[0];
                             ResourceLocation loc = new ResourceLocation(dataSplit[0]);
                             if (ForgeRegistries.ENTITIES.containsKey(loc)) {
                                 type = ForgeRegistries.ENTITIES.getValue(loc);
@@ -143,14 +145,14 @@ public class HordeSpawnTable {
                         entry.setNBT(nbt);
                     }
                 }
-                Hordes.logInfo("Loaded entity " + name + " as " + type.toString() + " with weight " + weight + ", min day " + minDay + " and max day " + maxDay);
+                Hordes.logInfo("Loaded entity " + entity + " as " + type.toString() + " with weight " + weight + ", min day " + minDay + " and max day " + maxDay);
                 HordeSpawnEntry entry = new HordeSpawnEntry(type, weight, minDay, maxDay);
                 if (nbt != null) {
                     entry.setNBT(nbt);
                 }
                 spawns.add(entry);
             } catch (Exception e) {
-                Hordes.logError("Error adding entity " + name + " " + e.getCause() + " " + e.getMessage(), e);
+                Hordes.logError("Error adding entity " + entity + " " + e.getCause() + " " + e.getMessage(), e);
             }
         }
        return new HordeSpawnTable(name, spawns);

@@ -26,6 +26,7 @@ public class HordeDataRegistry {
 	public static void init() {
 		registerValueGetters();
 		registerDeserializers();
+		registerFunctions();
 	}
 
 	private static void registerValueGetters() {
@@ -42,6 +43,10 @@ public class HordeDataRegistry {
 		registerConditionDeserializer(Constants.loc("random"), RandomCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("biome"), BiomeCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("day"), DayCondition::deserialize);
+	}
+
+	public static void registerFunctions() {
+		//TODO: add function deserializers
 	}
 
 	public static ValueGetter readValue(DataType type, JsonObject json) {

@@ -15,6 +15,8 @@ public interface ValueGetter<T extends Comparable<T>> {
     static ValueGetter readValue(DataType type, JsonElement value) {
         if (value.isJsonObject()) {
             return HordeDataRegistry.readValue(type, value.getAsJsonObject());
+        } else if (value.isJsonArray()) {
+            return new RandomValue(type, value.getAsJsonArray());
         }
         return new StaticValue(type, value);
     }

@@ -41,6 +41,7 @@ import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.hordeevent.capability.HordeSavedData;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeSpawn;
+import net.smileycorp.hordes.common.hordeevent.data.HordeScriptLoader;
 import net.smileycorp.hordes.common.hordeevent.data.HordeTableLoader;
 
 import java.util.UUID;
@@ -64,6 +65,7 @@ public class HordeEventHandler {
 	@SubscribeEvent
 	public void addResourceReload(AddReloadListenerEvent event ) {
 		event.addListener(HordeTableLoader.INSTANCE);
+		event.addListener(HordeScriptLoader.INSTANCE);
 	}
 
 	//update the next day in the horde level data
