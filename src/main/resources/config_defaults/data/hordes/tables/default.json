@@ -11,20 +11,20 @@
 		"nbt": "{HandItems:[{id:trident,Count:1}]}"
 	},
 	"minecraft:zoglin-3-40-40",
-	"minecraft:zombified_piglin-25-40-0"
+	"minecraft:zombified_piglin-10-40-0",
 	"minecraft:husk-25-50-0",
 	{
 		"entity": "minecraft:zoglin",
 		"weight": 3,
 		"first_day": 50,
 		"last_day": 0,
-		"nbt": "{Passengers:[{id:drowned,HandItems:[{id:trident,Count:1b}]}]}"
+		"nbt": "{Passengers:[{id:drowned,HandItems:[{id:trident,Count:1}]}]}"
 	},
 	{
 		"entity": "minecraft:zombie_horse",
 		"weight": 3,
 		"first_day": 50,
 		"last_day": 0,
-		"nbt": "{Passengers:[{id:drowned,HandItems:[{id:trident,Count:1b}]}]}"
+		"nbt": "{Passengers:[{id:drowned,HandItems:[{id:trident,Count:1}]}]}"
 	}
 ]

@@ -1,8 +1,5 @@
 package net.smileycorp.hordes.integration.jei;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.helpers.IGuiHelper;
@@ -15,6 +12,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import net.smileycorp.hordes.common.Constants;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @JeiPlugin
 public class JEIPluginInfection implements IModPlugin {

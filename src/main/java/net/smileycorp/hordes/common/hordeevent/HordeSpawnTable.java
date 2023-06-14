@@ -5,12 +5,14 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.recipe.WeightedOutputs;
 import net.smileycorp.hordes.common.CommonUtils;
 import net.smileycorp.hordes.common.Hordes;
-import net.smileycorp.hordes.common.hordeevent.HordeSpawnEntry;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -19,10 +21,12 @@ import java.util.Map;
 
 public class HordeSpawnTable {
 
-    private final List<HordeSpawnEntry> spawns;
+    protected final List<HordeSpawnEntry> spawns;
     private final ResourceLocation name;
 
-   private HordeSpawnTable(ResourceLocation name, List<HordeSpawnEntry> spawns) {
+    private boolean tested;
+
+   protected HordeSpawnTable(ResourceLocation name, List<HordeSpawnEntry> spawns) {
     this.name = name;
     this.spawns=spawns;
     }
@@ -42,9 +46,44 @@ public class HordeSpawnTable {
         return new WeightedOutputs<>(1, spawnmap);
     }
 
+    public List<HordeSpawnEntry> getEntriesFor(Mob entity) {
+        return getEntriesFor(entity.getType());
+    }
+
+    public List<HordeSpawnEntry> getEntriesFor(EntityType<?> type) {
+        List<HordeSpawnEntry> list = new ArrayList<>();
+        for (HordeSpawnEntry entry : spawns) if (entry.getEntity() == type) list.add(entry);
+        return list;
+    }
+
+    public HordeSpawnEntry getEntryFor(Mob entity, int day) {
+        if (!tested) testEntries();
+        for (HordeSpawnEntry entry : getEntriesFor(entity)) {
+            if (entry.getMinDay() <= day && (entry.getMaxDay() == 0 || entry.getMaxDay() >= day)) {
+                return entry;
+            }
+        }
+        return null;
+    }
+
+    private void testEntries() {
+        List<HordeSpawnEntry> toRemove = new ArrayList<>();
+        for (HordeSpawnEntry entry : spawns) {
+            try {
+                Entity entity = entry.getEntity().create(ServerLifecycleHooks.getCurrentServer().overworld());
+                if (!(entity instanceof Mob)) toRemove.add(entry);
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+        }
+        for (HordeSpawnEntry type : toRemove) spawns.remove(type);
+        tested = true;
+    }
+
     public static HordeSpawnTable deserialize(ResourceLocation name, JsonElement json) throws Exception {
         List<HordeSpawnEntry> spawns = Lists.newArrayList();
         for (JsonElement element : json.getAsJsonArray()) {
+            String entity = null;
             try {
                 EntityType<?> type = null;
                 int weight = 0;
@@ -53,7 +92,7 @@ public class HordeSpawnTable {
                 CompoundTag nbt = null;
                 if (element.isJsonObject()) {
                     JsonObject obj = element.getAsJsonObject();
-                    String entity = obj.get("entity").getAsString();
+                    entity = obj.get("entity").getAsString();
                     type = ForgeRegistries.ENTITIES.getValue(new ResourceLocation(entity));
                     if (obj.has("weight")) weight = obj.get("weight").getAsInt();
                     if (obj.has("first_day")) minDay = obj.get("first_day").getAsInt();
@@ -70,6 +109,7 @@ public class HordeSpawnTable {
                                 dataSplit[0] = dataSplit[0].substring(0, dataSplit[0].indexOf("{"));
                                 nbt = CommonUtils.parseNBT(data, nbtstring);
                             }
+                            entity = dataSplit[0];
                             ResourceLocation loc = new ResourceLocation(dataSplit[0]);
                             if (ForgeRegistries.ENTITIES.containsKey(loc)) {
                                 type = ForgeRegistries.ENTITIES.getValue(loc);
@@ -105,14 +145,14 @@ public class HordeSpawnTable {
                         entry.setNBT(nbt);
                     }
                 }
-                Hordes.logInfo("Loaded entity " + name + " as " + type.toString() + " with weight " + weight + ", min day " + minDay + " and max day " + maxDay);
+                Hordes.logInfo("Loaded entity " + entity + " as " + type.toString() + " with weight " + weight + ", min day " + minDay + " and max day " + maxDay);
                 HordeSpawnEntry entry = new HordeSpawnEntry(type, weight, minDay, maxDay);
                 if (nbt != null) {
                     entry.setNBT(nbt);
                 }
                 spawns.add(entry);
             } catch (Exception e) {
-                Hordes.logError("Error adding entity " + name + " " + e.getCause() + " " + e.getMessage(), e);
+                Hordes.logError("Error adding entity " + entity + " " + e.getCause() + " " + e.getMessage(), e);
             }
         }
        return new HordeSpawnTable(name, spawns);

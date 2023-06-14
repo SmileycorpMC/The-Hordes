@@ -8,6 +8,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.util.LazyOptional;
@@ -15,11 +16,12 @@ import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 
 import java.util.Collection;
+import java.util.UUID;
 
-public class CommandStopHordeEvent {
+public class CommandResetHordeEvent {
 
 	public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-		LiteralArgumentBuilder<CommandSourceStack> command = Commands.literal("stopHordeEvent")
+		LiteralArgumentBuilder<CommandSourceStack> command = Commands.literal("resetHordeEvent")
 				.requires((commandSource) -> commandSource.hasPermission(1))
 				.executes(ctx -> execute(ctx))
 				.then(Commands.argument("player", EntityArgument.players())
@@ -35,10 +37,11 @@ public class CommandStopHordeEvent {
 
 	public static int execute(CommandContext<CommandSourceStack> ctx, Collection<ServerPlayer> players) throws CommandSyntaxException {
 		CommandSourceStack source = ctx.getSource();
-		for (Player player : players) {
+		for (ServerPlayer player : players) {
 			LazyOptional<IHordeEvent> optional = player.getCapability(Hordes.HORDE_EVENT, null);
 			if (optional.isPresent()) {
-				optional.resolve().get().stopEvent(player, true);
+				optional.resolve().get().reset(ctx.getSource().getLevel());
+				source.getEntity().sendMessage(new TranslatableComponent("commands.hordes.HordeReset.success", player.getName()), UUID.fromString("1512ce82-00e5-441a-9774-f46d9b7badfb"));
 				return 1;
 			}
 		}

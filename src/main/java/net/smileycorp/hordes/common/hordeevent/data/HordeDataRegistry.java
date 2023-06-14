@@ -1,13 +1,13 @@
 package net.smileycorp.hordes.common.hordeevent.data;
 
 import com.google.common.collect.Maps;
-import com.google.gson.*;
-
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.atlas.api.data.LogicalOperation;
+import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.Hordes;
-import net.smileycorp.hordes.common.ModDefinitions;
 import net.smileycorp.hordes.common.hordeevent.data.conditions.*;
 import net.smileycorp.hordes.common.hordeevent.data.values.LevelNBTGetter;
 import net.smileycorp.hordes.common.hordeevent.data.values.PlayerNBTGetter;
@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class DataRegistry {
+public class HordeDataRegistry {
 
 	private static Map<ResourceLocation, BiFunction<String, DataType, ValueGetter>> VALUE_GETTERS = Maps.newHashMap();
 	private static Map<ResourceLocation, Function<JsonElement, Condition>> CONDITION_DESERIALIZERS = Maps.newHashMap();
@@ -26,22 +26,27 @@ public class DataRegistry {
 	public static void init() {
 		registerValueGetters();
 		registerDeserializers();
+		registerFunctions();
 	}
 
 	private static void registerValueGetters() {
-		registerValueGetter(ModDefinitions.getResource("level_nbt"), LevelNBTGetter::new);
-		registerValueGetter(ModDefinitions.getResource("player_nbt"), PlayerNBTGetter::new);
-		registerValueGetter(ModDefinitions.getResource("player_pos"), PlayerPosGetter::new);
+		registerValueGetter(Constants.loc("level_nbt"), LevelNBTGetter::new);
+		registerValueGetter(Constants.loc("player_nbt"), PlayerNBTGetter::new);
+		registerValueGetter(Constants.loc("player_pos"), PlayerPosGetter::new);
 	}
 
 
 	public static void registerDeserializers() {
 		for (LogicalOperation operation : LogicalOperation.values())
-			registerConditionDeserializer(ModDefinitions.getResource(operation.getName()), e -> LogicalCondition.deserialize(operation, e));
-		registerConditionDeserializer(ModDefinitions.getResource("comparison"), ComparisonCondition::deserialize);
-		registerConditionDeserializer(ModDefinitions.getResource("random"), RandomCondition::deserialize);
-		registerConditionDeserializer(ModDefinitions.getResource("biome"), BiomeCondition::deserialize);
-		registerConditionDeserializer(ModDefinitions.getResource("day"), DayCondition::deserialize);
+			registerConditionDeserializer(Constants.loc(operation.getName()), e -> LogicalCondition.deserialize(operation, e));
+		registerConditionDeserializer(Constants.loc("comparison"), ComparisonCondition::deserialize);
+		registerConditionDeserializer(Constants.loc("random"), RandomCondition::deserialize);
+		registerConditionDeserializer(Constants.loc("biome"), BiomeCondition::deserialize);
+		registerConditionDeserializer(Constants.loc("day"), DayCondition::deserialize);
+	}
+
+	public static void registerFunctions() {
+		//TODO: add function deserializers
 	}
 
 	public static ValueGetter readValue(DataType type, JsonObject json) {

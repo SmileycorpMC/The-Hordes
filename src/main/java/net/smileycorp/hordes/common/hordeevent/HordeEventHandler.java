@@ -1,7 +1,5 @@
 package net.smileycorp.hordes.common.hordeevent;
 
-import java.util.UUID;
-
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.MinecraftServer;
@@ -38,12 +36,15 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.entity.ai.GoToEntityPositionGoal;
 import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
-import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.Constants;
+import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.hordeevent.capability.HordeSavedData;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeSpawn;
+import net.smileycorp.hordes.common.hordeevent.data.HordeScriptLoader;
 import net.smileycorp.hordes.common.hordeevent.data.HordeTableLoader;
+
+import java.util.UUID;
 
 @EventBusSubscriber(modid=Constants.MODID)
 public class HordeEventHandler {
@@ -64,18 +65,19 @@ public class HordeEventHandler {
 	@SubscribeEvent
 	public void addResourceReload(AddReloadListenerEvent event ) {
 		event.addListener(HordeTableLoader.INSTANCE);
+		event.addListener(HordeScriptLoader.INSTANCE);
 	}
 
 	//update the next day in the horde level data
 	@SubscribeEvent
 	public void serverTick(ServerTickEvent event) {
-		if (event.phase == Phase.START) {
+		if (event.phase == Phase.START &! CommonConfigHandler.hordesCommandOnly.get()) {
 			MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
 			ServerLevel level = server.overworld();
 			if ((level.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT) |! CommonConfigHandler.pauseEventServer.get())) {
 				int day = (int) Math.floor(level.getDayTime() / CommonConfigHandler.dayLength.get());
 				HordeSavedData data = HordeSavedData.getData(level);
-				if (day >= data.getNextDay()) {
+				if (CommonConfigHandler.hordeSpawnDays.get() > 0 && day >= data.getNextDay()) {
 					data.setNextDay(level.random.nextInt(CommonConfigHandler.hordeSpawnVariation.get() + 1) + CommonConfigHandler.hordeSpawnDays.get() + data.getNextDay());
 				}
 				data.save();
@@ -96,7 +98,7 @@ public class HordeEventHandler {
 					int day = (int) Math.floor(level.getDayTime() / CommonConfigHandler.dayLength.get());
 					int time = Math.round(level.getDayTime() % CommonConfigHandler.dayLength.get());
 					if (horde != null && !horde.isActive(player)) {
-						if (time >= CommonConfigHandler.hordeStartTime.get() && day >= horde.getNextDay() && (day!=0 || CommonConfigHandler.spawnFirstDay.get())) {
+						if (time >= CommonConfigHandler.hordeStartTime.get() && day >= horde.getNextDay() && (day>0 || CommonConfigHandler.spawnFirstDay.get())) {
 							horde.tryStartEvent(player, CommonConfigHandler.hordeSpawnDuration.get(), false);
 						}
 					}

@@ -1,11 +1,6 @@
 package net.smileycorp.hordes.common.entities;
 
-import java.util.Collection;
-import java.util.Optional;
-import java.util.UUID;
-
 import com.mojang.authlib.GameProfile;
-
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.BaseComponent;
@@ -31,6 +26,10 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.infection.HordesInfection;
+
+import java.util.Collection;
+import java.util.Optional;
+import java.util.UUID;
 
 
 public class ZombiePlayer extends Zombie implements IZombiePlayer {

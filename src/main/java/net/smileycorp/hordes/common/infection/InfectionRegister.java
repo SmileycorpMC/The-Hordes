@@ -1,12 +1,6 @@
 package net.smileycorp.hordes.common.infection;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.google.common.collect.Lists;
-
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.ResourceLocation;
@@ -26,6 +20,11 @@ import net.smileycorp.hordes.common.CommonUtils;
 import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.infection.capability.IInfection;
 import net.smileycorp.hordes.integration.jei.JEIPluginInfection;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class InfectionRegister {
 

@@ -30,10 +30,14 @@ public class DefaultDataGenerator {
         if (CONFIG_FOLDER.toFile().exists()) return false;
         generateHordeTableFile();
         generateMcmetaFile();
-        copyFile("tables/skeletons.json");
-        copyFile("tables/mixed_mobs.json");
-        copyFile("tables/illagers.json");
-        copyFile("horde_scripts/default.json");
+        copyFile("assets/hordes/sounds.json");
+        copyFile("assets/hordes/sounds/horde_spawn.ogg");
+        copyFile("assets/hordes/lang/en_us.json");
+        copyFile("data/hordes/horde_scripts/default.json");
+        copyFile("data/hordes/tables/skeletons.json");
+        copyFile("data/hordes/tables/mixed_mobs.json");
+        copyFile("data/hordes/tables/illagers.json");
+        copyFile("data/hordes/horde_scripts/default.json");
         return true;
     }
 
@@ -67,12 +71,12 @@ public class DefaultDataGenerator {
                 CommentedFileConfig configData = config.getHandler().reader(FMLPaths.CONFIGDIR.get()).apply(config);
                 hordeEntries = configData.get(Lists.newArrayList("Horde Event", "spawnList"));
             } catch (Exception e) {
-                copyFile("tables/default.json");
+                copyFile("data/hordes/tables/default.json");
                 Hordes.logError("Error reading hordes-common.toml, generating fallback spawnlist", e);
                 return;
             }
             if (hordeEntries == null || hordeEntries.isEmpty() || hordeEntries.equals(oldHordeEntries)) {
-                copyFile("tables/default.json");
+                copyFile("data/hordes/tables/default.json");
                 return;
             }
             JsonArray json = new JsonArray();
@@ -88,11 +92,11 @@ public class DefaultDataGenerator {
     private static void copyFile(String path) {
         try {
             ModFile mod = FMLLoader.getLoadingModList().getModFileById("hordes").getFile();
-            File directory = CONFIG_FOLDER.resolve("data/hordes").toFile();
+            File directory = CONFIG_FOLDER.toFile();
             File output = new File(directory, path);
             File dir = output.getParentFile();
             if (dir != null) dir.mkdirs();
-            FileUtils.copyInputStreamToFile(Files.newInputStream(mod.findResource("default_data/" + path), StandardOpenOption.READ), new File(directory, path));
+            FileUtils.copyInputStreamToFile(Files.newInputStream(mod.findResource("config_defaults/" + path), StandardOpenOption.READ), new File(directory, path));
         } catch (Exception e) {
             Hordes.logError("Failed to copy file " + path, e);
         }

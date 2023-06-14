@@ -1,10 +1,10 @@
 package net.smileycorp.hordes.integration.jei;
 
-import java.util.List;
-
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.ingredients.IIngredients;
 import net.minecraft.world.item.ItemStack;
+
+import java.util.List;
 
 @SuppressWarnings("removal")
 public class InfectionCureWrapper {

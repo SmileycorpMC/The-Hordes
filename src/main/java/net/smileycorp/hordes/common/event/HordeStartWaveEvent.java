@@ -7,7 +7,7 @@ import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 
 @Cancelable
-public class HordeStartWaveEvent extends HordeEvent {
+public class HordeStartWaveEvent extends HordePlayerEvent {
 
 	protected ResourceLocation sound = Constants.HORDE_SOUND;
 	protected int count;

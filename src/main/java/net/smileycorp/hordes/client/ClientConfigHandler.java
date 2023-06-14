@@ -1,14 +1,13 @@
 package net.smileycorp.hordes.client;
 
-import java.awt.Color;
-import java.util.List;
-
 import com.google.common.collect.Lists;
-
 import net.minecraft.network.chat.TextColor;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 import net.smileycorp.hordes.common.Hordes;
+
+import java.awt.*;
+import java.util.List;
 
 
 public class ClientConfigHandler {
