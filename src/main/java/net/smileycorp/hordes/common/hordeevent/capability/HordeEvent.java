@@ -160,12 +160,16 @@ class HordeEvent implements IHordeEvent {
 			try {
 				AtomicBoolean cancelled = new AtomicBoolean(false);
 				Mob newEntity = (Mob) EntityType.loadEntityRecursive(entry.getNBT(), level, (entity)->{
-					cancelled.set(loadEntity(level, player, (Mob) entity, pos));
-					return entity;
+					Mob e = loadEntity(level, player, (Mob) entity, pos);
+					cancelled.set(e == null);
+					return e;
 				});
-				if (cancelled.get()) return;
+				if (cancelled.get()) continue;
 				newEntity.readAdditionalSaveData(entry.getNBT());
-				if (!((ServerLevel)level).tryAddFreshEntityWithPassengers(newEntity)) logError("Unable to spawn entity from " + type, new Exception());
+				if (!((ServerLevel)level).tryAddFreshEntityWithPassengers(newEntity)) {
+					logError("Unable to spawn entity from " + type, new Exception());
+					continue;
+				}
 				finalizeEntity(newEntity , level, player);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -174,7 +178,7 @@ class HordeEvent implements IHordeEvent {
 		}
 	}
 
-	private boolean loadEntity(Level level, Player player, Mob entity, BlockPos pos) {
+	private Mob loadEntity(Level level, Player player, Mob entity, BlockPos pos) {
 		HordeSpawnEntityEvent spawnEntityEvent = new HordeSpawnEntityEvent(player, entity, pos, this);
 		MinecraftForge.EVENT_BUS.post(spawnEntityEvent);
 		if (!spawnEntityEvent.isCanceled()) {
@@ -182,10 +186,10 @@ class HordeEvent implements IHordeEvent {
 			pos = spawnEntityEvent.pos;
 			entity.finalizeSpawn((ServerLevelAccessor) level, level.getCurrentDifficultyAt(pos), null, null, null);
 			entity.setPos(pos.getX(), pos.getY(), pos.getZ());
-			return true;
+			return entity;
 		} else {
 			logInfo("Entity spawn event has been cancelled, not spawning entity  of class " + entity.getType());
-			return false;
+			return null;
 		}
 	}
 
