@@ -118,13 +118,13 @@ public class CommonConfigHandler {
 		zombiePlayersFireImmune = builder.comment("Whether zombie players and drowned players should be immune to fire damage").define("zombiePlayersFireImmune", false);
 		zombiePlayersBurn = builder.comment("Whether zombie players and drowned players burn in sunlight.").define("zombiePlayersBurn", false);
 		zombiePlayersOnlyHurtByPlayers = builder.comment("Whether zombie players and drowned players are immune to all damage from non player sources.").define("zombiePlayersOnlyHurtByPlayers", false);
-		zombiesBurn = builder.comment("Whether zombies and drowneds burn in sunlight.").define("zombiesBurn", true);
-		skeletonsBurn = builder.comment("Whether skeletons and strays burn in sunlight.").define("skeletonsBurn", true);
+		zombiesBurn = builder.comment("Whether zombies and drowneds burn in sunlight.").define("zombiesBurn", false);
+		skeletonsBurn = builder.comment("Whether skeletons and strays burn in sunlight.").define("skeletonsBurn", false);
 		zombieVillagersCanBeCured = builder.comment("Whether zombie villagers have vanilla curing mechanics or not").define("zombieVillagersCanBeCured", false);
 		piglinsHoglinsConvert = builder.comment("Whether piglins and hoglins automatically convert to zombies in the overworld").define("piglinsHoglinsConvert", false);
 		aggressiveZombieHorses = builder.comment("Whether zombie horses are aggressive or not.").define("aggressiveZombieHorses", true);
-		zombieHorsesBurn = builder.comment("Whether zombie horses burn in sunlight.").define("zombieHorsesBurn", true);
-		skeletonHorsesBurn = builder.comment("Whether skeleton horses burn in sunlight.").define("skeletonHorsesBurn", true);
+		zombieHorsesBurn = builder.comment("Whether zombie horses burn in sunlight.").define("zombieHorsesBurn", false);
+		skeletonHorsesBurn = builder.comment("Whether skeleton horses burn in sunlight.").define("skeletonHorsesBurn", false);
 		zombiesScareHorses = builder.comment("Whether unmounted horses are scared of zombies.").define("zombiesScareHorses", true);
 		aggressiveZombiePiglins = builder.comment("Whether zombie piglins are hostile by default").define("zombiePiglinsHostile", true);
 		piglinsHuntZombies = builder.comment("Whether piglins kill zombie mobs").define("piglinsHuntZombies", true);

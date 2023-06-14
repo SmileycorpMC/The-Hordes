@@ -19,6 +19,7 @@ public class HordeEventCommands {
 			CommandStartHordeEvent.register(dispatcher);
 			CommandStopHordeEvent.register(dispatcher);
 			CommandDebugHordeEvent.register(dispatcher);
+			CommandResetHordeEvent.register(dispatcher);
 		}
 	}
 

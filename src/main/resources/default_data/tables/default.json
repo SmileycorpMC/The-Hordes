@@ -11,7 +11,7 @@
 		"nbt": "{HandItems:[{id:trident,Count:1}]}"
 	},
 	"minecraft:zoglin-3-40-40",
-	"minecraft:zombified_piglin-25-40-0",
+	"minecraft:zombified_piglin-10-40-0",
 	"minecraft:husk-25-50-0",
 	{
 		"entity": "minecraft:zoglin",

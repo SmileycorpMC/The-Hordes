@@ -48,7 +48,9 @@ public abstract class MixinZombieHorse extends AbstractHorse implements Enemy {
 	@Inject(at=@At("TAIL"), method = "createAttributes()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;", cancellable = true)
 	private static void createAttributes(CallbackInfoReturnable<AttributeSupplier.Builder> callback) {
 		if (CommonConfigHandler.aggressiveZombieHorses.get()) {
-			callback.setReturnValue(callback.getReturnValue().add(Attributes.FOLLOW_RANGE, 35.0D).add(Attributes.ATTACK_DAMAGE, 3.0D));
+			callback.setReturnValue(callback.getReturnValue()
+					.add(Attributes.FOLLOW_RANGE, 35.0D).add(Attributes.ATTACK_DAMAGE, 3.0D).
+							add(Attributes.MOVEMENT_SPEED, 1));
 		}
 	}
 
