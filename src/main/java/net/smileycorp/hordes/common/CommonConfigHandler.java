@@ -3,6 +3,7 @@ package net.smileycorp.hordes.common;
 import com.google.common.collect.Lists;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
+import net.smileycorp.hordes.common.hordeevent.data.values.NBTGetter;
 
 import java.util.List;
 
@@ -63,9 +64,10 @@ public class CommonConfigHandler {
 	public static ConfigValue<Boolean> zombiesScareHorses;
 	public static ConfigValue<Boolean> aggressiveZombiePiglins;
 	public static ConfigValue<Boolean> piglinsHuntZombies;
+	public static ConfigValue<Boolean> piglinsCureThemself;
 	public static ConfigValue<Boolean> zoglinsAttackUndead;
 
-	//load config properties
+    //load config properties
 	static {
 		Hordes.logInfo("Trying to load common config");
 		//horde event
@@ -78,7 +80,7 @@ public class CommonConfigHandler {
 		hordeSpawnInterval = builder.comment("Time in ticks between spawns for the horde spawn event.").define("hordeSpawnInterval", 1000);
 		hordeStartTime = builder.comment("What time of day does the horde event start? eg 18000 is midnight with default day length.").define("hordeStartTime", 18000);
 		hordeSpawnDays = builder.comment("Amount of days between horde spawns.").define("hordeSpawnDays", 10);
-		hordeSpawnVariation = builder.comment("Amount of days a horde event can be randomly extended by").define("hordeSpawnVariation", 0);
+		hordeSpawnVariation = builder.comment("Amount of days a horde event can be randomly delayed by").define("hordeSpawnVariation", 0);
 		hordeSpawnMax = builder.comment("Max cap for the number of entities that can exist from the horde at once.").define("hordeSpawnMax", 160);
 		dayLength = builder.comment("Length of a day (use only if you have another day that changes the length of the day/night cycle) Default is 24000").define("dayLength", 24000);
 		spawnFirstDay = builder.comment("Set to true to enable the horde spawning on the first day. (Game day 0)").define("spawnFirstDay", false);
@@ -98,10 +100,6 @@ public class CommonConfigHandler {
 		playerInfectChance = builder.comment("Chance out of 100 for a player to get infected").define("playerInfectChance", 75);
 		ticksForEffectStage = builder.comment("How long do each of the 4 effect phases last for before the next phase is activated?").define("ticksForEffectStage", 6000);
 		infectionSpawnsZombiePlayers = builder.comment("Do players who die to infection spawn a zombie?").define("infectionSpawnsZombiePlayers", true);
-		infectionEntities = builder.comment("Mobs in this list can cause the infection effect.)")
-				.define("infectionEntities", Lists.newArrayList("minecraft:zombie", "minecraft:zombie_villager", "minecraft:husk", "minecraft:drowned", "minecraft:zombie_horse", "minecraft:zombified_piglin", "minecraft:zoglin", "hordes:zombie_player", "hordes:drowned_player"));
-		cureItemList = builder.comment("A list of items which can cure infection when 'consumed' or used on an entity can accept nbt tags. eg.minecraft:golden_apple, minecraft:potion{Potion: \\\"minecraft:strong_regeneration\\\"}")
-				.define("cureItemList", Lists.newArrayList("minecraft:golden_apple", "minecraft:enchanted_golden_apple"));
 		infectionConversionList = builder.comment("A list of entities that can be infected, followed by the chance out of 100 to infect, then the entity to convert them to, " +
 				"entities can have nbt attached to them.(e.g. minecraft:villager-85-minecraft:zombie_villager{ActiveEffects:[{Id:12,Amplifier:0,Duration:10000}]}), "
 				+ "note: players and villagers have special code accociated with them, and should not be in this list")
@@ -128,6 +126,7 @@ public class CommonConfigHandler {
 		zombiesScareHorses = builder.comment("Whether unmounted horses are scared of zombies.").define("zombiesScareHorses", true);
 		aggressiveZombiePiglins = builder.comment("Whether zombie piglins are hostile by default").define("zombiePiglinsHostile", true);
 		piglinsHuntZombies = builder.comment("Whether piglins kill zombie mobs").define("piglinsHuntZombies", true);
+		piglinsCureThemself = builder.comment("Whether piglins use cures they find and keep in their inventory to heal infection.").define("piglinsCureThemself", true);
 		zoglinsAttackUndead = builder.comment("Whether zoglins are agressive towards other undead mobs").define("zoglinsAttackUndead", false);
 		builder.pop();
 		config = builder.build();

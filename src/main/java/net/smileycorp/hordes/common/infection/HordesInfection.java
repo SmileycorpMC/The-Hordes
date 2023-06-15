@@ -1,9 +1,13 @@
 package net.smileycorp.hordes.common.infection;
 
+import net.minecraft.core.Registry;
+import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -15,6 +19,9 @@ public class HordesInfection {
 
 	public static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, Constants.MODID);
 	public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(ForgeRegistries.ENTITIES, Constants.MODID);
+
+	public static final TagKey<EntityType<?>> INFECTION_ENTITIES_TAG = TagKey.m_203882_(Registry.ENTITY_TYPE_REGISTRY, Constants.loc("infection_entities"));
+	public static final TagKey<Item> INFECTION_CURES_TAG = TagKey.m_203882_(Registry.ITEM_REGISTRY, Constants.loc("infection_cures"));
 
 	public static RegistryObject<MobEffect> INFECTED = EFFECTS.register("infected", () -> new InfectedEffect());
 

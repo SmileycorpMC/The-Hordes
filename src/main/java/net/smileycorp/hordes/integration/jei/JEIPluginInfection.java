@@ -1,10 +1,12 @@
 package net.smileycorp.hordes.integration.jei;
 
+import com.google.common.collect.Lists;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.helpers.IJeiHelpers;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
+import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.runtime.IJeiRuntime;
 import mezz.jei.recipes.RecipeManager;
 import mezz.jei.recipes.RecipeManagerInternal;
@@ -34,6 +36,11 @@ public class JEIPluginInfection implements IModPlugin {
 	}
 
 	@Override
+	public void registerRecipes(IRecipeRegistration registry) {
+		registry.addRecipes(Lists.newArrayList(new InfectionCureWrapper()), InfectionCureCategory.ID);
+	}
+
+	/*@Override
 	public void onRuntimeAvailable(IJeiRuntime runtime) {
 		if (runtime.getRecipeManager() instanceof RecipeManager ) {
 			recipeManager = (RecipeManager) runtime.getRecipeManager();
@@ -63,7 +70,7 @@ public class JEIPluginInfection implements IModPlugin {
 				}
 			}
 		}
-	}
+	}*/
 
 	@Override
 	public ResourceLocation getPluginUid() {

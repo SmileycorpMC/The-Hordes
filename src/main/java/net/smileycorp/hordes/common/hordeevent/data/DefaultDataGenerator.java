@@ -29,6 +29,7 @@ public class DefaultDataGenerator {
     public static boolean tryGenerateDataFiles() {
         if (CONFIG_FOLDER.toFile().exists()) return false;
         generateHordeTableFile();
+        generateInfectionEntitiesFile();
         generateInfectionCuresFile();
         generateMcmetaFile();
         copyFile("assets/hordes/sounds.json");
@@ -38,9 +39,6 @@ public class DefaultDataGenerator {
         copyFile("data/hordes/tables/skeletons.json");
         copyFile("data/hordes/tables/mixed_mobs.json");
         copyFile("data/hordes/tables/illagers.json");
-        copyFile("data/hordes/tags/items/infection_cures.json");
-        copyFile("data/minecraft/tags/items/piglin_loved.json");
-        //TODO: convert infection list to tag
         return true;
     }
 
@@ -56,6 +54,7 @@ public class DefaultDataGenerator {
             FileWriter writer = new FileWriter(file);
             writer.write(GSON.toJson(json));
             writer.close();
+            Hordes.logInfo("Generated pack.mcmeta");
         } catch (Exception e) {
             Hordes.logError("Failed to generate pack.mcmeta", e);
         }
@@ -78,8 +77,13 @@ public class DefaultDataGenerator {
                 Hordes.logError("Error reading hordes-common.toml, generating fallback spawnlist", e);
                 return;
             }
-            if (hordeEntries == null || hordeEntries.isEmpty() || hordeEntries.equals(oldHordeEntries)) {
+            if (oldHordeEntries.equals(hordeEntries)) {
                 copyFile("data/hordes/tables/default.json");
+                Hordes.logInfo("hordes-common.toml spawnlist matches last update defaults, generating new spawnlist");
+            }
+            if (hordeEntries == null || hordeEntries.isEmpty()) {
+                copyFile("data/hordes/tables/default.json");
+                Hordes.logError("hordes-common.toml spawnlist is empty, generating fallback spawnlist", new Exception());
                 return;
             }
             JsonArray json = new JsonArray();
@@ -87,8 +91,50 @@ public class DefaultDataGenerator {
             FileWriter writer = new FileWriter(file);
             writer.write(GSON.toJson(json));
             writer.close();
+            Hordes.logInfo("Generated default horde table file from old config values.");
         } catch (Exception e) {
             Hordes.logError("Failed to generate horde table file", e);
+        }
+    }
+
+    private static void generateInfectionEntitiesFile() {
+        try {
+            List<String> infectionEntities = null;
+            List<String> oldInfectionEntries = Lists.newArrayList("minecraft:zombie", "minecraft:zombie_villager",
+                    "minecraft:husk", "minecraft:drowned", "minecraft:zombie_horse",
+                    "hordes:zombie_player", "hordes:drowned_player");
+            File file = CONFIG_FOLDER.resolve("data/hordes/tags/entity_types/infection_entities.json").toFile();
+            file.getParentFile().mkdirs();
+            file.createNewFile();
+            try {
+                ModConfig config = ConfigTracker.INSTANCE.fileMap().get("hordes-common.toml");
+                CommentedFileConfig configData = config.getHandler().reader(FMLPaths.CONFIGDIR.get()).apply(config);
+                infectionEntities = configData.get(Lists.newArrayList("Infection", "infectionEntities"));
+            } catch (Exception e) {
+                copyFile("data/hordes/tags/entity_types/infection_entities.json");
+                Hordes.logError("Error reading hordes-common.toml, generating fallback infection entities tag", e);
+                return;
+            }
+            if (oldInfectionEntries.equals(infectionEntities)) {
+                copyFile("data/hordes/tags/entity_types/infection_entities.json");
+                Hordes.logInfo("hordes-common.toml spawnlist matches last update defaults, generating new infection entities tag");
+            }
+            if (infectionEntities  == null || infectionEntities .isEmpty()) {
+                copyFile("data/hordes/tags/entity_types/infection_entities.json");
+                Hordes.logError("hordes-common.toml spawnlist is empty, generating fallback infection entities tag", new Exception());
+                return;
+            }
+            JsonObject json = new JsonObject();
+            json.addProperty("replace", false);
+            JsonArray values = new JsonArray();
+            for (String entry : infectionEntities) values.add(entry);
+            json.add("values", values);
+            FileWriter writer = new FileWriter(file);
+            writer.write(GSON.toJson(json));
+            writer.close();
+            Hordes.logInfo("Generated infection entity tag file from old config values.");
+        } catch (Exception e) {
+            Hordes.logError("Failed to generate infection entity file", e);
         }
     }
 
@@ -104,20 +150,28 @@ public class DefaultDataGenerator {
                 cureEntries = configData.get(Lists.newArrayList("Infection", "cureItemList"));
             } catch (Exception e) {
                 copyFile("data/hordes/tags/items/infection_cures.json");
-                Hordes.logError("Error reading hordes-common.toml, generating fallback cure item list", e);
+                Hordes.logError("Error reading hordes-common.toml, generating fallback cure item tag", e);
                 return;
             }
             if (cureEntries == null || cureEntries.isEmpty()) {
                 copyFile("data/hordes/tags/items/infection_cures.json");
+                Hordes.logError("hordes-common.toml spawnlist is empty, generating fallback cure item tag", new Exception());
                 return;
             }
-            JsonArray json = new JsonArray();
-            for (String entry : cureEntries) json.add(entry);
+            JsonObject json = new JsonObject();
+            json.addProperty("replace", false);
+            JsonArray values = new JsonArray();
+            for (String entry : cureEntries) {
+                if (entry.contains("{")) entry = entry.substring(entry.indexOf("{"));
+                values.add(entry);
+            }
+            json.add("values", values);
             FileWriter writer = new FileWriter(file);
             writer.write(GSON.toJson(json));
             writer.close();
+            Hordes.logInfo("Generated cure tag from old config values.");
         } catch (Exception e) {
-            Hordes.logError("Failed to generate cure item file", e);
+            Hordes.logError("Failed to generate cure item tag file", e);
         }
     }
 
@@ -129,6 +183,7 @@ public class DefaultDataGenerator {
             File dir = output.getParentFile();
             if (dir != null) dir.mkdirs();
             FileUtils.copyInputStreamToFile(Files.newInputStream(mod.findResource("config_defaults/" + path), StandardOpenOption.READ), new File(directory, path));
+            Hordes.logInfo("Copied file " + path);
         } catch (Exception e) {
             Hordes.logError("Failed to copy file " + path, e);
         }

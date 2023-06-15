@@ -57,14 +57,11 @@ public abstract class MixinPiglinAi {
 		}
 	}
 
-	@Inject(at=@At("HEAD"), method = "stopHoldingOffHandItem(Lnet/minecraft/world/entity/monster/piglin/Piglin;Z)V", cancellable = true)
-	private static void stopHoldingOffHandItem(Piglin piglin, boolean isCurrency, CallbackInfo callback) {
-		if (!CommonConfigHandler.enableMobInfection.get()) return;
-		if (piglin.hasEffect(HordesInfection.INFECTED.get())) {
-			ItemStack stack = piglin.getOffhandItem();
-			if (InfectionRegister.isCure(stack)) {
-				piglin.removeEffect(HordesInfection.INFECTED.get());
-			}
+	@Inject(at=@At("HEAD"), method = "admireGoldItem(Lnet/minecraft/world/entity/LivingEntity;)V", cancellable = true)
+	private static void admireGoldItem(LivingEntity entity, CallbackInfo callback) {
+		if (entity.hasEffect(HordesInfection.INFECTED.get()) && entity.getOffhandItem().m_204117_(HordesInfection.INFECTION_CURES_TAG)) {
+			entity.startUsingItem(InteractionHand.OFF_HAND);
+			callback.cancel();
 		}
 	}
 
