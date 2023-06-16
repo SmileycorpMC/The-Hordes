@@ -2,6 +2,7 @@ package net.smileycorp.hordes.common.infection;
 
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
@@ -9,8 +10,11 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.common.util.LazyOptional;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Constants;
+import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.infection.capability.IInfection;
 
 import java.util.List;
 import java.util.UUID;
@@ -27,7 +31,7 @@ public class InfectedEffect extends MobEffect {
 
 	@Override
 	public List<ItemStack> getCurativeItems() {
-		return CommonConfigHandler.enableMobInfection.get() ? InfectionRegister.getCureList() : super.getCurativeItems();
+		return CommonConfigHandler.enableMobInfection.get() ? HordesInfection.getCureList() : super.getCurativeItems();
 	}
 
 	@Override
@@ -57,6 +61,17 @@ public class InfectedEffect extends MobEffect {
 	public void removeAttributeModifiers(LivingEntity entity, AttributeMap map, int amplifier) {
 		AttributeInstance attribute = map.getInstance(Attributes.MOVEMENT_SPEED);
 		if (attribute != null) attribute.removeModifier(SPEED_MOD_UUID);
+	}
+
+	public static void apply(LivingEntity entity) {
+		entity.addEffect(new MobEffectInstance(HordesInfection.INFECTED.get(), getInfectionTime(entity)));
+	}
+
+	public static int getInfectionTime(LivingEntity entity) {
+		int time = CommonConfigHandler.ticksForEffectStage.get();
+		LazyOptional<IInfection> optional = entity.getCapability(Hordes.INFECTION);
+		if (optional.isPresent()) time = (int)((double)time * Math.pow(CommonConfigHandler.effectStageTickReduction.get(), optional.resolve().get().getInfectionCount()));
+		return time;
 	}
 
 }

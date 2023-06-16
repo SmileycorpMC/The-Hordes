@@ -35,7 +35,7 @@ public class MiscEventHandler {
 	public void onDeath(LivingDeathEvent event) {
 		LivingEntity entity = event.getEntity();
 		if (entity!=null) {
-			Level level = entity.level;
+			Level level = entity.level();
 			if (!level.isClientSide) {
 				if (entity instanceof Player &!(entity instanceof FakePlayer)) {
 					if ((entity.hasEffect(HordesInfection.INFECTED.get()) && CommonConfigHandler.enableMobInfection.get()) || CommonConfigHandler.zombieGraves.get() ||
@@ -55,7 +55,7 @@ public class MiscEventHandler {
 	public void onDrop(LivingDropsEvent event) {
 		if (event.getEntity() instanceof Player) {
 			Player player = (Player) event.getEntity();
-			Level level = player.level;
+			Level level = player.level();
 			if (!level.isClientSide &!(player instanceof FakePlayer)) {
 				if ((player.hasEffect(HordesInfection.INFECTED.get()) && CommonConfigHandler.enableMobInfection.get()) || CommonConfigHandler.zombieGraves.get()) {
 					LazyOptional<IZombifyPlayer> optional = player.getCapability(Hordes.ZOMBIFY_PLAYER, null);
@@ -91,7 +91,7 @@ public class MiscEventHandler {
 	@SubscribeEvent
 	public void entityConvert(LivingConversionEvent.Post event) {
 		LivingEntity before = event.getEntity();
-		if (before.level.isClientSide) return;
+		if (before.level().isClientSide) return;
 		LivingEntity after = event.getOutcome();
 		if (before instanceof AbstractHorse && after instanceof AbstractHorse) {
 			SimpleContainer beforeInv = ((AbstractHorse)before).inventory;

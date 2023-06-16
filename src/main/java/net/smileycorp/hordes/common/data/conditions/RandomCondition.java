@@ -1,8 +1,8 @@
-package net.smileycorp.hordes.common.hordeevent.data.conditions;
+package net.smileycorp.hordes.common.data.conditions;
 
 import com.google.gson.JsonElement;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.smileycorp.hordes.common.Hordes;
 
@@ -15,7 +15,7 @@ public class RandomCondition implements Condition {
 	}
 
 	@Override
-	public boolean apply(Level level, Player player, RandomSource rand) {
+	public boolean apply(Level level, LivingEntity entity, RandomSource rand) {
 		return rand.nextInt((int)(chance * 100f)) == 0;
 	}
 

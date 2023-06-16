@@ -6,16 +6,20 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.entities.DrownedPlayer;
 import net.smileycorp.hordes.common.entities.ZombiePlayer;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class HordesInfection {
 
@@ -34,9 +38,21 @@ public class HordesInfection {
 
 	public static final ResourceKey<DamageType> INFECTION_DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE, Constants.loc("infection"));
 
-	public static DamageSource getInfectionDamage(Entity entity) {
+	public static DamageSource getInfectionDamage(LivingEntity entity) {
 		return new DamageSource(entity.level().damageSources().damageTypes.getHolder(INFECTION_DAMAGE).get());
 	}
 
+    public static List<ItemStack> getCureList() {
+        return ForgeRegistries.ITEMS.tags().getTag(INFECTION_CURES_TAG)
+                .stream().map(item->new ItemStack(item)).collect(Collectors.toList());
+    }
+
+	public static boolean isCure(ItemStack stack) {
+		return stack.is(INFECTION_CURES_TAG);
+	}
+
+	public static boolean canCauseInfection(LivingEntity entity) {
+		return entity.getType().is(INFECTION_ENTITIES_TAG);
+	}
 
 }

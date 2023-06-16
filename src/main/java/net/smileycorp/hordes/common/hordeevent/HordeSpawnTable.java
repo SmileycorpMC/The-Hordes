@@ -11,8 +11,8 @@ import net.minecraft.world.entity.Mob;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.recipe.WeightedOutputs;
-import net.smileycorp.hordes.common.CommonUtils;
 import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.data.DataRegistry;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -97,7 +97,7 @@ public class HordeSpawnTable {
                     if (obj.has("weight")) weight = obj.get("weight").getAsInt();
                     if (obj.has("first_day")) minDay = obj.get("first_day").getAsInt();
                     if (obj.has("last_day")) maxDay = obj.get("last_day").getAsInt();
-                    if (obj.has("nbt")) nbt = CommonUtils.parseNBT(entity, obj.get("nbt").getAsString());
+                    if (obj.has("nbt")) nbt = DataRegistry.parseNBT(entity, obj.get("nbt").getAsString());
                 } else {
                     //check if it matches the syntax for a registry name
                     String data = element.getAsString();
@@ -107,7 +107,7 @@ public class HordeSpawnTable {
                             if (dataSplit[0].contains("{")) {
                                 String nbtstring = dataSplit[0].substring(dataSplit[0].indexOf("{"));
                                 dataSplit[0] = dataSplit[0].substring(0, dataSplit[0].indexOf("{"));
-                                nbt = CommonUtils.parseNBT(data, nbtstring);
+                                nbt = DataRegistry.parseNBT(data, nbtstring);
                             }
                             entity = dataSplit[0];
                             ResourceLocation loc = new ResourceLocation(dataSplit[0]);

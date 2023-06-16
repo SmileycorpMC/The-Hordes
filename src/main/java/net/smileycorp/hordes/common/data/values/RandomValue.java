@@ -1,10 +1,10 @@
-package net.smileycorp.hordes.common.hordeevent.data.values;
+package net.smileycorp.hordes.common.data.values;
 
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.smileycorp.atlas.api.data.DataType;
 
@@ -19,7 +19,7 @@ public class RandomValue<T extends Comparable<T>> implements ValueGetter<T> {
     }
 
     @Override
-    public T get(Level level, Player player, RandomSource rand) {
+    public T get(Level level, LivingEntity entity, RandomSource rand) {
         return values.get(rand.nextInt(values.size()));
     }
 

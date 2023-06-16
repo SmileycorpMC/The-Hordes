@@ -1,0 +1,23 @@
+[
+	{
+		"entity": "minecraft:horse",
+		"converts_to": "minecraft:zombie_horse",
+		"chance": 0.65
+	},
+	{
+		"entity": "minecraft:piglin",
+		"converts_to": "minecraft:zombified_piglin",
+		"chance": 0.75
+	},
+	{
+		"entity": "minecraft:piglin_brute",
+		"converts_to": "minecraft:zombified_piglin",
+		"chance": 0.35,
+		"nbt": "{Attributes:[{Name:\"generic.max_health\",Base:50f}]}"
+	},
+	{
+		"entity": "minecraft:hoglin",
+		"converts_to": "minecraft:zoglin",
+		"chance": 0.15
+	}
+]

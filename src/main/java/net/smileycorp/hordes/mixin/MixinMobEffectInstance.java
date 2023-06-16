@@ -8,7 +8,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.network.NetworkDirection;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.infection.HordesInfection;
-import net.smileycorp.hordes.common.infection.InfectionRegister;
+import net.smileycorp.hordes.common.infection.InfectedEffect;
 import net.smileycorp.hordes.common.infection.network.InfectMessage;
 import net.smileycorp.hordes.common.infection.network.InfectionPacketHandler;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,7 +34,7 @@ public class MixinMobEffectInstance {
 		if (duration <= 1 && effect == HordesInfection.INFECTED.get()) {
 			if (amplifier < 3) {
 				amplifier = amplifier + 1;
-				duration = InfectionRegister.getInfectionTime(entity);
+				duration = InfectedEffect.getInfectionTime(entity);
 				if (entity instanceof ServerPlayer) InfectionPacketHandler.NETWORK_INSTANCE.sendTo(new InfectMessage(), ((ServerPlayer) entity).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 				callback.setReturnValue(true);
 				callback.cancel();

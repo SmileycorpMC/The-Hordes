@@ -10,20 +10,19 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.util.thread.SidedThreadGroups;
 import net.smileycorp.hordes.client.ClientConfigHandler;
 import net.smileycorp.hordes.client.ClientHandler;
 import net.smileycorp.hordes.common.capability.IZombifyPlayer;
+import net.smileycorp.hordes.common.data.ConfigFilesGenerator;
+import net.smileycorp.hordes.common.data.DataRegistry;
 import net.smileycorp.hordes.common.hordeevent.HordeEventHandler;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeSpawn;
-import net.smileycorp.hordes.common.hordeevent.data.DefaultDataGenerator;
-import net.smileycorp.hordes.common.hordeevent.data.HordeDataRegistry;
 import net.smileycorp.hordes.common.hordeevent.network.HordeEventPacketHandler;
 import net.smileycorp.hordes.common.infection.HordesInfection;
 import net.smileycorp.hordes.common.infection.InfectionEventHandler;
-import net.smileycorp.hordes.common.infection.InfectionRegister;
 import net.smileycorp.hordes.common.infection.capability.IInfection;
 import net.smileycorp.hordes.common.infection.network.InfectionPacketHandler;
 import org.apache.logging.log4j.LogManager;
@@ -44,15 +43,18 @@ public class Hordes {
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CommonConfigHandler.config);
 		ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfigHandler.config);
 		//generate data files
-		if (DefaultDataGenerator.tryGenerateDataFiles()) logInfo("Generated default config files.");
-		else logInfo("Config files exist, skipping generation");
+		if (ConfigFilesGenerator.shouldGenerateFiles()) {
+			SidedThreadGroups.CLIENT.newThread(ConfigFilesGenerator::generateAssets);
+			SidedThreadGroups.SERVER.newThread(ConfigFilesGenerator::generateData);
+		} else {
+			logInfo("Config files are up to date, skipping data/asset generation");
+		}
 	}
 
 	@SubscribeEvent
 	public static void constructMod(FMLConstructModEvent event) {
 		//Horde Event
 		if (CommonConfigHandler.enableHordeEvent.get()) {
-			HordeDataRegistry.init();
 			HordeEventPacketHandler.initPackets();
 			MinecraftForge.EVENT_BUS.register(new HordeEventHandler());
 		} else {
@@ -65,17 +67,10 @@ public class Hordes {
 		} else {
 			MinecraftForge.EVENT_BUS.unregister(InfectionEventHandler.class);
 		}
+		DataRegistry.init();
 		MinecraftForge.EVENT_BUS.register(new MiscEventHandler());
 		HordesInfection.EFFECTS.register(FMLJavaModLoadingContext.get().getModEventBus());
 		HordesInfection.ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
-	}
-
-	@SubscribeEvent
-	public static void loadComplete(FMLLoadCompleteEvent event) {
-		//Mob Infection
-		if (CommonConfigHandler.enableMobInfection.get()) {
-			InfectionRegister.readConfig();
-		}
 	}
 
 	@SubscribeEvent

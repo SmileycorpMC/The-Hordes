@@ -9,11 +9,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.data.DataRegistry;
+import net.smileycorp.hordes.common.data.conditions.Condition;
+import net.smileycorp.hordes.common.data.values.ValueGetter;
 import net.smileycorp.hordes.common.event.HordeBuildSpawntableEvent;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
-import net.smileycorp.hordes.common.hordeevent.data.HordeDataRegistry;
-import net.smileycorp.hordes.common.hordeevent.data.conditions.Condition;
-import net.smileycorp.hordes.common.hordeevent.data.values.ValueGetter;
 
 import java.util.List;
 
@@ -54,7 +54,7 @@ public class HordeScript<T extends HordePlayerEvent> {
 			}
 			List<Condition> conditions = Lists.newArrayList();
 			for (JsonElement condition : obj.get("conditions").getAsJsonArray()) {
-				conditions.add(HordeDataRegistry.readCondition(condition.getAsJsonObject()));
+				conditions.add(DataRegistry.readCondition(condition.getAsJsonObject()));
 			}
 			if (function == null || clazz == null) throw new Exception("invalid function: " + obj.get("function").getAsString());
 			return new HordeScript(function, clazz, conditions.toArray(new Condition[]{}));

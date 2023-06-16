@@ -24,7 +24,6 @@ import net.smileycorp.hordes.common.ai.FleeEntityGoal;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeSpawn;
 import net.smileycorp.hordes.common.infection.HordesInfection;
-import net.smileycorp.hordes.common.infection.InfectionRegister;
 import net.smileycorp.hordes.common.infection.network.CureEntityMessage;
 import net.smileycorp.hordes.common.infection.network.InfectionPacketHandler;
 import org.spongepowered.asm.mixin.Mixin;
@@ -55,7 +54,7 @@ public abstract class MixinMob extends LivingEntity {
 	public void checkAndHandleImportantInteractions(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> callback) {
 		ItemStack stack = player.getItemInHand(hand);
 		if (hasEffect(HordesInfection.INFECTED.get())) {
-			if (InfectionRegister.isCure(stack)) {
+			if (HordesInfection.isCure(stack)) {
 				removeEffect(HordesInfection.INFECTED.get());
 				if (!player.level().isClientSide) InfectionPacketHandler.NETWORK_INSTANCE.send(
 						PacketDistributor.TRACKING_CHUNK.with(()->player.level().getChunkAt(getOnPos())),
@@ -139,7 +138,7 @@ public abstract class MixinMob extends LivingEntity {
 	@Inject(at=@At("HEAD"), method = "registerGoals()V", cancellable = true)
 	public void registerGoals(CallbackInfo callback) {
 		if (CommonConfigHandler.piglinsHuntZombies.get() && ((LivingEntity)this) instanceof Piglin) {
-			goalSelector.addGoal(1, new FleeEntityGoal((Mob)(LivingEntity)this, 1.5, 5, InfectionRegister::canCauseInfection));
+			goalSelector.addGoal(1, new FleeEntityGoal((Mob)(LivingEntity)this, 1.5, 5, HordesInfection::canCauseInfection));
 		}
 	}
 

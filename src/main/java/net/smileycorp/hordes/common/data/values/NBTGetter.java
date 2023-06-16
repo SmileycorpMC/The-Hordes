@@ -1,8 +1,8 @@
-package net.smileycorp.hordes.common.hordeevent.data.values;
+package net.smileycorp.hordes.common.data.values;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.atlas.api.data.NBTExplorer;
@@ -16,15 +16,15 @@ public abstract class NBTGetter<T extends Comparable<T>> implements ValueGetter<
 	}
 
 	@Override
-	public T get(Level level, Player player, RandomSource rand) {
+	public T get(Level level, LivingEntity entity, RandomSource rand) {
 		try {
-			return explorer.findValue(getNBT(level, player, rand));
+			return explorer.findValue(getNBT(level, entity, rand));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-	protected abstract CompoundTag getNBT(Level level, Player player, RandomSource rand);
+	protected abstract CompoundTag getNBT(Level level, LivingEntity entity, RandomSource rand);
 
 }

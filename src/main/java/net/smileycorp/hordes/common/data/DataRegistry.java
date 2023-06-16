@@ -1,24 +1,26 @@
-package net.smileycorp.hordes.common.hordeevent.data;
+package net.smileycorp.hordes.common.data;
 
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.ResourceLocation;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.atlas.api.data.LogicalOperation;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.Hordes;
-import net.smileycorp.hordes.common.hordeevent.data.conditions.*;
-import net.smileycorp.hordes.common.hordeevent.data.values.LevelNBTGetter;
-import net.smileycorp.hordes.common.hordeevent.data.values.PlayerNBTGetter;
-import net.smileycorp.hordes.common.hordeevent.data.values.PlayerPosGetter;
-import net.smileycorp.hordes.common.hordeevent.data.values.ValueGetter;
+import net.smileycorp.hordes.common.data.conditions.*;
+import net.smileycorp.hordes.common.data.values.EntityNBTGetter;
+import net.smileycorp.hordes.common.data.values.EntityPosGetter;
+import net.smileycorp.hordes.common.data.values.LevelNBTGetter;
+import net.smileycorp.hordes.common.data.values.ValueGetter;
 
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class HordeDataRegistry {
+public class DataRegistry {
 
 	private static Map<ResourceLocation, BiFunction<String, DataType, ValueGetter>> VALUE_GETTERS = Maps.newHashMap();
 	private static Map<ResourceLocation, Function<JsonElement, Condition>> CONDITION_DESERIALIZERS = Maps.newHashMap();
@@ -31,8 +33,8 @@ public class HordeDataRegistry {
 
 	private static void registerValueGetters() {
 		registerValueGetter(Constants.loc("level_nbt"), LevelNBTGetter::new);
-		registerValueGetter(Constants.loc("player_nbt"), PlayerNBTGetter::new);
-		registerValueGetter(Constants.loc("player_pos"), PlayerPosGetter::new);
+		registerValueGetter(Constants.loc("player_nbt"), EntityNBTGetter::new);
+		registerValueGetter(Constants.loc("player_pos"), EntityPosGetter::new);
 	}
 
 
@@ -80,4 +82,16 @@ public class HordeDataRegistry {
 		CONDITION_DESERIALIZERS.put(name, serializer);
 	}
 
+    public static CompoundTag parseNBT(String name, String nbtstring) {
+        CompoundTag nbt = null;
+        try {
+            CompoundTag parsed = TagParser.parseTag(nbtstring);
+            if (parsed != null) nbt = parsed;
+            else throw new NullPointerException("Parsed NBT is null.");
+        } catch (Exception e) {
+            Hordes.logError("Failed to read config, " + e.getCause() + " " + e.getMessage(), e);
+            Hordes.logError("Error parsing nbt for entity " + name + " " + e.getMessage(), e);
+        }
+        return nbt;
+    }
 }

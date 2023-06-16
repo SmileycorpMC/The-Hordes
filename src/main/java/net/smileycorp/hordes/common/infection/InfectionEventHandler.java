@@ -4,7 +4,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.ZombieVillager;
@@ -17,6 +16,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
@@ -35,6 +35,7 @@ import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.event.InfectionDeathEvent;
 import net.smileycorp.hordes.common.infection.capability.IInfection;
+import net.smileycorp.hordes.common.infection.data.InfectionConversionLoader;
 import net.smileycorp.hordes.common.infection.network.CureEntityMessage;
 import net.smileycorp.hordes.common.infection.network.InfectMessage;
 import net.smileycorp.hordes.common.infection.network.InfectionPacketHandler;
@@ -46,21 +47,24 @@ public class InfectionEventHandler {
 	@SubscribeEvent
 	public void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
 		Entity entity = event.getObject();
-		if (entity instanceof Player && !(entity instanceof FakePlayer) || entity instanceof Villager || InfectionRegister.canBeInfected(entity)) {
+		if (entity instanceof Player && !(entity instanceof FakePlayer) || entity instanceof Villager || InfectionConversionLoader.INSTANCE.canBeInfected(entity)) {
 			event.addCapability(Constants.loc("InfectionCounter"), new IInfection.Provider());
 		}
+	}
+
+	//register data listeners
+	@SubscribeEvent
+	public void addResourceReload(AddReloadListenerEvent event ) {
+		event.addListener(InfectionConversionLoader.INSTANCE);
 	}
 
 	@SubscribeEvent
 	public void onEntityAdded(EntityJoinLevelEvent event) {
 		Entity entity = event.getEntity();
-		if (entity != null) {
-			if (!entity.level().isClientSide) {
-				if (CommonConfigHandler.infectionEntitiesAggroConversions.get()) {
-					if (InfectionRegister.canCauseInfection(entity) && entity instanceof Mob) {
-						((Mob)entity).targetSelector.addGoal(3, new NearestAttackableTargetGoal<>((Mob)entity, LivingEntity.class, 10, true, false, InfectionRegister::canBeInfected));
-					}
-				}
+		if (entity instanceof Mob &!entity.level().isClientSide && CommonConfigHandler.infectionEntitiesAggroConversions.get()) {
+			if (HordesInfection.canCauseInfection((LivingEntity) entity)) {
+				((Mob) entity).targetSelector.addGoal(3, new NearestAttackableTargetGoal<>((Mob) entity, LivingEntity.class,
+						10, true, false, InfectionConversionLoader.INSTANCE::canBeInfected));
 			}
 		}
 	}
@@ -70,7 +74,7 @@ public class InfectionEventHandler {
 		LivingEntity entity = event.getEntity();
 		ItemStack stack = event.getItem();
 		if (entity.hasEffect(HordesInfection.INFECTED.get())) {
-			if (InfectionRegister.isCure(stack)) {
+			if (HordesInfection.isCure(stack)) {
 				LazyOptional<IInfection> optional = entity.getCapability(Hordes.INFECTION);
 				if (optional.isPresent()) optional.resolve().get().increaseInfection();
 				entity.removeEffect(HordesInfection.INFECTED.get());
@@ -88,7 +92,7 @@ public class InfectionEventHandler {
 			if (((EntityHitResult) ray).getEntity() instanceof LivingEntity) {
 				LivingEntity entity = (LivingEntity) ((EntityHitResult) ray).getEntity();
 				if (entity.hasEffect(HordesInfection.INFECTED.get())) {
-					if (InfectionRegister.isCure(stack)) {
+					if (HordesInfection.isCure(stack)) {
 						entity.removeEffect(HordesInfection.INFECTED.get());
 						LazyOptional<IInfection> optional = entity.getCapability(Hordes.INFECTION);
 						if (optional.isPresent()) optional.resolve().get().increaseInfection();
@@ -106,21 +110,21 @@ public class InfectionEventHandler {
 		Entity attacker = event.getSource().getDirectEntity();
 		Level level = entity.level();
 		RandomSource rand = level.random;
-		if (!level.isClientSide && InfectionRegister.canCauseInfection(attacker)) {
+		if (!level.isClientSide && entity instanceof LivingEntity && HordesInfection.canCauseInfection((LivingEntity) attacker)) {
 			if (!entity.hasEffect(HordesInfection.INFECTED.get())) {
 				if ((entity instanceof Player && CommonConfigHandler.infectPlayers.get())) {
 					int c = rand.nextInt(100);
 					if (c <= CommonConfigHandler.playerInfectChance.get()) {
-						entity.addEffect(new MobEffectInstance(HordesInfection.INFECTED.get(), InfectionRegister.getInfectionTime(entity), 0));
+						InfectedEffect.apply(entity);
 						InfectionPacketHandler.NETWORK_INSTANCE.sendTo(new InfectMessage(), ((ServerPlayer) entity).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 					}
 				} else if ((entity instanceof Villager && CommonConfigHandler.infectVillagers.get())) {
 					int c = rand.nextInt(100);
 					if (c <= CommonConfigHandler.villagerInfectChance.get()) {
-						entity.addEffect(new MobEffectInstance(HordesInfection.INFECTED.get(), InfectionRegister.getInfectionTime(entity), 0));
+						InfectedEffect.apply(entity);
 					}
-				} else if (InfectionRegister.canBeInfected(entity)) {
-					InfectionRegister.tryToInfect(entity);
+				} else if (InfectionConversionLoader.INSTANCE.canBeInfected(entity)) {
+					InfectionConversionLoader.INSTANCE.tryToInfect(entity);
 				}
 			}
 		}
@@ -157,8 +161,8 @@ public class InfectionEventHandler {
 			level.addFreshEntity(zombie);
 			entity.kill();
 			event.setResult(Result.DENY);
-		} else if (InfectionRegister.canBeInfected(entity))  {
-			InfectionRegister.convertEntity(entity);
+		} else if (InfectionConversionLoader.INSTANCE.canBeInfected(entity))  {
+			InfectionConversionLoader.INSTANCE.convertEntity(entity);
 			event.setResult(Result.DENY);
 		}
 	}
