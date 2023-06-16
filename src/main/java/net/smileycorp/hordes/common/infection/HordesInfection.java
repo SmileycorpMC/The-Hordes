@@ -1,6 +1,5 @@
 package net.smileycorp.hordes.common.infection;
 
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;

@@ -1,6 +1,5 @@
 package net.smileycorp.hordes.mixin;
 
-import net.minecraft.server.packs.FolderPackResources;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -10,7 +9,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;

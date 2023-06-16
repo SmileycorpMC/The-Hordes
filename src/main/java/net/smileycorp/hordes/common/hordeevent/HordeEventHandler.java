@@ -24,7 +24,6 @@ import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
-import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.living.MobSpawnEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;

@@ -30,7 +30,6 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.PacketDistributor;
 import net.smileycorp.atlas.api.util.DirectionUtils;
-import net.smileycorp.atlas.common.ModDefinitions;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.Hordes;
