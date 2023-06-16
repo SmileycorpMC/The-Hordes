@@ -31,8 +31,8 @@ public abstract class MixinPiglinAi {
 	}
 
 	@Inject(at=@At("HEAD"), method = "isZombified(Lnet/minecraft/world/entity/EntityType;)Z", cancellable = true)
-	private static void isZombified(EntityType<?> p_34807_, CallbackInfoReturnable<Boolean> callback) {
-		if (CommonConfigHandler.piglinsHuntZombies.get() && HordesInfection.canCauseInfection(p_34807_)) {
+	private static void isZombified(EntityType<?> type, CallbackInfoReturnable<Boolean> callback) {
+		if (CommonConfigHandler.piglinsHuntZombies.get() && type.is(HordesInfection.INFECTION_ENTITIES_TAG)) {
 			callback.setReturnValue(true);
 			callback.cancel();
 		}

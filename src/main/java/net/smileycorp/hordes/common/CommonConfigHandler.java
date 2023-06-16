@@ -99,10 +99,6 @@ public class CommonConfigHandler {
 		playerInfectChance = builder.comment("Chance out of 100 for a player to get infected").define("playerInfectChance", 75);
 		ticksForEffectStage = builder.comment("How long do each of the 4 effect phases last for before the next phase is activated?").define("ticksForEffectStage", 6000);
 		infectionSpawnsZombiePlayers = builder.comment("Do players who die to infection spawn a zombie?").define("infectionSpawnsZombiePlayers", true);
-		infectionConversionList = builder.comment("A list of entities that can be infected, followed by the chance out of 100 to infect, then the entity to convert them to, " +
-						"entities can have nbt attached to them.(e.g. minecraft:villager-85-minecraft:zombie_villager{ActiveEffects:[{Id:12,Amplifier:0,Duration:10000}]}), "
-						+ "note: players and villagers have special code accociated with them, and should not be in this list")
-				.define("customConversionList", Lists.newArrayList("minecraft:horse-65-minecraft:zombie_horse", "minecraft:piglin-75-minecraft:zombified_piglin", "minecraft:piglin_brute-35-minecraft:zombified_piglin", "minecraft:hoglin-35-minecraft:zoglin"));
 		infectionEntitiesAggroConversions = builder.comment("Do entities on the infectionEntities list automatically target entities on the infectionConversionList").define("infectionEntitiesAggroConversions", true);
 		effectStageTickReduction = builder.comment("What factor should the infection potion effect timer be multiplied by for each cured infection? (Resets on death, set to 1 to disable scaling)").define("effectStageTickReduction", 0.95);
 
