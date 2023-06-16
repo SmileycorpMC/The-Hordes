@@ -23,7 +23,7 @@ import net.minecraftforge.fml.util.thread.SidedThreadGroups;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.entity.ai.GoToEntityPositionGoal;
-import net.smileycorp.atlas.api.network.SimpleStringMessage;
+import net.smileycorp.atlas.api.network.GenericStringMessage;
 import net.smileycorp.atlas.api.recipe.WeightedOutputs;
 import net.smileycorp.atlas.api.util.DirectionUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
@@ -87,7 +87,7 @@ class HordeEvent implements IHordeEvent {
 
 	@Override
 	public void update(Player player) {
-		Level level = player.level;
+		Level level = player.level();
 		if (!level.isClientSide && player!=null) {
 			if (level.dimension() == Level.OVERWORLD) {
 				if ((timer % CommonConfigHandler.hordeSpawnInterval.get()) == 0) {
@@ -122,7 +122,7 @@ class HordeEvent implements IHordeEvent {
 			logError("Cannot load wave spawntable, cancelling spawns.", new Exception());
 			return;
 		}
-		Level level = player.level;
+		Level level = player.level();
 		HordeStartWaveEvent startEvent = new HordeStartWaveEvent(player, this, count);
 		postEvent(startEvent);
 		if (startEvent.isCanceled()) return;
@@ -235,7 +235,7 @@ class HordeEvent implements IHordeEvent {
 
 	@Override
 	public boolean isHordeDay(Player player) {
-		Level level = player.level;
+		Level level = player.level();
 		if (level.isClientSide |!(level.dimension() == Level.OVERWORLD)) return false;
 		return isActive(player) || (!CommonConfigHandler.hordesCommandOnly.get() && Math.floor(level.getDayTime()/CommonConfigHandler.dayLength.get())>=nextDay);
 	}
@@ -276,7 +276,7 @@ class HordeEvent implements IHordeEvent {
 	public void tryStartEvent(Player player, int duration, boolean isCommand) {
 		if (CommonConfigHandler.hordesCommandOnly.get()) return;
 		if (player!=null) {
-			Level level = player.level;
+			Level level = player.level();
 			if (level.dimension() == Level.OVERWORLD) {
 				HordeStartEvent startEvent = new HordeStartEvent(player, this, isCommand);
 				postEvent(startEvent);
@@ -324,7 +324,7 @@ class HordeEvent implements IHordeEvent {
 	}
 
 	private void sendMessage(Player player, String str) {
-		HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new SimpleStringMessage(str), ((ServerPlayer) player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+		HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new GenericStringMessage(str), ((ServerPlayer) player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 	}
 
 	@Override

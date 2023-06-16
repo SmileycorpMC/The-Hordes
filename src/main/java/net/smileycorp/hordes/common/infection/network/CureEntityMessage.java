@@ -4,9 +4,14 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.PacketListener;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.network.NetworkEvent;
+import net.smileycorp.atlas.api.network.AbstractMessage;
 import net.smileycorp.atlas.api.network.SimpleAbstractMessage;
+import net.smileycorp.hordes.client.ClientHandler;
 
-public class CureEntityMessage extends SimpleAbstractMessage {
+public class CureEntityMessage extends AbstractMessage {
 
 	private int entity;
 
@@ -32,5 +37,11 @@ public class CureEntityMessage extends SimpleAbstractMessage {
 
 	@Override
 	public void handle(PacketListener handler) {}
+
+	@Override
+	public void process(NetworkEvent.Context ctx) {
+		ctx.enqueueWork(() ->  DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> ClientHandler.processCureEntity(this)));
+		ctx.setPacketHandled(true);
+	}
 
 }

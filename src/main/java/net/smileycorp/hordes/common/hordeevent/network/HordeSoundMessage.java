@@ -4,9 +4,14 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.PacketListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.network.NetworkEvent;
+import net.smileycorp.atlas.api.network.AbstractMessage;
 import net.smileycorp.atlas.api.network.SimpleAbstractMessage;
+import net.smileycorp.hordes.client.ClientHandler;
 
-public class HordeSoundMessage extends SimpleAbstractMessage {
+public class HordeSoundMessage extends AbstractMessage {
 
 	protected Vec3 direction;
 	protected ResourceLocation sound;
@@ -37,16 +42,13 @@ public class HordeSoundMessage extends SimpleAbstractMessage {
 		}
 	}
 
-
-	public Vec3 getDirection() {
-		return direction;
-	}
-
-	public ResourceLocation getSound() {
-		return sound;
-	}
-
 	@Override
 	public void handle(PacketListener handler) {}
+
+	@Override
+	public void process(NetworkEvent.Context ctx) {
+		ctx.enqueueWork(() ->  DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> ClientHandler.playHordeSound(direction, sound)));
+		ctx.setPacketHandled(true);
+	}
 
 }

@@ -21,7 +21,7 @@ public class ZombifyPlayer implements IZombifyPlayer {
 		MinecraftForge.EVENT_BUS.post(event);
 		if (event.isCanceled()) return null;
 		type = event.getEntityType();
-		zombie = (Mob) type.create(player.level);
+		zombie = (Mob) type.create(player.level());
 		((IZombiePlayer) zombie).setPlayer(player);
 		zombie.setPos(player.getX(), player.getY(), player.getZ());
 		zombie.yBodyRotO = player.yBodyRotO;

@@ -23,6 +23,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.server.ServerLifecycleHooks;
+import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.infection.HordesInfection;
 
@@ -54,7 +55,7 @@ public class ZombiePlayer extends Zombie implements IZombiePlayer {
 	}
 
 	public ZombiePlayer(Player player) {
-		this(player.level);
+		this(player.level());
 		setPlayer(player);
 	}
 
@@ -180,7 +181,7 @@ public class ZombiePlayer extends Zombie implements IZombiePlayer {
 	@Override
 	public MutableComponent getDisplayName() {
 		MutableComponent textcomponentstring = PlayerTeam.formatNameForTeam(getTeam(),
-				MutableComponent.create(new TranslatableContents("entity.hordes.ZombiePlayer.chat", null, new Object[]{getCustomName()})));
+				TextUtils.translatableComponent("entity.hordes.ZombiePlayer.chat", "Zombie Player", getCustomName()));
 		textcomponentstring.getStyle().withHoverEvent(this.createHoverEvent());
 		textcomponentstring.getStyle().withInsertion(this.getEncodeId());
 		return textcomponentstring;

@@ -36,6 +36,7 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.entity.ai.GoToEntityPositionGoal;
 import net.smileycorp.atlas.api.util.DataUtils;
+import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.Hordes;
@@ -91,7 +92,7 @@ public class HordeEventHandler {
 	public void playerTick(PlayerTickEvent event) {
 		Player player = event.player;
 		if (event.phase == Phase.END && player != null && !(player instanceof FakePlayer)) {
-			Level level = player.level;
+			Level level = player.level();
 			if (!level.isClientSide && (level.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT) || !CommonConfigHandler.pauseEventServer.get())) {
 				LazyOptional<IHordeEvent> optional = player.getCapability(Hordes.HORDE_EVENT, null);
 				if (optional.isPresent()) {
@@ -115,7 +116,7 @@ public class HordeEventHandler {
 	@SubscribeEvent
 	public void tryDespawn(MobSpawnEvent.AllowDespawn event) {
 		LivingEntity entity = event.getEntity();
-		if (entity.level.isClientSide) return;
+		if (entity.level().isClientSide) return;
 		LazyOptional<IHordeSpawn> optional = entity.getCapability(Hordes.HORDESPAWN, null);
 		if (optional.isPresent()) {
 			IHordeSpawn cap = optional.resolve().get();
@@ -141,7 +142,7 @@ public class HordeEventHandler {
 	public void onDeath(LivingDeathEvent event) {
 		if (event.getEntity() instanceof Mob) {
 			Mob entity = (Mob) event.getEntity();
-			if (entity.level.isClientSide) return;
+			if (entity.level().isClientSide) return;
 			LazyOptional<IHordeSpawn> optional = entity.getCapability(Hordes.HORDESPAWN, null);
 			if (optional.isPresent()) {
 				IHordeSpawn cap = optional.resolve().get();
@@ -164,7 +165,7 @@ public class HordeEventHandler {
 	//sync entity capabilities when added to level
 	@SubscribeEvent(priority=EventPriority.LOWEST)
 	public void update(LivingTickEvent event) {
-		Level level = event.getEntity().level;
+		Level level = event.getEntity().level();
 		if (!level.isClientSide && event.getEntity() instanceof Mob && level.dimension() == Level.OVERWORLD && event.getEntity().tickCount%5==0) {
 			Mob entity = (Mob) event.getEntity();
 			LazyOptional<IHordeSpawn> optional = entity.getCapability(Hordes.HORDESPAWN, null);
@@ -225,7 +226,7 @@ public class HordeEventHandler {
 	@SubscribeEvent
 	public void trySleep(PlayerSleepInBedEvent event) {
 		Player player = event.getEntity();
-		Level level = player.level;
+		Level level = player.level();
 		if (!CommonConfigHandler.canSleepDuringHorde.get()) {
 			if (!level.isClientSide) {
 				LazyOptional<IHordeEvent> optional = player.getCapability(Hordes.HORDE_EVENT, null);
@@ -233,7 +234,7 @@ public class HordeEventHandler {
 					IHordeEvent horde = optional.resolve().get();
 					if ((horde.isHordeDay(player) && level.dimensionType().bedWorks() &! level.isDay()) || horde.isActive(player)) {
 						event.setResult(BedSleepingProblem.OTHER_PROBLEM);
-						player.displayClientMessage(MutableComponent.create(new TranslatableContents(Constants.hordeTrySleep, null, new Object[]{})), true);
+						player.displayClientMessage(TextUtils.translatableComponent(Constants.hordeTrySleep, "Can't sleep now, a horde is approaching"), true);
 					}
 				}
 			}

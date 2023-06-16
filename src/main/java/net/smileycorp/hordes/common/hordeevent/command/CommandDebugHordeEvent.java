@@ -12,6 +12,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.contents.LiteralContents;
 import net.minecraft.network.chat.contents.TranslatableContents;
+import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.common.hordeevent.capability.HordeSavedData;
 
 import java.nio.charset.StandardCharsets;
@@ -43,7 +44,7 @@ public class CommandDebugHordeEvent {
 		MutableComponent text = MutableComponent.create(new LiteralContents(file));
 		text.setStyle(Style.EMPTY.withUnderlined(true).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file))
 				.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, MutableComponent.create(new LiteralContents(file)))));
-		source.getEntity().sendSystemMessage(MutableComponent.create(new TranslatableContents("commands.hordes.HordeDebug.success", null, new Object[]{text})));
+		source.getEntity().sendSystemMessage(TextUtils.translatableComponent("commands.hordes.HordeDebug.success", null, text));
 		return 1;
 	}
 

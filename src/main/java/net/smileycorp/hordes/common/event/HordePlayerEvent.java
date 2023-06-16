@@ -15,7 +15,7 @@ public class HordePlayerEvent extends PlayerEvent {
 
 	public HordePlayerEvent(Player player, IHordeEvent horde) {
 		super(player);
-		level = player.level;
+		level = player.level();
 		this.horde = horde;
 		day = (int) Math.floor(level.getDayTime()/CommonConfigHandler.dayLength.get());
 	}

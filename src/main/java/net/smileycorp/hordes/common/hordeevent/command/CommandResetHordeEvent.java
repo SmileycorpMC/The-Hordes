@@ -13,6 +13,7 @@ import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.util.LazyOptional;
+import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 
@@ -41,7 +42,7 @@ public class CommandResetHordeEvent {
 			LazyOptional<IHordeEvent> optional = player.getCapability(Hordes.HORDE_EVENT, null);
 			if (optional.isPresent()) {
 				optional.resolve().get().reset(ctx.getSource().getLevel());
-				source.getEntity().sendSystemMessage(MutableComponent.create(new TranslatableContents("commands.hordes.HordeReset.success", null, new Object[]{player.getName()})));
+				source.getEntity().sendSystemMessage(TextUtils.translatableComponent("commands.hordes.HordeReset.success", null, player.getName()));
 				return 1;
 			}
 		}

@@ -22,6 +22,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.server.ServerLifecycleHooks;
+import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.infection.HordesInfection;
 
@@ -53,7 +54,7 @@ public class DrownedPlayer extends Drowned implements IZombiePlayer {
 	}
 
 	public DrownedPlayer(Player player) {
-		this(player.level);
+		this(player.level());
 		setPlayer(player);
 	}
 
@@ -163,7 +164,7 @@ public class DrownedPlayer extends Drowned implements IZombiePlayer {
 	@Override
 	public MutableComponent getDisplayName() {
 		MutableComponent textcomponentstring = PlayerTeam.formatNameForTeam(getTeam(),
-				MutableComponent.create(new TranslatableContents("entity.hordes.ZombiePlayer.chat", null, new Object[]{getCustomName()})));
+				TextUtils.translatableComponent("entity.hordes.DrownedPlayer.chat", "Drowned Player", getCustomName()));
 		textcomponentstring.getStyle().withHoverEvent(this.createHoverEvent());
 		textcomponentstring.getStyle().withInsertion(this.getEncodeId());
 		return textcomponentstring;

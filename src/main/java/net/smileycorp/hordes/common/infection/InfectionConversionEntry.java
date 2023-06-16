@@ -25,7 +25,7 @@ public class InfectionConversionEntry {
 	public LivingEntity convertEntity(LivingEntity entity) {
 		LivingConversionEvent.Pre preEvent = new LivingConversionEvent.Pre(entity, result, (i)->{});
 		MinecraftForge.EVENT_BUS.post(preEvent);
-		Level level = entity.level;
+		Level level = entity.level();
 		LivingEntity zombie = preEvent.getOutcome().create(level);
 		zombie.setPos(entity.getX(), entity.getY(), entity.getZ());
 		for (EquipmentSlot slot : EquipmentSlot.values()) {

@@ -57,11 +57,13 @@ public abstract class MixinMob extends LivingEntity {
 		if (hasEffect(HordesInfection.INFECTED.get())) {
 			if (InfectionRegister.isCure(stack)) {
 				removeEffect(HordesInfection.INFECTED.get());
-				if (!player.level.isClientSide) InfectionPacketHandler.NETWORK_INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(()->player.level.getChunkAt(getOnPos())), new CureEntityMessage((Mob)(LivingEntity)this));
+				if (!player.level().isClientSide) InfectionPacketHandler.NETWORK_INSTANCE.send(
+						PacketDistributor.TRACKING_CHUNK.with(()->player.level().getChunkAt(getOnPos())),
+						new CureEntityMessage((Mob)(LivingEntity)this));
 				if (!player.isCreative()) {
 					ItemStack container = stack.getItem().getCraftingRemainingItem(stack);
 					if (stack.isDamageableItem() && player instanceof ServerPlayer) {
-						stack.hurt(1, player.level.random, (ServerPlayer) player);
+						stack.hurt(1, player.level().random, (ServerPlayer) player);
 					} else {
 						stack.shrink(1);
 					}
@@ -69,7 +71,7 @@ public abstract class MixinMob extends LivingEntity {
 						player.setItemInHand(hand, container);
 					}
 				}
-				callback.setReturnValue(InteractionResult.sidedSuccess(player.level.isClientSide));
+				callback.setReturnValue(InteractionResult.sidedSuccess(player.level().isClientSide));
 				callback.cancel();
 			}
 		}

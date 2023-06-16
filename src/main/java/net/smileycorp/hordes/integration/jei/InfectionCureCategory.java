@@ -13,6 +13,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.common.Constants;
 
 import java.util.List;
@@ -38,7 +39,7 @@ public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapp
 
 	@Override
 	public MutableComponent getTitle() {
-		return MutableComponent.create(new TranslatableContents("jei.category.hordes.InfectionCures", null, new Object[]{}));
+		return TextUtils.translatableComponent("jei.category.hordes.InfectionCures", "Infection Cures");
 	}
 
 	@Override
@@ -52,16 +53,6 @@ public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapp
 		for (int i = 0; i < items.size(); i++) {
 			recipeLayout.addSlot(RecipeIngredientRole.INPUT, (i%9)*18+3, Math.floorDiv(i, 9)*18+3).addItemStack(items.get(i));
 		}
-	}
-
-	@Override
-	public void draw(InfectionCureWrapper recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
-		/*Minecraft mc = Minecraft.getInstance();
-		Font font = mc.font;
-		MutableComponent text = MutableComponent.create(new TranslatableContents("jei.category.hordes.InfectionCures", null, new Object[]{}))
-				.setStyle(Style.EMPTY.withBold(true).withColor(TextColor.fromRgb(0x440002)));
-		font.draw(stack, text, 0, 0, 0);
-		font.drawShadow(stack, text, 0, 0, 0);*/
 	}
 
 	@Override

@@ -110,7 +110,7 @@ public class InfectionRegister {
 	}
 
 	public static void tryToInfect(LivingEntity entity) {
-		int c = entity.level.random.nextInt(100);
+		int c = entity.level().random.nextInt(100);
 		if (c <= conversionTable.get(entity.getType()).getInfectChance()) {
 			entity.addEffect(new MobEffectInstance(HordesInfection.INFECTED.get(), getInfectionTime(entity), 0));
 		}

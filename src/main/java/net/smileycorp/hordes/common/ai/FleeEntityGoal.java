@@ -31,7 +31,7 @@ public class FleeEntityGoal extends Goal  {
 	public FleeEntityGoal(Mob entity, double speed, double range, Predicate<LivingEntity> predicate) {
 		super();
 		this.entity=entity;
-		level=entity.level;
+		level=entity.level();
 		pather=entity.getNavigation();
 		this.predicate = predicate;
 		this.speed = speed;
@@ -79,7 +79,7 @@ public class FleeEntityGoal extends Goal  {
 			Vec3 dir = DirectionUtils.getDirectionVecXZ(this.entity, entity);
 			resultDir = new Vec3((dir.x + resultDir.x)/2, (dir.y + resultDir.y)/2, (dir.z + resultDir.z)/2);
 		}
-		return Stream.of(level.getHeightmapPos(Types.WORLD_SURFACE, BlockPos.m_274446_(pos.add(resultDir.reverse().multiply(5, 0, 5)))));
+		return Stream.of(level.getHeightmapPos(Types.WORLD_SURFACE, BlockPos.containing(pos.add(resultDir.reverse().multiply(5, 0, 5)))));
 	}
 
 }

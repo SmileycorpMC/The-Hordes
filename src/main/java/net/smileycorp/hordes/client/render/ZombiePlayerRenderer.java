@@ -32,7 +32,7 @@ public class ZombiePlayerRenderer<T extends Zombie & IZombiePlayer> extends Huma
 	public ZombiePlayerRenderer(EntityRendererProvider.Context ctx, Color colour) {
 		super(ctx, new ZombiePlayerModel<T>(ctx.bakeLayer(DEFAULT), colour), 0.5F);
 		addLayer(new HumanoidArmorLayer<>(this, new ZombieModel<T>(ctx.bakeLayer(ModelLayers.ZOMBIE_INNER_ARMOR)),
-				new ZombieModel<T>(ctx.bakeLayer(ModelLayers.ZOMBIE_OUTER_ARMOR)), ctx.m_266367_()));
+				new ZombieModel<T>(ctx.bakeLayer(ModelLayers.ZOMBIE_OUTER_ARMOR)), ctx.getModelManager()));
 		addLayer(new ZombiePlayerCapeLayer<>(this));
 		addLayer(new ZombiePlayerElytraLayer<T>(this, ctx.getModelSet()));
 		defaultModel = model;

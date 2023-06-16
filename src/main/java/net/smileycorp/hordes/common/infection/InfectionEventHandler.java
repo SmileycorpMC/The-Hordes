@@ -55,7 +55,7 @@ public class InfectionEventHandler {
 	public void onEntityAdded(EntityJoinLevelEvent event) {
 		Entity entity = event.getEntity();
 		if (entity != null) {
-			if (!entity.level.isClientSide) {
+			if (!entity.level().isClientSide) {
 				if (CommonConfigHandler.infectionEntitiesAggroConversions.get()) {
 					if (InfectionRegister.canCauseInfection(entity) && entity instanceof Mob) {
 						((Mob)entity).targetSelector.addGoal(3, new NearestAttackableTargetGoal<>((Mob)entity, LivingEntity.class, 10, true, false, InfectionRegister::canBeInfected));
@@ -74,7 +74,7 @@ public class InfectionEventHandler {
 				LazyOptional<IInfection> optional = entity.getCapability(Hordes.INFECTION);
 				if (optional.isPresent()) optional.resolve().get().increaseInfection();
 				entity.removeEffect(HordesInfection.INFECTED.get());
-				InfectionPacketHandler.NETWORK_INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(()->entity.level.getChunkAt(entity.getOnPos())),
+				InfectionPacketHandler.NETWORK_INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(()->entity.level().getChunkAt(entity.getOnPos())),
 						new CureEntityMessage(entity));
 			}
 		}
@@ -104,7 +104,7 @@ public class InfectionEventHandler {
 	public void onDamage(LivingDamageEvent event) {
 		LivingEntity entity = event.getEntity();
 		Entity attacker = event.getSource().getDirectEntity();
-		Level level = entity.level;
+		Level level = entity.level();
 		RandomSource rand = level.random;
 		if (!level.isClientSide && InfectionRegister.canCauseInfection(attacker)) {
 			if (!entity.hasEffect(HordesInfection.INFECTED.get())) {
@@ -130,8 +130,8 @@ public class InfectionEventHandler {
 	public void onDeath(LivingDeathEvent event) {
 		LivingEntity entity = event.getEntity();
 		DamageSource source = event.getSource();
-		Level level = entity.level;
-		if (!level.isClientSide && (source.m_276093_(HordesInfection.INFECTION_DAMAGE) || entity.hasEffect(HordesInfection.INFECTED.get()))) {
+		Level level = entity.level();
+		if (!level.isClientSide && (source.is(HordesInfection.INFECTION_DAMAGE) || entity.hasEffect(HordesInfection.INFECTED.get()))) {
 			InfectionDeathEvent newevent = new InfectionDeathEvent(entity, event.getSource());
 			MinecraftForge.EVENT_BUS.post(newevent);
 			if (newevent.getResult() == Result.DENY) event.setCanceled(true);
@@ -141,7 +141,7 @@ public class InfectionEventHandler {
 	@SubscribeEvent
 	public void onInfectDeath(InfectionDeathEvent event) {
 		LivingEntity entity = event.getEntity();
-		Level level = entity.level;
+		Level level = entity.level();
 		if (entity instanceof Villager) {
 			Villager villager = (Villager) entity;
 			ZombieVillager zombie = EntityType.ZOMBIE_VILLAGER.create(level);
