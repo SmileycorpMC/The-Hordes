@@ -1,7 +1,6 @@
 package net.smileycorp.hordes.common.infection;
 
 import net.minecraft.core.Registry;
-import net.minecraft.tags.Tag;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;

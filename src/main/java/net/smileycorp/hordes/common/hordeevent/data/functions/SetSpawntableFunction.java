@@ -2,7 +2,6 @@ package net.smileycorp.hordes.common.hordeevent.data.functions;
 
 import net.minecraft.resources.ResourceLocation;
 import net.smileycorp.hordes.common.event.HordeBuildSpawntableEvent;
-import net.smileycorp.hordes.common.event.HordeStartEvent;
 import net.smileycorp.hordes.common.hordeevent.data.HordeTableLoader;
 import net.smileycorp.hordes.common.hordeevent.data.values.ValueGetter;
 

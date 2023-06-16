@@ -7,10 +7,8 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.smileycorp.atlas.api.network.SimpleMessageDecoder;
 import net.smileycorp.atlas.api.network.SimpleMessageEncoder;
-import net.smileycorp.atlas.api.network.SimpleStringMessage;
 import net.smileycorp.hordes.client.ClientHandler;
 import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.common.infection.InfectionRegister;
 
 public class InfectionPacketHandler {
 

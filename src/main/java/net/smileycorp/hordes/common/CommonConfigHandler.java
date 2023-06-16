@@ -3,7 +3,6 @@ package net.smileycorp.hordes.common;
 import com.google.common.collect.Lists;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
-import net.smileycorp.hordes.common.hordeevent.data.values.NBTGetter;
 
 import java.util.List;
 

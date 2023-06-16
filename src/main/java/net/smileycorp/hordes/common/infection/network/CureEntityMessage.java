@@ -3,7 +3,6 @@ package net.smileycorp.hordes.common.infection.network;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.PacketListener;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.Level;
 import net.smileycorp.atlas.api.network.SimpleAbstractMessage;
 
