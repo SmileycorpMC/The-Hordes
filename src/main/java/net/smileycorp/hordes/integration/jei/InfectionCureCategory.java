@@ -79,11 +79,11 @@ public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapp
 
 	@Override
 	public void draw(InfectionCureWrapper recipe, PoseStack matrixStack, double mouseX, double mouseY) {
-		Minecraft mc = Minecraft.getInstance();
+		/*Minecraft mc = Minecraft.getInstance();
 		Font font = mc.font;
 		MutableComponent text = new TranslatableComponent("jei.category.hordes.InfectionCures").setStyle(Style.EMPTY.withBold(true).withColor(TextColor.fromRgb(0x440002)));
 		font.draw(matrixStack, text, 0, 0, 0);
-		font.drawShadow(matrixStack, text, 0, 0, 0);
+		font.drawShadow(matrixStack, text, 0, 0, 0);*/
 	}
 
 }

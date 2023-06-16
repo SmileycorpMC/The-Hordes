@@ -21,56 +21,15 @@ import java.util.List;
 @JeiPlugin
 public class JEIPluginInfection implements IModPlugin {
 
-	public static IJeiHelpers jeiHelpers;
-
-	private static InfectionCureCategory infectionCategory;
-	private static List<InfectionCureWrapper> recipes = new ArrayList<InfectionCureWrapper>();
-	private static RecipeManager recipeManager = null;
-
 	@Override
 	public void registerCategories(IRecipeCategoryRegistration registry) {
-		jeiHelpers = registry.getJeiHelpers();
-		IGuiHelper guiHelper = jeiHelpers.getGuiHelper();
-		infectionCategory = new InfectionCureCategory(guiHelper);
-		registry.addRecipeCategories(infectionCategory);
+		registry.addRecipeCategories(new InfectionCureCategory(registry.getJeiHelpers().getGuiHelper()));
 	}
 
 	@Override
 	public void registerRecipes(IRecipeRegistration registry) {
 		registry.addRecipes(Lists.newArrayList(new InfectionCureWrapper()), InfectionCureCategory.ID);
 	}
-
-	/*@Override
-	public void onRuntimeAvailable(IJeiRuntime runtime) {
-		if (runtime.getRecipeManager() instanceof RecipeManager ) {
-			recipeManager = (RecipeManager) runtime.getRecipeManager();
-		}
-	}
-
-	@SuppressWarnings("removal")
-	public static void setRecipes(List<ItemStack> cures) {
-		if (recipeManager != null) {
-			RecipeManagerInternal manager = ObfuscationReflectionHelper.getPrivateValue(RecipeManager.class, recipeManager , "internal");
-			if (manager!=null) {
-				for (InfectionCureWrapper recipe : recipes) manager.hideRecipe(InfectionCureCategory.ID, recipe);
-				recipes.clear();
-				List<ItemStack> items = new ArrayList<ItemStack>();
-				for (ItemStack stack : cures) {
-					items.add(stack);
-					if (items.size() == 54) {
-						recipes.add(new InfectionCureWrapper(items));
-						items = new ArrayList<ItemStack>();
-					}
-				}
-				if (!items.isEmpty()) {
-					recipes.add(new InfectionCureWrapper(items));
-				}
-				for (InfectionCureWrapper recipe : recipes) {
-					recipeManager.addRecipe(recipe, InfectionCureCategory.ID);
-				}
-			}
-		}
-	}*/
 
 	@Override
 	public ResourceLocation getPluginUid() {
