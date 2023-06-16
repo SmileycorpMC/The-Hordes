@@ -8,10 +8,11 @@
 	"1.1.5d": "fix crashes caused by a null pointer exception with zombie players and conversions",
 	"1.1.5e": "fix crash when zombie players can't properly select which player model to use, fix issues with drowned player names",
 	"1.1.6": "add additional config options",
-	"1.1.6a": "fix mixin config preventing mod load"
+	"1.1.6a": "fix mixin config preventing mod load",
+	"1.2.0": "add datapack support, player arguments for commands, piglin infection"
   },
   "promos": {
-    "1.18.2-latest": "1.1.6a",
-    "1.18.2-recommended": "1.1.6a"
+    "1.18.2-latest": "1.2.0",
+    "1.18.2-recommended": "1.2.0"
   }
 }
