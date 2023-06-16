@@ -41,7 +41,7 @@ public class MixinMobEffectInstance {
 				return;
 			}
 			else {
-				entity.hurt(HordesInfection.INFECTION_DAMAGE, Float.MAX_VALUE);
+				entity.hurt(HordesInfection.getInfectionDamage(entity), Float.MAX_VALUE);
 				callback.setReturnValue(false);
 				callback.cancel();
 				return;

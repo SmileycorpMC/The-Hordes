@@ -25,6 +25,7 @@ import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
+import net.minecraftforge.event.entity.living.MobSpawnEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
@@ -113,7 +114,7 @@ public class HordeEventHandler {
 
 	//prevent despawning of entities in an active horde
 	@SubscribeEvent
-	public void tryDespawn(LivingSpawnEvent.AllowDespawn event) {
+	public void tryDespawn(MobSpawnEvent.AllowDespawn event) {
 		LivingEntity entity = event.getEntity();
 		if (entity.level.isClientSide) return;
 		LazyOptional<IHordeSpawn> optional = entity.getCapability(Hordes.HORDESPAWN, null);

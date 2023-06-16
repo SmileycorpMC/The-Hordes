@@ -40,7 +40,7 @@ import net.smileycorp.hordes.common.infection.network.CureEntityMessage;
 import net.smileycorp.hordes.common.infection.network.InfectMessage;
 import net.smileycorp.hordes.common.infection.network.InfectionPacketHandler;
 
-@EventBusSubscriber(modid=ModDefinitions.MODID)
+@EventBusSubscriber(modid=Constants.MODID)
 public class InfectionEventHandler {
 
 	//attach required entity capabilities for event to function
@@ -132,7 +132,7 @@ public class InfectionEventHandler {
 		LivingEntity entity = event.getEntity();
 		DamageSource source = event.getSource();
 		Level level = entity.level;
-		if (!level.isClientSide && (source == HordesInfection.INFECTION_DAMAGE || entity.hasEffect(HordesInfection.INFECTED.get()))) {
+		if (!level.isClientSide && (source.m_276093_(HordesInfection.INFECTION_DAMAGE) || entity.hasEffect(HordesInfection.INFECTED.get()))) {
 			InfectionDeathEvent newevent = new InfectionDeathEvent(entity, event.getSource());
 			MinecraftForge.EVENT_BUS.post(newevent);
 			if (newevent.getResult() == Result.DENY) event.setCanceled(true);

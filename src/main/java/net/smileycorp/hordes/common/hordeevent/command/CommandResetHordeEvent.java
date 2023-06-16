@@ -41,7 +41,7 @@ public class CommandResetHordeEvent {
 			LazyOptional<IHordeEvent> optional = player.getCapability(Hordes.HORDE_EVENT, null);
 			if (optional.isPresent()) {
 				optional.resolve().get().reset(ctx.getSource().getLevel());
-				source.getEntity().sendSystemMessage(MutableComponent.create(new TranslatableContents("commands.hordes.HordeReset.success", player.getName())));
+				source.getEntity().sendSystemMessage(MutableComponent.create(new TranslatableContents("commands.hordes.HordeReset.success", null, new Object[]{player.getName()})));
 				return 1;
 			}
 		}

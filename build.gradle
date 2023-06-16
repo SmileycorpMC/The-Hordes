@@ -24,7 +24,7 @@ repositories {
     }
 }
 
-version = '1.19.2-1.2.0'
+version = '1.19.4-1.2.0'
 group = 'net.smileycorp.hordes' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'The-Hordes'
 
@@ -94,9 +94,9 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.19.2-43.2.14'
-	implementation fg.deobf('curse.maven:jei-238222:4494410')
-	implementation fg.deobf('curse.maven:atlaslib-463826:4088354')
+    minecraft 'net.minecraftforge:forge:1.19.4-45.1.0'
+	implementation fg.deobf('curse.maven:jei-238222:4581325')
+	implementation fg.deobf('curse.maven:atlaslib-463826:4578087')
 	annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
