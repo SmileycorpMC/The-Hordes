@@ -13,6 +13,8 @@
 	"commands.hordes.HordeDebug.success":"Output horde log to %1$s",
 	"commands.hordes.HordeClean.usage":"/clearHordeData",
 	"commands.hordes.HordeClean.success":"Cleared all existing horde world data",
+	"commands.hordes.HordeReset.usage":"/resetHorde <optional: player>",
+	"commands.hordes.HordeReset.success":"Reset all horde data for player %1$s",
 	"message.hordes.EventStart":"You hear the howls of a nearby horde",
 	"message.hordes.EventEnd":"The air is quiet, the horde has stopped",
 	"message.hordes.TrySleep":"You may not rest now, a horde is approaching",

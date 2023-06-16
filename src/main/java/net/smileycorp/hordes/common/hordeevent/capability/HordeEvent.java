@@ -112,10 +112,13 @@ class HordeEvent implements IHordeEvent {
 	@Override
 	public void spawnWave(Player player, int count) {
 		cleanSpawns();
-		if (loadedTable == null) loadedTable = HordeTableLoader.INSTANCE.getDefaultTable();
-		HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, loadedTable, this);
-		postEvent(buildTableEvent);
-		if (loadedTable == null) {
+		HordeSpawnTable table = loadedTable;
+		if (table == null) {
+			HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, HordeTableLoader.INSTANCE.getDefaultTable(), this);
+			postEvent(buildTableEvent);
+			table = buildTableEvent.spawntable;
+		}
+		if (table == null) {
 			logError("Cannot load wave spawntable, cancelling spawns.", new Exception());
 			return;
 		}
@@ -137,7 +140,7 @@ class HordeEvent implements IHordeEvent {
 				break;
 			}
 		}
-		WeightedOutputs<HordeSpawnEntry> spawntable = buildTableEvent.spawntable.getSpawnTable(day);
+		WeightedOutputs<HordeSpawnEntry> spawntable = table.getSpawnTable(day);
 		if (spawntable.isEmpty()) {
 			logInfo("Spawntable is empty, stopping wave spawn.");
 			return;
@@ -275,20 +278,19 @@ class HordeEvent implements IHordeEvent {
 		if (player!=null) {
 			Level level = player.level;
 			if (level.dimension() == Level.OVERWORLD) {
-				if (loadedTable == null) loadedTable = HordeTableLoader.INSTANCE.getDefaultTable();
 				HordeStartEvent startEvent = new HordeStartEvent(player, this, isCommand);
 				postEvent(startEvent);
 				if (startEvent.isCanceled()) {
 					loadedTable = null;
 					return;
 				}
-				if (loadedTable == null) {
-					logInfo("Spawntable is null, canceling event start.");
-					return;
+				HordeSpawnTable table = loadedTable;
+				if (table == null) {
+					HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, HordeTableLoader.INSTANCE.getDefaultTable(), this);
+					postEvent(buildTableEvent);
+					table = buildTableEvent.spawntable;
 				}
-				HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, loadedTable, this);
-				postEvent(buildTableEvent);
-				if (!buildTableEvent.spawntable.getSpawnTable(day).isEmpty()) {
+				if (!table.getSpawnTable(day).isEmpty()) {
 					timer = duration;
 					hasChanged = true;
 					sendMessage(player, startEvent.getMessage());
