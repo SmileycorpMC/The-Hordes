@@ -1,10 +1,15 @@
 package net.smileycorp.hordes.common.hordeevent;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class HordeSpawnEntry {
 
+	private final ResourceLocation name;
+
+	@Deprecated
 	protected final EntityType<?> type;
 	protected final int weight;
 	protected final int minDay;
@@ -16,6 +21,7 @@ public class HordeSpawnEntry {
 	}
 
 	HordeSpawnEntry(EntityType<?> type, int weight, int minDay, int maxDay) {
+		this.name= ForgeRegistries.ENTITY_TYPES.getKey(type);
 		this.type=type;
 		this.weight=weight;
 		this.minDay=minDay;
@@ -34,8 +40,13 @@ public class HordeSpawnEntry {
 		return maxDay;
 	}
 
+	@Deprecated
 	public EntityType<?> getEntity() {
 		return type;
+	}
+
+	public ResourceLocation getName() {
+		return name;
 	}
 
 	public CompoundTag getNBT() {

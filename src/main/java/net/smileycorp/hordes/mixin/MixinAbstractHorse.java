@@ -1,12 +1,5 @@
 package net.smileycorp.hordes.mixin;
 
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.MobType;
 import net.minecraft.world.entity.animal.Animal;
@@ -17,6 +10,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.ai.HorseFleeGoal;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AbstractHorse.class)
 public abstract class MixinAbstractHorse extends Animal {
@@ -30,8 +29,21 @@ public abstract class MixinAbstractHorse extends Animal {
 
 	@Inject(at=@At("HEAD"), method = "aiStep()V", cancellable = true)
 	public void aiStep(CallbackInfo callback) {
-		if ((Animal)this instanceof ZombieHorse && CommonConfigHandler.zombieHorsesBurn.get()) tryBurn();
-		else if ((Animal)this instanceof SkeletonHorse && CommonConfigHandler.skeletonHorsesBurn.get()) tryBurn();
+		if ((Animal)this instanceof ZombieHorse) {
+			if (CommonConfigHandler.aggressiveZombieHorses.get()) {
+				updateSwingTime();
+				float f = this.getLightLevelDependentMagicValue();
+				if (f > 0.5F) noActionTime += 2;
+			}
+			if (CommonConfigHandler.zombieHorsesBurn.get()) {
+				tryBurn();
+			}
+		}
+		else if ((Animal)this instanceof SkeletonHorse) {
+			if (CommonConfigHandler.skeletonHorsesBurn.get()) {
+				tryBurn();
+			}
+		}
 	}
 
 	protected void tryBurn() {

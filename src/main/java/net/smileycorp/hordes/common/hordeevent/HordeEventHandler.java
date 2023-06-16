@@ -1,7 +1,5 @@
 package net.smileycorp.hordes.common.hordeevent;
 
-import java.util.UUID;
-
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -19,13 +17,14 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
-import net.minecraftforge.event.entity.living.MobSpawnEvent;
+import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
@@ -43,6 +42,10 @@ import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.hordeevent.capability.HordeSavedData;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeSpawn;
+import net.smileycorp.hordes.common.hordeevent.data.HordeScriptLoader;
+import net.smileycorp.hordes.common.hordeevent.data.HordeTableLoader;
+
+import java.util.UUID;
 
 @EventBusSubscriber(modid=Constants.MODID)
 public class HordeEventHandler {
@@ -59,10 +62,17 @@ public class HordeEventHandler {
 		}
 	}
 
+	//register data listeners
+	@SubscribeEvent
+	public void addResourceReload(AddReloadListenerEvent event ) {
+		event.addListener(HordeTableLoader.INSTANCE);
+		event.addListener(HordeScriptLoader.INSTANCE);
+	}
+
 	//update the next day in the horde level data
 	@SubscribeEvent
 	public void serverTick(ServerTickEvent event) {
-		if (event.phase == Phase.START) {
+		if (event.phase == Phase.START &! CommonConfigHandler.hordesCommandOnly.get()) {
 			MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
 			ServerLevel level = server.overworld();
 			if ((level.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT) |! CommonConfigHandler.pauseEventServer.get())) {
@@ -89,7 +99,7 @@ public class HordeEventHandler {
 					int day = (int) Math.floor(level.getDayTime() / CommonConfigHandler.dayLength.get());
 					int time = Math.round(level.getDayTime() % CommonConfigHandler.dayLength.get());
 					if (horde != null && !horde.isActive(player)) {
-						if (time >= CommonConfigHandler.hordeStartTime.get() && day >= horde.getNextDay() && (day!=0 || CommonConfigHandler.spawnFirstDay.get())) {
+						if (time >= CommonConfigHandler.hordeStartTime.get() && day >= horde.getNextDay() && (day>0 || CommonConfigHandler.spawnFirstDay.get())) {
 							horde.tryStartEvent(player, CommonConfigHandler.hordeSpawnDuration.get(), false);
 						}
 					}
@@ -103,7 +113,7 @@ public class HordeEventHandler {
 
 	//prevent despawning of entities in an active horde
 	@SubscribeEvent
-	public void tryDespawn(MobSpawnEvent.AllowDespawn event) {
+	public void tryDespawn(LivingSpawnEvent.AllowDespawn event) {
 		LivingEntity entity = event.getEntity();
 		if (entity.level.isClientSide) return;
 		LazyOptional<IHordeSpawn> optional = entity.getCapability(Hordes.HORDESPAWN, null);

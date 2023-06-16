@@ -1,21 +1,15 @@
 package net.smileycorp.hordes.mixin;
 
-import java.util.UUID;
-
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.animal.horse.ZombieHorse;
 import net.minecraft.world.entity.monster.AbstractSkeleton;
+import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -26,15 +20,31 @@ import net.smileycorp.atlas.api.entity.ai.GoToEntityPositionGoal;
 import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.ai.FleeEntityGoal;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeSpawn;
 import net.smileycorp.hordes.common.infection.HordesInfection;
 import net.smileycorp.hordes.common.infection.InfectionRegister;
 import net.smileycorp.hordes.common.infection.network.CureEntityMessage;
 import net.smileycorp.hordes.common.infection.network.InfectionPacketHandler;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.UUID;
 
 @Mixin(Mob.class)
 public abstract class MixinMob extends LivingEntity {
+
+	@Shadow
+	public GoalSelector goalSelector;
+
+	@Shadow
+	public GoalSelector targetSelector;
 
 	public MixinMob(Level level) {
 		super(null, level);
@@ -121,6 +131,13 @@ public abstract class MixinMob extends LivingEntity {
 					if (player != null) converted.goalSelector.addGoal(6, new GoToEntityPositionGoal(converted, player));
 				}
 			}
+		}
+	}
+
+	@Inject(at=@At("HEAD"), method = "registerGoals()V", cancellable = true)
+	public void registerGoals(CallbackInfo callback) {
+		if (CommonConfigHandler.piglinsHuntZombies.get() && ((LivingEntity)this) instanceof Piglin) {
+			goalSelector.addGoal(1, new FleeEntityGoal((Mob)(LivingEntity)this, 1.5, 5, InfectionRegister::canCauseInfection));
 		}
 	}
 

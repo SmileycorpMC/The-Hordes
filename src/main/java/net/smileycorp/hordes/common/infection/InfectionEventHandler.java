@@ -5,11 +5,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.ZombieVillager;
 import net.minecraft.world.entity.npc.Villager;
@@ -26,14 +22,13 @@ import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.network.NetworkDirection;
-import net.smileycorp.atlas.api.network.SimpleStringMessage;
+import net.minecraftforge.network.PacketDistributor;
 import net.smileycorp.atlas.api.util.DirectionUtils;
 import net.smileycorp.atlas.common.ModDefinitions;
 import net.smileycorp.hordes.common.CommonConfigHandler;
@@ -41,6 +36,7 @@ import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.event.InfectionDeathEvent;
 import net.smileycorp.hordes.common.infection.capability.IInfection;
+import net.smileycorp.hordes.common.infection.network.CureEntityMessage;
 import net.smileycorp.hordes.common.infection.network.InfectMessage;
 import net.smileycorp.hordes.common.infection.network.InfectionPacketHandler;
 
@@ -71,16 +67,6 @@ public class InfectionEventHandler {
 	}
 
 	@SubscribeEvent
-	public void playerJoin(PlayerLoggedInEvent event) {
-		Player player = event.getEntity();
-		if (player != null) {
-			if (player instanceof ServerPlayer) {
-				InfectionPacketHandler.NETWORK_INSTANCE.sendTo(new SimpleStringMessage(InfectionRegister.getCurePacketData()), ((ServerPlayer) player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
-			}
-		}
-	}
-
-	@SubscribeEvent
 	public void onItemStackConsume(LivingEntityUseItemEvent.Finish event) {
 		LivingEntity entity = event.getEntity();
 		ItemStack stack = event.getItem();
@@ -89,6 +75,8 @@ public class InfectionEventHandler {
 				LazyOptional<IInfection> optional = entity.getCapability(Hordes.INFECTION);
 				if (optional.isPresent()) optional.resolve().get().increaseInfection();
 				entity.removeEffect(HordesInfection.INFECTED.get());
+				InfectionPacketHandler.NETWORK_INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(()->entity.level.getChunkAt(entity.getOnPos())),
+						new CureEntityMessage(entity));
 			}
 		}
 	}
@@ -144,7 +132,7 @@ public class InfectionEventHandler {
 		LivingEntity entity = event.getEntity();
 		DamageSource source = event.getSource();
 		Level level = entity.level;
-		if (!level.isClientSide && (source.m_276093_(HordesInfection.INFECTION_DAMAGE) || entity.hasEffect(HordesInfection.INFECTED.get()))) {
+		if (!level.isClientSide && (source == HordesInfection.INFECTION_DAMAGE || entity.hasEffect(HordesInfection.INFECTED.get()))) {
 			InfectionDeathEvent newevent = new InfectionDeathEvent(entity, event.getSource());
 			MinecraftForge.EVENT_BUS.post(newevent);
 			if (newevent.getResult() == Result.DENY) event.setCanceled(true);

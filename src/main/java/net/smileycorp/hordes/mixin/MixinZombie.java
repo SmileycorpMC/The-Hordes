@@ -1,12 +1,11 @@
 package net.smileycorp.hordes.mixin;
 
+import net.minecraft.world.entity.monster.Zombie;
+import net.smileycorp.hordes.common.CommonConfigHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import net.minecraft.world.entity.monster.Zombie;
-import net.smileycorp.hordes.common.CommonConfigHandler;
 
 @Mixin(Zombie.class)
 public abstract class MixinZombie {

@@ -1,7 +1,6 @@
 package net.smileycorp.hordes.integration.jei;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -17,7 +16,10 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.smileycorp.hordes.common.Constants;
+
+import java.util.List;
 
 public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapper> {
 
@@ -50,10 +52,9 @@ public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapp
 
 	@Override
 	public void setRecipe(IRecipeLayoutBuilder recipeLayout, InfectionCureWrapper recipe, IFocusGroup focuses) {
-		for (int i = 0; i <9; i++) {
-			for (int j = 0; j <6; j++) {
-				recipeLayout.addSlot(RecipeIngredientRole.INPUT, i*18+3, j*18+3).addItemStack(recipe.getItem(i, j));
-			}
+		List<ItemStack> items = recipe.getItems();
+		for (int i = 0; i < items.size(); i++) {
+			recipeLayout.addSlot(RecipeIngredientRole.INPUT, (i%9)*18+3, Math.floorDiv(i, 9)*18+3).addItemStack(items.get(i));
 		}
 	}
 
