@@ -65,9 +65,9 @@ public class ClientHandler {
 			Minecraft mc = Minecraft.getInstance();
 			Level level = mc.level;
 			Player player = mc.player;
-			BlockPos pos = BlockPos.m_274561_(player.getX() + (5*vec3.x), player.getY(), player.getZ() + (5*vec3.z));
+			BlockPos pos = new BlockPos(player.getX() + (5*vec3.x), player.getY(), player.getZ() + (5*vec3.z));
 			float pitch = 1+((level.random.nextInt(6)-3)/10);
-			level.playSound(player, pos, SoundEvent.m_262824_(sound), SoundSource.HOSTILE, 0.6f, pitch);
+			level.playSound(player, pos, new SoundEvent(sound), SoundSource.HOSTILE, 0.6f, pitch);
 		}
 	}
 

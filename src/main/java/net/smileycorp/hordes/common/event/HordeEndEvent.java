@@ -5,7 +5,7 @@ import net.minecraft.world.entity.player.Player;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 
-public class HordeEndEvent extends HordeEvent {
+public class HordeEndEvent extends HordePlayerEvent {
 
 	protected final BlockPos pos;
 	protected String message = Constants.hordeEventEnd;

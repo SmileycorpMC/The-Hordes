@@ -1,10 +1,5 @@
 package net.smileycorp.hordes.common.ai;
 
-import java.util.EnumSet;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -16,6 +11,11 @@ import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.smileycorp.atlas.api.util.DirectionUtils;
+
+import java.util.EnumSet;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 public class FleeEntityGoal extends Goal  {
 
@@ -79,7 +79,7 @@ public class FleeEntityGoal extends Goal  {
 			Vec3 dir = DirectionUtils.getDirectionVecXZ(this.entity, entity);
 			resultDir = new Vec3((dir.x + resultDir.x)/2, (dir.y + resultDir.y)/2, (dir.z + resultDir.z)/2);
 		}
-		return Stream.of(level.getHeightmapPos(Types.WORLD_SURFACE, BlockPos.m_274446_(pos.add(resultDir.reverse().multiply(5, 0, 5)))));
+		return Stream.of(level.getHeightmapPos(Types.WORLD_SURFACE, new BlockPos(pos.add(resultDir.reverse().multiply(5, 0, 5)))));
 	}
 
 }

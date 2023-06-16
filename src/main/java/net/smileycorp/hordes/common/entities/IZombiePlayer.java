@@ -1,16 +1,15 @@
 package net.smileycorp.hordes.common.entities;
 
-import java.util.Collection;
-import java.util.Optional;
-import java.util.UUID;
-
 import com.mojang.authlib.GameProfile;
-
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+
+import java.util.Collection;
+import java.util.Optional;
+import java.util.UUID;
 
 public interface IZombiePlayer {
 

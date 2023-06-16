@@ -7,7 +7,7 @@ import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 
 @Cancelable
-public class HordeStartEvent extends HordeEvent {
+public class HordeStartEvent extends HordePlayerEvent {
 
 	protected final BlockPos pos;
 	protected String message = Constants.hordeEventStart;
