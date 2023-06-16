@@ -16,7 +16,7 @@ public class HordeStartEvent extends HordePlayerEvent {
 	protected HordeSpawnTable table;
 	protected final boolean wasCommand;
 
-	public HordeStartEvent(Player player, IHordeEvent horde, HordeSpawnTable table, boolean wasCommand) {
+	public HordeStartEvent(Player player, IHordeEvent horde, boolean wasCommand) {
 		super(player, horde);
 		pos = player.blockPosition();
 		this.wasCommand = wasCommand;
