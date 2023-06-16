@@ -5,7 +5,6 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.LiteralContents;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -136,13 +135,13 @@ public class ZombiePlayer extends Zombie implements IZombiePlayer {
 		if (CommonConfigHandler.drownedPlayers.get()) {
 			Zombie drowned = convertTo(HordesInfection.DROWNED_PLAYER.get(), true);
 			if (drowned != null) {
-				drowned.handleAttributes(drowned.level.getCurrentDifficultyAt(drowned.blockPosition()).getSpecialMultiplier());
+				drowned.handleAttributes(drowned.level().getCurrentDifficultyAt(drowned.blockPosition()).getSpecialMultiplier());
 				drowned.setCanBreakDoors(drowned.supportsBreakDoorGoal() && this.canBreakDoors());
 				ForgeEventFactory.onLivingConvert(this, drowned);
 				if (drowned instanceof IZombiePlayer) ((IZombiePlayer) drowned).copyFrom(this);
 			}
 			if (!this.isSilent()) {
-				level.levelEvent((Player)null, 1040, this.blockPosition(), 0);
+				level().levelEvent((Player)null, 1040, this.blockPosition(), 0);
 			}
 		}
 	}

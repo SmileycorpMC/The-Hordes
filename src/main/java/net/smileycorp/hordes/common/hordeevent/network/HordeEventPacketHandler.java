@@ -3,13 +3,9 @@ package net.smileycorp.hordes.common.hordeevent.network;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent.Context;
-import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.smileycorp.atlas.api.network.GenericStringMessage;
 import net.smileycorp.atlas.api.network.NetworkUtils;
-import net.smileycorp.atlas.api.network.SimpleMessageDecoder;
-import net.smileycorp.atlas.api.network.SimpleMessageEncoder;
-import net.smileycorp.atlas.api.network.SimpleStringMessage;
 import net.smileycorp.hordes.client.ClientHandler;
 import net.smileycorp.hordes.common.Constants;
 

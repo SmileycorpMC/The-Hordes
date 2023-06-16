@@ -8,7 +8,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 import net.smileycorp.atlas.api.network.AbstractMessage;
-import net.smileycorp.atlas.api.network.SimpleAbstractMessage;
 import net.smileycorp.hordes.client.ClientHandler;
 
 public class CureEntityMessage extends AbstractMessage {

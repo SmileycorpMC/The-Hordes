@@ -11,7 +11,6 @@ import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.contents.LiteralContents;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.common.hordeevent.capability.HordeSavedData;
 

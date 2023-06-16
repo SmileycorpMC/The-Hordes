@@ -2,9 +2,7 @@ package net.smileycorp.hordes.common.infection.client;
 
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.client.event.CustomizeGuiOverlayEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.smileycorp.hordes.client.ClientConfigHandler;
