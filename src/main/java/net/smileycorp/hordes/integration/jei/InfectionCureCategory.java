@@ -22,11 +22,12 @@ public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapp
 	private final IDrawable background;
 	private final IDrawable icon;
 
-	public static final ResourceLocation TEXTURE = Constants.loc("textures/gui/jei/cure_list.png");
+	public static final ResourceLocation BACKGROUND_TEXTURE = Constants.loc("textures/gui/jei/cure_list.png");
+	public static final ResourceLocation ICON_TEXTURE = Constants.loc("textures/mob_effect/infected.png");
 
 	public InfectionCureCategory(IGuiHelper guiHelper) {
-		background = guiHelper.createDrawable(TEXTURE, 0, 0, 167, 113);
-		icon = guiHelper.createDrawable(TEXTURE, 168, 0, 18, 18);
+		background = guiHelper.createDrawable(BACKGROUND_TEXTURE, 0, 0, 167, 113);
+		icon = guiHelper.createDrawable(ICON_TEXTURE, 0, 0, 18, 18);
 	}
 
 	@Override
@@ -48,7 +49,7 @@ public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapp
 	public void setRecipe(IRecipeLayoutBuilder recipeLayout, InfectionCureWrapper recipe, IFocusGroup focuses) {
 		List<ItemStack> items = recipe.getItems();
 		for (int i = 0; i < items.size(); i++) {
-			recipeLayout.addSlot(RecipeIngredientRole.INPUT, (i%9)*18+3, Math.floorDiv(i, 9)*18+3).addItemStack(items.get(i));
+			recipeLayout.addSlot(RecipeIngredientRole.INPUT, (i%9)*18+4, Math.floorDiv(i, 9)*18+4).addItemStack(items.get(i));
 		}
 	}
 

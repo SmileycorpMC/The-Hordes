@@ -42,9 +42,6 @@ public abstract class MixinMob extends LivingEntity {
 	@Shadow
 	public GoalSelector goalSelector;
 
-	@Shadow
-	public GoalSelector targetSelector;
-
 	public MixinMob(Level level) {
 		super(null, level);
 	}

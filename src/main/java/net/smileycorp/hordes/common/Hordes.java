@@ -1,10 +1,12 @@
 package net.smileycorp.hordes.common;
 
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -44,8 +46,8 @@ public class Hordes {
 		ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfigHandler.config);
 		//generate data files
 		if (ConfigFilesGenerator.shouldGenerateFiles()) {
-			SidedThreadGroups.CLIENT.newThread(ConfigFilesGenerator::generateAssets);
-			SidedThreadGroups.SERVER.newThread(ConfigFilesGenerator::generateData);
+			DistExecutor.unsafeRunWhenOn(Dist.CLIENT, ()->ConfigFilesGenerator::generateAssets);
+			ConfigFilesGenerator.generateData();
 		} else {
 			logInfo("Config files are up to date, skipping data/asset generation");
 		}
@@ -83,7 +85,7 @@ public class Hordes {
 	}
 
 	public static void logError(Object message, Exception e) {
-		logger.error(message);
+		logger.error(message, e);
 		e.printStackTrace();
 	}
 

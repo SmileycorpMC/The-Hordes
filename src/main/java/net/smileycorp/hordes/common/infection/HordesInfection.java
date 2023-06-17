@@ -52,6 +52,7 @@ public class HordesInfection {
 	}
 
 	public static boolean canCauseInfection(LivingEntity entity) {
+		if (entity == null) return false;
 		return entity.getType().is(INFECTION_ENTITIES_TAG);
 	}
 

@@ -23,7 +23,7 @@ public class ConfigFilesGenerator {
 
     public static boolean shouldGenerateFiles() {
         if (isUpToDate()) return false;
-        copyFile("hordes_data.json");
+        copyFile("hordes-info.json");
         copyFile("pack.mcmeta");
         return true;
     }

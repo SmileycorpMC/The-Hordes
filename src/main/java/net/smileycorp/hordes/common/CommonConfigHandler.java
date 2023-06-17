@@ -28,21 +28,18 @@ public class CommonConfigHandler {
 	public static ConfigValue<Boolean> canSleepDuringHorde;
 	public static ConfigValue<Double> hordeMultiplayerScaling;
 	public static ConfigValue<Boolean> pauseEventServer;
-	public static ConfigValue<List<String>> hordeSpawnList;
 
 	//infection
 	public static ConfigValue<Boolean> enableMobInfection;
 	public static ConfigValue<Boolean> infectVillagers;
-	public static ConfigValue<Integer> villagerInfectChance;
 	public static ConfigValue<Boolean> infectPlayers;
+	public static ConfigValue<Float> villagerInfectChance;
+	public static ConfigValue<Float> playerInfectChance;
+	public static ConfigValue<Integer> ticksForEffectStage;
+
 	public static ConfigValue<Boolean> infectSlowness;
 	public static ConfigValue<Boolean> infectHunger;
-	public static ConfigValue<Integer> playerInfectChance;
-	public static ConfigValue<Integer> ticksForEffectStage;
 	public static ConfigValue<Boolean> infectionSpawnsZombiePlayers;
-	public static ConfigValue<List<String>> infectionEntities;
-	public static ConfigValue<List<String>> cureItemList;
-	public static ConfigValue<List<String>> infectionConversionList;
 	public static ConfigValue<Boolean> infectionEntitiesAggroConversions;
 	public static ConfigValue<Double> effectStageTickReduction;
 
@@ -92,11 +89,11 @@ public class CommonConfigHandler {
 		builder.push("Infection");
 		enableMobInfection = builder.comment("Set to false to completely disable mob infection and anything related to it.").define("enableMobInfection", true);
 		infectVillagers = builder.comment("Can villagers be infected.").define("infectVillagers", true);
-		villagerInfectChance = builder.comment("Chance out of 100 for a villager to get infected").define("villagerInfectChance", 85);
+		villagerInfectChance = builder.comment("Chance for a player to get infected, a value of 1 or higher makes it guaranteed").define("villagerInfectChance", 0.85f);
 		infectPlayers = builder.comment("Can players be infected.").define("infectPlayers", true);
 		infectSlowness = builder.comment("Whether later levels of infected should slightly slow movement speed? ").define("infectSlowness", true);
 		infectHunger = builder.comment("Whether later levels of infected should depleet hunger quicker? ").define("infectHunger", true);
-		playerInfectChance = builder.comment("Chance out of 100 for a player to get infected").define("playerInfectChance", 75);
+		playerInfectChance = builder.comment("Chance for a player to get infected, a value of 1 or higher makes it guaranteed").define("playerInfectChance", 0.75f);
 		ticksForEffectStage = builder.comment("How long do each of the 4 effect phases last for before the next phase is activated?").define("ticksForEffectStage", 6000);
 		infectionSpawnsZombiePlayers = builder.comment("Do players who die to infection spawn a zombie?").define("infectionSpawnsZombiePlayers", true);
 		infectionEntitiesAggroConversions = builder.comment("Do entities on the infectionEntities list automatically target entities on the infectionConversionList").define("infectionEntitiesAggroConversions", true);
