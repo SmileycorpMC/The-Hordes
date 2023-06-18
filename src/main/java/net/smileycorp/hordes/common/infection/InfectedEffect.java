@@ -36,9 +36,7 @@ public class InfectedEffect extends MobEffect {
 
 	@Override
 	public void applyEffectTick(LivingEntity entity, int amplifier) {
-		if (entity instanceof Player) {
-			((Player)entity).causeFoodExhaustion(0.007F * (amplifier+1));
-		}
+		if (entity instanceof Player) ((Player)entity).causeFoodExhaustion(0.007F * (amplifier+1));
 	}
 
 	@Override
@@ -48,13 +46,12 @@ public class InfectedEffect extends MobEffect {
 
 	@Override
 	public void addAttributeModifiers(LivingEntity entity, AttributeMap map, int amplifier) {
-		if (amplifier > 0 && CommonConfigHandler.infectSlowness.get()) {
+		if (amplifier < 0 |! CommonConfigHandler.infectSlowness.get()) return;
 			AttributeInstance attribute = map.getInstance(Attributes.MOVEMENT_SPEED);
-			if (attribute != null) {
-				attribute.removeModifier(SPEED_MOD_UUID);
-				attribute.addPermanentModifier(new AttributeModifier(SPEED_MOD_UUID, SPEED_MOD_NAME + " " + amplifier, this.getAttributeModifierValue(amplifier-1, SPEED_MOD), AttributeModifier.Operation.MULTIPLY_TOTAL));
-			}
-		}
+		if (attribute == null) return;
+		attribute.removeModifier(SPEED_MOD_UUID);
+		attribute.addPermanentModifier(new AttributeModifier(SPEED_MOD_UUID, SPEED_MOD_NAME + " " + amplifier,
+				getAttributeModifierValue(amplifier-1, SPEED_MOD), AttributeModifier.Operation.MULTIPLY_TOTAL));
 	}
 
 	@Override

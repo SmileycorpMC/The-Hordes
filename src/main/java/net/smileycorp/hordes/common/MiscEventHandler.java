@@ -34,47 +34,34 @@ public class MiscEventHandler {
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onDeath(LivingDeathEvent event) {
 		LivingEntity entity = event.getEntity();
-		if (entity!=null) {
-			Level level = entity.level();
-			if (!level.isClientSide) {
-				if (entity instanceof Player &!(entity instanceof FakePlayer)) {
-					if ((entity.hasEffect(HordesInfection.INFECTED.get()) && CommonConfigHandler.enableMobInfection.get()) || CommonConfigHandler.zombieGraves.get() ||
-							(entity.isUnderWater() && CommonConfigHandler.drownedGraves.get())) {
-						LazyOptional<IZombifyPlayer> optional = entity.getCapability(Hordes.ZOMBIFY_PLAYER, null);
-						if (optional.isPresent()) {
-							optional.resolve().get().createZombie((Player) entity);
-						}
-					}
-				}
-			}
+		if (!(entity instanceof Player) || entity instanceof FakePlayer || entity.level().isClientSide) return;
+		if ((entity.hasEffect(HordesInfection.INFECTED.get()) && CommonConfigHandler.enableMobInfection.get()) || CommonConfigHandler.zombieGraves.get() ||
+				(entity.isUnderWater() && CommonConfigHandler.drownedGraves.get())) {
+			LazyOptional<IZombifyPlayer> optional = entity.getCapability(Hordes.ZOMBIFY_PLAYER, null);
+			if (!optional.isPresent()) return;
+			optional.resolve().get().createZombie((Player) entity);
 		}
 	}
 
 	//move items to zombie entity and spawn if one should spawn
 	@SubscribeEvent(receiveCanceled = true)
 	public void onDrop(LivingDropsEvent event) {
-		if (event.getEntity() instanceof Player) {
-			Player player = (Player) event.getEntity();
-			Level level = player.level();
-			if (!level.isClientSide &!(player instanceof FakePlayer)) {
-				if ((player.hasEffect(HordesInfection.INFECTED.get()) && CommonConfigHandler.enableMobInfection.get()) || CommonConfigHandler.zombieGraves.get()) {
-					LazyOptional<IZombifyPlayer> optional = player.getCapability(Hordes.ZOMBIFY_PLAYER, null);
-					if (optional.isPresent()) {
-						IZombifyPlayer cap = optional.resolve().get();
-						Mob zombie = cap.getZombie();
-						if (zombie!=null) {
-							Collection<ItemEntity> drops = event.getDrops();
-							((IZombiePlayer)zombie).setInventory(drops);
-							zombie.setPersistenceRequired();
-							level.addFreshEntity(zombie);
-							drops.clear();
-							cap.clearZombie();
-							event.setCanceled(true);
-							player.removeEffect(HordesInfection.INFECTED.get());
-						}
-					}
-				}
-			}
+		if (!(event.getEntity() instanceof Player) || event.getEntity() instanceof FakePlayer || event.getEntity().level().isClientSide) return;
+		Player player = (Player) event.getEntity();
+		if ((player.hasEffect(HordesInfection.INFECTED.get()) && CommonConfigHandler.enableMobInfection.get()) || CommonConfigHandler.zombieGraves.get()) {
+			LazyOptional<IZombifyPlayer> optional = player.getCapability(Hordes.ZOMBIFY_PLAYER, null);
+			if (!optional.isPresent()) return;
+			IZombifyPlayer cap = optional.resolve().get();
+			Mob zombie = cap.getZombie();
+			if (zombie == null) return;
+			Collection<ItemEntity> drops = event.getDrops();
+			((IZombiePlayer)zombie).setInventory(drops);
+			zombie.setPersistenceRequired();
+			player.level().addFreshEntity(zombie);
+			drops.clear();
+			cap.clearZombie();
+			event.setCanceled(true);
+			player.removeEffect(HordesInfection.INFECTED.get());
 		}
 	}
 

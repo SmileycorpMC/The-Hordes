@@ -88,25 +88,30 @@ class HordeEvent implements IHordeEvent {
 	@Override
 	public void update(Player player) {
 		Level level = player.level();
-		if (!level.isClientSide && player!=null) {
-			if (level.dimension() == Level.OVERWORLD) {
-				if ((timer % CommonConfigHandler.hordeSpawnInterval.get()) == 0) {
-					int amount = (int)(CommonConfigHandler.hordeSpawnAmount.get() * (1+(day/CommonConfigHandler.hordeSpawnDays.get()) * (CommonConfigHandler.hordeSpawnMultiplier.get()-1)));
-					List<? extends Player>players = level.players();
-					for (Player entity : players) {
-						if (entity != player && player.distanceTo(entity)<=25) {
-							amount = (int) Math.floor(amount * CommonConfigHandler.hordeMultiplayerScaling.get());
-						}
-					}
-					spawnWave(player, amount);
-				}
-				timer--;
-				if (timer == 0) {
-					stopEvent(player, false);
-				}
-				hasChanged = true;
-			}
+		if (level.isClientSide || player == null || level.dimension() != Level.OVERWORLD) return;
+		if (timer % CommonConfigHandler.hordeSpawnInterval.get() != 0) {
+			updateTimer(player);
+			return;
 		}
+		int amount = (int)(CommonConfigHandler.hordeSpawnAmount.get() * (1+(day/CommonConfigHandler.hordeSpawnDays.get()) * (CommonConfigHandler.hordeSpawnMultiplier.get()-1)));
+		List<? extends Player>players = level.players();
+		for (Player other : players) {
+			if (shouldReduce(player, other)) amount = (int) Math.floor(amount * CommonConfigHandler.hordeMultiplayerScaling.get());
+		}
+		spawnWave(player, amount);
+		updateTimer(player);
+	}
+
+	private void updateTimer(Player player) {
+		timer--;
+		if (timer == 0) stopEvent(player, false);
+		hasChanged = true;
+	}
+
+	private boolean shouldReduce(Player player, Player other) {
+		if (other == player || player.distanceTo(other) > 25) return false;
+		LazyOptional<IHordeEvent> optional = other.getCapability(Hordes.HORDE_EVENT);
+		return optional.isPresent() && optional.resolve().get().isActive(other);
 	}
 
 	@Override
@@ -133,8 +138,7 @@ class HordeEvent implements IHordeEvent {
 		while (basepos.equals(player.blockPosition())) {
 			basedir = DirectionUtils.getRandomDirectionVecXZ(rand);
 			basepos = DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, 75, 7, 0);
-			i++;
-			if (i==20) {
+			if (i++>=20) {
 				logInfo("Unable to find unlit pos for horde " + this + " ignoring light level");
 				basepos = DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, 75);
 				break;
@@ -165,14 +169,7 @@ class HordeEvent implements IHordeEvent {
 				AtomicBoolean cancelled = new AtomicBoolean(false);
 				CompoundTag nbt = entry.getNBT();
 				nbt.putString("id", entry.getName().toString());
-				Mob newEntity = (Mob) EntityType.loadEntityRecursive(nbt, level, (entity)->{
-					Entity e = loadEntity(level, player, (Mob) entity, pos);
-					if (e instanceof Player) {
-						cancelled.set(true);
-						return null;
-					}
-					return e;
-				});
+				Mob newEntity = (Mob) EntityType.loadEntityRecursive(nbt, level, (entity)->loadEntity(level, player, (Mob) entity, pos, cancelled));
 				if (cancelled.get()) continue;
 				newEntity.readAdditionalSaveData(entry.getNBT());
 				if (!((ServerLevel)level).tryAddFreshEntityWithPassengers(newEntity)) {
@@ -187,7 +184,7 @@ class HordeEvent implements IHordeEvent {
 		}
 	}
 
-	private Entity loadEntity(Level level, Player player, Mob entity, BlockPos pos) {
+	private Entity loadEntity(Level level, Player player, Mob entity, BlockPos pos, AtomicBoolean cancel) {
 		HordeSpawnEntityEvent spawnEntityEvent = new HordeSpawnEntityEvent(player, entity, pos, this);
 		postEvent(spawnEntityEvent);
 		if (!spawnEntityEvent.isCanceled()) {
@@ -198,36 +195,34 @@ class HordeEvent implements IHordeEvent {
 			return entity;
 		} else {
 			logInfo("Entity spawn event has been cancelled, not spawning entity  of class " + entity.getType());
-			return player;
+			cancel.set(true);
+			return entity;
 		}
 	}
 
-	private void finalizeEntity(Mob entity, Level level, Player player) {
-		entity.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(100.0D);
-		LazyOptional<IHordeSpawn> optional = entity.getCapability(Hordes.HORDESPAWN);
+	private void finalizeEntity(Mob other, Level level, Player player) {
+		other.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(100.0D);
+		LazyOptional<IHordeSpawn> optional = other.getCapability(Hordes.HORDESPAWN);
 		if (optional.isPresent()) { optional.resolve().get().setPlayerUUID(player.getUUID().toString());
-			registerEntity(entity);
+			registerEntity(other);
 			hasChanged = true;
 		}
-		entity.targetSelector.getRunningGoals().forEach((goal) -> goal.stop());
-		if (entity instanceof PathfinderMob) {
-			entity.targetSelector.addGoal(1, new HurtByTargetGoal((PathfinderMob) entity));
-		}
-		entity.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(entity, Player.class, true));
-		entity.goalSelector.addGoal(6, new GoToEntityPositionGoal(entity, player)); //TODO: debug ai not working correctly on drowned mobs that aren't in water
-		for (Entity passenger : entity.getPassengers()) if (passenger instanceof Mob) finalizeEntity((Mob) passenger, level, player);
+		other.targetSelector.getRunningGoals().forEach(WrappedGoal::stop);
+		if (other instanceof PathfinderMob) other.targetSelector.addGoal(1, new HurtByTargetGoal((PathfinderMob) other));
+		other.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(other, Player.class, true));
+		other.goalSelector.addGoal(6, new GoToEntityPositionGoal(other, player)); //TODO: debug ai not working correctly on drowned mobs that aren't in water
+		for (Entity passenger : other.getPassengers()) if (passenger instanceof Mob) finalizeEntity((Mob) passenger, level, player);
 	}
 
 	private void cleanSpawns() {
 		List<Mob> toRemove = new ArrayList<>();
 		for (Mob entity : entitiesSpawned) {
-			if (entity.isDeadOrDying() |! entity.isAlive()) {
-				LazyOptional<IHordeSpawn> optional = entity.getCapability(Hordes.HORDESPAWN, null);
-				if (optional.isPresent()) {
-					IHordeSpawn cap = optional.resolve().get();
-					cap.setPlayerUUID("");
-					toRemove.add(entity);
-				}
+			if (entity.isAlive() |! entity.isDeadOrDying() |! entity.isRemoved()) continue;
+			LazyOptional<IHordeSpawn> optional = entity.getCapability(Hordes.HORDESPAWN, null);
+			if (optional.isPresent()) {
+				IHordeSpawn cap = optional.resolve().get();
+				cap.setPlayerUUID("");
+				toRemove.add(entity);
 			}
 		}
 		entitiesSpawned.removeAll(toRemove);
@@ -252,57 +247,52 @@ class HordeEvent implements IHordeEvent {
 
 	@Override
 	public void setPlayer(Player player) {
-		Set<Mob> toRemove = new HashSet<>();
-		for (Mob entity : entitiesSpawned) {
-			if (entity!=null) {
-				GoToEntityPositionGoal task = null;
-				for (WrappedGoal entry : entity.goalSelector.getRunningGoals().toArray(WrappedGoal[]::new)) {
-					if (entry.getGoal() instanceof GoToEntityPositionGoal) {
-						task = (GoToEntityPositionGoal) entry.getGoal();
-						break;
-					}
-				}
-				if (task!=null) {
-					entity.goalSelector.removeGoal(task);
-					entity.goalSelector.addGoal(6, new GoToEntityPositionGoal(entity, player));
-				}
-			} else toRemove.add(entity);
-		}
-		entitiesSpawned.removeAll(toRemove);
+		cleanSpawns();
+		entitiesSpawned.forEach(entity->fixGoals(player, entity));
 		hasChanged = true;
+	}
+
+	private void fixGoals(Player player, Mob entity) {
+		for (WrappedGoal entry : entity.goalSelector.getRunningGoals().toArray(WrappedGoal[]::new)) {
+			if (!(entry.getGoal() instanceof GoToEntityPositionGoal)) continue;
+			entity.goalSelector.removeGoal(entry.getGoal());
+			entity.goalSelector.addGoal(6, new GoToEntityPositionGoal(entity, player));
+			return;
+		}
 	}
 
 	@Override
 	public void tryStartEvent(Player player, int duration, boolean isCommand) {
-		if (CommonConfigHandler.hordesCommandOnly.get()) return;
-		if (player!=null) {
-			Level level = player.level();
-			if (level.dimension() == Level.OVERWORLD) {
-				HordeStartEvent startEvent = new HordeStartEvent(player, this, isCommand);
-				postEvent(startEvent);
-				if (startEvent.isCanceled()) {
-					loadedTable = null;
-					return;
-				}
-				HordeSpawnTable table = loadedTable;
-				if (table == null) {
-					HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, HordeTableLoader.INSTANCE.getDefaultTable(), this);
-					postEvent(buildTableEvent);
-					table = buildTableEvent.spawntable;
-				}
-				if (!table.getSpawnTable(day).isEmpty()) {
-					timer = duration;
-					hasChanged = true;
-					sendMessage(player, startEvent.getMessage());
-					if (isCommand) day = (int) Math.floor(level.getDayTime()/CommonConfigHandler.dayLength.get());
-					else day = nextDay;
-				} else {
-					loadedTable = null;
-					logInfo("Spawntable is empty, canceling event start.");
-				}
-				if (!isCommand) nextDay = HordeSavedData.getData((ServerLevel) level).getNextDay();
-			}
-		} else logError("player is null for " + toString(), new NullPointerException());
+		if (CommonConfigHandler.hordesCommandOnly.get() &! isCommand) return;
+		if (player==null) {
+			logError("player is null for " + toString(), new NullPointerException());
+			return;
+		}
+		Level level = player.level();
+		if (level.dimension() != Level.OVERWORLD) return;
+		HordeStartEvent startEvent = new HordeStartEvent(player, this, isCommand);
+		postEvent(startEvent);
+		if (startEvent.isCanceled()) {
+			loadedTable = null;
+			return;
+		}
+		HordeSpawnTable table = loadedTable;
+		if (table == null) {
+			HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, HordeTableLoader.INSTANCE.getDefaultTable(), this);
+			postEvent(buildTableEvent);
+			table = buildTableEvent.spawntable;
+		}
+		if (!table.getSpawnTable(day).isEmpty()) {
+			timer = duration;
+			hasChanged = true;
+			sendMessage(player, startEvent.getMessage());
+			if (isCommand) day = (int) Math.floor(level.getDayTime() / CommonConfigHandler.dayLength.get());
+			else day = nextDay;
+		} else {
+			loadedTable = null;
+			logInfo("Spawntable is empty, canceling event start.");
+		}
+		if (!isCommand) nextDay = HordeSavedData.getData((ServerLevel) level).getNextDay();
 	}
 
 	public void setSpawntable(HordeSpawnTable table) {
@@ -339,13 +329,13 @@ class HordeEvent implements IHordeEvent {
 	}
 
 	@Override
-	public void removeEntity(Mob entity) {
-		entitiesSpawned.remove(entity);
+	public void removeEntity(Mob other) {
+		entitiesSpawned.remove(other);
 	}
 
 	@Override
-	public void registerEntity(Mob entity) {
-		if (!entitiesSpawned.contains(entity)) entitiesSpawned.add(entity);
+	public void registerEntity(Mob other) {
+		if (!entitiesSpawned.contains(other)) entitiesSpawned.add(other);
 	}
 
 	public String toString(Player player) {

@@ -46,11 +46,10 @@ public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapp
 	}
 
 	@Override
-	public void setRecipe(IRecipeLayoutBuilder recipeLayout, InfectionCureWrapper recipe, IFocusGroup focuses) {
+	public void setRecipe(IRecipeLayoutBuilder layout, InfectionCureWrapper recipe, IFocusGroup focuses) {
 		List<ItemStack> items = recipe.getItems();
-		for (int i = 0; i < items.size(); i++) {
-			recipeLayout.addSlot(RecipeIngredientRole.INPUT, (i%9)*18+4, Math.floorDiv(i, 9)*18+4).addItemStack(items.get(i));
-		}
+		for (int i = 0; i < items.size(); i++) layout.addSlot(RecipeIngredientRole.INPUT,
+				(i%9)*18+4, Math.floorDiv(i, 9)*18+4).addItemStack(items.get(i));
 	}
 
 	@Override

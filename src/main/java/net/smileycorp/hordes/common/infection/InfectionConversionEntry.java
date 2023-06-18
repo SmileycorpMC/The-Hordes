@@ -35,12 +35,8 @@ public class InfectionConversionEntry {
 		Level level = entity.level();
 		LivingEntity zombie = preEvent.getOutcome().create(level);
 		zombie.setPos(entity.getX(), entity.getY(), entity.getZ());
-		for (EquipmentSlot slot : EquipmentSlot.values()) {
-			zombie.setItemSlot(slot, entity.getItemBySlot(slot));
-		}
-		if (entity.hasCustomName()) {
-			zombie.setCustomName(entity.getCustomName());
-		}
+		for (EquipmentSlot slot : EquipmentSlot.values()) zombie.setItemSlot(slot, entity.getItemBySlot(slot));
+		if (entity.hasCustomName()) zombie.setCustomName(entity.getCustomName());
 		if (zombie instanceof AgeableMob) ((AgeableMob) zombie).setAge(entity.isBaby() ? -1000000 : 0);
 		if (zombie instanceof Zombie) ((Zombie) zombie).setBaby(entity.isBaby());
 		if (nbt != null) entity.readAdditionalSaveData(nbt);

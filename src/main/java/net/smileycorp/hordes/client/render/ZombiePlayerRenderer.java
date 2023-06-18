@@ -29,16 +29,16 @@ public class ZombiePlayerRenderer<T extends Zombie & IZombiePlayer> extends Huma
 	protected final ZombiePlayerModel<T> defaultModel;
 	protected final ZombiePlayerModel<T> slimModel;
 
-	public ZombiePlayerRenderer(EntityRendererProvider.Context ctx, Color colour, ResourceLocation overlay) {
-		super(ctx, new ZombiePlayerModel<T>(ctx.bakeLayer(DEFAULT), colour), 0.5F);
+	public ZombiePlayerRenderer(EntityRendererProvider.Context ctx, Color colour, ResourceLocation overlay, boolean isDrowned) {
+		super(ctx, new ZombiePlayerModel<T>(ctx.bakeLayer(DEFAULT), colour, isDrowned), 0.5F);
 		addLayer(new HumanoidArmorLayer<>(this, new ZombieModel<T>(ctx.bakeLayer(ModelLayers.ZOMBIE_INNER_ARMOR)),
 				new ZombieModel<T>(ctx.bakeLayer(ModelLayers.ZOMBIE_OUTER_ARMOR)), ctx.getModelManager()));
 		addLayer(new ZombiePlayerCapeLayer<>(this));
 		addLayer(new ZombiePlayerElytraLayer<T>(this, ctx.getModelSet()));
-		addLayer(new ZombiePlayerOverlayLayer(this, new ZombiePlayerModel<T>(ctx.bakeLayer(DEFAULT), Color.white),
-			new ZombiePlayerModel<T>(ctx.bakeLayer(SLIM), Color.white), overlay));
+		addLayer(new ZombiePlayerOverlayLayer(this, new ZombiePlayerModel<T>(ctx.bakeLayer(DEFAULT)),
+			new ZombiePlayerModel<T>(ctx.bakeLayer(SLIM)), overlay));
 		defaultModel = model;
-		slimModel = new ZombiePlayerModel<T>(ctx.bakeLayer(SLIM), colour);
+		slimModel = new ZombiePlayerModel<T>(ctx.bakeLayer(SLIM), colour, isDrowned);
 	}
 
 	@Override

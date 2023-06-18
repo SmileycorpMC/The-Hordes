@@ -44,9 +44,9 @@ public class ClientHandler {
 	@SubscribeEvent
 	public static void registerEntityRenderers(RegisterRenderers event) {
 		event.registerEntityRenderer(HordesInfection.ZOMBIE_PLAYER.get(), ctx -> new ZombiePlayerRenderer<>(ctx,
-				ClientConfigHandler.getZombiePlayerColour(), Constants.loc("textures/entity/zombie_player_outer_layer.png")));
+				ClientConfigHandler.getZombiePlayerColour(), Constants.loc("textures/entity/zombie_player_outer_layer.png"), false));
 		event.registerEntityRenderer(HordesInfection.DROWNED_PLAYER.get(), ctx -> new ZombiePlayerRenderer<>(ctx,
-				ClientConfigHandler.getDrownedPlayerColour(), Constants.loc("textures/entity/drowned_player_outer_layer.png")));
+				ClientConfigHandler.getDrownedPlayerColour(), Constants.loc("textures/entity/drowned_player_outer_layer.png"), true));
 	}
 
 	@SubscribeEvent
