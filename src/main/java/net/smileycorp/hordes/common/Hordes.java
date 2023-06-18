@@ -13,7 +13,6 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.util.thread.SidedThreadGroups;
 import net.smileycorp.hordes.client.ClientConfigHandler;
 import net.smileycorp.hordes.client.ClientHandler;
 import net.smileycorp.hordes.common.capability.IZombifyPlayer;
