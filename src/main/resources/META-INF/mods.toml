@@ -4,7 +4,7 @@ license="GNU LESSER GENERAL PUBLIC LICENSE Version 2.1"
 
 [[mods]]
 modId="hordes"
-version="1.2.0"
+version="2.0.0"
 displayName="The Hordes"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/the-hordes"
 updateJSONURL="https://raw.githubusercontent.com/SmileycorpMC/The-Hordes/1.19/update.json"
@@ -15,6 +15,6 @@ description="Adds mob horde invasions and zombie infections to the game."
 [[dependencies.hordes]]
     modId="atlaslib"
     mandatory=true
-    versionRange="[1.1.5,)"
+    versionRange="[1.1.9a,)"
     ordering="NONE"
     side="BOTH"

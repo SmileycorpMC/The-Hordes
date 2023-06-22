@@ -22,6 +22,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.util.thread.SidedThreadGroups;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.server.ServerLifecycleHooks;
+import net.smileycorp.atlas.api.IOngoingEvent;
 import net.smileycorp.atlas.api.entity.ai.GoToEntityPositionGoal;
 import net.smileycorp.atlas.api.network.GenericStringMessage;
 import net.smileycorp.atlas.api.recipe.WeightedOutputs;
@@ -40,7 +41,7 @@ import net.smileycorp.hordes.common.hordeevent.network.HordeSoundMessage;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-class HordeEvent implements IHordeEvent {
+public class HordeEvent implements IOngoingEvent<Player> {
 
 	private Set<Mob> entitiesSpawned = new HashSet<>();
 	private int timer = 0;
@@ -58,7 +59,6 @@ class HordeEvent implements IHordeEvent {
 		}
 	}
 
-	@Override
 	public void readFromNBT(CompoundTag nbt) {
 		entitiesSpawned.clear();
 		if (nbt.contains("timer")) {
@@ -75,7 +75,6 @@ class HordeEvent implements IHordeEvent {
 		}
 	}
 
-	@Override
 	public CompoundTag writeToNBT(CompoundTag nbt) {
 		nbt.putInt("timer", timer);
 		nbt.putInt("nextDay", nextDay);
@@ -85,7 +84,6 @@ class HordeEvent implements IHordeEvent {
 		return nbt;
 	}
 
-	@Override
 	public void update(Player player) {
 		Level level = player.level();
 		if (level.isClientSide || player == null || level.dimension() != Level.OVERWORLD) return;
@@ -110,11 +108,10 @@ class HordeEvent implements IHordeEvent {
 
 	private boolean shouldReduce(Player player, Player other) {
 		if (other == player || player.distanceTo(other) > 25) return false;
-		LazyOptional<IHordeEvent> optional = other.getCapability(Hordes.HORDE_EVENT);
-		return optional.isPresent() && optional.resolve().get().isActive(other);
+		HordeEvent horde = HordeSavedData.getData((ServerLevel) other.level()).getEvent(other);
+		return horde != null && horde.isActive(other);
 	}
 
-	@Override
 	public void spawnWave(Player player, int count) {
 		cleanSpawns();
 		HordeSpawnTable table = loadedTable;
@@ -200,18 +197,18 @@ class HordeEvent implements IHordeEvent {
 		}
 	}
 
-	private void finalizeEntity(Mob other, Level level, Player player) {
-		other.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(100.0D);
-		LazyOptional<IHordeSpawn> optional = other.getCapability(Hordes.HORDESPAWN);
+	private void finalizeEntity(Mob entity, Level level, Player player) {
+		entity.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(100.0D);
+		LazyOptional<IHordeSpawn> optional = entity.getCapability(Hordes.HORDESPAWN);
 		if (optional.isPresent()) { optional.resolve().get().setPlayerUUID(player.getUUID().toString());
-			registerEntity(other);
+			registerEntity(entity);
 			hasChanged = true;
 		}
-		other.targetSelector.getRunningGoals().forEach(WrappedGoal::stop);
-		if (other instanceof PathfinderMob) other.targetSelector.addGoal(1, new HurtByTargetGoal((PathfinderMob) other));
-		other.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(other, Player.class, true));
-		other.goalSelector.addGoal(6, new GoToEntityPositionGoal(other, player)); //TODO: debug ai not working correctly on drowned mobs that aren't in water
-		for (Entity passenger : other.getPassengers()) if (passenger instanceof Mob) finalizeEntity((Mob) passenger, level, player);
+		entity.targetSelector.getRunningGoals().forEach(WrappedGoal::stop);
+		if (entity instanceof PathfinderMob) entity.targetSelector.addGoal(1, new HurtByTargetGoal((PathfinderMob) entity));
+		entity.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(entity, Player.class, true));
+		entity.goalSelector.addGoal(6, new GoToEntityPositionGoal(entity, player));
+		for (Entity passenger : entity.getPassengers()) if (passenger instanceof Mob) finalizeEntity((Mob) passenger, level, player);
 	}
 
 	private void cleanSpawns() {
@@ -228,24 +225,20 @@ class HordeEvent implements IHordeEvent {
 		entitiesSpawned.removeAll(toRemove);
 	}
 
-	@Override
 	public boolean isHordeDay(Player player) {
 		Level level = player.level();
 		if (level.isClientSide |!(level.dimension() == Level.OVERWORLD)) return false;
 		return isActive(player) || (!CommonConfigHandler.hordesCommandOnly.get() && Math.floor(level.getDayTime()/CommonConfigHandler.dayLength.get())>=nextDay);
 	}
 
-	@Override
 	public boolean isActive(Player player) {
 		return timer > 0;
 	}
 
-	@Override
 	public boolean hasChanged() {
 		return hasChanged;
 	}
 
-	@Override
 	public void setPlayer(Player player) {
 		cleanSpawns();
 		entitiesSpawned.forEach(entity->fixGoals(player, entity));
@@ -261,7 +254,6 @@ class HordeEvent implements IHordeEvent {
 		}
 	}
 
-	@Override
 	public void tryStartEvent(Player player, int duration, boolean isCommand) {
 		if (CommonConfigHandler.hordesCommandOnly.get() &! isCommand) return;
 		if (player==null) {
@@ -303,12 +295,10 @@ class HordeEvent implements IHordeEvent {
 		return loadedTable;
 	}
 
-	@Override
 	public void setNextDay(int day) {
 		nextDay=day;
 	}
 
-	@Override
 	public int getNextDay() {
 		return nextDay;
 	}
@@ -317,7 +307,6 @@ class HordeEvent implements IHordeEvent {
 		HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new GenericStringMessage(str), ((ServerPlayer) player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 	}
 
-	@Override
 	public void stopEvent(Player player, boolean isCommand) {
 		HordeEndEvent endEvent = new HordeEndEvent(player, this, isCommand);
 		postEvent(endEvent);
@@ -328,18 +317,16 @@ class HordeEvent implements IHordeEvent {
 		loadedTable = null;
 	}
 
-	@Override
 	public void removeEntity(Mob other) {
 		entitiesSpawned.remove(other);
 	}
 
-	@Override
 	public void registerEntity(Mob other) {
 		if (!entitiesSpawned.contains(other)) entitiesSpawned.add(other);
 	}
 
-	public String toString(Player player) {
-		return "OngoingHordeEvent@" + Integer.toHexString(hashCode()) + "[player=" + (player == null ? "null" : player.getName().getString()) + ", isActive=" + (timer > 0) +
+	public String toString(String player) {
+		return "OngoingHordeEvent@" + Integer.toHexString(hashCode()) + "[player=" + (player == null ? "null" : player) + ", isActive=" + (timer > 0) +
 				", ticksLeft=" + timer +", entityCount="+ entitiesSpawned.size()+", nextDay="+nextDay + ", day="+day+"]";
 	}
 
@@ -379,7 +366,6 @@ class HordeEvent implements IHordeEvent {
 		MinecraftForge.EVENT_BUS.post(event);
 	}
 
-	@Override
 	public void reset(ServerLevel level) {
 		entitiesSpawned.clear();
 		HordeSavedData data = HordeSavedData.getData((ServerLevel) level);
@@ -387,4 +373,5 @@ class HordeEvent implements IHordeEvent {
 		loadedTable = null;
 		timer = 0;
 	}
+
 }

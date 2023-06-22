@@ -76,6 +76,7 @@ public class InfectionEventHandler {
 		LazyOptional<IInfection> optional = entity.getCapability(Hordes.INFECTION);
 		if (optional.isPresent()) optional.resolve().get().increaseInfection();
 		entity.removeEffect(HordesInfection.INFECTED.get());
+		if (entity.level().isClientSide) return;
 		InfectionPacketHandler.NETWORK_INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(()->entity.level().getChunkAt(entity.getOnPos())),
 				new CureEntityMessage(entity));
 	}

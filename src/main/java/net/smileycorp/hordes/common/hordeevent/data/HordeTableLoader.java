@@ -30,7 +30,7 @@ public class HordeTableLoader extends SimpleJsonResourceReloadListener {
     private final Map<ResourceLocation, HordeSpawnTable> SPAWN_TABLES = Maps.newHashMap();
 
     public HordeTableLoader() {
-        super(GSON, "tables");
+        super(GSON, "horde_data/tables");
     }
 
     @Override

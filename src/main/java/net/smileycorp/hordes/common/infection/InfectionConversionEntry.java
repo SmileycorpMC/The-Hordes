@@ -12,6 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingConversionEvent;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.data.DataRegistry;
 
 public class InfectionConversionEntry {
@@ -27,6 +28,7 @@ public class InfectionConversionEntry {
 		this.result = result;
 		this.infectChance = infectChance;
 		this.nbt = nbt;
+		Hordes.logInfo("Loaded conversion " + entity + " to " + result + nbt + " with chance of " + infectChance);
 	}
 
 	public LivingEntity convertEntity(LivingEntity entity) {

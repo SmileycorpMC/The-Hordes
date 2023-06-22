@@ -16,7 +16,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.util.LazyOptional;
 import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.hordeevent.HordeSpawnTable;
-import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
+import net.smileycorp.hordes.common.hordeevent.capability.HordeEvent;
+import net.smileycorp.hordes.common.hordeevent.capability.HordeSavedData;
 import net.smileycorp.hordes.common.hordeevent.data.HordeTableLoader;
 
 import java.util.Collection;
@@ -26,42 +27,15 @@ public class CommandSpawnWave {
 	public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 		LiteralArgumentBuilder<CommandSourceStack> command = Commands.literal("spawnHordeWave")
 				.requires((commandSource) -> commandSource.hasPermission(1)).then(Commands.argument("count", IntegerArgumentType.integer())
-						.executes(ctx -> execute(ctx, IntegerArgumentType.getInteger(ctx, "count")))
+						.executes(ctx -> execute(ctx, IntegerArgumentType.getInteger(ctx, "count"), null))
 						.then(Commands.argument("table", ResourceLocationArgument.id()).suggests(HordeTableLoader::getSuggestions)
 								.executes(ctx -> execute(ctx,IntegerArgumentType.getInteger(ctx, "count"), ResourceLocationArgument.getId(ctx, "table")))))
 				.then(Commands.argument("player", EntityArgument.players()).then(Commands.argument("count", IntegerArgumentType.integer())
-						.executes(ctx -> execute(ctx, IntegerArgumentType.getInteger(ctx, "count"), EntityArgument.getPlayers(ctx, "player")))
+						.executes(ctx -> execute(ctx, IntegerArgumentType.getInteger(ctx, "count"), EntityArgument.getPlayers(ctx, "player"), null))
 						.then(Commands.argument("table", ResourceLocationArgument.id()).suggests(HordeTableLoader::getSuggestions)
 								.executes(ctx -> execute(ctx,IntegerArgumentType.getInteger(ctx, "count"),
 										EntityArgument.getPlayers(ctx, "player"), ResourceLocationArgument.getId(ctx, "table"))))));
 		dispatcher.register(command);
-	}
-
-	public static int execute(CommandContext<CommandSourceStack> ctx, int count) throws CommandSyntaxException {
-		CommandSourceStack source = ctx.getSource();
-		if (source.getEntity() instanceof Player) {
-			Player player = (Player) source.getEntity();
-			LazyOptional<IHordeEvent> optional = player.getCapability(Hordes.HORDE_EVENT, null);
-			if (optional.isPresent()) {
-				optional.resolve().get().spawnWave(player, count);
-				return 1;
-			}
-		}
-		return 0;
-	}
-
-	public static int execute(CommandContext<CommandSourceStack> ctx, int count, Collection<ServerPlayer> players) throws CommandSyntaxException {
-		for (Player player : players) {
-			LazyOptional<IHordeEvent> optional = player.getCapability(Hordes.HORDE_EVENT, null);
-			try {
-				if (optional.isPresent()) {
-					optional.resolve().get().spawnWave(player, count);
-				}
-			} catch (Exception e) {
-				Hordes.logError("Failed to run startHordeEvent command", e);
-			}
-		}
-		return 1;
 	}
 
 	public static int execute(CommandContext<CommandSourceStack> ctx, int count, ResourceLocation table) throws CommandSyntaxException {
@@ -72,15 +46,12 @@ public class CommandSpawnWave {
 
 	public static int execute(CommandContext<CommandSourceStack> ctx, int count, Collection<ServerPlayer> players, ResourceLocation table) throws CommandSyntaxException {
 		for (Player player : players) {
-			LazyOptional<IHordeEvent> optional = player.getCapability(Hordes.HORDE_EVENT, null);
+			HordeEvent horde = HordeSavedData.getData(ctx.getSource().getLevel()).getEvent(player);
 			try {
-				if (optional.isPresent()) {
-					IHordeEvent event = optional.resolve().get();
-					HordeSpawnTable current = event.getSpawntable();
-					event.setSpawntable(HordeTableLoader.INSTANCE.getTable(table));
-					event.spawnWave(player, count);
-					event.setSpawntable(current);
-				}
+				HordeSpawnTable current = horde.getSpawntable();
+				horde.setSpawntable(HordeTableLoader.INSTANCE.getTable(table));
+				horde.spawnWave(player, count);
+				horde.setSpawntable(current);
 			} catch (Exception e) {
 				Hordes.logError("Failed to run startHordeEvent command", e);
 			}

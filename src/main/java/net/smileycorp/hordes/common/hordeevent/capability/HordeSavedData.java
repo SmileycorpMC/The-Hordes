@@ -1,64 +1,64 @@
 package net.smileycorp.hordes.common.hordeevent.capability;
 
+import com.google.common.collect.Maps;
+import com.mojang.authlib.GameProfile;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.server.ServerLifecycleHooks;
+import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
-import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.common.Hordes;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 public class HordeSavedData extends SavedData {
 
-	public static final String DATA = Constants.MODID + "_HordeEvent";
+	public static final String DATA = "hordes";
 
-	private int nextDay = 0;
+	private int next_day = 0;
 
 	protected Level level = null;
 
+	private Map<UUID, HordeEvent> events = Maps.newHashMap();
+
 	public void load(CompoundTag nbt) {
-		if (nbt.contains("nextDay")) {
-			int next = nbt.getInt("nextDay");
-			if (next > nextDay) {
-				nextDay = next;
+		if (nbt.contains("next_day")) {
+			int next = nbt.getInt("next_day");
+			if (next > next_day) {
+				next_day = next;
+			}
+		}
+		if (nbt.contains("events")) {
+			CompoundTag events = nbt.getCompound("events");
+			for (String uuid : events.getAllKeys()) {
+				if (!DataUtils.isValidUUID(uuid)) return;
+				HordeEvent horde = new HordeEvent();
+				horde.readFromNBT(events.getCompound(uuid));
+				this.events.put(UUID.fromString(uuid), horde);
 			}
 		}
 	}
 
 	@Override
 	public CompoundTag save(CompoundTag nbt) {
-		nbt.putInt("nextDay", nextDay);
+		nbt.putInt("next_day", next_day);
+		CompoundTag events = new CompoundTag();
+		for (Entry<UUID, HordeEvent> entry : this.events.entrySet()) {
+			events.put(entry.getKey().toString(), entry.getValue().writeToNBT(new CompoundTag()));
+		}
+		nbt.put("events", events);
 		return nbt;
 	}
 
 	public int getNextDay() {
-		return nextDay;
+		return next_day;
 	}
 
-	public void setNextDay(int nextDay) {
-		this.nextDay = nextDay;
-	}
-
-	public Map<Player, HordeEvent> getEvents() {
-		Map<Player, HordeEvent> events = new HashMap<>();
-		if (!level.isClientSide) {
-			for (Player player : ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers()) {
-				LazyOptional<IHordeEvent> optional = player.getCapability(Hordes.HORDE_EVENT, null);
-				if (optional.isPresent() &! player.isDeadOrDying()) {
-					events.put(player, (HordeEvent) player.getCapability(Hordes.HORDE_EVENT, null).resolve().get());
-				}
-			}
-		}
-		return events;
+	public void setNextDay(int next_day) {
+		this.next_day = next_day;
 	}
 
 	public void save() {
@@ -66,21 +66,38 @@ public class HordeSavedData extends SavedData {
 		if (level instanceof ServerLevel) ((ServerLevel)level).getChunkSource().getDataStorage().set(DATA, this);
 	}
 
+	public HordeEvent getEvent(Player player) {
+		return player == null ? null : getEvent(player.getUUID());
+	}
+
+	public HordeEvent getEvent(UUID uuid) {
+		return uuid == null ? null : getEvent(uuid);
+	}
+
 	public List<String> getDebugText() {
 		List<String> out = new ArrayList<>();
 		out.add(toString());
 		out.add("Existing events: {");
-		for (Entry<Player, HordeEvent> entry : getEvents().entrySet()) {
-			out.add("	" +entry.getValue().toString(entry.getKey()));
+		for (Entry<UUID, HordeEvent> entry : events.entrySet()) {
+			out.add("	" +entry.getValue().toString(getName(entry.getKey())));
 			out.addAll(entry.getValue().getEntityStrings());
 		}
 		out.add("}");
 		return out;
 	}
 
+	public String getName(UUID uuid) {
+		Player player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(uuid);
+		if (player != null) return player.getName().getString();
+		Optional<GameProfile> profile = ServerLifecycleHooks.getCurrentServer().getProfileCache().get(uuid);
+		if (profile.isPresent() && profile.get().getName() != null) return profile.get().getName();
+		return uuid.toString();
+	}
+
 	@Override
 	public String toString() {
-		return super.toString() + "[levelTime: " + level.getDayTime() + ", nextDay="+nextDay+"]";
+		return super.toString() + "[current_day: " + (int)Math.floor((int)level.getDayTime()/(int)CommonConfigHandler.dayLength.get()) +
+				", current_time: " + level.getDayTime()%(int)CommonConfigHandler.dayLength.get() + "next_day="+ next_day +"]";
 	}
 
 	public static HordeSavedData getData(ServerLevel level) {

@@ -26,7 +26,7 @@ public class HordeScriptLoader extends SimpleJsonResourceReloadListener {
     private final Map<ResourceLocation, HordeScript> SCRIPTS = Maps.newHashMap();
 
     public HordeScriptLoader() {
-        super(GSON, "horde_scripts");
+        super(GSON, "horde_data/scripts");
     }
 
     @Override

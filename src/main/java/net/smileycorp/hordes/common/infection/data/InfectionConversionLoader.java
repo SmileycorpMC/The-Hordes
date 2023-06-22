@@ -10,6 +10,7 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.infection.InfectedEffect;
 import net.smileycorp.hordes.common.infection.InfectionConversionEntry;
 
@@ -25,20 +26,30 @@ public class InfectionConversionLoader extends SimpleJsonResourceReloadListener 
     private final Map<EntityType<?>, InfectionConversionEntry> conversionTable = new HashMap<>();
 
     public InfectionConversionLoader() {
-        super(GSON, "");
+        super(GSON, "horde_data");
     }
 
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> map, ResourceManager manager, ProfilerFiller profiller) {
         conversionTable.clear();
-       for (String id : manager.getNamespaces()) {
-           try {
-               for (JsonElement element : map.get(new ResourceLocation(id, "infection_conversions.json")).getAsJsonArray()) {
-                   InfectionConversionEntry entry = InfectionConversionEntry.deserialize(element.getAsJsonObject());
-                  conversionTable.put(entry.getEntity(), entry);
-               }
-           } catch (Exception e) {}
-       }
+        for (ResourceLocation a : map.keySet()) Hordes.logInfo(a);
+        for (String id : manager.getNamespaces()) {
+            ResourceLocation loc = new ResourceLocation(id, "infection_conversions");
+            JsonElement json = map.get(loc);
+            if (json == null) return;
+            try {
+                for (JsonElement element : json.getAsJsonArray()) {
+                    try {
+                       InfectionConversionEntry entry = InfectionConversionEntry.deserialize(element.getAsJsonObject());
+                       conversionTable.put(entry.getEntity(), entry);
+                    } catch (Exception e) {
+                       Hordes.logError("Failed to load conversion entry " + element.getAsString(), e);
+                    }
+                }
+            } catch (Exception e) {
+                Hordes.logError("Failed to load conversion table " + loc, e);
+            }
+        }
     }
 
     public void tryToInfect(LivingEntity entity) {

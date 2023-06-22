@@ -27,10 +27,11 @@
 	"entity.hordes.ZombiePlayer.chat":"%1$s's Zombie",
 	"entity.hordes.DrownedPlayer.chat":"Drowned %1$s",
 	"entity.hordes.ZombiePlayer.name":"Player Zombie",
+	"entity.hordes.DrownedPlayer.name":"Drowned Player",
 
-	"effect.hordes.infected":"Infected",
-	"death.attack.infection":"%1$s succumbed to their infection.",
-	"death.attack.infection.player":"%1$s succumbed to their infection.",
+	"effect.hordes.infected":"Infection",
+	"death.attack.infection":"%1$s succumbed to infection.",
+	"death.attack.infection.player":"%1$s succumbed to infection.",
 
 	"jei.category.hordes.InfectionCures":"Infection Cures"
 }

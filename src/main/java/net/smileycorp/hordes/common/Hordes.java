@@ -19,7 +19,6 @@ import net.smileycorp.hordes.common.capability.IZombifyPlayer;
 import net.smileycorp.hordes.common.data.ConfigFilesGenerator;
 import net.smileycorp.hordes.common.data.DataRegistry;
 import net.smileycorp.hordes.common.hordeevent.HordeEventHandler;
-import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeSpawn;
 import net.smileycorp.hordes.common.hordeevent.network.HordeEventPacketHandler;
 import net.smileycorp.hordes.common.infection.HordesInfection;
@@ -33,9 +32,8 @@ import org.apache.logging.log4j.Logger;
 @Mod.EventBusSubscriber(modid = Constants.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class Hordes {
 
-	private static Logger logger = LogManager.getLogger(Constants.NAME);
+	private static Logger logger = LogManager.getLogger(Constants.MODID);
 
-	public final static Capability<IHordeEvent> HORDE_EVENT = CapabilityManager.get(new CapabilityToken<IHordeEvent>(){});
 	public final static Capability<IHordeSpawn> HORDESPAWN = CapabilityManager.get(new CapabilityToken<IHordeSpawn>(){});
 	public final static Capability<IZombifyPlayer> ZOMBIFY_PLAYER = CapabilityManager.get(new CapabilityToken<IZombifyPlayer>(){});
 	public final static Capability<IInfection> INFECTION = CapabilityManager.get(new CapabilityToken<IInfection>(){});

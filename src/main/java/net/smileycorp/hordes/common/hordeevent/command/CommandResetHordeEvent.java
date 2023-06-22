@@ -13,7 +13,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.util.LazyOptional;
 import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.common.Hordes;
-import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
+import net.smileycorp.hordes.common.hordeevent.capability.HordeEvent;
+import net.smileycorp.hordes.common.hordeevent.capability.HordeSavedData;
 
 import java.util.Collection;
 
@@ -37,9 +38,9 @@ public class CommandResetHordeEvent {
 	public static int execute(CommandContext<CommandSourceStack> ctx, Collection<ServerPlayer> players) throws CommandSyntaxException {
 		CommandSourceStack source = ctx.getSource();
 		for (ServerPlayer player : players) {
-			LazyOptional<IHordeEvent> optional = player.getCapability(Hordes.HORDE_EVENT, null);
-			if (optional.isPresent()) {
-				optional.resolve().get().reset(ctx.getSource().getLevel());
+			HordeEvent horde = HordeSavedData.getData(source.getLevel()).getEvent(player);
+			if (horde != null) {
+				horde.reset(ctx.getSource().getLevel());
 				source.getEntity().sendSystemMessage(TextUtils.translatableComponent("commands.hordes.HordeReset.success", null, player.getName()));
 				return 1;
 			}

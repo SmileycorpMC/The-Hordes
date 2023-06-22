@@ -4,7 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
+import net.smileycorp.hordes.common.hordeevent.capability.HordeEvent;
 
 @Cancelable
 public class HordeStartEvent extends HordePlayerEvent {
@@ -13,7 +13,7 @@ public class HordeStartEvent extends HordePlayerEvent {
 	protected String message = Constants.hordeEventStart;
 	protected final boolean wasCommand;
 
-	public HordeStartEvent(Player player, IHordeEvent horde, boolean wasCommand) {
+	public HordeStartEvent(Player player, HordeEvent horde, boolean wasCommand) {
 		super(player, horde);
 		pos = player.blockPosition();
 		this.wasCommand = wasCommand;

@@ -1,12 +1,17 @@
 package net.smileycorp.hordes.mixin;
 
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.GoalSelector;
+import net.minecraft.world.entity.ai.goal.WrappedGoal;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.animal.horse.ZombieHorse;
 import net.minecraft.world.entity.monster.AbstractSkeleton;
 import net.minecraft.world.entity.monster.piglin.Piglin;
@@ -21,7 +26,8 @@ import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.ai.FleeEntityGoal;
-import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
+import net.smileycorp.hordes.common.hordeevent.capability.HordeEvent;
+import net.smileycorp.hordes.common.hordeevent.capability.HordeSavedData;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeSpawn;
 import net.smileycorp.hordes.common.infection.HordesInfection;
 import net.smileycorp.hordes.common.infection.network.CureEntityMessage;
@@ -96,22 +102,20 @@ public abstract class MixinMob extends LivingEntity {
 	private Mob convertTo(Mob converted) {
 		LazyOptional<IHordeSpawn> beforeOptional = getCapability(Hordes.HORDESPAWN);
 		LazyOptional<IHordeSpawn> afterOptional = converted.getCapability(Hordes.HORDESPAWN);
-		if (beforeOptional.isPresent() && afterOptional.isPresent()) {
-			if (beforeOptional.resolve().get().isHordeSpawned()) {
-				String uuid = beforeOptional.resolve().get().getPlayerUUID();
-				if (DataUtils.isValidUUID(uuid)) {
-					afterOptional.resolve().get().setPlayerUUID(uuid);
-					beforeOptional.resolve().get().setPlayerUUID("");
-					Player player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(UUID.fromString(uuid));
-					if (player!=null) {
-						LazyOptional<IHordeEvent> optionalp = player.getCapability(Hordes.HORDE_EVENT, null);
-						if (optionalp.isPresent()) {
-							optionalp.resolve().get().registerEntity(converted);
-							optionalp.resolve().get().removeEntity((Mob)(LivingEntity)this);
-						}
-					}
-				}
-			}
+		if (!(beforeOptional.isPresent() || afterOptional.isPresent() || beforeOptional.resolve().get().isHordeSpawned())) return converted;
+		String uuid = beforeOptional.resolve().get().getPlayerUUID();
+		if (!DataUtils.isValidUUID(uuid)) return converted;
+		afterOptional.resolve().get().setPlayerUUID(uuid);
+		beforeOptional.resolve().get().setPlayerUUID("");
+		HordeEvent horde = HordeSavedData.getData((ServerLevel) level()).getEvent(UUID.fromString(uuid));
+		if (horde != null) {
+			Player player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(UUID.fromString(uuid));
+			horde.registerEntity(converted);
+			horde.removeEntity((Mob) (LivingEntity) this);
+			converted.targetSelector.getRunningGoals().forEach(WrappedGoal::stop);
+			if (converted instanceof PathfinderMob) converted.targetSelector.addGoal(1, new HurtByTargetGoal((PathfinderMob) converted));
+			converted.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(converted, Player.class, true));
+			if (player != null) converted.goalSelector.addGoal(6, new GoToEntityPositionGoal(converted, player));
 		}
 		return converted;
 	}

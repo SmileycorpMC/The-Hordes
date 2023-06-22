@@ -39,7 +39,7 @@ public class HordesInfection {
 	public static final ResourceKey<DamageType> INFECTION_DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE, Constants.loc("infection"));
 
 	public static DamageSource getInfectionDamage(LivingEntity entity) {
-		return new DamageSource(entity.level().damageSources().damageTypes.getHolder(INFECTION_DAMAGE).get());
+		return entity.damageSources().source(INFECTION_DAMAGE);
 	}
 
     public static List<ItemStack> getCureList() {
