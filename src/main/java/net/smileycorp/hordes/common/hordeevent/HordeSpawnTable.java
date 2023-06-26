@@ -10,7 +10,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.server.ServerLifecycleHooks;
-import net.smileycorp.atlas.api.recipe.WeightedOutputs;
+import net.smileycorp.atlas.api.util.WeightedOutputs;
 import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.data.DataRegistry;
 

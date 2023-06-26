@@ -4,23 +4,20 @@
 	"compatibilityLevel": "JAVA_17",
 	"refmap": "hordes.refmap.json",
 	"mixins": [
-		"MixinAbstractHorse",
-		"MixinAbstractPiglin",
-		"MixinHoglin",
-		"MixinMob",
-		"MixinMobEffectInstance",
-		"MixinPackRepository",
-		"MixinPiglin",
-		"MixinPiglinAi",
-		"MixinPiglinBrute",
-		"MixinZoglin",
-		"MixinZombie",
-		"MixinZombieHorse",
-		"MixinZombieVillager",
-		"MixinZombifiedPiglin"
-	],
-	"injector": {
-		"defaultRequire": 1
-	},
+      "MixinAbstractHorse",
+      "MixinAbstractPiglin",
+      "MixinBuiltInPackSource",
+      "MixinHoglin",
+      "MixinMob",
+      "MixinMobEffectInstance",
+      "MixinPiglin",
+      "MixinPiglinAi",
+      "MixinPiglinBrute",
+      "MixinZoglin",
+      "MixinZombie",
+      "MixinZombieHorse",
+      "MixinZombieVillager",
+      "MixinZombifiedPiglin"
+    ],
 	"minVersion": "0.8"
 }

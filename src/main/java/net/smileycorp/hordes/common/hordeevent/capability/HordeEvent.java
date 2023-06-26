@@ -19,14 +19,12 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fml.util.thread.SidedThreadGroups;
 import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.IOngoingEvent;
 import net.smileycorp.atlas.api.entity.ai.GoToEntityPositionGoal;
 import net.smileycorp.atlas.api.network.GenericStringMessage;
-import net.smileycorp.atlas.api.recipe.WeightedOutputs;
 import net.smileycorp.atlas.api.util.DirectionUtils;
+import net.smileycorp.atlas.api.util.WeightedOutputs;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.event.*;
@@ -38,7 +36,10 @@ import net.smileycorp.hordes.common.hordeevent.data.functions.HordeScript;
 import net.smileycorp.hordes.common.hordeevent.network.HordeEventPacketHandler;
 import net.smileycorp.hordes.common.hordeevent.network.HordeSoundMessage;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class HordeEvent implements IOngoingEvent<Player> {
@@ -48,15 +49,11 @@ public class HordeEvent implements IOngoingEvent<Player> {
 	private int day = 0;
 	private int nextDay = -1;
 	private boolean hasChanged = false;
-	private Random rand = new Random();
 
 	private HordeSpawnTable loadedTable;
 
-	public HordeEvent(){
-		if (Thread.currentThread().getThreadGroup() == SidedThreadGroups.SERVER) {
-			HordeSavedData data = HordeSavedData.getData(ServerLifecycleHooks.getCurrentServer().overworld());
-			nextDay = data.getNextDay();
-		}
+	HordeEvent(HordeSavedData data){
+		nextDay = data.getNextDay();
 	}
 
 	public void readFromNBT(CompoundTag nbt) {
@@ -129,11 +126,11 @@ public class HordeEvent implements IOngoingEvent<Player> {
 		postEvent(startEvent);
 		if (startEvent.isCanceled()) return;
 		count = startEvent.getCount();
-		Vec3 basedir = DirectionUtils.getRandomDirectionVecXZ(rand);
+		Vec3 basedir = DirectionUtils.getRandomDirectionVecXZ(level.random);
 		BlockPos basepos = DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, 75, 7, 0);
 		int i = 0;
 		while (basepos.equals(player.blockPosition())) {
-			basedir = DirectionUtils.getRandomDirectionVecXZ(rand);
+			basedir = DirectionUtils.getRandomDirectionVecXZ(level.random);
 			basepos = DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, 75, 7, 0);
 			if (i++>=20) {
 				logInfo("Unable to find unlit pos for horde " + this + " ignoring light level");
@@ -158,9 +155,9 @@ public class HordeEvent implements IOngoingEvent<Player> {
 				logInfo("Can't spawn wave because max cap has been reached");
 				return;
 			}
-			Vec3 dir = DirectionUtils.getRandomDirectionVecXZ(rand);
-			BlockPos pos = DirectionUtils.getClosestLoadedPos(level, basepos, dir, rand.nextInt(10));
-			HordeSpawnEntry entry = spawntable.getResult(rand);
+			Vec3 dir = DirectionUtils.getRandomDirectionVecXZ(level.random);
+			BlockPos pos = DirectionUtils.getClosestLoadedPos(level, basepos, dir, level.random.nextInt(10));
+			HordeSpawnEntry entry = spawntable.getResult(player.getRandom());
 			EntityType<?> type = entry.getEntity();
 			try {
 				AtomicBoolean cancelled = new AtomicBoolean(false);

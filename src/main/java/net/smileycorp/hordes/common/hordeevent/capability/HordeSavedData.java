@@ -35,7 +35,7 @@ public class HordeSavedData extends SavedData {
 			CompoundTag events = nbt.getCompound("events");
 			for (String uuid : events.getAllKeys()) {
 				if (!DataUtils.isValidUUID(uuid)) return;
-				HordeEvent horde = new HordeEvent();
+				HordeEvent horde = new HordeEvent(this);
 				horde.readFromNBT(events.getCompound(uuid));
 				this.events.put(UUID.fromString(uuid), horde);
 			}
@@ -71,7 +71,9 @@ public class HordeSavedData extends SavedData {
 	}
 
 	public HordeEvent getEvent(UUID uuid) {
-		return uuid == null ? null : getEvent(uuid);
+		if (uuid == null) return null;
+		if (!events.containsKey(uuid)) events.put(uuid, new HordeEvent(this));
+		return events.get(uuid);
 	}
 
 	public List<String> getDebugText() {

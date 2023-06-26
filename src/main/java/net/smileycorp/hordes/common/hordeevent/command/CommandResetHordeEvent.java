@@ -10,9 +10,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.common.util.LazyOptional;
 import net.smileycorp.atlas.api.util.TextUtils;
-import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.hordeevent.capability.HordeEvent;
 import net.smileycorp.hordes.common.hordeevent.capability.HordeSavedData;
 
