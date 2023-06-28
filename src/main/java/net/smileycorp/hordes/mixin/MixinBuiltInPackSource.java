@@ -23,7 +23,7 @@ public class MixinBuiltInPackSource {
 	private void loadPacks(Consumer<Pack> packConsumer, CallbackInfo callback) {
 		Path pack = FMLPaths.GAMEDIR.get().resolve("config").resolve("hordes");
 		PathPackResources resources = new PathPackResources("hordes-config", true, pack);
-		packConsumer.accept(Pack.readMetaAndCreate("hordes-config", Component.literal("Hordes Config"), false,
+		packConsumer.accept(Pack.readMetaAndCreate("hordes-config", Component.literal("Hordes Config"), true,
 				(str)->resources, (Object)this instanceof ClientPackSource ? PackType.CLIENT_RESOURCES : PackType.SERVER_DATA, Pack.Position.TOP, PackSource.BUILT_IN));
 	}
 
