@@ -6,7 +6,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
-import net.smileycorp.hordes.common.Hordes;
 
 public interface IZombifyPlayer {
 
@@ -22,7 +21,7 @@ public interface IZombifyPlayer {
 
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> capability, Direction facing) {
-			return capability == Hordes.ZOMBIFY_PLAYER ? LazyOptional.of(() -> impl).cast() : LazyOptional.empty();
+			return capability == HordesCapabilities.ZOMBIFY_PLAYER ? LazyOptional.of(() -> impl).cast() : LazyOptional.empty();
 		}
 
 	}

@@ -13,7 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.util.LazyOptional;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.infection.capability.IInfection;
 
 import java.util.List;
@@ -66,7 +66,7 @@ public class InfectedEffect extends MobEffect {
 
 	public static int getInfectionTime(LivingEntity entity) {
 		int time = CommonConfigHandler.ticksForEffectStage.get();
-		LazyOptional<IInfection> optional = entity.getCapability(Hordes.INFECTION);
+		LazyOptional<IInfection> optional = entity.getCapability(HordesCapabilities.INFECTION);
 		if (optional.isPresent()) time = (int)((double)time * Math.pow(CommonConfigHandler.effectStageTickReduction.get(), optional.resolve().get().getInfectionCount()));
 		return time;
 	}

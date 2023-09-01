@@ -24,8 +24,8 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.entity.ai.GoToEntityPositionGoal;
 import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
-import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.ai.FleeEntityGoal;
+import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 import net.smileycorp.hordes.hordeevent.capability.HordeSavedData;
 import net.smileycorp.hordes.hordeevent.capability.IHordeSpawn;
@@ -100,8 +100,8 @@ public abstract class MixinMob extends LivingEntity {
 	//copy horde data to converted entities after conversion before capabilities are cleared
 	@ModifyVariable(method = "convertTo", at = @At(value = "STORE", ordinal = 0))
 	private Mob convertTo(Mob converted) {
-		LazyOptional<IHordeSpawn> beforeOptional = getCapability(Hordes.HORDESPAWN);
-		LazyOptional<IHordeSpawn> afterOptional = converted.getCapability(Hordes.HORDESPAWN);
+		LazyOptional<IHordeSpawn> beforeOptional = getCapability(HordesCapabilities.HORDESPAWN);
+		LazyOptional<IHordeSpawn> afterOptional = converted.getCapability(HordesCapabilities.HORDESPAWN);
 		if (!(beforeOptional.isPresent() || afterOptional.isPresent() || beforeOptional.resolve().get().isHordeSpawned())) return converted;
 		String uuid = beforeOptional.resolve().get().getPlayerUUID();
 		if (!DataUtils.isValidUUID(uuid)) return converted;
@@ -124,7 +124,7 @@ public abstract class MixinMob extends LivingEntity {
 	@Inject(at=@At("TAIL"), method = "convertTo(Lnet/minecraft/world/entity/EntityType;Z)Lnet/minecraft/world/entity/Mob;", cancellable = true)
 	public void convertTo(EntityType<?> type, boolean keepEquipment, CallbackInfoReturnable<Mob> callback) {
 		Mob converted = callback.getReturnValue();
-		LazyOptional<IHordeSpawn> optional = converted.getCapability(Hordes.HORDESPAWN);
+		LazyOptional<IHordeSpawn> optional = converted.getCapability(HordesCapabilities.HORDESPAWN);
 		if (optional.isPresent()) {
 			if (optional.resolve().get().isHordeSpawned()) {
 				String uuid = optional.resolve().get().getPlayerUUID();

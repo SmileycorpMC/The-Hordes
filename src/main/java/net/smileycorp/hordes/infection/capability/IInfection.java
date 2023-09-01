@@ -5,7 +5,7 @@ import net.minecraft.nbt.IntTag;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.capability.HordesCapabilities;
 
 public interface IInfection {
 
@@ -48,7 +48,7 @@ public interface IInfection {
 		protected IInfection impl = new Infection();
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction facing) {
-			return cap == Hordes.INFECTION ? LazyOptional.of(() -> impl).cast() : LazyOptional.empty();
+			return cap == HordesCapabilities.INFECTION ? LazyOptional.of(() -> impl).cast() : LazyOptional.empty();
 		}
 
 		@Override

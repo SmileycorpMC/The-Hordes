@@ -5,7 +5,7 @@ import net.minecraft.nbt.StringTag;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.capability.HordesCapabilities;
 
 public interface IHordeSpawn {
 
@@ -72,7 +72,7 @@ public interface IHordeSpawn {
 		protected IHordeSpawn impl = new HordeSpawn();
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction facing) {
-			return cap == Hordes.HORDESPAWN ? LazyOptional.of(() -> impl).cast() : LazyOptional.empty();
+			return cap == HordesCapabilities.HORDESPAWN ? LazyOptional.of(() -> impl).cast() : LazyOptional.empty();
 		}
 
 		@Override

@@ -26,8 +26,8 @@ import net.smileycorp.atlas.api.network.GenericStringMessage;
 import net.smileycorp.atlas.api.util.DirectionUtils;
 import net.smileycorp.atlas.api.util.WeightedOutputs;
 import net.smileycorp.hordes.common.CommonConfigHandler;
-import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.HordesLogger;
+import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.common.event.*;
 import net.smileycorp.hordes.hordeevent.HordeSpawnEntry;
 import net.smileycorp.hordes.hordeevent.HordeSpawnTable;
@@ -197,7 +197,7 @@ public class HordeEvent implements IOngoingEvent<Player> {
 
 	private void finalizeEntity(Mob entity, Level level, Player player) {
 		entity.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(100.0D);
-		LazyOptional<IHordeSpawn> optional = entity.getCapability(Hordes.HORDESPAWN);
+		LazyOptional<IHordeSpawn> optional = entity.getCapability(HordesCapabilities.HORDESPAWN);
 		if (optional.isPresent()) { optional.resolve().get().setPlayerUUID(player.getUUID().toString());
 			registerEntity(entity);
 			hasChanged = true;
@@ -213,7 +213,7 @@ public class HordeEvent implements IOngoingEvent<Player> {
 		List<Mob> toRemove = new ArrayList<>();
 		for (Mob entity : entitiesSpawned) {
 			if (entity.isAlive() |! entity.isDeadOrDying() |! entity.isRemoved()) continue;
-			LazyOptional<IHordeSpawn> optional = entity.getCapability(Hordes.HORDESPAWN, null);
+			LazyOptional<IHordeSpawn> optional = entity.getCapability(HordesCapabilities.HORDESPAWN, null);
 			if (optional.isPresent()) {
 				IHordeSpawn cap = optional.resolve().get();
 				cap.setPlayerUUID("");

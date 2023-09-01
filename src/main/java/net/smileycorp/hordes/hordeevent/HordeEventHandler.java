@@ -31,7 +31,7 @@ import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 import net.smileycorp.hordes.hordeevent.capability.HordeSavedData;
 import net.smileycorp.hordes.hordeevent.capability.IHordeSpawn;
@@ -116,7 +116,7 @@ public class HordeEventHandler {
 	public void update(LivingTickEvent event) {
 		Player player = getHordePlayer(event.getEntity());
 		if (player == null) return;
-		IHordeSpawn cap = event.getEntity().getCapability(Hordes.HORDESPAWN).resolve().get();
+		IHordeSpawn cap = event.getEntity().getCapability(HordesCapabilities.HORDESPAWN).resolve().get();
 		if (cap.isSynced()) return;
 		Mob entity = (Mob) event.getEntity();
 		entity.targetSelector.getRunningGoals().forEach((goal) -> goal.stop());
@@ -132,7 +132,7 @@ public class HordeEventHandler {
 
 	private Player getHordePlayer(Entity entity) {
 		if (entity.level().isClientSide |!(entity instanceof Mob)) return null;
-		LazyOptional<IHordeSpawn> optional = entity.getCapability(Hordes.HORDESPAWN);
+		LazyOptional<IHordeSpawn> optional = entity.getCapability(HordesCapabilities.HORDESPAWN);
 		if (!optional.isPresent()) return null;
 		IHordeSpawn cap = optional.resolve().get();
 		if (!cap.isHordeSpawned()) return null;

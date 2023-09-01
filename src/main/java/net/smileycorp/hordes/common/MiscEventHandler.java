@@ -22,6 +22,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.smileycorp.atlas.api.util.TextUtils;
+import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.common.capability.IZombifyPlayer;
 import net.smileycorp.hordes.common.entities.IZombiePlayer;
 import net.smileycorp.hordes.infection.HordesInfection;
@@ -47,7 +48,7 @@ public class MiscEventHandler {
 		if (!(entity instanceof Player) || entity instanceof FakePlayer || entity.level().isClientSide) return;
 		if ((entity.hasEffect(HordesInfection.INFECTED.get()) && CommonConfigHandler.enableMobInfection.get()) || CommonConfigHandler.zombieGraves.get() ||
 				(entity.isUnderWater() && CommonConfigHandler.drownedGraves.get())) {
-			LazyOptional<IZombifyPlayer> optional = entity.getCapability(Hordes.ZOMBIFY_PLAYER, null);
+			LazyOptional<IZombifyPlayer> optional = entity.getCapability(HordesCapabilities.ZOMBIFY_PLAYER, null);
 			if (!optional.isPresent()) return;
 			optional.resolve().get().createZombie((Player) entity);
 		}
@@ -59,7 +60,7 @@ public class MiscEventHandler {
 		if (!(event.getEntity() instanceof Player) || event.getEntity() instanceof FakePlayer || event.getEntity().level().isClientSide) return;
 		Player player = (Player) event.getEntity();
 		if ((player.hasEffect(HordesInfection.INFECTED.get()) && CommonConfigHandler.enableMobInfection.get()) || CommonConfigHandler.zombieGraves.get()) {
-			LazyOptional<IZombifyPlayer> optional = player.getCapability(Hordes.ZOMBIFY_PLAYER, null);
+			LazyOptional<IZombifyPlayer> optional = player.getCapability(HordesCapabilities.ZOMBIFY_PLAYER, null);
 			if (!optional.isPresent()) return;
 			IZombifyPlayer cap = optional.resolve().get();
 			Mob zombie = cap.getZombie();
