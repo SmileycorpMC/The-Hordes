@@ -24,7 +24,7 @@ public class HordeTableLoader extends SimpleJsonResourceReloadListener {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
-    public static ResourceLocation DEFAULT_TABLE = Constants.loc("default");
+    public static ResourceLocation FALLBACK_TABLE = Constants.loc("fallback");
     public static HordeTableLoader INSTANCE = new HordeTableLoader();
 
     private final Map<ResourceLocation, HordeSpawnTable> SPAWN_TABLES = Maps.newHashMap();
@@ -47,7 +47,7 @@ public class HordeTableLoader extends SimpleJsonResourceReloadListener {
     }
 
     public HordeSpawnTable getDefaultTable() {
-        return getTable(DEFAULT_TABLE);
+        return getTable(FALLBACK_TABLE);
     }
 
     public HordeSpawnTable getTable(ResourceLocation loc) {
