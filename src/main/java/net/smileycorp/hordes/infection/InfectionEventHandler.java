@@ -1,11 +1,15 @@
 package net.smileycorp.hordes.infection;
 
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.monster.ZombieVillager;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
@@ -133,23 +137,20 @@ public class InfectionEventHandler {
 	public void onInfectDeath(InfectionDeathEvent event) {
 		LivingEntity entity = event.getEntity();
 		Level level = entity.level();
-		if (entity instanceof Villager) {
+		if (entity instanceof Villager && level instanceof ServerLevel) {
 			Villager villager = (Villager) entity;
-			ZombieVillager zombie = EntityType.ZOMBIE_VILLAGER.create(level);
-			zombie.setVillagerData(villager.getVillagerData());
-			zombie.setVillagerXp(villager.getVillagerXp());
-			zombie.setPos(entity.getX(), entity.getY(), entity.getZ());
-			for (EquipmentSlot slot : EquipmentSlot.values()) {
-				zombie.setItemSlot(slot, entity.getItemBySlot(slot));
+			ZombieVillager zombie = villager.convertTo(EntityType.ZOMBIE_VILLAGER, false);
+			if (zombie != null) {
+				zombie.finalizeSpawn((ServerLevel) level, level.getCurrentDifficultyAt(zombie.blockPosition()), MobSpawnType.CONVERSION, new Zombie.ZombieGroupData(false, true), (CompoundTag) null);
+				zombie.setVillagerData(villager.getVillagerData());
+				zombie.setGossips(villager.getGossips().store(NbtOps.INSTANCE));
+				zombie.setTradeOffers(villager.getOffers().createTag());
+				zombie.setVillagerXp(villager.getVillagerXp());
+				net.minecraftforge.event.ForgeEventFactory.onLivingConvert(villager, zombie);
 			}
-			if (entity.hasCustomName()) {
-				zombie.setCustomName(entity.getCustomName());
-			}
-			level.addFreshEntity(zombie);
-			entity.kill();
 			event.setResult(Result.DENY);
 		} else if (InfectionConversionLoader.INSTANCE.canBeInfected(entity))  {
-			InfectionConversionLoader.INSTANCE.convertEntity(entity);
+			if (!InfectionConversionLoader.INSTANCE.convertEntity((Mob) entity)) return;
 			event.setResult(Result.DENY);
 		}
 	}

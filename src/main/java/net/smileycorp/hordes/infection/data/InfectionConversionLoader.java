@@ -10,6 +10,8 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.monster.Slime;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.infection.InfectedEffect;
 
@@ -57,13 +59,14 @@ public class InfectionConversionLoader extends SimpleJsonResourceReloadListener 
     }
 
     public boolean canBeInfected(Entity entity) {
-        if (!(entity instanceof LivingEntity)) return false;
+        if (!(entity instanceof Mob)) return false;
         return conversionTable.containsKey(entity.getType());
     }
 
-    public void convertEntity(LivingEntity entity) {
+    public boolean convertEntity(Mob entity) {
         InfectionConversionEntry entry = conversionTable.get(entity.getType());
-        if (entry != null) entry.convertEntity(entity);
+        if (entry != null) return entry.convertEntity(entity) != null;
+        return false;
     }
 
 }
