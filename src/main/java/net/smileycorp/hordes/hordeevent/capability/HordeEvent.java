@@ -27,6 +27,7 @@ import net.smileycorp.atlas.api.util.DirectionUtils;
 import net.smileycorp.atlas.api.util.WeightedOutputs;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.*;
 import net.smileycorp.hordes.hordeevent.HordeSpawnEntry;
 import net.smileycorp.hordes.hordeevent.HordeSpawnTable;
@@ -328,11 +329,11 @@ public class HordeEvent implements IOngoingEvent<Player> {
 	}
 
 	private void logInfo(Object message) {
-		Hordes.logInfo("["+this+"]" + message);
+		HordesLogger.logInfo("["+this+"]" + message);
 	}
 
 	private void logError(Object message, Exception e) {
-		Hordes.logError("["+this+"]" + message, e);
+		HordesLogger.logError("["+this+"]" + message, e);
 	}
 
 	public List<String> getEntityStrings() {

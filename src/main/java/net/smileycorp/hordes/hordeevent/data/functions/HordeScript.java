@@ -8,7 +8,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.smileycorp.atlas.api.data.DataType;
-import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.data.DataRegistry;
 import net.smileycorp.hordes.common.data.conditions.Condition;
 import net.smileycorp.hordes.common.data.values.ValueGetter;
@@ -59,7 +59,7 @@ public class HordeScript<T extends HordePlayerEvent> {
 			if (function == null || clazz == null) throw new Exception("invalid function: " + obj.get("function").getAsString());
 			return new HordeScript(function, clazz, conditions.toArray(new Condition[]{}));
 		} catch (Exception e) {
-			Hordes.logError("Error loading script " + key + " " + e.getCause() + " " + e.getMessage(), e);
+			HordesLogger.logError("Error loading script " + key + " " + e.getCause() + " " + e.getMessage(), e);
 		}
 		return null;
 	}

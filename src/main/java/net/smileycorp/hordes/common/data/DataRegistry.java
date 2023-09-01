@@ -9,7 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.atlas.api.data.LogicalOperation;
 import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.data.conditions.*;
 import net.smileycorp.hordes.common.data.values.EntityNBTGetter;
 import net.smileycorp.hordes.common.data.values.EntityPosGetter;
@@ -57,7 +57,7 @@ public class DataRegistry {
 				return VALUE_GETTERS.get(new ResourceLocation(json.get("name").getAsString()))
 						.apply(json.get("value").getAsString(), type);
 			} catch (Exception e) {
-				Hordes.logError("Failed to read value "+ json, e);
+				HordesLogger.logError("Failed to read value "+ json, e);
 			}
 		}
 		return null;
@@ -68,7 +68,7 @@ public class DataRegistry {
 			try {
 				return CONDITION_DESERIALIZERS.get(new ResourceLocation(json.get("name").getAsString())).apply(json.get("value"));
 			} catch (Exception e) {
-				Hordes.logError("Failed to read condition "+ json, e);
+				HordesLogger.logError("Failed to read condition "+ json, e);
 			}
 		}
 		return null;
@@ -89,8 +89,8 @@ public class DataRegistry {
             if (parsed != null) nbt = parsed;
             else throw new NullPointerException("Parsed NBT is null.");
         } catch (Exception e) {
-            Hordes.logError("Failed to read config, " + e.getCause() + " " + e.getMessage(), e);
-            Hordes.logError("Error parsing nbt for entity " + name + " " + e.getMessage(), e);
+            HordesLogger.logError("Failed to read config, " + e.getCause() + " " + e.getMessage(), e);
+            HordesLogger.logError("Error parsing nbt for entity " + name + " " + e.getMessage(), e);
         }
         return nbt;
     }

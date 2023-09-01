@@ -13,7 +13,7 @@ import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.hordeevent.HordeSpawnTable;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 import net.smileycorp.hordes.hordeevent.capability.HordeSavedData;
@@ -52,7 +52,7 @@ public class CommandSpawnWave {
 				horde.spawnWave(player, count);
 				horde.setSpawntable(current);
 			} catch (Exception e) {
-				Hordes.logError("Failed to run startHordeEvent command", e);
+				HordesLogger.logError("Failed to run startHordeEvent command", e);
 			}
 		}
 		return 1;

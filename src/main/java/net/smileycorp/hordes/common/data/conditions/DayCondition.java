@@ -5,7 +5,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.smileycorp.hordes.common.CommonConfigHandler;
-import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.HordesLogger;
 
 public class DayCondition implements Condition {
 
@@ -24,7 +24,7 @@ public class DayCondition implements Condition {
 		try {
 			return new DayCondition(json.getAsInt());
 		} catch(Exception e) {
-			Hordes.logError("Incorrect parameters for condition hordes:day", e);
+			HordesLogger.logError("Incorrect parameters for condition hordes:day", e);
 		}
 		return null;
 	}

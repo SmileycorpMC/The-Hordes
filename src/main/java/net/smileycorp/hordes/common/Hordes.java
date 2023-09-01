@@ -25,20 +25,17 @@ import net.smileycorp.hordes.infection.HordesInfection;
 import net.smileycorp.hordes.infection.InfectionEventHandler;
 import net.smileycorp.hordes.infection.capability.IInfection;
 import net.smileycorp.hordes.infection.network.InfectionPacketHandler;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @Mod(value = Constants.MODID)
 @Mod.EventBusSubscriber(modid = Constants.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class Hordes {
-
-	private static Logger logger = LogManager.getLogger(Constants.MODID);
 
 	public final static Capability<IHordeSpawn> HORDESPAWN = CapabilityManager.get(new CapabilityToken<IHordeSpawn>(){});
 	public final static Capability<IZombifyPlayer> ZOMBIFY_PLAYER = CapabilityManager.get(new CapabilityToken<IZombifyPlayer>(){});
 	public final static Capability<IInfection> INFECTION = CapabilityManager.get(new CapabilityToken<IInfection>(){});
 
 	public Hordes() {
+		HordesLogger.clearLog();
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CommonConfigHandler.config);
 		ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfigHandler.config);
 		//generate data files
@@ -46,7 +43,7 @@ public class Hordes {
 			DistExecutor.unsafeRunWhenOn(Dist.CLIENT, ()->ConfigFilesGenerator::generateAssets);
 			ConfigFilesGenerator.generateData();
 		} else {
-			logInfo("Config files are up to date, skipping data/asset generation");
+			HordesLogger.logInfo("Config files are up to date, skipping data/asset generation");
 		}
 	}
 
@@ -75,15 +72,6 @@ public class Hordes {
 	@SubscribeEvent
 	public static void loadClient(FMLClientSetupEvent event) {
 		MinecraftForge.EVENT_BUS.register(new ClientHandler());
-	}
-
-	public static void logInfo(Object message) {
-		logger.info(message);
-	}
-
-	public static void logError(Object message, Exception e) {
-		logger.error(message, e);
-		e.printStackTrace();
 	}
 
 }

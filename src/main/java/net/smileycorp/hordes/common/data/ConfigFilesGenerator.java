@@ -8,7 +8,7 @@ import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.loading.moddiscovery.ModFile;
 import net.smileycorp.atlas.api.util.DataUtils;
-import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.HordesLogger;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -36,7 +36,7 @@ public class ConfigFilesGenerator {
         DataUtils.copyFileFromMod("assets/hordes/lang/en_us.json", "hordes");
         DataUtils.copyFileFromMod("assets/hordes/textures/entity/drowned_player_outer_layer.png", "hordes");
         DataUtils.copyFileFromMod("assets/hordes/textures/entity/zombie_player_outer_layer.png", "hordes");
-        Hordes.logInfo("Generated asset files.");
+        HordesLogger.logInfo("Generated asset files.");
     }
 
     public static void generateData() {
@@ -48,7 +48,7 @@ public class ConfigFilesGenerator {
         DataUtils.copyFileFromMod("data/hordes/horde_data/tables/illagers.json", "hordes");
         DataUtils.copyFileFromMod("data/hordes/tags/entity_types/infection_entities.json", "hordes");
         DataUtils.copyFileFromMod("data/hordes/tags/items/infection_cures.json", "hordes");
-        Hordes.logInfo("Generated data files.");
+        HordesLogger.logInfo("Generated data files.");
     }
 
     private static boolean isUpToDate() {

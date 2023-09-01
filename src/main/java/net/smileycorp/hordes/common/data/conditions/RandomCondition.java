@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
-import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.HordesLogger;
 
 public class RandomCondition implements Condition {
 
@@ -23,7 +23,7 @@ public class RandomCondition implements Condition {
 		try {
 			return new RandomCondition(json.getAsFloat());
 		} catch(Exception e) {
-			Hordes.logError("Incorrect parameters for condition hordes:random", e);
+			HordesLogger.logError("Incorrect parameters for condition hordes:random", e);
 		}
 		return null;
 	}

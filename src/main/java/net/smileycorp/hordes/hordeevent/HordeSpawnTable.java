@@ -11,7 +11,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.util.WeightedOutputs;
-import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.data.DataRegistry;
 
 import java.util.AbstractMap;
@@ -40,7 +40,7 @@ public class HordeSpawnTable {
         for(HordeSpawnEntry entry : spawns) {
             if (entry.getMinDay() <= day && (entry.getMaxDay() == 0 || entry.getMaxDay() >= day)) {
                 spawnmap.add(new AbstractMap.SimpleEntry<>(entry, entry.getWeight()));
-                Hordes.logInfo("Adding entry " + entry.toString() + " to hordespawn on day " + day);
+                HordesLogger.logInfo("Adding entry " + entry.toString() + " to hordespawn on day " + day);
             }
         }
         return new WeightedOutputs<>(1, spawnmap);
@@ -145,14 +145,14 @@ public class HordeSpawnTable {
                         entry.setNBT(nbt);
                     }
                 }
-                Hordes.logInfo("Loaded entity " + entity + " as " + type.toString() + " with weight " + weight + ", min day " + minDay + " and max day " + maxDay);
+                HordesLogger.logInfo("Loaded entity " + entity + " as " + type.toString() + " with weight " + weight + ", min day " + minDay + " and max day " + maxDay);
                 HordeSpawnEntry entry = new HordeSpawnEntry(type, weight, minDay, maxDay);
                 if (nbt != null) {
                     entry.setNBT(nbt);
                 }
                 spawns.add(entry);
             } catch (Exception e) {
-                Hordes.logError("Error adding entity " + entity + " " + e.getCause() + " " + e.getMessage(), e);
+                HordesLogger.logError("Error adding entity " + entity + " " + e.getCause() + " " + e.getMessage(), e);
             }
         }
        return new HordeSpawnTable(name, spawns);

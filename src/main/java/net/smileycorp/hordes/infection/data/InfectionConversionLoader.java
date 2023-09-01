@@ -10,7 +10,7 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.infection.InfectedEffect;
 
 import java.util.HashMap;
@@ -31,7 +31,7 @@ public class InfectionConversionLoader extends SimpleJsonResourceReloadListener 
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> map, ResourceManager manager, ProfilerFiller profiller) {
         conversionTable.clear();
-        for (ResourceLocation a : map.keySet()) Hordes.logInfo(a);
+        for (ResourceLocation a : map.keySet()) HordesLogger.logInfo(a);
         for (String id : manager.getNamespaces()) {
             ResourceLocation loc = new ResourceLocation(id, "infection_conversions");
             JsonElement json = map.get(loc);
@@ -42,11 +42,11 @@ public class InfectionConversionLoader extends SimpleJsonResourceReloadListener 
                        InfectionConversionEntry entry = InfectionConversionEntry.deserialize(element.getAsJsonObject());
                        conversionTable.put(entry.getEntity(), entry);
                     } catch (Exception e) {
-                       Hordes.logError("Failed to load conversion entry " + element.getAsString(), e);
+                       HordesLogger.logError("Failed to load conversion entry " + element.getAsString(), e);
                     }
                 }
             } catch (Exception e) {
-                Hordes.logError("Failed to load conversion table " + loc, e);
+                HordesLogger.logError("Failed to load conversion table " + loc, e);
             }
         }
     }
