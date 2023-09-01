@@ -16,7 +16,7 @@ public class RandomCondition implements Condition {
 
 	@Override
 	public boolean apply(Level level, LivingEntity entity, RandomSource rand) {
-		return rand.nextInt((int)(chance * 100f)) == 0;
+		return rand.nextFloat() <= chance;
 	}
 
 	public static RandomCondition deserialize(JsonElement json) {
