@@ -1,9 +1,9 @@
 package net.smileycorp.hordes.common.event;
 
 import net.minecraft.world.entity.player.Player;
-import net.smileycorp.hordes.common.hordeevent.HordeSpawnTable;
-import net.smileycorp.hordes.common.hordeevent.MutableSpawnTable;
-import net.smileycorp.hordes.common.hordeevent.capability.HordeEvent;
+import net.smileycorp.hordes.hordeevent.HordeSpawnTable;
+import net.smileycorp.hordes.hordeevent.MutableSpawnTable;
+import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 
 public class HordeBuildSpawntableEvent extends HordePlayerEvent {
 

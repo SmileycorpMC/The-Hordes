@@ -22,7 +22,7 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.smileycorp.hordes.common.capability.IZombifyPlayer;
 import net.smileycorp.hordes.common.entities.IZombiePlayer;
-import net.smileycorp.hordes.common.infection.HordesInfection;
+import net.smileycorp.hordes.infection.HordesInfection;
 
 import java.util.Collection;
 
@@ -91,8 +91,8 @@ public class MiscEventHandler {
 	//register attributes for zombie/drowned players
 	@SubscribeEvent
 	public static void registerAttributes(EntityAttributeCreationEvent event) {
-		event.put(HordesInfection.ZOMBIE_PLAYER.get(), Zombie.createAttributes().build());
-		event.put(HordesInfection.DROWNED_PLAYER.get(), Drowned.createAttributes().build());
+		event.put(HordesEntities.ZOMBIE_PLAYER.get(), Zombie.createAttributes().build());
+		event.put(HordesEntities.DROWNED_PLAYER.get(), Drowned.createAttributes().build());
 	}
 
 }

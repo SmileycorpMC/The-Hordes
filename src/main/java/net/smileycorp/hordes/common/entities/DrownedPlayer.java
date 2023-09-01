@@ -23,7 +23,7 @@ import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
-import net.smileycorp.hordes.common.infection.HordesInfection;
+import net.smileycorp.hordes.common.HordesEntities;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -49,7 +49,7 @@ public class DrownedPlayer extends Drowned implements IZombiePlayer {
 	}
 
 	public DrownedPlayer(Level level) {
-		this(HordesInfection.DROWNED_PLAYER.get() ,level);
+		this(HordesEntities.DROWNED_PLAYER.get() ,level);
 	}
 
 	public DrownedPlayer(Player player) {

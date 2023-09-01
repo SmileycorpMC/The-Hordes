@@ -5,9 +5,9 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.smileycorp.hordes.common.CommonConfigHandler;
+import net.smileycorp.hordes.common.HordesEntities;
 import net.smileycorp.hordes.common.entities.IZombiePlayer;
 import net.smileycorp.hordes.common.event.SpawnZombiePlayerEvent;
-import net.smileycorp.hordes.common.infection.HordesInfection;
 
 public class ZombifyPlayer implements IZombifyPlayer {
 
@@ -16,7 +16,7 @@ public class ZombifyPlayer implements IZombifyPlayer {
 	@Override
 	public Mob createZombie(Player player) {
 		EntityType<? extends IZombiePlayer> type = (player.isUnderWater() && (CommonConfigHandler.drownedPlayers.get() || CommonConfigHandler.drownedGraves.get()))
-				? HordesInfection.DROWNED_PLAYER.get() : HordesInfection.ZOMBIE_PLAYER.get();
+				? HordesEntities.DROWNED_PLAYER.get() : HordesEntities.ZOMBIE_PLAYER.get();
 		SpawnZombiePlayerEvent event = new SpawnZombiePlayerEvent(player, type);
 		MinecraftForge.EVENT_BUS.post(event);
 		if (event.isCanceled()) return null;

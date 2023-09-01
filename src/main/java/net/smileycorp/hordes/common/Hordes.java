@@ -18,13 +18,13 @@ import net.smileycorp.hordes.client.ClientHandler;
 import net.smileycorp.hordes.common.capability.IZombifyPlayer;
 import net.smileycorp.hordes.common.data.ConfigFilesGenerator;
 import net.smileycorp.hordes.common.data.DataRegistry;
-import net.smileycorp.hordes.common.hordeevent.HordeEventHandler;
-import net.smileycorp.hordes.common.hordeevent.capability.IHordeSpawn;
-import net.smileycorp.hordes.common.hordeevent.network.HordeEventPacketHandler;
-import net.smileycorp.hordes.common.infection.HordesInfection;
-import net.smileycorp.hordes.common.infection.InfectionEventHandler;
-import net.smileycorp.hordes.common.infection.capability.IInfection;
-import net.smileycorp.hordes.common.infection.network.InfectionPacketHandler;
+import net.smileycorp.hordes.hordeevent.HordeEventHandler;
+import net.smileycorp.hordes.hordeevent.capability.IHordeSpawn;
+import net.smileycorp.hordes.hordeevent.network.HordeEventPacketHandler;
+import net.smileycorp.hordes.infection.HordesInfection;
+import net.smileycorp.hordes.infection.InfectionEventHandler;
+import net.smileycorp.hordes.infection.capability.IInfection;
+import net.smileycorp.hordes.infection.network.InfectionPacketHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -69,7 +69,7 @@ public class Hordes {
 		DataRegistry.init();
 		MinecraftForge.EVENT_BUS.register(new MiscEventHandler());
 		HordesInfection.EFFECTS.register(FMLJavaModLoadingContext.get().getModEventBus());
-		HordesInfection.ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
+		HordesEntities.ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
 	}
 
 	@SubscribeEvent

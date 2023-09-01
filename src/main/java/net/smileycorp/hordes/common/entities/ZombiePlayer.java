@@ -24,7 +24,7 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
-import net.smileycorp.hordes.common.infection.HordesInfection;
+import net.smileycorp.hordes.common.HordesEntities;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -50,7 +50,7 @@ public class ZombiePlayer extends Zombie implements IZombiePlayer {
 	}
 
 	public ZombiePlayer(Level level) {
-		this(HordesInfection.ZOMBIE_PLAYER.get() ,level);
+		this(HordesEntities.ZOMBIE_PLAYER.get() ,level);
 	}
 
 	public ZombiePlayer(Player player) {
@@ -133,7 +133,7 @@ public class ZombiePlayer extends Zombie implements IZombiePlayer {
 	@Override
 	protected void doUnderWaterConversion() {
 		if (CommonConfigHandler.drownedPlayers.get()) {
-			Zombie drowned = convertTo(HordesInfection.DROWNED_PLAYER.get(), true);
+			Zombie drowned = convertTo(HordesEntities.DROWNED_PLAYER.get(), true);
 			if (drowned != null) {
 				drowned.handleAttributes(drowned.level().getCurrentDifficultyAt(drowned.blockPosition()).getSpecialMultiplier());
 				drowned.setCanBreakDoors(drowned.supportsBreakDoorGoal() && this.canBreakDoors());

@@ -27,10 +27,10 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.client.render.ZombiePlayerRenderer;
 import net.smileycorp.hordes.common.Constants;
+import net.smileycorp.hordes.common.HordesEntities;
 import net.smileycorp.hordes.common.entities.IZombiePlayer;
-import net.smileycorp.hordes.common.infection.HordesInfection;
-import net.smileycorp.hordes.common.infection.client.ClientInfectionEventHandler;
-import net.smileycorp.hordes.common.infection.network.CureEntityMessage;
+import net.smileycorp.hordes.infection.client.ClientInfectionEventHandler;
+import net.smileycorp.hordes.infection.network.CureEntityMessage;
 
 @EventBusSubscriber(modid = Constants.MODID, value = Dist.CLIENT, bus = Bus.MOD)
 public class ClientHandler {
@@ -43,9 +43,9 @@ public class ClientHandler {
 
 	@SubscribeEvent
 	public static void registerEntityRenderers(RegisterRenderers event) {
-		event.registerEntityRenderer(HordesInfection.ZOMBIE_PLAYER.get(), ctx -> new ZombiePlayerRenderer<>(ctx,
+		event.registerEntityRenderer(HordesEntities.ZOMBIE_PLAYER.get(), ctx -> new ZombiePlayerRenderer<>(ctx,
 				ClientConfigHandler.getZombiePlayerColour(), Constants.loc("textures/entity/zombie_player_outer_layer.png"), false));
-		event.registerEntityRenderer(HordesInfection.DROWNED_PLAYER.get(), ctx -> new ZombiePlayerRenderer<>(ctx,
+		event.registerEntityRenderer(HordesEntities.DROWNED_PLAYER.get(), ctx -> new ZombiePlayerRenderer<>(ctx,
 				ClientConfigHandler.getDrownedPlayerColour(), Constants.loc("textures/entity/drowned_player_outer_layer.png"), true));
 	}
 

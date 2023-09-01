@@ -4,7 +4,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.common.hordeevent.capability.HordeEvent;
+import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 
 @Cancelable
 public class HordeStartWaveEvent extends HordePlayerEvent {

@@ -1,7 +1,7 @@
 package net.smileycorp.hordes.common.ai;
 
 import net.minecraft.world.entity.Mob;
-import net.smileycorp.hordes.common.infection.HordesInfection;
+import net.smileycorp.hordes.infection.HordesInfection;
 
 public class HorseFleeGoal extends FleeEntityGoal {
 
