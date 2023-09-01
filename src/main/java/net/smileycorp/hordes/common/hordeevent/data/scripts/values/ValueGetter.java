@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.common.hordeevent.data.values;
+package net.smileycorp.hordes.common.hordeevent.data.scripts.values;
 
 import com.google.gson.JsonElement;
 import net.minecraft.world.entity.player.Player;

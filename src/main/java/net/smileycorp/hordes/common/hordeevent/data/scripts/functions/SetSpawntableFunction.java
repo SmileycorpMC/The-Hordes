@@ -1,9 +1,9 @@
-package net.smileycorp.hordes.common.hordeevent.data.functions;
+package net.smileycorp.hordes.common.hordeevent.data.scripts.functions;
 
 import net.minecraft.resources.ResourceLocation;
 import net.smileycorp.hordes.common.event.HordeBuildSpawntableEvent;
 import net.smileycorp.hordes.common.hordeevent.data.HordeTableLoader;
-import net.smileycorp.hordes.common.hordeevent.data.values.ValueGetter;
+import net.smileycorp.hordes.common.hordeevent.data.scripts.values.ValueGetter;
 
 public class SetSpawntableFunction implements HordeFunction<HordeBuildSpawntableEvent> {
 

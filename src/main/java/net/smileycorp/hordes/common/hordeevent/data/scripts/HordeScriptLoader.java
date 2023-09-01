@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.common.hordeevent.data;
+package net.smileycorp.hordes.common.hordeevent.data.scripts;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -11,7 +11,6 @@ import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
-import net.smileycorp.hordes.common.hordeevent.data.functions.HordeScript;
 
 import java.util.Collection;
 import java.util.List;

@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.common.hordeevent.data.values;
+package net.smileycorp.hordes.common.hordeevent.data.scripts.values;
 
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.entity.player.Player;

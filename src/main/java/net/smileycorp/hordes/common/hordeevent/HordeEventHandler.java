@@ -41,7 +41,7 @@ import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.hordeevent.capability.HordeSavedData;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeSpawn;
-import net.smileycorp.hordes.common.hordeevent.data.HordeScriptLoader;
+import net.smileycorp.hordes.common.hordeevent.data.scripts.HordeScriptLoader;
 import net.smileycorp.hordes.common.hordeevent.data.HordeTableLoader;
 
 import java.util.UUID;

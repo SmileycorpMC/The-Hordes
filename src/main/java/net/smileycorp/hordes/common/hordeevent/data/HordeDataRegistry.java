@@ -8,11 +8,11 @@ import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.atlas.api.data.LogicalOperation;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.Hordes;
-import net.smileycorp.hordes.common.hordeevent.data.conditions.*;
-import net.smileycorp.hordes.common.hordeevent.data.values.LevelNBTGetter;
-import net.smileycorp.hordes.common.hordeevent.data.values.PlayerNBTGetter;
-import net.smileycorp.hordes.common.hordeevent.data.values.PlayerPosGetter;
-import net.smileycorp.hordes.common.hordeevent.data.values.ValueGetter;
+import net.smileycorp.hordes.common.hordeevent.data.scripts.conditions.*;
+import net.smileycorp.hordes.common.hordeevent.data.scripts.values.LevelNBTGetter;
+import net.smileycorp.hordes.common.hordeevent.data.scripts.values.PlayerNBTGetter;
+import net.smileycorp.hordes.common.hordeevent.data.scripts.values.PlayerPosGetter;
+import net.smileycorp.hordes.common.hordeevent.data.scripts.values.ValueGetter;
 
 import java.util.Map;
 import java.util.function.BiFunction;

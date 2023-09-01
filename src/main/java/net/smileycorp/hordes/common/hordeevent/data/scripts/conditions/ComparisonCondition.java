@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.common.hordeevent.data.conditions;
+package net.smileycorp.hordes.common.hordeevent.data.scripts.conditions;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -7,7 +7,7 @@ import net.minecraft.world.level.Level;
 import net.smileycorp.atlas.api.data.ComparableOperation;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.Hordes;
-import net.smileycorp.hordes.common.hordeevent.data.values.ValueGetter;
+import net.smileycorp.hordes.common.hordeevent.data.scripts.values.ValueGetter;
 
 import java.util.Random;
 

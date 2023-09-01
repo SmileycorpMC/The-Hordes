@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.common.hordeevent.data.functions;
+package net.smileycorp.hordes.common.hordeevent.data.scripts.functions;
 
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
 

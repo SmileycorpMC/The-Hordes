@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.common.hordeevent.data.functions;
+package net.smileycorp.hordes.common.hordeevent.data.scripts;
 
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
@@ -11,8 +11,10 @@ import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.event.HordeBuildSpawntableEvent;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
 import net.smileycorp.hordes.common.hordeevent.data.HordeDataRegistry;
-import net.smileycorp.hordes.common.hordeevent.data.conditions.Condition;
-import net.smileycorp.hordes.common.hordeevent.data.values.ValueGetter;
+import net.smileycorp.hordes.common.hordeevent.data.scripts.conditions.Condition;
+import net.smileycorp.hordes.common.hordeevent.data.scripts.functions.HordeFunction;
+import net.smileycorp.hordes.common.hordeevent.data.scripts.functions.SetSpawntableFunction;
+import net.smileycorp.hordes.common.hordeevent.data.scripts.values.ValueGetter;
 
 import java.util.List;
 import java.util.Random;

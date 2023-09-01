@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.common.hordeevent.data.conditions;
+package net.smileycorp.hordes.common.hordeevent.data.scripts.conditions;
 
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
