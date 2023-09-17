@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.common.hordeevent.data;
+package net.smileycorp.hordes.common.hordeevent.data.scripts;
 
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
@@ -7,7 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.atlas.api.data.LogicalOperation;
 import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.hordeevent.data.conditions.*;
 import net.smileycorp.hordes.common.hordeevent.data.values.LevelNBTGetter;
 import net.smileycorp.hordes.common.hordeevent.data.values.PlayerNBTGetter;
@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class HordeDataRegistry {
+public class HordeScriptRegistry {
 
 	private static Map<ResourceLocation, BiFunction<String, DataType, ValueGetter>> VALUE_GETTERS = Maps.newHashMap();
 	private static Map<ResourceLocation, Function<JsonElement, Condition>> CONDITION_DESERIALIZERS = Maps.newHashMap();
@@ -55,7 +55,7 @@ public class HordeDataRegistry {
 				return VALUE_GETTERS.get(new ResourceLocation(json.get("name").getAsString()))
 						.apply(json.get("value").getAsString(), type);
 			} catch (Exception e) {
-				Hordes.logError("Failed to read value "+ json, e);
+				HordesLogger.logError("Failed to read value "+ json, e);
 			}
 		}
 		return null;
@@ -66,7 +66,7 @@ public class HordeDataRegistry {
 			try {
 				return CONDITION_DESERIALIZERS.get(new ResourceLocation(json.get("name").getAsString())).apply(json.get("value"));
 			} catch (Exception e) {
-				Hordes.logError("Failed to read condition "+ json, e);
+				HordesLogger.logError("Failed to read condition "+ json, e);
 			}
 		}
 		return null;

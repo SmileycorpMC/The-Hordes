@@ -68,7 +68,7 @@ public class CommonConfigHandler {
 
 	//load config properties
 	static {
-		Hordes.logInfo("Trying to load common config");
+		HordesLogger.logInfo("Trying to load common config");
 		//horde event
 		builder.push("Horde Event");
 		enableHordeEvent = builder.comment("Set to false to completely disable the horde event and anything relating to it.").define("enableHordeEvent", true);

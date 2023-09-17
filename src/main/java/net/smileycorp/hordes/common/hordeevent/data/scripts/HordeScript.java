@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.common.hordeevent.data.functions;
+package net.smileycorp.hordes.common.hordeevent.data.scripts;
 
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
@@ -8,10 +8,11 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.smileycorp.atlas.api.data.DataType;
-import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.HordeBuildSpawntableEvent;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
-import net.smileycorp.hordes.common.hordeevent.data.HordeDataRegistry;
+import net.smileycorp.hordes.common.hordeevent.data.functions.HordeFunction;
+import net.smileycorp.hordes.common.hordeevent.data.functions.SetSpawntableFunction;
 import net.smileycorp.hordes.common.hordeevent.data.conditions.Condition;
 import net.smileycorp.hordes.common.hordeevent.data.values.ValueGetter;
 
@@ -54,12 +55,12 @@ public class HordeScript<T extends HordePlayerEvent> {
 			}
 			List<Condition> conditions = Lists.newArrayList();
 			for (JsonElement condition : obj.get("conditions").getAsJsonArray()) {
-				conditions.add(HordeDataRegistry.readCondition(condition.getAsJsonObject()));
+				conditions.add(HordeScriptRegistry.readCondition(condition.getAsJsonObject()));
 			}
 			if (function == null || clazz == null) throw new Exception("invalid function: " + obj.get("function").getAsString());
 			return new HordeScript(function, clazz, conditions.toArray(new Condition[]{}));
 		} catch (Exception e) {
-			Hordes.logError("Error loading script " + key + " " + e.getCause() + " " + e.getMessage(), e);
+			HordesLogger.logError("Error loading script " + key + " " + e.getCause() + " " + e.getMessage(), e);
 		}
 		return null;
 	}

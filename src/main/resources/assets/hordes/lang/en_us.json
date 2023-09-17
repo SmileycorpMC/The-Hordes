@@ -1,0 +1,21 @@
+{
+	"commands.hordes.SpawnHordeWave.usage":"/spawnHordeWave <optional: player> <number of mobs to spawn> <optional: spawn table to use>",
+	"commands.hordes.SpawnHordeWave.success":"Succesfully summoned horde wave;",
+	"commands.hordes.SpawnHordeWave.invalidValue":"%1$s is not a valid argument for <number of mobs to spawn>",
+	"commands.hordes.SpawnHordeWave.wrongArgCount":"Wrong number of arguments supplied for /spawnHordeWave",
+	"commands.hordes.StartHorde.usage":"/startHordeEvent <optional: player> <length of event> <optional: spawn table to use>",
+	"commands.hordes.StartHorde.success":"Succesfully started horde event for %1$s ticks",
+	"commands.hordes.StartHorde.invalidValue":"%1$s is not a valid argument for <length of event>;",
+	"commands.hordes.StartHorde.wrongArgCount":"Wrong number of arguments supplied for /startHordeEvent",
+	"commands.hordes.StopHorde.usage":"/stopHordeEvent <optional: player>",
+	"commands.hordes.StopHorde.success":"Stopped active horde event",
+	"commands.hordes.HordeDebug.usage":"/debugHorde <optional: player>",
+	"commands.hordes.HordeDebug.success":"Output horde log to %1$s",
+	"commands.hordes.HordeClean.usage":"/clearHordeData",
+	"commands.hordes.HordeClean.success":"Cleared all existing horde world data",
+	"commands.hordes.HordeReset.usage":"/resetHorde <optional: player>",
+	"commands.hordes.HordeReset.success":"Reset all horde data for player %1$s",
+	"message.hordes.DataError":"Errors exist in currently loaded data, please check the file %1$s for more information.",
+
+	"jei.category.hordes.InfectionCures":"Infection Cures"
+}

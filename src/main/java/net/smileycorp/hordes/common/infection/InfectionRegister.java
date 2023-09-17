@@ -13,6 +13,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.CommonUtils;
 import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.infection.capability.IInfection;
 
 import java.util.HashMap;
@@ -30,12 +31,12 @@ public class InfectionRegister {
 
 	@SuppressWarnings("unchecked")
 	private static void readEntityConversions() {
-		Hordes.logInfo("Trying to read conversion table from config");
+		HordesLogger.logInfo("Trying to read conversion table from config");
 		if (CommonConfigHandler.infectionConversionList == null) {
-			Hordes.logError("Error reading config.", new NullPointerException("Conversion table has loaded as null"));
+			HordesLogger.logError("Error reading config.", new NullPointerException("Conversion table has loaded as null"));
 		}
 		else if (CommonConfigHandler.infectionConversionList.get().size()<=0) {
-			Hordes.logError("Error reading config.", new Exception("Conversion table in config is empty"));
+			HordesLogger.logError("Error reading config.", new Exception("Conversion table in config is empty"));
 		}
 		for (String name : CommonConfigHandler.infectionConversionList.get()) {
 			try {
@@ -75,14 +76,14 @@ public class InfectionRegister {
 				if (type == null) {
 					throw new Exception("Entry " + name + " is not in the correct format");
 				}
-				InfectionConversionEntry entry = new InfectionConversionEntry(infectChance, (EntityType<? extends LivingEntity>) result);
+				InfectionConversionEntry entry = new InfectionConversionEntry(infectChance, (EntityType) result);
 				if (nbt != null) {
 					entry.setNBT(nbt);
 				}
 				conversionTable.put(type, entry);
-				Hordes.logInfo("Loaded conversion " + name + " as " + type.toString() + " with infection chance " + infectChance + ", and converts to " + result.toString());
+				HordesLogger.logInfo("Loaded conversion " + name + " as " + type.toString() + " with infection chance " + infectChance + ", and converts to " + result.toString());
 			} catch (Exception e) {
-				Hordes.logError("Error adding conversion " + name + " " + e.getCause() + " " + e.getMessage(), e);
+				HordesLogger.logError("Error adding conversion " + name + " " + e.getCause() + " " + e.getMessage(), e);
 			}
 		}
 	}
@@ -105,7 +106,7 @@ public class InfectionRegister {
 	}
 
 	public static boolean canBeInfected(Entity entity) {
-		if (!(entity instanceof LivingEntity)) return false;
+		if (!(entity instanceof Mob)) return false;
 		return conversionTable.containsKey(entity.getType());
 	}
 
@@ -116,7 +117,7 @@ public class InfectionRegister {
 		}
 	}
 
-	public static void convertEntity(LivingEntity entity) {
+	public static void convertEntity(Mob entity) {
 		conversionTable.get(entity.getType()).convertEntity(entity);
 	}
 

@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import net.minecraft.network.chat.TextColor;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
-import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.HordesLogger;
 
 import java.awt.*;
 import java.util.List;
@@ -33,7 +33,7 @@ public class ClientConfigHandler {
 
 	//load config properties
 	static {
-		Hordes.logInfo("Trying to load client config");
+		HordesLogger.logInfo("Trying to load client config");
 		//horde event
 		builder.push("Horde Event");
 		eventNotifyMode = builder.comment("How do players get notified of a horde event. 0: Off, 1: Chat, 2:Action Bar, 3:Title").define("eventNotifyMode", 2);

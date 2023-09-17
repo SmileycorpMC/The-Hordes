@@ -1,5 +1,7 @@
 package net.smileycorp.hordes.common.infection;
 
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
@@ -7,6 +9,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.monster.ZombieVillager;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
@@ -18,6 +21,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -143,23 +147,20 @@ public class InfectionEventHandler {
 	public void onInfectDeath(InfectionDeathEvent event) {
 		LivingEntity entity = event.getEntity();
 		Level level = entity.level;
-		if (entity instanceof Villager) {
+		if (entity instanceof Villager && level instanceof ServerLevel) {
 			Villager villager = (Villager) entity;
-			ZombieVillager zombie = EntityType.ZOMBIE_VILLAGER.create(level);
-			zombie.setVillagerData(villager.getVillagerData());
-			zombie.setVillagerXp(villager.getVillagerXp());
-			zombie.setPos(entity.getX(), entity.getY(), entity.getZ());
-			for (EquipmentSlot slot : EquipmentSlot.values()) {
-				zombie.setItemSlot(slot, entity.getItemBySlot(slot));
+			ZombieVillager zombie = villager.convertTo(EntityType.ZOMBIE_VILLAGER, false);
+			if (zombie != null) {
+				zombie.finalizeSpawn((ServerLevel) level, level.getCurrentDifficultyAt(zombie.blockPosition()), MobSpawnType.CONVERSION, new Zombie.ZombieGroupData(false, true), null);
+				zombie.setVillagerData(villager.getVillagerData());
+				zombie.setGossips(villager.getGossips().store(NbtOps.INSTANCE).getValue());
+				zombie.setTradeOffers(villager.getOffers().createTag());
+				zombie.setVillagerXp(villager.getVillagerXp());
+				ForgeEventFactory.onLivingConvert(villager, zombie);
 			}
-			if (entity.hasCustomName()) {
-				zombie.setCustomName(entity.getCustomName());
-			}
-			level.addFreshEntity(zombie);
-			entity.kill();
 			event.setResult(Result.DENY);
 		} else if (InfectionRegister.canBeInfected(entity))  {
-			InfectionRegister.convertEntity(entity);
+			InfectionRegister.convertEntity((Mob)entity);
 			event.setResult(Result.DENY);
 		}
 	}
