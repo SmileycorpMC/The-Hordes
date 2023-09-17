@@ -12,8 +12,8 @@ public class CommonUtils {
 			if (parsed != null) nbt = parsed;
 			else throw new NullPointerException("Parsed NBT is null.");
 		} catch (Exception e) {
-			Hordes.logError("Failed to read config, " + e.getCause() + " " + e.getMessage(), e);
-			Hordes.logError("Error parsing nbt for entity " + name + " " + e.getMessage(), e);
+			HordesLogger.logError("Failed to read config, " + e.getCause() + " " + e.getMessage(), e);
+			HordesLogger.logError("Error parsing nbt for entity " + name + " " + e.getMessage(), e);
 		}
 		return nbt;
 	}

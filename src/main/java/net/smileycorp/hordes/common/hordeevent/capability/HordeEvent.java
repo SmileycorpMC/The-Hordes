@@ -28,12 +28,13 @@ import net.smileycorp.atlas.api.recipe.WeightedOutputs;
 import net.smileycorp.atlas.api.util.DirectionUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.*;
 import net.smileycorp.hordes.common.hordeevent.HordeSpawnEntry;
 import net.smileycorp.hordes.common.hordeevent.HordeSpawnTable;
-import net.smileycorp.hordes.common.hordeevent.data.HordeScriptLoader;
+import net.smileycorp.hordes.common.hordeevent.data.scripts.HordeScriptLoader;
 import net.smileycorp.hordes.common.hordeevent.data.HordeTableLoader;
-import net.smileycorp.hordes.common.hordeevent.data.functions.HordeScript;
+import net.smileycorp.hordes.common.hordeevent.data.scripts.HordeScript;
 import net.smileycorp.hordes.common.hordeevent.network.HordeEventPacketHandler;
 import net.smileycorp.hordes.common.hordeevent.network.HordeSoundMessage;
 
@@ -354,11 +355,11 @@ class HordeEvent implements IHordeEvent {
 	}
 
 	private void logInfo(Object message) {
-		Hordes.logInfo("["+this+"]" + message);
+		HordesLogger.logInfo("["+this+"]" + message);
 	}
 
 	private void logError(Object message, Exception e) {
-		Hordes.logError("["+this+"]" + message, e);
+		HordesLogger.logError("["+this+"]" + message, e);
 	}
 
 	public List<String> getEntityStrings() {

@@ -12,6 +12,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.contents.LiteralContents;
 import net.minecraft.network.chat.contents.TranslatableContents;
+import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.hordeevent.capability.HordeSavedData;
 
 import java.nio.charset.StandardCharsets;
@@ -31,19 +32,10 @@ public class CommandDebugHordeEvent {
 
 	public static int execute(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
 		CommandSourceStack source = ctx.getSource();
-		Path path = Paths.get("logs/hordes.log");
 		HordeSavedData data = HordeSavedData.getData(source.getServer().overworld());
-		List<String> out = data.getDebugText();
-		try {
-			Files.write(path, out, StandardCharsets.UTF_8);
-		} catch (Exception e) {
-			return 0;
-		}
-		String file = path.toAbsolutePath().toString();
-		MutableComponent text = MutableComponent.create(new LiteralContents(file));
-		text.setStyle(Style.EMPTY.withUnderlined(true).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file))
-				.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, MutableComponent.create(new LiteralContents(file)))));
-		source.getEntity().sendSystemMessage(MutableComponent.create(new TranslatableContents("commands.hordes.HordeDebug.success", null, new Object[]{text})));
+		if (!HordesLogger.logSaveData(data)) return 0;
+		source.getEntity().sendSystemMessage(MutableComponent.create(new TranslatableContents("commands.hordes.HordeDebug.success",
+				null, new Object[]{HordesLogger.getFiletext()})));
 		return 1;
 	}
 

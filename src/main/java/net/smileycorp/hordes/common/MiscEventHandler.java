@@ -1,5 +1,7 @@
 package net.smileycorp.hordes.common;
 
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -17,6 +19,7 @@ import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.living.LivingConversionEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -29,6 +32,15 @@ import java.util.Collection;
 
 @EventBusSubscriber(modid = Constants.MODID, bus = Bus.MOD)
 public class MiscEventHandler {
+
+	//send error messages if the logger has errors
+	@SubscribeEvent
+	public void onJoin(PlayerEvent.PlayerLoggedInEvent event) {
+		if (event.getEntity() == null) return;
+		if (event.getEntity().level.isClientSide()) return;
+		if (HordesLogger.hasErrors()) event.getEntity().sendSystemMessage(MutableComponent.create(
+				new TranslatableContents("message.hordes.DataError", null, new Object[]{HordesLogger.getFiletext()})));
+	}
 
 	//determine if zombie entity should spawn, and if so create the correct entity and set properties
 	@SubscribeEvent(priority = EventPriority.HIGHEST)

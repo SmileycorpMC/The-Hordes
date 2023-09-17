@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.common.hordeevent.data;
+package net.smileycorp.hordes.common.hordeevent.data.scripts;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -9,9 +9,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
-import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
-import net.smileycorp.hordes.common.hordeevent.data.functions.HordeScript;
 
 import java.util.Collection;
 import java.util.List;
@@ -35,9 +34,9 @@ public class HordeScriptLoader extends SimpleJsonResourceReloadListener {
         for (Map.Entry<ResourceLocation, JsonElement> entry : map.entrySet()) {
             try {
                 SCRIPTS.put(entry.getKey(), HordeScript.deserialize(entry.getKey(), entry.getValue()));
-                Hordes.logInfo("loaded horde script " + entry.getKey());
+                HordesLogger.logInfo("loaded horde script " + entry.getKey());
             } catch (Exception e) {
-                Hordes.logError("Failed to parse script " + entry.getKey(), e);
+                HordesLogger.logError("Failed to parse script " + entry.getKey(), e);
             }
         }
     }

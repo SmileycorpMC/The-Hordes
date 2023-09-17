@@ -6,8 +6,8 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.smileycorp.atlas.api.data.LogicalOperation;
-import net.smileycorp.hordes.common.Hordes;
-import net.smileycorp.hordes.common.hordeevent.data.HordeDataRegistry;
+import net.smileycorp.hordes.common.HordesLogger;
+import net.smileycorp.hordes.common.hordeevent.data.scripts.HordeScriptRegistry;
 
 import java.util.List;
 
@@ -45,14 +45,14 @@ public class LogicalCondition implements Condition {
 			List<Condition> conditions = Lists.newArrayList();
 			for (JsonElement element : json.getAsJsonArray()) {
 				try {
-					conditions.add(HordeDataRegistry.readCondition(element.getAsJsonObject()));
+					conditions.add(HordeScriptRegistry.readCondition(element.getAsJsonObject()));
 				} catch(Exception e) {
-					Hordes.logError("Failed to read condition of logical " + element, e);
+					HordesLogger.logError("Failed to read condition of logical " + element, e);
 				}
 			}
 			return new LogicalCondition(operation, conditions.toArray(new Condition[]{}));
 		} catch(Exception e) {
-			Hordes.logError("Incorrect parameters for condition hordes:"+operation.getName(), e);
+			HordesLogger.logError("Incorrect parameters for condition hordes:"+operation.getName(), e);
 		}
 		return null;
 	}
