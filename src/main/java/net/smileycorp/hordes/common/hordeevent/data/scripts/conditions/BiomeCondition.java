@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.HordesLogger;
 
 import java.util.Random;
 
@@ -25,7 +25,7 @@ public class BiomeCondition implements Condition {
 		try {
 			return new BiomeCondition(new ResourceLocation(json.getAsString()));
 		} catch(Exception e) {
-			Hordes.logError("Incorrect parameters for condition hordes:biome", e);
+			HordesLogger.logError("Incorrect parameters for condition hordes:biome", e);
 		}
 		return null;
 	}

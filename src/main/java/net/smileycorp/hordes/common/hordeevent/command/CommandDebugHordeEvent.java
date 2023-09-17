@@ -6,15 +6,9 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.*;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.hordeevent.capability.HordeSavedData;
-
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.UUID;
 
 public class CommandDebugHordeEvent {
 
@@ -27,19 +21,9 @@ public class CommandDebugHordeEvent {
 
 	public static int execute(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
 		CommandSourceStack source = ctx.getSource();
-		Path path = Paths.get("logs/hordes.log");
 		HordeSavedData data = HordeSavedData.getData(source.getServer().overworld());
-		List<String> out = data.getDebugText();
-		try {
-			Files.write(path, out, StandardCharsets.UTF_8);
-		} catch (Exception e) {
-			return 0;
-		}
-		String file = path.toAbsolutePath().toString();
-		TextComponent text = new TextComponent(file);
-		text.setStyle(Style.EMPTY.withUnderlined(true).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file))
-				.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent(file))));
-		source.getEntity().sendMessage(new TranslatableComponent("commands.hordes.HordeDebug.success", text), UUID.fromString("1512ce82-00e5-441a-9774-f46d9b7badfb"));
+		if (!HordesLogger.logSaveData(data)) return 0;
+		source.getEntity().sendMessage(new TranslatableComponent("commands.hordes.HordeDebug.success", HordesLogger.getFiletext()), null);
 		return 1;
 	}
 

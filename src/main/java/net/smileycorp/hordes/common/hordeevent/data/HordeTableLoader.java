@@ -14,7 +14,7 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.hordeevent.HordeSpawnTable;
 
 import java.util.Map;
@@ -24,7 +24,7 @@ public class HordeTableLoader extends SimpleJsonResourceReloadListener {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
-    public static ResourceLocation DEFAULT_TABLE = Constants.loc("default");
+    public static ResourceLocation FALLBACK = Constants.loc("fallback");
     public static HordeTableLoader INSTANCE = new HordeTableLoader();
 
     private final Map<ResourceLocation, HordeSpawnTable> SPAWN_TABLES = Maps.newHashMap();
@@ -39,15 +39,15 @@ public class HordeTableLoader extends SimpleJsonResourceReloadListener {
         for (Map.Entry<ResourceLocation, JsonElement> entry : map.entrySet()) {
             try {
                 SPAWN_TABLES.put(entry.getKey(), HordeSpawnTable.deserialize(entry.getKey(), entry.getValue()));
-                Hordes.logInfo("loaded horde table " + entry.getKey());
+                HordesLogger.logInfo("loaded horde table " + entry.getKey());
             } catch (Exception e) {
-                Hordes.logError("Failed to parse table " + entry.getKey(), e);
+                HordesLogger.logError("Failed to parse table " + entry.getKey(), e);
             }
         }
     }
 
     public HordeSpawnTable getDefaultTable() {
-        return getTable(DEFAULT_TABLE);
+        return getTable(FALLBACK);
     }
 
     public HordeSpawnTable getTable(ResourceLocation loc) {

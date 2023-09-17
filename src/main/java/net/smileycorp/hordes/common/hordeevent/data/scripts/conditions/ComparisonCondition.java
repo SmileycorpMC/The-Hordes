@@ -6,7 +6,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.smileycorp.atlas.api.data.ComparableOperation;
 import net.smileycorp.atlas.api.data.DataType;
-import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.hordeevent.data.scripts.values.ValueGetter;
 
 import java.util.Random;
@@ -37,7 +37,7 @@ public class ComparisonCondition<T extends Comparable<T>> implements Condition {
 			ValueGetter value2 = ValueGetter.readValue(type,  obj.get("value2"));
 			return new ComparisonCondition(value1, operation, value2);
 		} catch(Exception e) {
-			Hordes.logError("Incorrect parameters for condition hordes:comparison", e);
+			HordesLogger.logError("Incorrect parameters for condition hordes:comparison", e);
 		}
 		return null;
 	}

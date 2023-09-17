@@ -15,6 +15,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.util.LazyOptional;
 import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.data.HordeTableLoader;
 
@@ -50,7 +51,7 @@ public class CommandStartHordeEvent {
 					optional.resolve().get().tryStartEvent(player, length, true);
 				}
 			} catch (Exception e) {
-				Hordes.logError("Failed to run startHordeEvent command", e);
+				HordesLogger.logError("Failed to run startHordeEvent command", e);
 			}
 		}
 		return 1;
@@ -72,7 +73,7 @@ public class CommandStartHordeEvent {
 					event.tryStartEvent(player, length, true);
 				}
 			} catch (Exception e) {
-				Hordes.logError("Failed to run startHordeEvent command", e);
+				HordesLogger.logError("Failed to run startHordeEvent command", e);
 			}
 		}
 		return 1;
