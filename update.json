@@ -6,7 +6,8 @@
 		"1.1.5b": "fix crashes caused by a null pointer exception with zombie players and conversions",
 		"1.1.5c": "fix crash when zombie players can't properly select which player model to use",
 		"1.1.5d": "fix null pointer crash during horde events",
-		"1.2.0": "add datapack support, player arguments for commands, piglin infection"
+		"1.2.0": "add datapack support, player arguments for commands, piglin infection",
+		"1.2.1": "fix various bugs, add fallback horde table and better error logging"
 	},
 	"1.19.3": {
 		"1.1.5e": "update to 1.19.3"
@@ -16,14 +17,15 @@
 		"1.1.6": "add additional config options",
 		"1.1.6a": "fix mixin config preventing mod load",
 		"1.1.6b": "update to use latest forge",
-		"1.2.0": "add datapack support, player arguments for commands, piglin infection"
+		"1.2.0": "add datapack support, player arguments for commands, piglin infection",
+		"1.2.1": "fix various bugs, add fallback horde table and better error logging"
 	},
 	"promos": {
-		"1.19.2-latest": "1.2.0",
-		"1.19.2-recommended": "1.2.0",
+		"1.19.2-latest": "1.2.1",
+		"1.19.2-recommended": "1.2.1",
 		"1.19.3-latest": "1.1.5e",
 		"1.19.3-recommended": "1.1.5e",
-		"1.19.4-latest": "1.2.0",
-		"1.19.4-recommended": "1.2.0"
+		"1.19.4-latest": "1.2.1",
+		"1.19.4-recommended": "1.2.1"
 	}
 }
