@@ -13,7 +13,7 @@
 		"entity": "minecraft:piglin_brute",
 		"converts_to": "minecraft:zombified_piglin",
 		"chance": 0.35,
-		"nbt": "{Attributes:[{Name:\"generic.max_health\",Base:50f}]}"
+		"nbt": "{Attributes:[{Name:\"generic.max_health\",Base:50f}], texture:\"hordes:textures/entity/zombified_piglin_brute.png\"}"
 	},
 	{
 		"entity": "minecraft:hoglin",

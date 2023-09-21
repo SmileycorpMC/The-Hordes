@@ -36,6 +36,7 @@ public class ConfigFilesGenerator {
         DataUtils.copyFileFromMod("assets/hordes/lang/en_us.json", "hordes");
         DataUtils.copyFileFromMod("assets/hordes/textures/entity/drowned_player_outer_layer.png", "hordes");
         DataUtils.copyFileFromMod("assets/hordes/textures/entity/zombie_player_outer_layer.png", "hordes");
+        DataUtils.copyFileFromMod("assets/hordes/textures/entity/zombified_piglin_brute.png", "hordes");
         HordesLogger.logInfo("Generated asset files.");
     }
 
