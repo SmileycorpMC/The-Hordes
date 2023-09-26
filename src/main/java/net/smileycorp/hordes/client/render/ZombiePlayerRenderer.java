@@ -15,13 +15,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.monster.Zombie;
 import net.smileycorp.atlas.api.client.PlayerTextureRenderer;
 import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.common.entities.IZombiePlayer;
+import net.smileycorp.hordes.common.entities.PlayerZombie;
 
 import java.awt.*;
 import java.util.Optional;
 import java.util.UUID;
 
-public class ZombiePlayerRenderer<T extends Zombie & IZombiePlayer> extends HumanoidMobRenderer<T, ZombiePlayerModel<T>> {
+public class ZombiePlayerRenderer<T extends Zombie & PlayerZombie> extends HumanoidMobRenderer<T, ZombiePlayerModel<T>> {
 
 	public static final ModelLayerLocation DEFAULT = new ModelLayerLocation(Constants.loc("zombie_player"), "default");
 	public static final ModelLayerLocation SLIM = new ModelLayerLocation(Constants.loc("zombie_player"), "slim");

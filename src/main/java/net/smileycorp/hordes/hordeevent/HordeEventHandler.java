@@ -11,7 +11,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Player.BedSleepingProblem;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent.Phase;
@@ -27,18 +26,15 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.entity.ai.GoToEntityPositionGoal;
-import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 import net.smileycorp.hordes.hordeevent.capability.HordeSavedData;
-import net.smileycorp.hordes.hordeevent.capability.IHordeSpawn;
+import net.smileycorp.hordes.hordeevent.capability.HordeSpawn;
 import net.smileycorp.hordes.hordeevent.data.HordeScriptLoader;
 import net.smileycorp.hordes.hordeevent.data.HordeTableLoader;
-
-import java.util.UUID;
 
 @EventBusSubscriber(modid=Constants.MODID)
 public class HordeEventHandler {
@@ -48,7 +44,7 @@ public class HordeEventHandler {
 	public void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
 		Entity entity = event.getObject();
 		if (entity instanceof Mob) {
-			event.addCapability(Constants.loc("HordeSpawn"), new IHordeSpawn.Provider());
+			event.addCapability(Constants.loc("HordeSpawn"), new HordeSpawn.Provider());
 		}
 	}
 
@@ -96,7 +92,7 @@ public class HordeEventHandler {
 	//prevent despawning of entities in an active horde
 	@SubscribeEvent
 	public void tryDespawn(MobSpawnEvent.AllowDespawn event) {
-		Player player = getHordePlayer(event.getEntity());
+		Player player = HordeSpawn.getHordePlayer(event.getEntity());
 		if (player == null) return;
 		HordeEvent horde = HordeSavedData.getData((ServerLevel) player.level()).getEvent(player);
 		if (horde != null && horde.isActive(player)) event.setResult(Result.DENY);
@@ -105,7 +101,7 @@ public class HordeEventHandler {
 	//remove entities from horde when they die
 	@SubscribeEvent
 	public void onDeath(LivingDeathEvent event) {
-		Player player = getHordePlayer(event.getEntity());
+		Player player = HordeSpawn.getHordePlayer(event.getEntity());
 		if (player == null) return;
 		HordeEvent horde = HordeSavedData.getData((ServerLevel) player.level()).getEvent(player);
 		if (horde != null) horde.removeEntity((Mob) event.getEntity());
@@ -114,9 +110,9 @@ public class HordeEventHandler {
 	//sync entity capabilities when added to level
 	@SubscribeEvent(priority=EventPriority.LOWEST)
 	public void update(LivingTickEvent event) {
-		Player player = getHordePlayer(event.getEntity());
+		Player player = HordeSpawn.getHordePlayer(event.getEntity());
 		if (player == null) return;
-		IHordeSpawn cap = event.getEntity().getCapability(HordesCapabilities.HORDESPAWN).resolve().get();
+		HordeSpawn cap = event.getEntity().getCapability(HordesCapabilities.HORDESPAWN).resolve().get();
 		if (cap.isSynced()) return;
 		Mob entity = (Mob) event.getEntity();
 		entity.targetSelector.getRunningGoals().forEach((goal) -> goal.stop());
@@ -128,17 +124,6 @@ public class HordeEventHandler {
 			entity.goalSelector.addGoal(6, new GoToEntityPositionGoal(entity, player));
 		}
 		cap.setSynced();
-	}
-
-	private Player getHordePlayer(Entity entity) {
-		if (entity.level().isClientSide |!(entity instanceof Mob)) return null;
-		LazyOptional<IHordeSpawn> optional = entity.getCapability(HordesCapabilities.HORDESPAWN);
-		if (!optional.isPresent()) return null;
-		IHordeSpawn cap = optional.resolve().get();
-		if (!cap.isHordeSpawned()) return null;
-		String uuid = cap.getPlayerUUID();
-		if (!DataUtils.isValidUUID(uuid)) return null;
-		return ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(UUID.fromString(uuid));
 	}
 
 	//prevent sleeping on horde nights

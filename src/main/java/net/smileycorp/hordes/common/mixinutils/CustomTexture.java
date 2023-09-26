@@ -2,7 +2,7 @@ package net.smileycorp.hordes.common.mixinutils;
 
 import net.minecraft.resources.ResourceLocation;
 
-public interface ICustomTexture {
+public interface CustomTexture {
 
    boolean hasCustomTexture();
 

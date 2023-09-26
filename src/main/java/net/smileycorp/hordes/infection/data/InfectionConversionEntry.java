@@ -14,8 +14,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.data.DataRegistry;
 
-import java.awt.*;
-
 public class InfectionConversionEntry {
 
 	protected final EntityType<? extends Mob> entity, result;

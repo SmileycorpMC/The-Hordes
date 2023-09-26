@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.smileycorp.hordes.common.mixinutils.ICustomTexture;
+import net.smileycorp.hordes.common.mixinutils.CustomTexture;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -24,7 +24,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
     @Redirect(method = "getRenderType", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/LivingEntityRenderer;getTextureLocation(Lnet/minecraft/world/entity/Entity;)Lnet/minecraft/resources/ResourceLocation;"))
     public ResourceLocation getCustomTexture(LivingEntityRenderer instance, Entity entity) {
         if (!(entity instanceof LivingEntity)) return getTextureLocation((T) entity);
-        ICustomTexture textureGetter = (ICustomTexture) entity;
+        CustomTexture textureGetter = (CustomTexture) entity;
         return textureGetter.hasCustomTexture() ? textureGetter.getTexture() : getTextureLocation((T) entity);
     }
 

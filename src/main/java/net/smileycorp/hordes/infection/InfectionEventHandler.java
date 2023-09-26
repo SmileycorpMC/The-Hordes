@@ -39,7 +39,7 @@ import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.common.event.InfectionDeathEvent;
-import net.smileycorp.hordes.infection.capability.IInfection;
+import net.smileycorp.hordes.infection.capability.Infection;
 import net.smileycorp.hordes.infection.data.InfectionConversionLoader;
 import net.smileycorp.hordes.infection.network.CureEntityMessage;
 import net.smileycorp.hordes.infection.network.InfectMessage;
@@ -53,7 +53,7 @@ public class InfectionEventHandler {
 	public void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
 		Entity entity = event.getObject();
 		if (entity instanceof Player && !(entity instanceof FakePlayer) || entity instanceof Villager || InfectionConversionLoader.INSTANCE.canBeInfected(entity)) {
-			event.addCapability(Constants.loc("InfectionCounter"), new IInfection.Provider());
+			event.addCapability(Constants.loc("InfectionCounter"), new Infection.Provider());
 		}
 	}
 
@@ -78,7 +78,7 @@ public class InfectionEventHandler {
 		LivingEntity entity = event.getEntity();
 		ItemStack stack = event.getItem();
 		if (!(entity.hasEffect(HordesInfection.INFECTED.get()) || HordesInfection.isCure(stack))) return;
-		LazyOptional<IInfection> optional = entity.getCapability(HordesCapabilities.INFECTION);
+		LazyOptional<Infection> optional = entity.getCapability(HordesCapabilities.INFECTION);
 		if (optional.isPresent()) optional.resolve().get().increaseInfection();
 		entity.removeEffect(HordesInfection.INFECTED.get());
 		if (entity.level().isClientSide) return;
@@ -94,7 +94,7 @@ public class InfectionEventHandler {
 		LivingEntity entity = (LivingEntity) ((EntityHitResult) ray).getEntity();
 		if (!(entity.hasEffect(HordesInfection.INFECTED.get()) || HordesInfection.isCure(stack))) return;
 		entity.removeEffect(HordesInfection.INFECTED.get());
-		LazyOptional<IInfection> optional = entity.getCapability(HordesCapabilities.INFECTION);
+		LazyOptional<Infection> optional = entity.getCapability(HordesCapabilities.INFECTION);
 		if (optional.isPresent()) optional.resolve().get().increaseInfection();
 		event.setCanceled(true);
 		event.setCancellationResult(InteractionResult.FAIL);

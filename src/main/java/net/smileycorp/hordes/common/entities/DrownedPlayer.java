@@ -30,7 +30,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 
-public class DrownedPlayer extends Drowned implements IZombiePlayer {
+public class DrownedPlayer extends Drowned implements PlayerZombie {
 
 	protected static final EntityDataAccessor<Optional<UUID>> PLAYER = SynchedEntityData.defineId(DrownedPlayer.class, EntityDataSerializers.OPTIONAL_UUID);
 	protected static final EntityDataAccessor<Boolean> SHOW_CAPE = SynchedEntityData.defineId(DrownedPlayer.class, EntityDataSerializers.BOOLEAN);
@@ -170,7 +170,7 @@ public class DrownedPlayer extends Drowned implements IZombiePlayer {
 	}
 
 	@Override
-	public void copyFrom(IZombiePlayer entity) {
+	public void copyFrom(PlayerZombie entity) {
 		Optional<UUID> optional = entity.getPlayerUUID();
 		if(optional.isPresent()) setPlayer(optional.get());
 		setInventory(entity.getInventory());

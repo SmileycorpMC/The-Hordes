@@ -2,14 +2,14 @@ package net.smileycorp.hordes.mixin;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
-import net.smileycorp.hordes.common.mixinutils.IChatName;
+import net.smileycorp.hordes.common.mixinutils.ChatName;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
-public class MixinEntity implements IChatName {
+public class MixinEntity implements ChatName {
 
     private String chatName;
 

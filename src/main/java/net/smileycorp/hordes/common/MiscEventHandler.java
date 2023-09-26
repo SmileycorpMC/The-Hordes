@@ -23,8 +23,8 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
-import net.smileycorp.hordes.common.capability.IZombifyPlayer;
-import net.smileycorp.hordes.common.entities.IZombiePlayer;
+import net.smileycorp.hordes.common.capability.ZombifyPlayer;
+import net.smileycorp.hordes.common.entities.PlayerZombie;
 import net.smileycorp.hordes.infection.HordesInfection;
 
 import java.util.Collection;
@@ -48,7 +48,7 @@ public class MiscEventHandler {
 		if (!(entity instanceof Player) || entity instanceof FakePlayer || entity.level().isClientSide) return;
 		if ((entity.hasEffect(HordesInfection.INFECTED.get()) && CommonConfigHandler.enableMobInfection.get()) || CommonConfigHandler.zombieGraves.get() ||
 				(entity.isUnderWater() && CommonConfigHandler.drownedGraves.get())) {
-			LazyOptional<IZombifyPlayer> optional = entity.getCapability(HordesCapabilities.ZOMBIFY_PLAYER, null);
+			LazyOptional<ZombifyPlayer> optional = entity.getCapability(HordesCapabilities.ZOMBIFY_PLAYER, null);
 			if (!optional.isPresent()) return;
 			optional.resolve().get().createZombie((Player) entity);
 		}
@@ -60,13 +60,13 @@ public class MiscEventHandler {
 		if (!(event.getEntity() instanceof Player) || event.getEntity() instanceof FakePlayer || event.getEntity().level().isClientSide) return;
 		Player player = (Player) event.getEntity();
 		if ((player.hasEffect(HordesInfection.INFECTED.get()) && CommonConfigHandler.enableMobInfection.get()) || CommonConfigHandler.zombieGraves.get()) {
-			LazyOptional<IZombifyPlayer> optional = player.getCapability(HordesCapabilities.ZOMBIFY_PLAYER, null);
+			LazyOptional<ZombifyPlayer> optional = player.getCapability(HordesCapabilities.ZOMBIFY_PLAYER, null);
 			if (!optional.isPresent()) return;
-			IZombifyPlayer cap = optional.resolve().get();
+			ZombifyPlayer cap = optional.resolve().get();
 			Mob zombie = cap.getZombie();
 			if (zombie == null) return;
 			Collection<ItemEntity> drops = event.getDrops();
-			((IZombiePlayer)zombie).setInventory(drops);
+			((PlayerZombie)zombie).setInventory(drops);
 			zombie.setPersistenceRequired();
 			player.level().addFreshEntity(zombie);
 			drops.clear();
@@ -81,7 +81,7 @@ public class MiscEventHandler {
 	public void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
 		Entity entity = event.getObject();
 		if (entity instanceof Player &!(entity instanceof FakePlayer)) {
-			event.addCapability(Constants.loc("Zombify"), new IZombifyPlayer.Provider());
+			event.addCapability(Constants.loc("Zombify"), new ZombifyPlayer.Provider());
 		}
 	}
 

@@ -13,13 +13,13 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.smileycorp.hordes.common.entities.IZombiePlayer;
+import net.smileycorp.hordes.common.entities.PlayerZombie;
 
 import java.awt.*;
 import java.util.Optional;
 import java.util.UUID;
 
-public class ZombiePlayerModel<T extends Zombie & IZombiePlayer> extends PlayerModel<T> {
+public class ZombiePlayerModel<T extends Zombie & PlayerZombie> extends PlayerModel<T> {
 	protected boolean fixedArms = false;
 	protected final Color colour;
 	protected final boolean isDrowned;

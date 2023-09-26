@@ -2,7 +2,6 @@ package net.smileycorp.hordes.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.MutableComponent;
@@ -29,7 +28,7 @@ import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.client.render.ZombiePlayerRenderer;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.HordesEntities;
-import net.smileycorp.hordes.common.entities.IZombiePlayer;
+import net.smileycorp.hordes.common.entities.PlayerZombie;
 import net.smileycorp.hordes.infection.client.ClientInfectionEventHandler;
 import net.smileycorp.hordes.infection.network.CureEntityMessage;
 
@@ -58,7 +57,7 @@ public class ClientHandler {
 
 	@SubscribeEvent
 	public void renderNameplate(RenderNameTagEvent event) {
-		if (event.getEntity() instanceof IZombiePlayer) {
+		if (event.getEntity() instanceof PlayerZombie) {
 			event.setContent(event.getEntity().getCustomName());
 		}
 	}

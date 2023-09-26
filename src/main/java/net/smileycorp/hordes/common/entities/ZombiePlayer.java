@@ -31,7 +31,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 
-public class ZombiePlayer extends Zombie implements IZombiePlayer {
+public class ZombiePlayer extends Zombie implements PlayerZombie {
 
 	protected static final EntityDataAccessor<Optional<UUID>> PLAYER = SynchedEntityData.defineId(ZombiePlayer.class, EntityDataSerializers.OPTIONAL_UUID);
 	protected static final EntityDataAccessor<Boolean> SHOW_CAPE = SynchedEntityData.defineId(ZombiePlayer.class, EntityDataSerializers.BOOLEAN);
@@ -138,7 +138,7 @@ public class ZombiePlayer extends Zombie implements IZombiePlayer {
 				drowned.handleAttributes(drowned.level().getCurrentDifficultyAt(drowned.blockPosition()).getSpecialMultiplier());
 				drowned.setCanBreakDoors(drowned.supportsBreakDoorGoal() && this.canBreakDoors());
 				ForgeEventFactory.onLivingConvert(this, drowned);
-				if (drowned instanceof IZombiePlayer) ((IZombiePlayer) drowned).copyFrom(this);
+				if (drowned instanceof PlayerZombie) ((PlayerZombie) drowned).copyFrom(this);
 			}
 			if (!this.isSilent()) {
 				level().levelEvent((Player)null, 1040, this.blockPosition(), 0);
@@ -187,7 +187,7 @@ public class ZombiePlayer extends Zombie implements IZombiePlayer {
 	}
 
 	@Override
-	public void copyFrom(IZombiePlayer entity) {
+	public void copyFrom(PlayerZombie entity) {
 		Optional<UUID> optional = entity.getPlayerUUID();
 		if(optional.isPresent()) setPlayer(optional.get());
 		setInventory(entity.getInventory());

@@ -10,12 +10,12 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.monster.Zombie;
 import net.smileycorp.atlas.api.client.PlayerTextureRenderer;
-import net.smileycorp.hordes.common.entities.IZombiePlayer;
+import net.smileycorp.hordes.common.entities.PlayerZombie;
 
 import java.util.Optional;
 import java.util.UUID;
 
-public class ZombiePlayerOverlayLayer<T extends Zombie & IZombiePlayer> extends RenderLayer<T, ZombiePlayerModel<T>> {
+public class ZombiePlayerOverlayLayer<T extends Zombie & PlayerZombie> extends RenderLayer<T, ZombiePlayerModel<T>> {
 
     protected final ZombiePlayerModel<T> defaultModel;
     protected final ZombiePlayerModel<T> slimModel;

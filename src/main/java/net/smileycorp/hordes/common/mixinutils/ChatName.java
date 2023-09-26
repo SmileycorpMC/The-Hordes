@@ -1,6 +1,6 @@
 package net.smileycorp.hordes.common.mixinutils;
 
-public interface IChatName {
+public interface ChatName {
 
    boolean hasChatName();
 

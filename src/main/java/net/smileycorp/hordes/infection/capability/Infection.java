@@ -7,7 +7,7 @@ import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 
-public interface IInfection {
+public interface Infection {
 
 	int getInfectionCount();
 
@@ -17,7 +17,7 @@ public interface IInfection {
 
 	IntTag saveInfectionCount();
 
-	class Infection implements IInfection {
+	class Impl implements Infection {
 
 		protected int count = 0;
 
@@ -45,7 +45,7 @@ public interface IInfection {
 
 	class Provider implements ICapabilitySerializable<IntTag> {
 
-		protected IInfection impl = new Infection();
+		protected Infection impl = new Impl();
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction facing) {
 			return cap == HordesCapabilities.INFECTION ? LazyOptional.of(() -> impl).cast() : LazyOptional.empty();

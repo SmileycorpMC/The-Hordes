@@ -197,7 +197,7 @@ public class HordeEvent implements IOngoingEvent<Player> {
 
 	private void finalizeEntity(Mob entity, Level level, Player player) {
 		entity.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(100.0D);
-		LazyOptional<IHordeSpawn> optional = entity.getCapability(HordesCapabilities.HORDESPAWN);
+		LazyOptional<HordeSpawn> optional = entity.getCapability(HordesCapabilities.HORDESPAWN);
 		if (optional.isPresent()) { optional.resolve().get().setPlayerUUID(player.getUUID().toString());
 			registerEntity(entity);
 			hasChanged = true;
@@ -213,9 +213,9 @@ public class HordeEvent implements IOngoingEvent<Player> {
 		List<Mob> toRemove = new ArrayList<>();
 		for (Mob entity : entitiesSpawned) {
 			if (entity.isAlive() |! entity.isDeadOrDying() |! entity.isRemoved()) continue;
-			LazyOptional<IHordeSpawn> optional = entity.getCapability(HordesCapabilities.HORDESPAWN, null);
+			LazyOptional<HordeSpawn> optional = entity.getCapability(HordesCapabilities.HORDESPAWN, null);
 			if (optional.isPresent()) {
-				IHordeSpawn cap = optional.resolve().get();
+				HordeSpawn cap = optional.resolve().get();
 				cap.setPlayerUUID("");
 				toRemove.add(entity);
 			}

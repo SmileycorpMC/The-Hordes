@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface IZombiePlayer {
+public interface PlayerZombie {
 
 	void setPlayer(Player player);
 
@@ -29,7 +29,7 @@ public interface IZombiePlayer {
 
 	NonNullList<ItemStack> getInventory();
 
-	void copyFrom(IZombiePlayer entity);
+	void copyFrom(PlayerZombie entity);
 
 	void setDisplayCape(boolean display);
 
