@@ -25,4 +25,5 @@ public class HordeEventPacketHandler {
 		ctx.get().enqueueWork(() -> DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> ClientHandler.displayMessage(message.getText())));
 		ctx.get().setPacketHandled(true);
 	}
+
 }

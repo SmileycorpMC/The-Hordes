@@ -53,7 +53,7 @@ public interface HordeSpawn {
 
 		@Override
 		public void setPlayerUUID(String uuid) {
-			this.uuid=uuid;
+			this.uuid = uuid;
 		}
 
 		@Override

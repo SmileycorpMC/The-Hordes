@@ -49,7 +49,7 @@ public class ClientConfigHandler {
 		builder.pop();
 		builder.push("Infection");
 		playerInfectionVisuals = builder.comment("Tint the player's screen and display other visual effects if they are infected.").define("playerInfectionVisuals", true);
-		playerInfectSound = builder.comment("Play a sound when the player beomes infected.").define("playerInfectSound", true);
+		playerInfectSound = builder.comment("Play a sound when the player becomes infected.").define("playerInfectSound", true);
 		builder.pop();
 		config = builder.build();
 	}

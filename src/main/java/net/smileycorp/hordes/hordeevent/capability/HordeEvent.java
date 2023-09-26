@@ -9,6 +9,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
@@ -37,13 +38,12 @@ import net.smileycorp.hordes.hordeevent.data.functions.HordeScript;
 import net.smileycorp.hordes.hordeevent.network.HordeEventPacketHandler;
 import net.smileycorp.hordes.hordeevent.network.HordeSoundMessage;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class HordeEvent implements IOngoingEvent<Player> {
+
+	private static UUID FOLLOW_RANGE_MODIFIER = UUID.fromString("51cfe045-4248-409e-be37-556d67de4b97");
 
 	private Set<Mob> entitiesSpawned = new HashSet<>();
 	private int timer = 0;
@@ -196,7 +196,8 @@ public class HordeEvent implements IOngoingEvent<Player> {
 	}
 
 	private void finalizeEntity(Mob entity, Level level, Player player) {
-		entity.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(100.0D);
+		entity.getAttribute(Attributes.FOLLOW_RANGE).addPermanentModifier(new AttributeModifier(FOLLOW_RANGE_MODIFIER,
+				"hordes:horde_range", 75, AttributeModifier.Operation.ADDITION));
 		LazyOptional<HordeSpawn> optional = entity.getCapability(HordesCapabilities.HORDESPAWN);
 		if (optional.isPresent()) { optional.resolve().get().setPlayerUUID(player.getUUID().toString());
 			registerEntity(entity);
@@ -309,18 +310,28 @@ public class HordeEvent implements IOngoingEvent<Player> {
 		HordeEndEvent endEvent = new HordeEndEvent(player, this, isCommand);
 		postEvent(endEvent);
 		timer = 0;
-		cleanSpawns();
-		sendMessage(player, endEvent.getMessage());
-		hasChanged = true;
 		loadedTable = null;
+		sendMessage(player, endEvent.getMessage());
+		for (Mob entity : entitiesSpawned) {
+			for (WrappedGoal entry : entity.goalSelector.getRunningGoals().toArray(WrappedGoal[]::new)) {
+				if (!(entry.getGoal() instanceof GoToEntityPositionGoal)) continue;
+				entity.goalSelector.removeGoal(entry.getGoal());
+				break;
+			}
+			LazyOptional<HordeSpawn> cap = entity.getCapability(HordesCapabilities.HORDESPAWN);
+			if (!cap.isPresent()) continue;
+			cap.resolve().get().setPlayerUUID("");
+			entity.getAttribute(Attributes.FOLLOW_RANGE).removeModifier(FOLLOW_RANGE_MODIFIER);
+		}
+		hasChanged = true;
 	}
 
-	public void removeEntity(Mob other) {
-		entitiesSpawned.remove(other);
+	public void removeEntity(Mob entity) {
+		entitiesSpawned.remove(entity);
 	}
 
-	public void registerEntity(Mob other) {
-		if (!entitiesSpawned.contains(other)) entitiesSpawned.add(other);
+	public void registerEntity(Mob enemy) {
+		if (!entitiesSpawned.contains(enemy)) entitiesSpawned.add(enemy);
 	}
 
 	public String toString(String player) {
@@ -329,7 +340,7 @@ public class HordeEvent implements IOngoingEvent<Player> {
 	}
 
 	private void logInfo(Object message) {
-		HordesLogger.logInfo("["+this+"]" + message);
+		HordesLogger.logInfo("[" + this + "]" + message);
 	}
 
 	private void logError(Object message, Exception e) {
