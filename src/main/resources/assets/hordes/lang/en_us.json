@@ -16,26 +16,7 @@
 	"commands.hordes.HordeReset.usage":"/resetHorde <optional: player>",
 	"commands.hordes.HordeReset.success":"Reset all horde data for player %1$s",
 	
-	"message.hordes.EventStart":"You hear the howls of a nearby horde",
-	"message.hordes.EventEnd":"The air is quiet, the horde has stopped",
-	"message.hordes.TrySleep":"You may not rest now, a horde is approaching",
-	"message.hordes.title":"The Hordes",
-	"message.hordes.DeathMessage":"%1$s succumbed to their infection.",
-	"message.hordes.DeathMessageFighting":"%1$s succumbed to their infection while fighting %2$s.",
-	"message.hordes.DeathMessageOther":"%1$s while infected.",
-	
 	"message.hordes.DataError":"Errors exist in currently loaded data, please check the file %1$s for more information.",
 	
-	"hordes.subtitle.hordeHowls":"Zombie Howls",
-
-	"entity.hordes.ZombiePlayer.chat":"%1$s's Zombie",
-	"entity.hordes.DrownedPlayer.chat":"Drowned %1$s",
-	"entity.hordes.ZombiePlayer.name":"Player Zombie",
-	"entity.hordes.DrownedPlayer.name":"Drowned Player",
-
-	"effect.hordes.infected":"Infection",
-	"death.attack.infection":"%1$s succumbed to infection.",
-	"death.attack.infection.zombified":"%1$s was zombified.",
-
 	"jei.category.hordes.InfectionCures":"Infection Cures"
 }

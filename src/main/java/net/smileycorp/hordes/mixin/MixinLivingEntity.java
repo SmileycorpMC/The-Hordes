@@ -9,7 +9,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
-import net.smileycorp.hordes.common.entities.ICustomTexture;
+import net.smileycorp.hordes.common.mixinutils.IChatName;
+import net.smileycorp.hordes.common.mixinutils.ICustomTexture;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -47,6 +48,7 @@ public abstract class MixinLivingEntity extends Entity implements ICustomTexture
     @Inject(at=@At("HEAD"), method = "addAdditionalSaveData")
     public void addAdditionalSaveData(CompoundTag tag, CallbackInfo callback) {
         if (hasCustomTexture()) tag.putString("texture", entityData.get(TEXTURE));
+        if (((IChatName)this).hasChatName()) tag.putString("chat_name", ((IChatName)this).getChatName());
     }
 
     @Inject(at=@At("HEAD"), method = "readAdditionalSaveData")
@@ -55,6 +57,7 @@ public abstract class MixinLivingEntity extends Entity implements ICustomTexture
             String texture = tag.getString("texture");
             if (ResourceLocation.isValidResourceLocation(texture)) entityData.set(TEXTURE, texture);
         }
+        if (tag.contains("chat_name")) ((IChatName)this).setChatName(tag.getString("chat_name"));
     }
 
 }

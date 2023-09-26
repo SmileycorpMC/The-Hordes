@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.common.entities;
+package net.smileycorp.hordes.common.mixinutils;
 
 import net.minecraft.resources.ResourceLocation;
 

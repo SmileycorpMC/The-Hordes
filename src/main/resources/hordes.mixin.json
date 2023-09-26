@@ -10,6 +10,8 @@
       "MixinAbstractHorse",
       "MixinAbstractPiglin",
       "MixinBuiltInPackSource",
+      "MixinDamageSource",
+      "MixinEntity",
       "MixinHoglin",
       "MixinLivingEntity",
       "MixinMob",

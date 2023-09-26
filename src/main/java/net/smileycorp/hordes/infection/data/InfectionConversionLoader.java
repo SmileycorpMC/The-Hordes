@@ -11,7 +11,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.monster.Slime;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.infection.InfectedEffect;
 

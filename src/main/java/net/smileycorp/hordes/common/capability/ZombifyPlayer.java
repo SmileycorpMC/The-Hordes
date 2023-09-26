@@ -35,7 +35,12 @@ public class ZombifyPlayer implements IZombifyPlayer {
 
 	@Override
 	public void clearZombie() {
-		zombie=null;
+		zombie = null;
+	}
+
+	@Override
+	public boolean wasZombified() {
+		return zombie != null;
 	}
 
 }

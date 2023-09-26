@@ -9,13 +9,15 @@ import net.minecraftforge.common.util.LazyOptional;
 
 public interface IZombifyPlayer {
 
-	public Mob createZombie(Player player);
+	Mob createZombie(Player player);
 
-	public Mob getZombie();
+	Mob getZombie();
 
-	public void clearZombie();
+	void clearZombie();
 
-	public static class Provider implements ICapabilityProvider {
+	boolean wasZombified();
+
+	class Provider implements ICapabilityProvider {
 
 		protected final IZombifyPlayer impl = new ZombifyPlayer();
 
