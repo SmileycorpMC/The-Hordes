@@ -21,11 +21,11 @@ public class HordeSpawnEntry {
 	}
 
 	HordeSpawnEntry(EntityType<?> type, int weight, int minDay, int maxDay) {
-		this.name= ForgeRegistries.ENTITY_TYPES.getKey(type);
-		this.type=type;
-		this.weight=weight;
-		this.minDay=minDay;
-		this.maxDay=maxDay;
+		this.name = ForgeRegistries.ENTITY_TYPES.getKey(type);
+		this.type = type;
+		this.weight = weight;
+		this.minDay = minDay;
+		this.maxDay = maxDay;
 	}
 
 	public int getWeight() {
@@ -59,8 +59,8 @@ public class HordeSpawnEntry {
 
 	@Override
 	public String toString() {
-		String str = "HordeSpawnEntry[type="+type+",weight="+weight+",minDay="+minDay+",maxDay="+maxDay+"]";
-		return nbt==null ? str : str + "{" + nbt.toString() + "}";
+		String str = "HordeSpawnEntry[type=" + type + ",weight=" + weight + ",minDay=" + minDay + ",maxDay=" + maxDay + "]";
+		return nbt == null ? str : str + "{" + nbt + "}";
 	}
 
 }

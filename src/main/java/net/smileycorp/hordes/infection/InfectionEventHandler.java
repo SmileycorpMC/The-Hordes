@@ -116,9 +116,7 @@ public class InfectionEventHandler {
 			if (rand.nextFloat() <= CommonConfigHandler.villagerInfectChance.get()) {
 				InfectedEffect.apply(entity);
 			}
-		} else if (InfectionConversionLoader.INSTANCE.canBeInfected(entity)) {
-			InfectionConversionLoader.INSTANCE.tryToInfect(entity);
-		}
+		} else if (InfectionConversionLoader.INSTANCE.canBeInfected(entity)) InfectionConversionLoader.INSTANCE.tryToInfect(entity);
 	}
 
 	@SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled=true)
@@ -150,7 +148,7 @@ public class InfectionEventHandler {
 			}
 			event.setResult(Result.DENY);
 		} else if (InfectionConversionLoader.INSTANCE.canBeInfected(entity))  {
-			if (!InfectionConversionLoader.INSTANCE.convertEntity((Mob) entity)) return;
+			if (InfectionConversionLoader.INSTANCE.convertEntity((Mob) entity)) return;
 			event.setResult(Result.DENY);
 		}
 	}

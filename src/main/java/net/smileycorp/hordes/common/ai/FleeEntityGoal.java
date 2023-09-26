@@ -30,9 +30,9 @@ public class FleeEntityGoal extends Goal  {
 
 	public FleeEntityGoal(Mob entity, double speed, double range, Predicate<LivingEntity> predicate) {
 		super();
-		this.entity=entity;
-		level=entity.level();
-		pather=entity.getNavigation();
+		this.entity = entity;
+		level = entity.level();
+		pather = entity.getNavigation();
 		this.predicate = predicate;
 		this.speed = speed;
 		this.range = range;
@@ -45,7 +45,8 @@ public class FleeEntityGoal extends Goal  {
 	}
 
 	private List<LivingEntity> getEntities() {
-		return level.getEntitiesOfClass(LivingEntity.class, new AABB(entity.getX()-range, entity.getY()-range, entity.getZ()-range, entity.getX()+range, entity.getZ()+range, entity.getZ()+range), predicate);
+		return level.getEntitiesOfClass(LivingEntity.class, new AABB(entity.getX() - range, entity.getY() - range, entity.getZ() - range,
+				entity.getX() + range, entity.getZ() + range, entity.getZ() + range), predicate);
 	}
 
 	@Override
@@ -77,7 +78,7 @@ public class FleeEntityGoal extends Goal  {
 		Vec3 resultDir = new Vec3(0, 0, 0);
 		for (LivingEntity entity : getEntities()) {
 			Vec3 dir = DirectionUtils.getDirectionVecXZ(this.entity, entity);
-			resultDir = new Vec3((dir.x + resultDir.x)/2, (dir.y + resultDir.y)/2, (dir.z + resultDir.z)/2);
+			resultDir = new Vec3((dir.x + resultDir.x) * 0.5, (dir.y + resultDir.y) * 0.5, (dir.z + resultDir.z) * 0.5);
 		}
 		return Stream.of(level.getHeightmapPos(Types.WORLD_SURFACE, BlockPos.containing(pos.add(resultDir.reverse().multiply(5, 0, 5)))));
 	}

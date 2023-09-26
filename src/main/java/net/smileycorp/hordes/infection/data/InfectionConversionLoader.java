@@ -36,8 +36,9 @@ public class InfectionConversionLoader extends SimpleJsonResourceReloadListener 
         for (String id : manager.getNamespaces()) {
             ResourceLocation loc = new ResourceLocation(id, "infection_conversions");
             JsonElement json = map.get(loc);
-            if (json == null) return;
+            if (json == null) continue;
             try {
+                HordesLogger.logInfo("Loading conversion table " + loc);
                 for (JsonElement element : json.getAsJsonArray()) {
                     try {
                        InfectionConversionEntry entry = InfectionConversionEntry.deserialize(element.getAsJsonObject());

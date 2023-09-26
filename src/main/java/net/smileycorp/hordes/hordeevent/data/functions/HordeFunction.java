@@ -4,6 +4,6 @@ import net.smileycorp.hordes.common.event.HordePlayerEvent;
 
 public interface HordeFunction<T extends HordePlayerEvent> {
 
-	public void apply(T event);
+	void apply(T event);
 
 }

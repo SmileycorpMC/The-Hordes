@@ -9,15 +9,15 @@ import net.smileycorp.hordes.common.capability.HordesCapabilities;
 
 public interface IInfection {
 
-	public int getInfectionCount();
+	int getInfectionCount();
 
-	public void increaseInfection();
+	void increaseInfection();
 
-	public void loadInfectionCount(IntTag tag);
+	void loadInfectionCount(IntTag tag);
 
-	public IntTag saveInfectionCount();
+	IntTag saveInfectionCount();
 
-	public static class Infection implements IInfection {
+	class Infection implements IInfection {
 
 		protected int count = 0;
 
@@ -43,7 +43,7 @@ public interface IInfection {
 
 	}
 
-	public static class Provider implements ICapabilitySerializable<IntTag> {
+	class Provider implements ICapabilitySerializable<IntTag> {
 
 		protected IInfection impl = new Infection();
 		@Override

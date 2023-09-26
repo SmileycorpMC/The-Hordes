@@ -9,23 +9,23 @@ import net.smileycorp.hordes.common.capability.HordesCapabilities;
 
 public interface IHordeSpawn {
 
-	public boolean isHordeSpawned();
+	boolean isHordeSpawned();
 
-	public void setPlayerUUID(String uuid);
+	void setPlayerUUID(String uuid);
 
-	public String getPlayerUUID();
+	String getPlayerUUID();
 
-	public boolean isSynced();
+	boolean isSynced();
 
-	public void setSynced();
+	void setSynced();
 
-	public StringTag writeNBT();
+	StringTag writeNBT();
 
-	public void readNBT(StringTag tag);
+	void readNBT(StringTag tag);
 
 
 
-	public static class HordeSpawn implements IHordeSpawn {
+	class HordeSpawn implements IHordeSpawn {
 
 		private String uuid = "";
 		private boolean isSynced;
@@ -67,7 +67,7 @@ public interface IHordeSpawn {
 
 	}
 
-	public static class Provider implements ICapabilitySerializable<StringTag> {
+	class Provider implements ICapabilitySerializable<StringTag> {
 
 		protected IHordeSpawn impl = new HordeSpawn();
 		@Override

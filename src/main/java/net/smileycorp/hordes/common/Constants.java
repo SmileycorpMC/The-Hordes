@@ -10,9 +10,6 @@ public class Constants {
 	public static final String hordeEventStart = "message.hordes.EventStart";
 	public static final String hordeEventEnd = "message.hordes.EventEnd";
 	public static final String hordeTrySleep = "message.hordes.TrySleep";
-	public static final String deathMessage = "message.hordes.DeathMessage";
-	public static final String deathMessageFighting = "message.hordes.DeathMessageFighting";
-	public static final String deathMessageOther = "message.hordes.DeathMessageOther";
 
 	public static final ResourceLocation HORDE_SOUND = loc("horde_spawn");
 

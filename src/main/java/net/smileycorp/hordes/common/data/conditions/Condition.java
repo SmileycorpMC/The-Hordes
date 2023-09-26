@@ -6,6 +6,6 @@ import net.minecraft.world.level.Level;
 
 public interface Condition {
 
-	public boolean apply(Level level, LivingEntity entity, RandomSource rand);
+	boolean apply(Level level, LivingEntity entity, RandomSource rand);
 
 }

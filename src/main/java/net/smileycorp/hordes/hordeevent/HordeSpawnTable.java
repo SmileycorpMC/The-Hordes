@@ -28,7 +28,7 @@ public class HordeSpawnTable {
 
    protected HordeSpawnTable(ResourceLocation name, List<HordeSpawnEntry> spawns) {
     this.name = name;
-    this.spawns=spawns;
+    this.spawns = spawns;
     }
 
     public ResourceLocation getName() {
@@ -130,26 +130,16 @@ public class HordeSpawnTable {
                                         throw new Exception("Entity " + name + " has max day value " + dataSplit[3] + " which is not a valid integer");
                                     }
                                 }
-                            } else {
-                                throw new Exception("Entity " + name + " is not registered");
-                            }
-                        } else {
-                            throw new Exception("Entry " + name + " is not in the correct format");
-                        }
+                            } else throw new Exception("Entity " + name + " is not registered");
+                        } else throw new Exception("Entry " + name + " is not in the correct format");
                     }
-                    if (type == null) {
-                        throw new Exception("Entry " + name + " is not in the correct format");
-                    }
+                    if (type == null) throw new Exception("Entry " + name + " is not in the correct format");
                     HordeSpawnEntry entry = new HordeSpawnEntry(type, weight, minDay, maxDay);
-                    if (nbt != null) {
-                        entry.setNBT(nbt);
-                    }
+                    if (nbt != null) entry.setNBT(nbt);
                 }
                 HordesLogger.logInfo("Loaded entity " + entity + " as " + type.toString() + " with weight " + weight + ", min day " + minDay + " and max day " + maxDay);
                 HordeSpawnEntry entry = new HordeSpawnEntry(type, weight, minDay, maxDay);
-                if (nbt != null) {
-                    entry.setNBT(nbt);
-                }
+                if (nbt != null) entry.setNBT(nbt);
                 spawns.add(entry);
             } catch (Exception e) {
                 HordesLogger.logError("Error adding entity " + entity + " " + e.getCause() + " " + e.getMessage(), e);

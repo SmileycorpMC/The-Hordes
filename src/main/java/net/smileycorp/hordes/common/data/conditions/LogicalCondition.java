@@ -37,7 +37,7 @@ public class LogicalCondition implements Condition {
 			builder.append(conditions[i].toString());
 			if (i < conditions.length-1) builder.append(" " + operation.getSymbol() + " ");
 		}
-		return super.toString() + "[" + builder.toString() + "]";
+		return super.toString() + "[" + builder + "]";
 	}
 
 	public static LogicalCondition deserialize(LogicalOperation operation, JsonElement json) {

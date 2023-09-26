@@ -13,53 +13,53 @@ import java.util.UUID;
 
 public interface IZombiePlayer {
 
-	public void setPlayer(Player player);
+	void setPlayer(Player player);
 
-	public void setPlayer(String username);
+	void setPlayer(String username);
 
-	public void setPlayer(UUID uuid);
+	void setPlayer(UUID uuid);
 
-	public void setPlayer(GameProfile profile);
+	void setPlayer(GameProfile profile);
 
-	public Optional<UUID> getPlayerUUID();
+	Optional<UUID> getPlayerUUID();
 
-	public void setInventory(Collection<ItemEntity> drops);
+	void setInventory(Collection<ItemEntity> drops);
 
-	public void setInventory(NonNullList<ItemStack> drops);
+	void setInventory(NonNullList<ItemStack> drops);
 
-	public NonNullList<ItemStack> getInventory();
+	NonNullList<ItemStack> getInventory();
 
-	public void copyFrom(IZombiePlayer entity);
+	void copyFrom(IZombiePlayer entity);
 
-	public void setDisplayCape(boolean display);
+	void setDisplayCape(boolean display);
 
-	public boolean displayCape();
+	boolean displayCape();
 
-	public double getXCloakO();
+	double getXCloakO();
 
-	public double getYCloakO();
+	double getYCloakO();
 
-	public double getZCloakO();
+	double getZCloakO();
 
-	public double getXCloak();
+	double getXCloak();
 
-	public double getYCloak();
+	double getYCloak();
 
-	public double getZCloak();
+	double getZCloak();
 
-	public void setXCloakO(double value);
+	void setXCloakO(double value);
 
-	public void setYCloakO(double value);
+	void setYCloakO(double value);
 
-	public void setZCloakO(double value);
+	void setZCloakO(double value);
 
-	public void setXCloak(double value);
+	void setXCloak(double value);
 
-	public void setYCloak(double value);
+	void setYCloak(double value);
 
-	public void setZCloak(double value);
+	void setZCloak(double value);
 
-	public default void moveCloak(Zombie entity) {
+	default void moveCloak(Zombie entity) {
 		setXCloakO(getXCloak());
 		setYCloakO(getYCloak());
 		setZCloakO(getZCloak());

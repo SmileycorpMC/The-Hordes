@@ -57,7 +57,7 @@ public class DataRegistry {
 				return VALUE_GETTERS.get(new ResourceLocation(json.get("name").getAsString()))
 						.apply(json.get("value").getAsString(), type);
 			} catch (Exception e) {
-				HordesLogger.logError("Failed to read value "+ json, e);
+				HordesLogger.logError("Failed to read value " + json, e);
 			}
 		}
 		return null;
@@ -68,7 +68,7 @@ public class DataRegistry {
 			try {
 				return CONDITION_DESERIALIZERS.get(new ResourceLocation(json.get("name").getAsString())).apply(json.get("value"));
 			} catch (Exception e) {
-				HordesLogger.logError("Failed to read condition "+ json, e);
+				HordesLogger.logError("Failed to read condition " + json, e);
 			}
 		}
 		return null;

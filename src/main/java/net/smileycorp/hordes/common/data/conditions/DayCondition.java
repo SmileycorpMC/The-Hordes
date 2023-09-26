@@ -17,7 +17,7 @@ public class DayCondition implements Condition {
 
 	@Override
 	public boolean apply(Level level, LivingEntity entity, RandomSource rand) {
-		return level.getDayTime()/ (float) CommonConfigHandler.dayLength.get() > day;
+		return level.getDayTime() / (float) CommonConfigHandler.dayLength.get() > day;
 	}
 
 	public static DayCondition deserialize(JsonElement json) {

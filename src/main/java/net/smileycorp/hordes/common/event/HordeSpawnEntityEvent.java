@@ -14,8 +14,8 @@ public class HordeSpawnEntityEvent extends HordePlayerEvent {
 
 	public HordeSpawnEntityEvent(Player player, Mob entity, BlockPos pos, HordeEvent horde) {
 		super(player, horde);
-		this.entity=entity;
-		this.pos=pos;
+		this.entity = entity;
+		this.pos = pos;
 	}
 
 }

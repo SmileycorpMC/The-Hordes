@@ -23,7 +23,7 @@ public class InfectMessage extends AbstractMessage {
 
 	@Override
 	public void process(NetworkEvent.Context ctx) {
-		ctx.enqueueWork(() ->  DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> ClientHandler.onInfect()));
+		ctx.enqueueWork(() -> DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> ClientHandler.onInfect()));
 		ctx.setPacketHandled(true);
 	}
 

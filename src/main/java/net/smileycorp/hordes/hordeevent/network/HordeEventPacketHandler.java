@@ -22,7 +22,7 @@ public class HordeEventPacketHandler {
 	}
 
 	public static void processNotificationMessage(GenericStringMessage message, Supplier<Context> ctx) {
-		ctx.get().enqueueWork(() ->  DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> ClientHandler.displayMessage(message.getText())));
+		ctx.get().enqueueWork(() -> DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> ClientHandler.displayMessage(message.getText())));
 		ctx.get().setPacketHandled(true);
 	}
 }

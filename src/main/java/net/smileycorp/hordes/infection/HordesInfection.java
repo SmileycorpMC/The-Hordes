@@ -25,7 +25,7 @@ public class HordesInfection {
 	public static final TagKey<EntityType<?>> INFECTION_ENTITIES_TAG = TagKey.create(Registries.ENTITY_TYPE, Constants.loc("infection_entities"));
 	public static final TagKey<Item> INFECTION_CURES_TAG = TagKey.create(Registries.ITEM, Constants.loc("infection_cures"));
 
-	public static final RegistryObject<MobEffect> INFECTED = EFFECTS.register("infected", () -> new InfectedEffect());
+	public static final RegistryObject<MobEffect> INFECTED = EFFECTS.register("infected", InfectedEffect::new);
 
 	public static final ResourceKey<DamageType> INFECTION_DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE, Constants.loc("infection"));
 
@@ -35,7 +35,7 @@ public class HordesInfection {
 
     public static List<ItemStack> getCureList() {
         return ForgeRegistries.ITEMS.tags().getTag(INFECTION_CURES_TAG)
-                .stream().map(item->new ItemStack(item)).collect(Collectors.toList());
+                .stream().map(ItemStack::new).collect(Collectors.toList());
     }
 
 	public static boolean isCure(ItemStack stack) {

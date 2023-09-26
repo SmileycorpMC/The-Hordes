@@ -18,8 +18,8 @@ public class HordeSoundMessage extends AbstractMessage {
 	public HordeSoundMessage() {}
 
 	public HordeSoundMessage(Vec3 direction, ResourceLocation sound) {
-		this.direction=direction;
-		this.sound=sound;
+		this.direction = direction;
+		this.sound = sound;
 	}
 
 	@Override
@@ -32,13 +32,11 @@ public class HordeSoundMessage extends AbstractMessage {
 
 	@Override
 	public void write(FriendlyByteBuf buf) {
-		if (direction!=null) {
+		if (direction != null) {
 			buf.writeDouble(direction.x);
 			buf.writeDouble(direction.z);
 		}
-		if (sound!=null) {
-			buf.writeUtf(sound.toString());
-		}
+		if (sound != null) buf.writeUtf(sound.toString());
 	}
 
 	@Override
@@ -46,7 +44,7 @@ public class HordeSoundMessage extends AbstractMessage {
 
 	@Override
 	public void process(NetworkEvent.Context ctx) {
-		ctx.enqueueWork(() ->  DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> ClientHandler.playHordeSound(direction, sound)));
+		ctx.enqueueWork(() -> DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> ClientHandler.playHordeSound(direction, sound)));
 		ctx.setPacketHandled(true);
 	}
 

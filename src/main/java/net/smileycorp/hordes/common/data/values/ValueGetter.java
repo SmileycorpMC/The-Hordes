@@ -9,7 +9,7 @@ import net.smileycorp.hordes.common.data.DataRegistry;
 
 public interface ValueGetter<T extends Comparable<T>> {
 
-    public T get(Level level, LivingEntity entity, RandomSource rand);
+   T get(Level level, LivingEntity entity, RandomSource rand);
 
     static ValueGetter readValue(DataType type, JsonElement value) {
         if (value.isJsonObject()) {
