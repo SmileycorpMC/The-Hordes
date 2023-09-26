@@ -38,7 +38,7 @@ public abstract class MixinZombieHorse extends AbstractHorse implements Enemy {
 			targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, AbstractVillager.class, false));
 			targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, IronGolem.class, true));
 			targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, Turtle.class, 10, true, false, Turtle.BABY_ON_LAND_SELECTOR));
-			goalSelector.addGoal(2, new MeleeAttackGoal(this, 8.0D, false));
+			goalSelector.addGoal(2, new MeleeAttackGoal(this, 3.0D, false));
 			goalSelector.addGoal(6, new MoveThroughVillageGoal(this, 1.0D, true, 4, () -> false));
 			goalSelector.getAvailableGoals().removeIf((goal) -> goal.getGoal() instanceof PanicGoal);
 			goalSelector.getAvailableGoals().removeIf((goal) -> goal.getGoal() instanceof RunAroundLikeCrazyGoal);

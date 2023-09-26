@@ -18,7 +18,7 @@ public class MixinDamageSource {
 
     @Inject(at = @At("HEAD"), method = "getLocalizedDeathMessage", cancellable = true)
     public void getLocalizedDeathMessage(LivingEntity entity, CallbackInfoReturnable<Component> callback) {
-        if (!(entity instanceof Player || this.equals(HordesInfection.getInfectionDamage(entity)))) return;
+        if (!(entity instanceof Player && this.equals(HordesInfection.getInfectionDamage(entity)))) return;
         String msg = "death.attack.infection";
         LazyOptional<IZombifyPlayer> optional = entity.getCapability(HordesCapabilities.ZOMBIFY_PLAYER);
         if (optional.isPresent() && optional.resolve().get().wasZombified()) msg += ".zombified";

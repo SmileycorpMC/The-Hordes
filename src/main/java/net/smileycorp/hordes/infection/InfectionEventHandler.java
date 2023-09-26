@@ -2,6 +2,7 @@ package net.smileycorp.hordes.infection;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
@@ -124,10 +125,15 @@ public class InfectionEventHandler {
 		LivingEntity entity = event.getEntity();
 		DamageSource source = event.getSource();
 		Level level = entity.level();
-		if (!level.isClientSide && (source.is(HordesInfection.INFECTION_DAMAGE) || entity.hasEffect(HordesInfection.INFECTED.get()))) {
-			InfectionDeathEvent newevent = new InfectionDeathEvent(entity, event.getSource());
-			MinecraftForge.EVENT_BUS.post(newevent);
-			if (newevent.getResult() == Result.DENY) event.setCanceled(true);
+		if (level.isClientSide || !(source.is(HordesInfection.INFECTION_DAMAGE) || entity.hasEffect(HordesInfection.INFECTED.get()))) return;
+		InfectionDeathEvent newevent = new InfectionDeathEvent(entity, event.getSource());
+		MinecraftForge.EVENT_BUS.post(newevent);
+		if (newevent.getResult() == Result.DENY) {
+			event.setCanceled(true);
+			if (!(entity instanceof OwnableEntity)) return;
+			LivingEntity owner = ((OwnableEntity) entity).getOwner();
+			if (!(owner instanceof ServerPlayer)) return;
+			owner.sendSystemMessage(Component.translatable("death.attack.infection.zombified", entity.getDisplayName()));
 		}
 	}
 

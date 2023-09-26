@@ -32,7 +32,7 @@ public class InfectionConversionLoader extends SimpleJsonResourceReloadListener 
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> map, ResourceManager manager, ProfilerFiller profiller) {
         conversionTable.clear();
-        for (ResourceLocation a : map.keySet()) HordesLogger.logInfo(a);
+        HordesLogger.logInfo("Loading conversion tables");
         for (String id : manager.getNamespaces()) {
             ResourceLocation loc = new ResourceLocation(id, "infection_conversions");
             JsonElement json = map.get(loc);

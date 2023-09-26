@@ -2,6 +2,7 @@ package net.smileycorp.hordes.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.MutableComponent;
@@ -44,9 +45,9 @@ public class ClientHandler {
 	@SubscribeEvent
 	public static void registerEntityRenderers(RegisterRenderers event) {
 		event.registerEntityRenderer(HordesEntities.ZOMBIE_PLAYER.get(), ctx -> new ZombiePlayerRenderer<>(ctx,
-				ClientConfigHandler.getZombiePlayerColour(), Constants.loc("textures/entity/zombie_player_outer_layer.png"), false));
+				ClientConfigHandler.getZombiePlayerColour(), Constants.loc("textures/entity/layer/zombie_player_outer_layer.png"), false));
 		event.registerEntityRenderer(HordesEntities.DROWNED_PLAYER.get(), ctx -> new ZombiePlayerRenderer<>(ctx,
-				ClientConfigHandler.getDrownedPlayerColour(), Constants.loc("textures/entity/drowned_player_outer_layer.png"), true));
+				ClientConfigHandler.getDrownedPlayerColour(), Constants.loc("textures/entity/layer/drowned_player_outer_layer.png"), true));
 	}
 
 	@SubscribeEvent
