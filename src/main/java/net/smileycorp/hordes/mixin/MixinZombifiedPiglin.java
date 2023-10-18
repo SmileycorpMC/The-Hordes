@@ -10,6 +10,7 @@ import net.minecraft.world.entity.monster.ZombifiedPiglin;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.smileycorp.atlas.api.util.Func;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,7 +24,7 @@ public abstract class MixinZombifiedPiglin extends Zombie {
 		super(null, level);
 	}
 
-	@Inject(at=@At("HEAD"), method = "addBehaviourGoals()V", cancellable = true)
+	@Inject(at=@At("HEAD"), method = "addBehaviourGoals", cancellable = true)
 	public void addBehaviourGoals(CallbackInfo callback) {
 		if (CommonConfigHandler.aggressiveZombiePiglins.get()) {
 			targetSelector.addGoal(1, (new HurtByTargetGoal(this)));
@@ -31,7 +32,7 @@ public abstract class MixinZombifiedPiglin extends Zombie {
 			targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, AbstractVillager.class, false));
 			targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, IronGolem.class, true));
 			targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, Turtle.class, 10, true, false, Turtle.BABY_ON_LAND_SELECTOR));
-			goalSelector.addGoal(6, new MoveThroughVillageGoal(this, 1.0D, true, 4, () -> false));
+			goalSelector.addGoal(6, new MoveThroughVillageGoal(this, 1.0D, true, 4, Func::False));
 		}
 	}
 

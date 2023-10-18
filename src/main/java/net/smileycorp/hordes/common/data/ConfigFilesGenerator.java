@@ -60,7 +60,7 @@ public class ConfigFilesGenerator {
 
     private static boolean isUpToDate() {
         File config_file = CONFIG_FOLDER.resolve("hordes/hordes-info.json").toFile();
-        if (!config_file.exists()) return false;
+        if (!config_file.isFile()) return false;
         try {
             JsonObject config_json = JsonParser.parseReader(new FileReader(config_file)).getAsJsonObject();
             if (config_json.get("data_version").getAsInt() < 0) return true;

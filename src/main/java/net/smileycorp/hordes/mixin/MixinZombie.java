@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Zombie.class)
 public abstract class MixinZombie {
 
-	@Inject(at=@At("HEAD"), method = "isSunSensitive()Z", cancellable = true)
+	@Inject(at=@At("HEAD"), method = "isSunSensitive", cancellable = true)
 	public void isSunSensitive(CallbackInfoReturnable<Boolean> callback) {
 		callback.setReturnValue(CommonConfigHandler.zombiesBurn.get());
 		callback.cancel();

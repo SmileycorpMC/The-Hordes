@@ -114,7 +114,7 @@ public class HordeEvent implements IOngoingEvent<Player> {
 		cleanSpawns();
 		HordeSpawnTable table = loadedTable;
 		if (table == null) {
-			HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, HordeTableLoader.INSTANCE.getDefaultTable(), this);
+			HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, HordeTableLoader.INSTANCE.getFallbackTable(), this);
 			postEvent(buildTableEvent);
 			table = buildTableEvent.spawntable;
 		}
@@ -269,7 +269,7 @@ public class HordeEvent implements IOngoingEvent<Player> {
 		}
 		HordeSpawnTable table = loadedTable;
 		if (table == null) {
-			HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, HordeTableLoader.INSTANCE.getDefaultTable(), this);
+			HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, HordeTableLoader.INSTANCE.getFallbackTable(), this);
 			postEvent(buildTableEvent);
 			table = buildTableEvent.spawntable;
 		}

@@ -4,10 +4,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
@@ -36,7 +33,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -53,34 +50,32 @@ public abstract class MixinMob extends LivingEntity {
 	}
 
 	//apply infection curing before any other interactions are handled
-	@Inject(at=@At("HEAD"), method = "checkAndHandleImportantInteractions(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;", cancellable = true)
+	@Inject(at=@At("HEAD"), method = "checkAndHandleImportantInteractions", cancellable = true)
 	public void checkAndHandleImportantInteractions(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> callback) {
 		ItemStack stack = player.getItemInHand(hand);
-		if (hasEffect(HordesInfection.INFECTED.get())) {
-			if (HordesInfection.isCure(stack)) {
-				removeEffect(HordesInfection.INFECTED.get());
-				if (!player.level().isClientSide) InfectionPacketHandler.NETWORK_INSTANCE.send(
-						PacketDistributor.TRACKING_CHUNK.with(()->player.level().getChunkAt(getOnPos())),
-						new CureEntityMessage((Mob)(LivingEntity)this));
-				if (!player.isCreative()) {
-					ItemStack container = stack.getItem().getCraftingRemainingItem(stack);
-					if (stack.isDamageableItem() && player instanceof ServerPlayer) {
-						stack.hurt(1, player.level().random, (ServerPlayer) player);
-					} else {
-						stack.shrink(1);
-					}
-					if (stack.isEmpty() && !container.isEmpty()) {
-						player.setItemInHand(hand, container);
-					}
-				}
-				callback.setReturnValue(InteractionResult.sidedSuccess(player.level().isClientSide));
-				callback.cancel();
+		if (!hasEffect(HordesInfection.INFECTED.get())) return;
+		if (!HordesInfection.isCure(stack)) return;
+		removeEffect(HordesInfection.INFECTED.get());
+		if (!player.level().isClientSide) InfectionPacketHandler.NETWORK_INSTANCE.send(
+				PacketDistributor.TRACKING_CHUNK.with(() -> player.level().getChunkAt(getOnPos())),
+				new CureEntityMessage(this));
+		if (!player.isCreative()) {
+			ItemStack container = stack.getItem().getCraftingRemainingItem(stack);
+			if (stack.isDamageableItem() && player instanceof ServerPlayer) {
+				stack.hurt(1, player.level().random, (ServerPlayer) player);
+			} else {
+				stack.shrink(1);
+			}
+			if (stack.isEmpty() && !container.isEmpty()) {
+				player.setItemInHand(hand, container);
 			}
 		}
+		callback.setReturnValue(InteractionResult.sidedSuccess(player.level().isClientSide));
+		callback.cancel();
 	}
 
 	//disables skeletons burning based on the config
-	@Inject(at=@At("HEAD"), method = "isSunBurnTick()Z", cancellable = true)
+	@Inject(at=@At("HEAD"), method = "isSunBurnTick", cancellable = true)
 	public void isSunBurnTick(CallbackInfoReturnable<Boolean> callback) {
 		if ((LivingEntity)this instanceof AbstractSkeleton &! CommonConfigHandler.skeletonsBurn.get()) {
 			callback.setReturnValue(false);
@@ -89,7 +84,7 @@ public abstract class MixinMob extends LivingEntity {
 	}
 
 	//despawns zombie horses in peaceful if they are set as aggressive in the config
-	@Inject(at=@At("HEAD"), method = "shouldDespawnInPeaceful()Z", cancellable = true)
+	@Inject(at=@At("HEAD"), method = "shouldDespawnInPeaceful", cancellable = true)
 	public void shouldDespawnInPeaceful(CallbackInfoReturnable<Boolean> callback) {
 		if ((LivingEntity)this instanceof ZombieHorse && CommonConfigHandler.aggressiveZombieHorses.get()) {
 			callback.setReturnValue(true);
@@ -98,8 +93,11 @@ public abstract class MixinMob extends LivingEntity {
 	}
 
 	//copy horde data to converted entities after conversion before capabilities are cleared
-	@ModifyVariable(method = "convertTo", at = @At(value = "STORE", ordinal = 0))
-	private Mob convertTo(Mob converted) {
+	@Redirect(method = "convertTo", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/EntityType;create(Lnet/minecraft/world/level/Level;)Lnet/minecraft/world/entity/Entity;"))
+	private Entity convertTo(EntityType instance, Level level) {
+		Entity entity = instance.create(level);
+		if (!(entity instanceof Mob)) return entity;
+		Mob converted = (Mob) entity;
 		LazyOptional<HordeSpawn> beforeOptional = getCapability(HordesCapabilities.HORDESPAWN);
 		LazyOptional<HordeSpawn> afterOptional = converted.getCapability(HordesCapabilities.HORDESPAWN);
 		if (!(beforeOptional.isPresent() || afterOptional.isPresent() || beforeOptional.resolve().get().isHordeSpawned())) return converted;
@@ -121,26 +119,30 @@ public abstract class MixinMob extends LivingEntity {
 	}
 
 	//add horde ai to converted mobs
-	@Inject(at=@At("TAIL"), method = "convertTo(Lnet/minecraft/world/entity/EntityType;Z)Lnet/minecraft/world/entity/Mob;", cancellable = true)
+	@Inject(at=@At("TAIL"), method = "convertTo", cancellable = true)
 	public void convertTo(EntityType<?> type, boolean keepEquipment, CallbackInfoReturnable<Mob> callback) {
 		Mob converted = callback.getReturnValue();
 		LazyOptional<HordeSpawn> optional = converted.getCapability(HordesCapabilities.HORDESPAWN);
-		if (optional.isPresent()) {
-			if (optional.resolve().get().isHordeSpawned()) {
-				String uuid = optional.resolve().get().getPlayerUUID();
-				if (DataUtils.isValidUUID(uuid)) {
-					Player player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(UUID.fromString(uuid));
-					if (player != null) converted.goalSelector.addGoal(6, new GoToEntityPositionGoal(converted, player));
-				}
-			}
+		if (!optional.isPresent()) return;
+		if (!optional.resolve().get().isHordeSpawned()) return;
+		String uuid = optional.resolve().get().getPlayerUUID();
+		if (DataUtils.isValidUUID(uuid)) {
+			Player player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(UUID.fromString(uuid));
+			if (player != null) converted.goalSelector.addGoal(6, new GoToEntityPositionGoal(converted, player));
 		}
 	}
 
-	@Inject(at=@At("HEAD"), method = "registerGoals()V", cancellable = true)
+	@Inject(at=@At("HEAD"), method = "registerGoals", cancellable = true)
 	public void registerGoals(CallbackInfo callback) {
 		if (CommonConfigHandler.piglinsHuntZombies.get() && ((LivingEntity)this) instanceof Piglin) {
 			goalSelector.addGoal(1, new FleeEntityGoal((Mob)(LivingEntity)this, 1.5, 5, HordesInfection::canCauseInfection));
 		}
 	}
 
+	@Inject(at = @At("HEAD"), method = "canBeLeashed")
+	public void canBeLeashed(Player player, CallbackInfoReturnable<Boolean> callback) {
+		if (((LivingEntity)this) instanceof ZombieHorse && CommonConfigHandler.aggressiveZombieHorses.get()) {
+			callback.setReturnValue(false);
+		}
+	}
 }

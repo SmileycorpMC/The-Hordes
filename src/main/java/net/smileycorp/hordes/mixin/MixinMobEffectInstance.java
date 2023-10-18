@@ -27,7 +27,7 @@ public class MixinMobEffectInstance {
 	@Shadow
 	private int amplifier;
 
-	@Inject(at=@At("HEAD"), method = "tick(Lnet/minecraft/world/entity/LivingEntity;Ljava/lang/Runnable;)Z", cancellable = true)
+	@Inject(at=@At("HEAD"), method = "tick", cancellable = true)
 	public void tick(LivingEntity entity, Runnable onUpdate, CallbackInfoReturnable<Boolean> callback) {
 		if (duration <= 1 && effect == HordesInfection.INFECTED.get()) {
 			if (amplifier < 3) {

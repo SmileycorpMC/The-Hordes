@@ -38,7 +38,9 @@ public class HordeTableLoader extends SimpleJsonResourceReloadListener {
         SPAWN_TABLES.clear();
         for (Map.Entry<ResourceLocation, JsonElement> entry : map.entrySet()) {
             try {
-                SPAWN_TABLES.put(entry.getKey(), HordeSpawnTable.deserialize(entry.getKey(), entry.getValue()));
+                HordeSpawnTable table = HordeSpawnTable.deserialize(entry.getKey(), entry.getValue());
+                if (table == null) throw new NullPointerException();
+                SPAWN_TABLES.put(entry.getKey(), table);
                 HordesLogger.logInfo("loaded horde table " + entry.getKey());
             } catch (Exception e) {
                 HordesLogger.logError("Failed to parse table " + entry.getKey(), e);
@@ -46,12 +48,13 @@ public class HordeTableLoader extends SimpleJsonResourceReloadListener {
         }
     }
 
-    public HordeSpawnTable getDefaultTable() {
+    public HordeSpawnTable getFallbackTable() {
         return getTable(FALLBACK_TABLE);
     }
 
     public HordeSpawnTable getTable(ResourceLocation loc) {
-        return SPAWN_TABLES.get(loc);
+        HordeSpawnTable table = SPAWN_TABLES.get(loc);
+        return table == null ? getFallbackTable() : table;
     }
 
     public static CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {

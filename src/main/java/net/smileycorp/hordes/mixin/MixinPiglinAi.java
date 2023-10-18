@@ -30,7 +30,7 @@ public abstract class MixinPiglinAi {
 		}
 	}
 
-	@Inject(at=@At("HEAD"), method = "isZombified(Lnet/minecraft/world/entity/EntityType;)Z", cancellable = true)
+	@Inject(at=@At("HEAD"), method = "isZombified", cancellable = true)
 	private static void isZombified(EntityType<?> type, CallbackInfoReturnable<Boolean> callback) {
 		if (CommonConfigHandler.piglinsHuntZombies.get() && type.is(HordesInfection.INFECTION_ENTITIES_TAG)) {
 			callback.setReturnValue(true);
@@ -38,10 +38,10 @@ public abstract class MixinPiglinAi {
 		}
 	}
 
-	@Inject(at=@At("TAIL"), method = "findNearestValidAttackTarget(Lnet/minecraft/world/entity/monster/piglin/Piglin;)Ljava/util/Optional;", cancellable = true)
+	@Inject(at=@At("TAIL"), method = "findNearestValidAttackTarget", cancellable = true)
 	private static void findNearestValidAttackTarget(Piglin piglin, CallbackInfoReturnable<Optional<? extends LivingEntity>> callback ) {
 		if (CommonConfigHandler.piglinsHuntZombies.get()) {
-			if (callback.getReturnValue().isEmpty()) {
+			if (!callback.getReturnValue().isPresent()) {
 				ItemStack stack = piglin.getItemInHand(InteractionHand.MAIN_HAND);
 				if (stack != null) {
 					if (stack.is(Items.CROSSBOW)) {
@@ -56,7 +56,7 @@ public abstract class MixinPiglinAi {
 		}
 	}
 
-	@Inject(at=@At("HEAD"), method = "admireGoldItem(Lnet/minecraft/world/entity/LivingEntity;)V", cancellable = true)
+	@Inject(at=@At("HEAD"), method = "admireGoldItem", cancellable = true)
 	private static void admireGoldItem(LivingEntity entity, CallbackInfo callback) {
 		if (entity.hasEffect(HordesInfection.INFECTED.get()) && entity.getOffhandItem().is(HordesInfection.INFECTION_CURES_TAG)) {
 			entity.startUsingItem(InteractionHand.OFF_HAND);

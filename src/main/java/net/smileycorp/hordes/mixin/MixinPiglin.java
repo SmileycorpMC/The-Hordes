@@ -30,7 +30,7 @@ public abstract class MixinPiglin extends AbstractPiglin {
 		super(null, level);
 	}
 
-	@Inject(at=@At("TAIL"), method = "customServerAiStep()V", cancellable = true)
+	@Inject(at=@At("TAIL"), method = "customServerAiStep", cancellable = true)
 	public void customServerAiStep(CallbackInfo callback) {
 		if (!(CommonConfigHandler.enableMobInfection.get() && CommonConfigHandler.piglinsCureThemself.get())) return;
 		if (!hasEffect(HordesInfection.INFECTED.get())) return;
@@ -50,8 +50,5 @@ public abstract class MixinPiglin extends AbstractPiglin {
 			}
 		}
 	}
-
-	@Shadow
-	protected abstract void holdInOffHand(ItemStack p_34786_);
 
 }
