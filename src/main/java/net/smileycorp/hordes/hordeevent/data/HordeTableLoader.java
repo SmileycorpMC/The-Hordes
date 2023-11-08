@@ -54,6 +54,7 @@ public class HordeTableLoader extends SimpleJsonResourceReloadListener {
 
     public HordeSpawnTable getTable(ResourceLocation loc) {
         HordeSpawnTable table = SPAWN_TABLES.get(loc);
+        if (table == null) HordesLogger.logInfo("Failed loading table " + loc + ", loading fallback table hordes:fallback");
         return table == null ? getFallbackTable() : table;
     }
 

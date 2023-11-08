@@ -49,6 +49,7 @@ public class HordeScriptLoader extends SimpleJsonResourceReloadListener {
     public Collection<HordeScript> getScripts(HordePlayerEvent event) {
         List<HordeScript> list = Lists.newArrayList();
         for (HordeScript script : getScripts()) {
+            HordesLogger.logInfo("Checking script " + script.getName());
             if (script.getType() == event.getClass()) list.add(script);
         }
         return list;

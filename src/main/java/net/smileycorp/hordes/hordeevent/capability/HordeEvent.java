@@ -370,6 +370,7 @@ public class HordeEvent implements IOngoingEvent<Player> {
 		for (HordeScript script : HordeScriptLoader.INSTANCE.getScripts(event)) {
 			if (script.shouldApply(event.getEntityWorld(), event.getEntity(), event.getEntityWorld().random)) {
 				script.apply(event);
+				HordesLogger.logInfo("Applying script " + script.getName());
 			}
 		}
 		MinecraftForge.EVENT_BUS.post(event);

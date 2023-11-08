@@ -21,11 +21,13 @@ public class HordeScript<T extends HordePlayerEvent> {
 
 	protected final HordeFunction<T> func;
 	protected final Class<T> type;
+	private final ResourceLocation name;
 	private final Condition[] conditions;
 
-	private HordeScript(HordeFunction<T> func, Class<T> type, Condition... conditions) {
+	private HordeScript(HordeFunction<T> func, Class<T> type, ResourceLocation name, Condition... conditions) {
 		this.func = func;
 		this.type = type;
+		this.name = name;
 		this.conditions = conditions;
 	}
 
@@ -57,11 +59,14 @@ public class HordeScript<T extends HordePlayerEvent> {
 				conditions.add(DataRegistry.readCondition(condition.getAsJsonObject()));
 			}
 			if (function == null || clazz == null) throw new Exception("invalid function: " + obj.get("function").getAsString());
-			return new HordeScript(function, clazz, conditions.toArray(new Condition[]{}));
+			return new HordeScript(function, clazz,  key, conditions.toArray(new Condition[]{}));
 		} catch (Exception e) {
 			HordesLogger.logError("Error loading script " + key + " " + e.getCause() + " " + e.getMessage(), e);
 		}
 		return null;
 	}
 
+	public ResourceLocation getName() {
+		return name;
+	}
 }
