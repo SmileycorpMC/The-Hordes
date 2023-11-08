@@ -6,6 +6,7 @@ import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.BuiltInPackSource;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
+import net.minecraft.server.packs.repository.ServerPacksSource;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.resource.PathPackResources;
 import org.spongepowered.asm.mixin.Mixin;
@@ -24,7 +25,7 @@ public class MixinBuiltInPackSource {
 		Path pack = FMLPaths.GAMEDIR.get().resolve("config").resolve("hordes");
 		PathPackResources resources = new PathPackResources("hordes-config", true, pack);
 		packConsumer.accept(Pack.readMetaAndCreate("hordes-config", Component.literal("Hordes Config"), true,
-				(str)->resources, (Object)this instanceof ClientPackSource ? PackType.CLIENT_RESOURCES : PackType.SERVER_DATA, Pack.Position.TOP, PackSource.BUILT_IN));
+				(str)->resources, (Object)this instanceof ServerPacksSource ? PackType.SERVER_DATA : PackType.CLIENT_RESOURCES, Pack.Position.TOP, PackSource.BUILT_IN));
 	}
 
 }
