@@ -39,7 +39,7 @@ public class MiscEventHandler {
 		if (event.getEntity() == null) return;
 		if (event.getEntity().level.isClientSide()) return;
 		if (HordesLogger.hasErrors()) event.getEntity().sendSystemMessage(MutableComponent.create(
-				new TranslatableContents("message.hordes.DataError", null, new Object[]{HordesLogger.getFiletext()})));
+				new TranslatableContents("message.hordes.DataError", HordesLogger.getFiletext())));
 	}
 
 	//determine if zombie entity should spawn, and if so create the correct entity and set properties

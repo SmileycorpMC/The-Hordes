@@ -141,7 +141,7 @@ public class ZombiePlayer extends Zombie implements IZombiePlayer {
 				if (drowned instanceof IZombiePlayer) ((IZombiePlayer) drowned).copyFrom(this);
 			}
 			if (!this.isSilent()) {
-				level.levelEvent((Player)null, 1040, this.blockPosition(), 0);
+				level.levelEvent(null, 1040, this.blockPosition(), 0);
 			}
 		}
 	}
@@ -180,7 +180,7 @@ public class ZombiePlayer extends Zombie implements IZombiePlayer {
 	@Override
 	public MutableComponent getDisplayName() {
 		MutableComponent textcomponentstring = PlayerTeam.formatNameForTeam(getTeam(),
-				MutableComponent.create(new TranslatableContents("entity.hordes.ZombiePlayer.chat", null, new Object[]{getCustomName()})));
+				MutableComponent.create(new TranslatableContents("entity.hordes.ZombiePlayer.chat", getCustomName())));
 		textcomponentstring.getStyle().withHoverEvent(this.createHoverEvent());
 		textcomponentstring.getStyle().withInsertion(this.getEncodeId());
 		return textcomponentstring;

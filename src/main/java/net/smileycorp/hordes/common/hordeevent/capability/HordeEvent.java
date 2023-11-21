@@ -32,9 +32,9 @@ import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.*;
 import net.smileycorp.hordes.common.hordeevent.HordeSpawnEntry;
 import net.smileycorp.hordes.common.hordeevent.HordeSpawnTable;
-import net.smileycorp.hordes.common.hordeevent.data.scripts.HordeScriptLoader;
 import net.smileycorp.hordes.common.hordeevent.data.HordeTableLoader;
 import net.smileycorp.hordes.common.hordeevent.data.scripts.HordeScript;
+import net.smileycorp.hordes.common.hordeevent.data.scripts.HordeScriptLoader;
 import net.smileycorp.hordes.common.hordeevent.network.HordeEventPacketHandler;
 import net.smileycorp.hordes.common.hordeevent.network.HordeSoundMessage;
 

@@ -11,9 +11,9 @@ import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.HordeBuildSpawntableEvent;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
+import net.smileycorp.hordes.common.hordeevent.data.conditions.Condition;
 import net.smileycorp.hordes.common.hordeevent.data.functions.HordeFunction;
 import net.smileycorp.hordes.common.hordeevent.data.functions.SetSpawntableFunction;
-import net.smileycorp.hordes.common.hordeevent.data.conditions.Condition;
 import net.smileycorp.hordes.common.hordeevent.data.values.ValueGetter;
 
 import java.util.List;
