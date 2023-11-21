@@ -7,7 +7,8 @@
 		"1.1.5c": "fix crash when zombie players can't properly select which player model to use",
 		"1.1.5d": "fix null pointer crash during horde events",
 		"1.2.0": "add datapack support, player arguments for commands, piglin infection",
-		"1.2.1": "fix various bugs, add fallback horde table and better error logging"
+		"1.2.1": "fix various bugs, add fallback horde table and better error logging",
+		"1.2.1a": "fixed errors in default table, zombie horse speed, config crashes and incorrect text"
 	},
 	"1.19.3": {
 		"1.1.5e": "update to 1.19.3"
@@ -18,14 +19,15 @@
 		"1.1.6a": "fix mixin config preventing mod load",
 		"1.1.6b": "update to use latest forge",
 		"1.2.0": "add datapack support, player arguments for commands, piglin infection",
-		"1.2.1": "fix various bugs, add fallback horde table and better error logging"
+		"1.2.1": "fix various bugs, add fallback horde table and better error logging",
+		"1.2.1a": "fixed errors in default table, zombie horse speed and config crashes"
 	},
 	"promos": {
-		"1.19.2-latest": "1.2.1",
-		"1.19.2-recommended": "1.2.1",
+		"1.19.2-latest": "1.2.1a",
+		"1.19.2-recommended": "1.2.1a",
 		"1.19.3-latest": "1.1.5e",
 		"1.19.3-recommended": "1.1.5e",
-		"1.19.4-latest": "1.2.1",
-		"1.19.4-recommended": "1.2.1"
+		"1.19.4-latest": "1.2.1a",
+		"1.19.4-recommended": "1.2.1a"
 	}
 }
