@@ -11,10 +11,11 @@
 	"1.1.6a": "fix mixin config preventing mod load",
 	"1.2.0": "add datapack support, player arguments for commands, piglin infection",
 	"1.2.0a": "fix wrong tables being loaded by hordes",
-	"1.2.1": "fix various bugs, add fallback horde table and better error logging"
+	"1.2.1": "fix various bugs, add fallback horde table and better error logging",
+	"1.2.1a": "fixed errors in default table, zombie horse speed and config crashes"
   },
   "promos": {
-    "1.18.2-latest": "1.2.1",
-    "1.18.2-recommended": "1.2.1"
+    "1.18.2-latest": "1.2.1a",
+    "1.18.2-recommended": "1.2.1a"
   }
 }
