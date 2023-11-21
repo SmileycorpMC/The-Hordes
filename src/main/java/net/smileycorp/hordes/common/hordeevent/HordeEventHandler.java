@@ -233,7 +233,7 @@ public class HordeEventHandler {
 					IHordeEvent horde = optional.resolve().get();
 					if ((horde.isHordeDay(player) && level.dimensionType().bedWorks() &! level.isDay()) || horde.isActive(player)) {
 						event.setResult(BedSleepingProblem.OTHER_PROBLEM);
-						player.displayClientMessage(MutableComponent.create(new TranslatableContents(Constants.hordeTrySleep, null, new Object[]{})), true);
+						player.displayClientMessage(MutableComponent.create(new TranslatableContents(Constants.hordeTrySleep)), true);
 					}
 				}
 			}

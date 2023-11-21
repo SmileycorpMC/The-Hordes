@@ -74,7 +74,7 @@ public class ClientHandler {
 	public static void displayMessage(String text) {
 		Minecraft mc = Minecraft.getInstance();
 		Gui gui = mc.gui;
-		MutableComponent message = MutableComponent.create(new TranslatableContents(text, null, new Object[]{}));
+		MutableComponent message = MutableComponent.create(new TranslatableContents(text));
 		message.setStyle(Style.EMPTY.withColor(ClientConfigHandler.getHordeMessageColour()));
 		if (ClientConfigHandler.eventNotifyMode.get() == 1) {
 			gui.getChat().addMessage(message);

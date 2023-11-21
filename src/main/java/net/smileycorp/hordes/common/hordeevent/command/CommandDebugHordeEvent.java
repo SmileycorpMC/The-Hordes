@@ -25,7 +25,7 @@ public class CommandDebugHordeEvent {
 		HordeSavedData data = HordeSavedData.getData(source.getServer().overworld());
 		if (!HordesLogger.logSaveData(data)) return 0;
 		source.getEntity().sendSystemMessage(MutableComponent.create(new TranslatableContents("commands.hordes.HordeDebug.success",
-				null, new Object[]{HordesLogger.getFiletext()})));
+				HordesLogger.getFiletext())));
 		return 1;
 	}
 

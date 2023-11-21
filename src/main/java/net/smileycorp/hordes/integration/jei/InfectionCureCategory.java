@@ -38,7 +38,7 @@ public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapp
 
 	@Override
 	public MutableComponent getTitle() {
-		return MutableComponent.create(new TranslatableContents("jei.category.hordes.InfectionCures", null, new Object[]{}));
+		return MutableComponent.create(new TranslatableContents("jei.category.hordes.InfectionCures"));
 	}
 
 	@Override
