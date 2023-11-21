@@ -83,7 +83,7 @@ public class DefaultDataGenerator {
             }
             if (hordeEntries == null || hordeEntries.isEmpty()) {
                 copyFile("data/hordes/tables/default.json");
-                HordesLogger.logError("hordes-common.toml spawnlist is empty, generating fallback spawnlist", new Exception());
+                HordesLogger.logInfo("hordes-common.toml spawnlist is empty, generating fallback spawnlist");
                 return;
             }
             JsonArray json = new JsonArray();
@@ -121,7 +121,7 @@ public class DefaultDataGenerator {
             }
             if (infectionEntities  == null || infectionEntities .isEmpty()) {
                 copyFile("data/hordes/tags/entity_types/infection_entities.json");
-                HordesLogger.logError("hordes-common.toml spawnlist is empty, generating fallback infection entities tag", new Exception());
+                HordesLogger.logInfo("hordes-common.toml spawnlist is empty, generating fallback infection entities tag");
                 return;
             }
             JsonObject json = new JsonObject();
@@ -155,7 +155,7 @@ public class DefaultDataGenerator {
             }
             if (cureEntries == null || cureEntries.isEmpty()) {
                 copyFile("data/hordes/tags/items/infection_cures.json");
-                HordesLogger.logError("hordes-common.toml spawnlist is empty, generating fallback cure item tag", new Exception());
+                HordesLogger.logInfo("hordes-common.toml spawnlist is empty, generating fallback cure item tag");
                 return;
             }
             JsonObject json = new JsonObject();
