@@ -81,7 +81,7 @@ public class InfectionRegister {
 					entry.setNBT(nbt);
 				}
 				conversionTable.put(type, entry);
-				HordesLogger.logInfo("Loaded conversion " + name + " as " + type.toString() + " with infection chance " + infectChance + ", and converts to " + result.toString());
+				HordesLogger.logInfo("Loaded conversion " + name + " as " + type + " with infection chance " + infectChance + ", and converts to " + result.toString());
 			} catch (Exception e) {
 				HordesLogger.logError("Error adding conversion " + name + " " + e.getCause() + " " + e.getMessage(), e);
 			}
