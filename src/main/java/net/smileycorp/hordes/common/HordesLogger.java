@@ -1,7 +1,10 @@
 package net.smileycorp.hordes.common;
 
 import com.google.common.collect.Lists;
-import net.minecraft.network.chat.*;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.contents.LiteralContents;
 import net.smileycorp.hordes.common.hordeevent.capability.HordeSavedData;
 import org.apache.logging.log4j.LogManager;

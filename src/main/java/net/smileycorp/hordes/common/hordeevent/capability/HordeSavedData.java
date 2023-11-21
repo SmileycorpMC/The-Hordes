@@ -84,7 +84,7 @@ public class HordeSavedData extends SavedData {
 	}
 
 	public static HordeSavedData getData(ServerLevel level) {
-		HordeSavedData data = (HordeSavedData) level.getChunkSource().getDataStorage().computeIfAbsent((nbt) -> getDataFromNBT(level, nbt), () -> getCleanData(level), DATA);
+		HordeSavedData data = level.getChunkSource().getDataStorage().computeIfAbsent((nbt) -> getDataFromNBT(level, nbt), () -> getCleanData(level), DATA);
 		if (data == null) {
 			data = getCleanData(level);
 		}
@@ -101,10 +101,10 @@ public class HordeSavedData extends SavedData {
 	public static HordeSavedData getCleanData(ServerLevel level) {
 		HordeSavedData data = new HordeSavedData();
 		data.level = level;
-		int day = Math.round(level.getDayTime()/CommonConfigHandler.dayLength.get());
+		int day = Math.round(level.getDayTime() / CommonConfigHandler.dayLength.get());
 		double multiplier = Math.ceil(day / CommonConfigHandler.hordeSpawnDays.get());
 		if (!(CommonConfigHandler.spawnFirstDay.get() && day == 0)) multiplier += 1;
-		int nextDay = (int) Math.floor(((multiplier*CommonConfigHandler.hordeSpawnDays.get()) + level.random.nextInt(CommonConfigHandler.hordeSpawnVariation.get() + 1)));
+		int nextDay = (int) Math.floor(((multiplier * CommonConfigHandler.hordeSpawnDays.get()) + level.random.nextInt(CommonConfigHandler.hordeSpawnVariation.get() + 1)));
 		data.setNextDay(nextDay);
 		return data;
 	}
