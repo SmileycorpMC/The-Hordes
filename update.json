@@ -2,10 +2,11 @@
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/the-hordes",
   "1.20.1": {
 	"1.3.0": "first release for 1.20",
-	"1.3.0a": "fix crash when loading the mod on servers, add better error checking for scripts."
+	"1.3.0a": "fix crash when loading the mod on servers, add better error checking for scripts.",
+	"1.3.0b": "fix horde event progression getting stuck"
   }
   "promos": {
-    "1.20.1-latest": "1.3.0a",
-    "1.20.1-recommended": "1.3.0a"
+    "1.20.1-latest": "1.3.0b",
+    "1.20.1-recommended": "1.3.0b"
   }
 }
