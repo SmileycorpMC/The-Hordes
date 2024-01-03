@@ -85,23 +85,19 @@ public class HordeEvent implements IOngoingEvent<Player> {
 	public void update(Player player) {
 		Level level = player.level();
 		if (level.isClientSide || player == null || level.dimension() != Level.OVERWORLD) return;
-		if (timer % CommonConfigHandler.hordeSpawnInterval.get() != 0) {
-			updateTimer(player);
-			return;
-		}
-		int amount = (int)(CommonConfigHandler.hordeSpawnAmount.get() * (1+(day/CommonConfigHandler.hordeSpawnDays.get()) * (CommonConfigHandler.hordeSpawnMultiplier.get()-1)));
-		List<? extends Player>players = level.players();
-		for (Player other : players) {
-			if (shouldReduce(player, other)) amount = (int) Math.floor(amount * CommonConfigHandler.hordeMultiplayerScaling.get());
-		}
-		spawnWave(player, amount);
-		updateTimer(player);
-	}
-
-	private void updateTimer(Player player) {
+		if (timer % CommonConfigHandler.hordeSpawnInterval.get() == 0) spawnWave(player, getMobCount(player, level));
 		timer--;
 		if (timer == 0) stopEvent(player, false);
 		hasChanged = true;
+	}
+
+	private int getMobCount(Player player, Level level) {
+		int amount = (int) (CommonConfigHandler.hordeSpawnAmount.get() * (1 + (day / CommonConfigHandler.hordeSpawnDays.get())
+				* (CommonConfigHandler.hordeSpawnMultiplier.get() - 1)));
+		List<? extends Player> players = level.players();
+		for (Player other : players) if (shouldReduce(player, other))
+			amount = (int) Math.floor(amount * CommonConfigHandler.hordeMultiplayerScaling.get());
+		return amount;
 	}
 
 	private boolean shouldReduce(Player player, Player other) {
@@ -133,8 +129,9 @@ public class HordeEvent implements IOngoingEvent<Player> {
 		while (basepos.equals(player.blockPosition())) {
 			basedir = DirectionUtils.getRandomDirectionVecXZ(level.random);
 			basepos = DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, 75, 7, 0);
-			if (i++>=20) {
+			if (i++ >=20) {
 				logInfo("Unable to find unlit pos for horde " + this + " ignoring light level");
+				basedir = DirectionUtils.getRandomDirectionVecXZ(level.random);
 				basepos = DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, 75);
 				break;
 			}
@@ -144,12 +141,13 @@ public class HordeEvent implements IOngoingEvent<Player> {
 			logInfo("Spawntable is empty, stopping wave spawn.");
 			return;
 		}
-		if (count > 0) {
-			if (player instanceof ServerPlayer) {
-				HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new HordeSoundMessage(basedir, startEvent.getSound()), ((ServerPlayer) player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
-			}
-		} else {
+		if (count <= 0) {
 			logInfo("Stopping wave spawn because count is " + count);
+			return;
+		}
+		if (player instanceof ServerPlayer) {
+			HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new HordeSoundMessage(basedir, startEvent.getSound()),
+					((ServerPlayer) player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 		}
 		for (int n = 0; n<count; n++) {
 			if (entitiesSpawned.size() > CommonConfigHandler.hordeSpawnMax.get()) {
@@ -226,8 +224,8 @@ public class HordeEvent implements IOngoingEvent<Player> {
 
 	public boolean isHordeDay(Player player) {
 		Level level = player.level();
-		if (level.isClientSide |!(level.dimension() == Level.OVERWORLD)) return false;
-		return isActive(player) || (!CommonConfigHandler.hordesCommandOnly.get() && Math.floor(level.getDayTime()/CommonConfigHandler.dayLength.get())>=nextDay);
+		if (level.isClientSide |! (level.dimension() == Level.OVERWORLD)) return false;
+		return isActive(player) || Math.floor(level.getDayTime() / CommonConfigHandler.dayLength.get()) >= nextDay;
 	}
 
 	public boolean isActive(Player player) {
@@ -255,8 +253,8 @@ public class HordeEvent implements IOngoingEvent<Player> {
 
 	public void tryStartEvent(Player player, int duration, boolean isCommand) {
 		if (CommonConfigHandler.hordesCommandOnly.get() &! isCommand) return;
-		if (player==null) {
-			logError("player is null for " + toString(), new NullPointerException());
+		if (player == null) {
+			logError("player is null for " + this, new NullPointerException());
 			return;
 		}
 		Level level = player.level();
@@ -295,7 +293,7 @@ public class HordeEvent implements IOngoingEvent<Player> {
 	}
 
 	public void setNextDay(int day) {
-		nextDay=day;
+		nextDay = day;
 	}
 
 	public int getNextDay() {
@@ -335,8 +333,8 @@ public class HordeEvent implements IOngoingEvent<Player> {
 	}
 
 	public String toString(String player) {
-		return "OngoingHordeEvent@" + Integer.toHexString(hashCode()) + "[player=" + (player == null ? "null" : player) + ", isActive=" + (timer > 0) +
-				", ticksLeft=" + timer +", entityCount="+ entitiesSpawned.size()+", nextDay="+nextDay + ", day="+day+"]";
+		return "OngoingHordeEvent@" + Integer.toHexString(hashCode()) + "[player = " + (player == null ? "null" : player) + ", isActive = " + (timer > 0) +
+				", ticksLeft=" + timer + ", entityCount=" + entitiesSpawned.size()+", nextDay=" + nextDay + ", day=" + day+"]";
 	}
 
 	private void logInfo(Object message) {

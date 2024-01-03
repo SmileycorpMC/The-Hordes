@@ -78,15 +78,16 @@ public class HordeEventHandler {
 		if (level.isClientSide || (CommonConfigHandler.pauseEventServer.get() && level.players().isEmpty())) return;
 		HordeEvent horde = HordeSavedData.getData((ServerLevel) level).getEvent(player);
 		if (horde == null) return;
-		int day = (int) Math.floor(level.getDayTime() / CommonConfigHandler.dayLength.get());
-		int time = Math.round(level.getDayTime() % CommonConfigHandler.dayLength.get());
-		if (horde == null || horde.isActive(player)) return;
-		if (time >= CommonConfigHandler.hordeStartTime.get() && day >= horde.getNextDay() && (day>0 || CommonConfigHandler.spawnFirstDay.get())) {
-			horde.tryStartEvent(player, CommonConfigHandler.hordeSpawnDuration.get(), false);
-		}
 		if (horde.isActive(player)) {
 			horde.update(player);
+			return;
 		}
+		int day = (int) Math.floor(level.getDayTime() / CommonConfigHandler.dayLength.get());
+		int time = Math.round(level.getDayTime() % CommonConfigHandler.dayLength.get());
+		if (time >= CommonConfigHandler.hordeStartTime.get() && day >= horde.getNextDay() && (day > 0 || CommonConfigHandler.spawnFirstDay.get())) {
+			horde.tryStartEvent(player, CommonConfigHandler.hordeSpawnDuration.get(), false);
+		}
+
 	}
 
 	//prevent despawning of entities in an active horde
@@ -134,7 +135,7 @@ public class HordeEventHandler {
 		if (CommonConfigHandler.canSleepDuringHorde.get() || level.isClientSide) return;
 		HordeEvent horde = HordeSavedData.getData((ServerLevel) player.level()).getEvent(player);
 		if (horde == null) return;
-		if (!horde.isHordeDay(player) |! level.dimensionType().bedWorks() || level.isDay() |! horde.isActive(player)) return;
+		if (level.isDay() |! (level.dimensionType().bedWorks() && (horde.isHordeDay(player) || horde.isActive(player)))) return;
 		event.setResult(BedSleepingProblem.OTHER_PROBLEM);
 		player.displayClientMessage(TextUtils.translatableComponent(Constants.hordeTrySleep, "Can't sleep now, a horde is approaching"), true);
 	}
