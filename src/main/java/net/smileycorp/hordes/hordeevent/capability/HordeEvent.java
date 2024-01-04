@@ -32,6 +32,7 @@ import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.common.event.*;
 import net.smileycorp.hordes.hordeevent.HordeSpawnEntry;
 import net.smileycorp.hordes.hordeevent.HordeSpawnTable;
+import net.smileycorp.hordes.hordeevent.HordeTrackPlayerGoal;
 import net.smileycorp.hordes.hordeevent.data.HordeScriptLoader;
 import net.smileycorp.hordes.hordeevent.data.HordeTableLoader;
 import net.smileycorp.hordes.hordeevent.data.functions.HordeScript;
@@ -204,7 +205,7 @@ public class HordeEvent implements IOngoingEvent<Player> {
 		entity.targetSelector.getRunningGoals().forEach(WrappedGoal::stop);
 		if (entity instanceof PathfinderMob) entity.targetSelector.addGoal(1, new HurtByTargetGoal((PathfinderMob) entity));
 		entity.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(entity, Player.class, true));
-		entity.goalSelector.addGoal(6, new GoToEntityPositionGoal(entity, player));
+		entity.goalSelector.addGoal(6, new HordeTrackPlayerGoal(entity, player));
 		for (Entity passenger : entity.getPassengers()) if (passenger instanceof Mob) finalizeEntity((Mob) passenger, level, player);
 	}
 
