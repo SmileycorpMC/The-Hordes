@@ -1,6 +1,5 @@
 package net.smileycorp.hordes.mixin;
 
-import net.minecraft.client.resources.ClientPackSource;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.BuiltInPackSource;

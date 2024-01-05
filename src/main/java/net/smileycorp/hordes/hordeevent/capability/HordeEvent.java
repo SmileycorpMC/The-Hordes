@@ -38,6 +38,7 @@ import net.smileycorp.hordes.hordeevent.data.HordeTableLoader;
 import net.smileycorp.hordes.hordeevent.data.functions.HordeScript;
 import net.smileycorp.hordes.hordeevent.network.HordeEventPacketHandler;
 import net.smileycorp.hordes.hordeevent.network.HordeSoundMessage;
+import net.smileycorp.hordes.hordeevent.network.UpdateClientHordeMessage;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -53,6 +54,7 @@ public class HordeEvent implements IOngoingEvent<Player> {
 	private boolean hasChanged = false;
 
 	private HordeSpawnTable loadedTable;
+	boolean sentDay;
 
 	HordeEvent(HordeSavedData data){
 		nextDay = data.getNextDay();
@@ -308,6 +310,8 @@ public class HordeEvent implements IOngoingEvent<Player> {
 	public void stopEvent(Player player, boolean isCommand) {
 		HordeEndEvent endEvent = new HordeEndEvent(player, this, isCommand);
 		postEvent(endEvent);
+		HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new UpdateClientHordeMessage(nextDay, 0),
+				((ServerPlayer) player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 		timer = 0;
 		loadedTable = null;
 		sendMessage(player, endEvent.getMessage());
@@ -377,10 +381,20 @@ public class HordeEvent implements IOngoingEvent<Player> {
 
 	public void reset(ServerLevel level) {
 		entitiesSpawned.clear();
-		HordeSavedData data = HordeSavedData.getData((ServerLevel) level);
+		HordeSavedData data = HordeSavedData.getData(level);
 		nextDay = data.getNextDay();
 		loadedTable = null;
 		timer = 0;
+	}
+
+	public boolean hasSynced() {
+		return sentDay;
+	}
+
+	public void sync(Player player) {
+		HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new UpdateClientHordeMessage(isActive(player) ? day : nextDay, CommonConfigHandler.dayLength.get()),
+				((ServerPlayer) player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+		sentDay = true;
 	}
 
 }

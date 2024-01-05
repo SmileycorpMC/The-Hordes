@@ -31,6 +31,7 @@ import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
+import net.smileycorp.hordes.hordeevent.capability.HordeEventClient;
 import net.smileycorp.hordes.hordeevent.capability.HordeSavedData;
 import net.smileycorp.hordes.hordeevent.capability.HordeSpawn;
 import net.smileycorp.hordes.hordeevent.data.HordeScriptLoader;
@@ -45,6 +46,9 @@ public class HordeEventHandler {
 		Entity entity = event.getObject();
 		if (entity instanceof Mob) {
 			event.addCapability(Constants.loc("HordeSpawn"), new HordeSpawn.Provider());
+		}
+		if (entity instanceof Player && entity.level().isClientSide) {
+			event.addCapability(Constants.loc("HordeEventClient"), new HordeEventClient.Provider());
 		}
 	}
 
@@ -78,6 +82,7 @@ public class HordeEventHandler {
 		if (level.isClientSide || (CommonConfigHandler.pauseEventServer.get() && level.players().isEmpty())) return;
 		HordeEvent horde = HordeSavedData.getData((ServerLevel) level).getEvent(player);
 		if (horde == null) return;
+		if (!horde.hasSynced()) horde.sync(player);
 		if (horde.isActive(player)) {
 			horde.update(player);
 			return;

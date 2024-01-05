@@ -19,6 +19,7 @@ public class HordeEventPacketHandler {
 		NETWORK_INSTANCE = NetworkUtils.createChannel(Constants.loc("HordeEvent"));
 		NetworkUtils.registerMessage(NETWORK_INSTANCE,0, HordeSoundMessage.class);
 		NetworkUtils.registerMessage(NETWORK_INSTANCE,1, GenericStringMessage.class, HordeEventPacketHandler::processNotificationMessage);
+		NetworkUtils.registerMessage(NETWORK_INSTANCE,2, UpdateClientHordeMessage.class);
 	}
 
 	public static void processNotificationMessage(GenericStringMessage message, Supplier<Context> ctx) {

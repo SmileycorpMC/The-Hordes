@@ -2,6 +2,7 @@ package net.smileycorp.hordes.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.MutableComponent;
@@ -12,14 +13,15 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent.RegisterRenderers;
 import net.minecraftforge.client.event.RenderNameTagEvent;
+import net.minecraftforge.client.event.ViewportEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
@@ -28,7 +30,9 @@ import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.client.render.ZombiePlayerRenderer;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.HordesEntities;
+import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.common.entities.PlayerZombie;
+import net.smileycorp.hordes.hordeevent.capability.HordeEventClient;
 import net.smileycorp.hordes.infection.client.ClientInfectionEventHandler;
 import net.smileycorp.hordes.infection.network.CureEntityMessage;
 
@@ -55,10 +59,21 @@ public class ClientHandler {
 		event.registerLayerDefinition(ZombiePlayerRenderer.SLIM, () -> ZombiePlayerRenderer.createLayer(true));
 	}
 
-	@SubscribeEvent
+    @SubscribeEvent
 	public void renderNameplate(RenderNameTagEvent event) {
 		if (event.getEntity() instanceof PlayerZombie) {
 			event.setContent(event.getEntity().getCustomName());
+		}
+	}
+
+	@SubscribeEvent
+	public void fogColour(ViewportEvent.ComputeFogColor event) {
+		Minecraft mc = Minecraft.getInstance();
+		LazyOptional<HordeEventClient> optional = mc.player.getCapability(HordesCapabilities.HORDE_EVENT_CLIENT);
+		if (optional.isPresent() && optional.orElseGet(null).isHordeNight(mc.level)) {
+			event.setRed(0.4f);
+			event.setGreen(0);
+			event.setBlue(0);
 		}
 	}
 
@@ -66,11 +81,17 @@ public class ClientHandler {
 		if (ClientConfigHandler.hordeSpawnSound.get()) {
 			Minecraft mc = Minecraft.getInstance();
 			Level level = mc.level;
-			Player player = mc.player;
-			BlockPos pos = BlockPos.containing(player.getX() + (5*vec3.x), player.getY(), player.getZ() + (5*vec3.z));
-			float pitch = 1+((level.random.nextInt(6)-3)/10);
-			level.playSound(player, pos, SoundEvent.createVariableRangeEvent(sound), SoundSource.HOSTILE, 0.6f, pitch);
+			LocalPlayer player = mc.player;
+			BlockPos pos = BlockPos.containing(player.getX() + (10 * vec3.x), player.getY(), player.getZ() + (10 * vec3.z));
+			float pitch = 1 + ((level.random.nextInt(6) - 3) / 10);
+			level.playSound(player, pos, SoundEvent.createVariableRangeEvent(sound), SoundSource.HOSTILE, 0.5f, pitch);
 		}
+	}
+
+	public static void setHordeDay(int day, int day_length) {
+		LocalPlayer player = Minecraft.getInstance().player;
+		LazyOptional<HordeEventClient> optional = player.getCapability(HordesCapabilities.HORDE_EVENT_CLIENT);
+		if (optional.isPresent()) optional.orElseGet(null).setNextDay(day, day_length);
 	}
 
 	public static void displayMessage(String text) {
@@ -95,7 +116,7 @@ public class ClientHandler {
 		if (ClientConfigHandler.playerInfectSound.get()) {
 			Minecraft mc = Minecraft.getInstance();
 			Level level = mc.level;
-			Player player = mc.player;
+			LocalPlayer player = mc.player;
 			level.playSound(player, player.blockPosition(), SoundEvents.ZOMBIE_VILLAGER_CONVERTED, SoundSource.HOSTILE, 0.75f, level.random.nextFloat());
 		}
 	}
