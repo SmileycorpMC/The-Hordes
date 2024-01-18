@@ -7,6 +7,7 @@ import net.minecraft.world.entity.monster.ZombieVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.smileycorp.hordes.common.CommonConfigHandler;
+import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.mixinutils.CustomTexture;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,7 +23,7 @@ public abstract class MixinZombieVillager extends Zombie {
 
 	@Inject(at=@At("HEAD"), method = "mobInteract(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;", cancellable = true)
 	public void interact(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> callback) {
-		if (!CommonConfigHandler.zombieVillagersCanBeCured.get() || ((CustomTexture)this).hasCustomTexture()) return;
+		if (CommonConfigHandler.zombieVillagersCanBeCured.get() &!((CustomTexture)this).hasCustomTexture()) return;
 		callback.setReturnValue(super.mobInteract(player, hand));
 		callback.cancel();
 	}
