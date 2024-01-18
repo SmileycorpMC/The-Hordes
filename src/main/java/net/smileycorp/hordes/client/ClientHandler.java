@@ -37,6 +37,8 @@ import net.smileycorp.hordes.hordeevent.capability.HordeEventClient;
 import net.smileycorp.hordes.infection.client.ClientInfectionEventHandler;
 import net.smileycorp.hordes.infection.network.CureEntityMessage;
 
+import java.awt.*;
+
 @EventBusSubscriber(modid = Constants.MODID, value = Dist.CLIENT, bus = Bus.MOD)
 public class ClientHandler {
 
@@ -69,14 +71,16 @@ public class ClientHandler {
 
 	@SubscribeEvent
 	public void fogColour(ViewportEvent.ComputeFogColor event) {
+		if (!ClientConfigHandler.hordeEventTintsSky.get()) return;
 		Minecraft mc = Minecraft.getInstance();
 		ClientLevel level = mc.level;
 		LazyOptional<HordeEventClient> optional = mc.player.getCapability(HordesCapabilities.HORDE_EVENT_CLIENT);
 		if (optional.isPresent() && optional.orElseGet(null).isHordeNight(level)) {
 			float d = level.getSkyDarken((float)event.getPartialTick()) * 1.4f;
-			event.setRed((1 - d) * 0.4f + (d * event.getRed()));
-			event.setGreen(d * event.getGreen());
-			event.setBlue(d * event.getBlue());
+			Color rgb = ClientConfigHandler.getHordeSkyColour();
+			event.setRed((1f - d) * (float)rgb.getRed()/255f + (d * event.getRed()));
+			event.setGreen((1f - d) * (float)rgb.getGreen()/255f + d * event.getGreen());
+			event.setBlue((1f - d) * (float)rgb.getBlue()/255f + d * event.getBlue());
 		}
 	}
 
