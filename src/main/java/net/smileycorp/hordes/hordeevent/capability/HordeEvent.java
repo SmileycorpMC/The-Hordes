@@ -214,7 +214,7 @@ public class HordeEvent implements IOngoingEvent<Player> {
 	private void cleanSpawns() {
 		List<Mob> toRemove = new ArrayList<>();
 		for (Mob entity : entitiesSpawned) {
-			if (entity.isAlive() |! entity.isDeadOrDying() |! entity.isRemoved()) continue;
+			if (entity.isAlive() |! entity.isRemoved()) continue;
 			LazyOptional<HordeSpawn> optional = entity.getCapability(HordesCapabilities.HORDESPAWN, null);
 			if (optional.isPresent()) {
 				HordeSpawn cap = optional.resolve().get();
@@ -255,6 +255,7 @@ public class HordeEvent implements IOngoingEvent<Player> {
 	}
 
 	public void tryStartEvent(Player player, int duration, boolean isCommand) {
+		cleanSpawns();
 		if (CommonConfigHandler.hordesCommandOnly.get() &! isCommand) return;
 		if (player == null) {
 			logError("player is null for " + this, new NullPointerException());
@@ -308,6 +309,7 @@ public class HordeEvent implements IOngoingEvent<Player> {
 	}
 
 	public void stopEvent(Player player, boolean isCommand) {
+		entitiesSpawned.clear();
 		HordeEndEvent endEvent = new HordeEndEvent(player, this, isCommand);
 		postEvent(endEvent);
 		HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new UpdateClientHordeMessage(nextDay, 0),
