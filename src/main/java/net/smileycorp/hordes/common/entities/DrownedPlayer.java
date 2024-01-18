@@ -9,6 +9,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -185,6 +186,11 @@ public class DrownedPlayer extends Drowned implements PlayerZombie {
 	public void tick() {
 		super.tick();
 		moveCloak(this);
+	}
+
+	@Override
+	public void checkDespawn() {
+		if (level().getDifficulty() == Difficulty.PEACEFUL) super.checkDespawn();
 	}
 
 	@Override

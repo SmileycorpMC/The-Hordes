@@ -1,5 +1,6 @@
 package net.smileycorp.hordes.common;
 
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -45,9 +46,9 @@ public class MiscEventHandler {
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onDeath(LivingDeathEvent event) {
 		LivingEntity entity = event.getEntity();
-		if (!(entity instanceof Player) || entity instanceof FakePlayer || entity.level().isClientSide) return;
-		if ((entity.hasEffect(HordesInfection.INFECTED.get()) && CommonConfigHandler.enableMobInfection.get()) || CommonConfigHandler.zombieGraves.get() ||
-				(entity.isUnderWater() && CommonConfigHandler.drownedGraves.get())) {
+		if (!(entity instanceof Player) || entity instanceof FakePlayer || entity.level().isClientSide || entity.level().getDifficulty() == Difficulty.PEACEFUL) return;
+		if ((entity.hasEffect(HordesInfection.INFECTED.get()) && CommonConfigHandler.infectionSpawnsZombiePlayers.get() && CommonConfigHandler.enableMobInfection.get())
+				|| CommonConfigHandler.zombieGraves.get() || (entity.isUnderWater() && CommonConfigHandler.drownedGraves.get())) {
 			LazyOptional<ZombifyPlayer> optional = entity.getCapability(HordesCapabilities.ZOMBIFY_PLAYER, null);
 			if (!optional.isPresent()) return;
 			optional.resolve().get().createZombie((Player) entity);
@@ -57,7 +58,8 @@ public class MiscEventHandler {
 	//move items to zombie entity and spawn if one should spawn
 	@SubscribeEvent(receiveCanceled = true)
 	public void onDrop(LivingDropsEvent event) {
-		if (!(event.getEntity() instanceof Player) || event.getEntity() instanceof FakePlayer || event.getEntity().level().isClientSide) return;
+		if (!(event.getEntity() instanceof Player) || event.getEntity() instanceof FakePlayer || event.getEntity().level().isClientSide
+				|| event.getEntity().level().getDifficulty() == Difficulty.PEACEFUL) return;
 		Player player = (Player) event.getEntity();
 		if ((player.hasEffect(HordesInfection.INFECTED.get()) && CommonConfigHandler.enableMobInfection.get()) || CommonConfigHandler.zombieGraves.get()) {
 			LazyOptional<ZombifyPlayer> optional = player.getCapability(HordesCapabilities.ZOMBIFY_PLAYER, null);

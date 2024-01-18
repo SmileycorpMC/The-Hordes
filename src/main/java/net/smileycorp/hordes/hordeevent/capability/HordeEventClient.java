@@ -5,7 +5,6 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
-import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 
 public interface HordeEventClient {
