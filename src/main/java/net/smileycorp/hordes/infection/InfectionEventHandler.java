@@ -77,7 +77,7 @@ public class InfectionEventHandler {
 	public void onItemStackConsume(LivingEntityUseItemEvent.Finish event) {
 		LivingEntity entity = event.getEntity();
 		ItemStack stack = event.getItem();
-		if (!(entity.hasEffect(HordesInfection.INFECTED.get()) || HordesInfection.isCure(stack))) return;
+		if (!(entity.hasEffect(HordesInfection.INFECTED.get()) && HordesInfection.isCure(stack))) return;
 		LazyOptional<Infection> optional = entity.getCapability(HordesCapabilities.INFECTION);
 		if (optional.isPresent()) optional.resolve().get().increaseInfection();
 		entity.removeEffect(HordesInfection.INFECTED.get());
