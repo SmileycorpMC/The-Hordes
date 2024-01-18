@@ -1,7 +1,6 @@
 package net.smileycorp.hordes.hordeevent.command;
 
 import com.google.common.collect.Lists;
-import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -22,8 +21,8 @@ import java.util.Collection;
 
 public class CommandStartHordeEvent {
 
-	public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-		LiteralArgumentBuilder<CommandSourceStack> command = Commands.literal("startHordeEvent")
+	public static void register(LiteralArgumentBuilder<CommandSourceStack> command) {
+		command.then(Commands.literal("start")
 				.requires((commandSource) -> commandSource.hasPermission(1)).then(Commands.argument("length", IntegerArgumentType.integer())
 						.executes(ctx -> execute(ctx, IntegerArgumentType.getInteger(ctx, "length"), null))
 				.then(Commands.argument("table", ResourceLocationArgument.id()).suggests(HordeTableLoader::getSuggestions)
@@ -32,8 +31,7 @@ public class CommandStartHordeEvent {
 				.executes(ctx -> execute(ctx, IntegerArgumentType.getInteger(ctx, "length"), EntityArgument.getPlayers(ctx, "player"), null))
 				.then(Commands.argument("table", ResourceLocationArgument.id()).suggests(HordeTableLoader::getSuggestions)
 				.executes(ctx -> execute(ctx,IntegerArgumentType.getInteger(ctx, "length"),
-						EntityArgument.getPlayers(ctx, "player"), ResourceLocationArgument.getId(ctx, "table"))))));
-		dispatcher.register(command);
+						EntityArgument.getPlayers(ctx, "player"), ResourceLocationArgument.getId(ctx, "table")))))));
 	}
 
 	public static int execute(CommandContext<CommandSourceStack> ctx, int length, ResourceLocation table) throws CommandSyntaxException {

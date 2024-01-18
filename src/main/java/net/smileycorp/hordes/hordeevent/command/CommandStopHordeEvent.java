@@ -1,7 +1,6 @@
 package net.smileycorp.hordes.hordeevent.command;
 
 import com.google.common.collect.Lists;
-import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -17,13 +16,12 @@ import java.util.Collection;
 
 public class CommandStopHordeEvent {
 
-	public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-		LiteralArgumentBuilder<CommandSourceStack> command = Commands.literal("stopHordeEvent")
+	public static void register(LiteralArgumentBuilder<CommandSourceStack> command) {
+			command.then(Commands.literal("stop")
 				.requires((commandSource) -> commandSource.hasPermission(1))
 				.executes(ctx -> execute(ctx))
 				.then(Commands.argument("player", EntityArgument.players())
-						.executes(ctx -> execute(ctx, EntityArgument.getPlayers(ctx, "player"))));
-		dispatcher.register(command);
+						.executes(ctx -> execute(ctx, EntityArgument.getPlayers(ctx, "player")))));
 	}
 
 	public static int execute(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
