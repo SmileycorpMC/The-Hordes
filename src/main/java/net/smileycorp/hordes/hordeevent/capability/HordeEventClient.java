@@ -27,7 +27,7 @@ public interface HordeEventClient {
         @Override
         public boolean isHordeNight(Level level) {
             if (day_length == 0) return false;
-            if (level.getDayTime() % day_length < 0.54 * day_length) return false;
+            if (level.getDayTime() % day_length < 0.5 * day_length) return false;
             return level.getDayTime() > day * day_length;
         }
 

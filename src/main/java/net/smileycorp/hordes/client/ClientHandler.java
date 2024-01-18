@@ -2,6 +2,7 @@ package net.smileycorp.hordes.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -11,6 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -30,6 +32,7 @@ import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.client.render.ZombiePlayerRenderer;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.HordesEntities;
+import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.common.entities.PlayerZombie;
 import net.smileycorp.hordes.hordeevent.capability.HordeEventClient;
@@ -69,11 +72,13 @@ public class ClientHandler {
 	@SubscribeEvent
 	public void fogColour(ViewportEvent.ComputeFogColor event) {
 		Minecraft mc = Minecraft.getInstance();
+		ClientLevel level = mc.level;
 		LazyOptional<HordeEventClient> optional = mc.player.getCapability(HordesCapabilities.HORDE_EVENT_CLIENT);
-		if (optional.isPresent() && optional.orElseGet(null).isHordeNight(mc.level)) {
-			event.setRed(0.4f);
-			event.setGreen(0);
-			event.setBlue(0);
+		if (optional.isPresent() && optional.orElseGet(null).isHordeNight(level)) {
+			float d = level.getSkyDarken((float)event.getPartialTick()) * 1.4f;
+			event.setRed((1 - d) * 0.4f + (d * event.getRed()));
+			event.setGreen(d * event.getGreen());
+			event.setBlue(d * event.getBlue());
 		}
 	}
 
