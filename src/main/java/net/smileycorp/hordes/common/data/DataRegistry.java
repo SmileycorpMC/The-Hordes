@@ -8,6 +8,7 @@ import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.ResourceLocation;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.atlas.api.data.LogicalOperation;
+import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.data.conditions.*;
@@ -15,6 +16,7 @@ import net.smileycorp.hordes.common.data.values.EntityNBTGetter;
 import net.smileycorp.hordes.common.data.values.EntityPosGetter;
 import net.smileycorp.hordes.common.data.values.LevelNBTGetter;
 import net.smileycorp.hordes.common.data.values.ValueGetter;
+import net.smileycorp.hordes.hordeevent.data.functions.FunctionRegistry;
 
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -27,8 +29,8 @@ public class DataRegistry {
 
 	public static void init() {
 		registerValueGetters();
-		registerDeserializers();
-		registerFunctions();
+		registerConditionDeserializers();
+		if (CommonConfigHandler.enableHordeEvent.get()) FunctionRegistry.registerFunctionSerializers();
 	}
 
 	private static void registerValueGetters() {
@@ -38,17 +40,13 @@ public class DataRegistry {
 	}
 
 
-	public static void registerDeserializers() {
+	public static void registerConditionDeserializers() {
 		for (LogicalOperation operation : LogicalOperation.values())
 			registerConditionDeserializer(Constants.loc(operation.getName()), e -> LogicalCondition.deserialize(operation, e));
 		registerConditionDeserializer(Constants.loc("comparison"), ComparisonCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("random"), RandomCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("biome"), BiomeCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("day"), DayCondition::deserialize);
-	}
-
-	public static void registerFunctions() {
-		//TODO: add function deserializers
 	}
 
 	public static ValueGetter readValue(DataType type, JsonObject json) {
