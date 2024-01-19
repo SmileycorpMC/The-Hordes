@@ -45,7 +45,7 @@ public class HordeTrackPlayerGoal extends Goal {
     public void tick() {
         if (timeToRecalcPath-- <= 0) {
             timeToRecalcPath = CommonConfigHandler.hordePathingInterval.get();
-            pather.moveTo(pather.createPath(target.blockPosition(), 1), 1);
+            pather.moveTo(pather.createPath(target.blockPosition(), 1), CommonConfigHandler.hordeEntitySpeed.get());
         }
 
     }
