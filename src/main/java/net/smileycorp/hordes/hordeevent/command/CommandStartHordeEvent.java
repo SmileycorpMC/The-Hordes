@@ -41,7 +41,7 @@ public class CommandStartHordeEvent {
 	}
 
 	public static int execute(CommandContext<CommandSourceStack> ctx, int length, Collection<ServerPlayer> players, ResourceLocation table) throws CommandSyntaxException {
-		for (Player player : players) {
+		for (ServerPlayer player : players) {
 			HordeEvent horde = HordeSavedData.getData(ctx.getSource().getLevel()).getEvent(player);
 			try {
 				horde.setSpawntable(HordeTableLoader.INSTANCE.getTable(table));

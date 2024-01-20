@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -66,7 +67,7 @@ public class HordeSavedData extends SavedData {
 		if (level instanceof ServerLevel) ((ServerLevel)level).getChunkSource().getDataStorage().set(DATA, this);
 	}
 
-	public HordeEvent getEvent(Player player) {
+	public HordeEvent getEvent(ServerPlayer player) {
 		return player == null ? null : getEvent(player.getUUID());
 	}
 
@@ -103,10 +104,8 @@ public class HordeSavedData extends SavedData {
 	}
 
 	public static HordeSavedData getData(ServerLevel level) {
-		HordeSavedData data = (HordeSavedData) level.getChunkSource().getDataStorage().computeIfAbsent((nbt) -> getDataFromNBT(level, nbt), () -> getCleanData(level), DATA);
-		if (data == null) {
-			data = getCleanData(level);
-		}
+		HordeSavedData data = level.getChunkSource().getDataStorage().computeIfAbsent((nbt) -> getDataFromNBT(level, nbt), () -> getCleanData(level), DATA);
+		if (data == null) data = getCleanData(level);
 		level.getChunkSource().getDataStorage().set(DATA, data);
 		return data;
 	}

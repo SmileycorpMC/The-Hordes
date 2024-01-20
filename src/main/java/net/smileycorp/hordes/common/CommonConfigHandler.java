@@ -27,6 +27,7 @@ public class CommonConfigHandler {
 	public static ConfigValue<Boolean> canSleepDuringHorde;
 	public static ConfigValue<Double> hordeMultiplayerScaling;
 	public static ConfigValue<Boolean> pauseEventServer;
+	public static ConfigValue<Boolean> hordeEventByPlayerTime;
 
 	//infection
 	public static ConfigValue<Boolean> enableMobInfection;
@@ -84,6 +85,7 @@ public class CommonConfigHandler {
 		canSleepDuringHorde = builder.comment("Set to false to disable the use of beds during a horde event.").define("canSleepDuringHorde", false);
 		hordeMultiplayerScaling = builder.comment("How much should the size of each horde scale down by when multiple players are near each other?").define("hordeMultiplayerScaling", 0.8);
 		pauseEventServer = builder.comment("Do the daylight cycle (and active horde events get paused while there are no players online.).").define("pauseEventServer", true);
+		hordeEventByPlayerTime = builder.comment("Are horde events tracked by player play time instead of world time.").define("hordeEventByPlayerTime", true);
 
 		//infection
 		builder.pop();

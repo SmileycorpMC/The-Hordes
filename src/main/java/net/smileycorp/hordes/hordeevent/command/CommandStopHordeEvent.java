@@ -32,7 +32,7 @@ public class CommandStopHordeEvent {
 
 	public static int execute(CommandContext<CommandSourceStack> ctx, Collection<ServerPlayer> players) throws CommandSyntaxException {
 		CommandSourceStack source = ctx.getSource();
-		for (Player player : players) {
+		for (ServerPlayer player : players) {
 			HordeEvent horde = HordeSavedData.getData(source.getLevel()).getEvent(player);
 			if (horde != null) {
 				horde.stopEvent(player, true);
