@@ -8,6 +8,9 @@
       "MixinLivingEntityRenderer",
       "MixinVillagerProfessionLayer"
     ],
+    "server": [
+      "MixinServerLevel"
+    ],
 	"mixins": [
       "MixinAbstractHorse",
       "MixinAbstractPiglin",

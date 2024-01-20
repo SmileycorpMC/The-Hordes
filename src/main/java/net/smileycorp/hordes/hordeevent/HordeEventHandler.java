@@ -2,6 +2,8 @@ package net.smileycorp.hordes.hordeevent;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
@@ -9,7 +11,6 @@ import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Player.BedSleepingProblem;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -76,18 +77,20 @@ public class HordeEventHandler {
 	//spawn the horde at the correct time
 	@SubscribeEvent
 	public void playerTick(PlayerTickEvent event) {
-		Player player = event.player;
-		if (event.phase != Phase.END || player == null || player instanceof FakePlayer) return;
-		Level level = player.level();
-		if (level.isClientSide || (CommonConfigHandler.pauseEventServer.get() && level.players().isEmpty())) return;
-		HordeEvent horde = HordeSavedData.getData((ServerLevel) level).getEvent(player);
+		if (event.phase != Phase.END || !(event.player instanceof ServerPlayer) || event.player instanceof FakePlayer) return;
+		ServerPlayer player = (ServerPlayer) event.player;
+		ServerLevel level = player.serverLevel();
+		if (CommonConfigHandler.pauseEventServer.get() && level.players().isEmpty()) return;
+		HordeEvent horde = HordeSavedData.getData(level).getEvent(player);
 		if (horde == null) return;
+		horde.updateTicksExisted();
 		if (!horde.hasSynced()) horde.sync(player);
 		if (horde.isActive(player)) {
 			horde.update(player);
 			return;
 		}
-		int day = (int) Math.floor(level.getDayTime() / CommonConfigHandler.dayLength.get());
+		int day = (int) Math.floor(CommonConfigHandler.hordeEventByPlayerTime.get() ? player.getStats().getValue(Stats.CUSTOM.get(Stats.PLAY_TIME))
+				: level.getDayTime() / CommonConfigHandler.dayLength.get());
 		int time = Math.round(level.getDayTime() % CommonConfigHandler.dayLength.get());
 		if (time >= CommonConfigHandler.hordeStartTime.get() && day >= horde.getNextDay() && (day > 0 || CommonConfigHandler.spawnFirstDay.get())) {
 			horde.tryStartEvent(player, CommonConfigHandler.hordeSpawnDuration.get(), false);
@@ -98,7 +101,7 @@ public class HordeEventHandler {
 	//prevent despawning of entities in an active horde
 	@SubscribeEvent
 	public void tryDespawn(MobSpawnEvent.AllowDespawn event) {
-		Player player = HordeSpawn.getHordePlayer(event.getEntity());
+		ServerPlayer player = HordeSpawn.getHordePlayer(event.getEntity());
 		if (player == null) return;
 		HordeEvent horde = HordeSavedData.getData((ServerLevel) player.level()).getEvent(player);
 		if (horde != null && horde.isActive(player)) event.setResult(Result.DENY);
@@ -107,7 +110,7 @@ public class HordeEventHandler {
 	//remove entities from horde when they die
 	@SubscribeEvent
 	public void onDeath(LivingDeathEvent event) {
-		Player player = HordeSpawn.getHordePlayer(event.getEntity());
+		ServerPlayer player = HordeSpawn.getHordePlayer(event.getEntity());
 		if (player == null) return;
 		HordeEvent horde = HordeSavedData.getData((ServerLevel) player.level()).getEvent(player);
 		if (horde != null) horde.removeEntity((Mob) event.getEntity());
@@ -116,7 +119,7 @@ public class HordeEventHandler {
 	//sync entity capabilities when added to level
 	@SubscribeEvent(priority=EventPriority.LOWEST)
 	public void update(LivingTickEvent event) {
-		Player player = HordeSpawn.getHordePlayer(event.getEntity());
+		ServerPlayer player = HordeSpawn.getHordePlayer(event.getEntity());
 		if (player == null) return;
 		HordeSpawn cap = event.getEntity().getCapability(HordesCapabilities.HORDESPAWN).resolve().get();
 		if (cap.isSynced()) return;
@@ -135,9 +138,9 @@ public class HordeEventHandler {
 	//prevent sleeping on horde nights
 	@SubscribeEvent
 	public void trySleep(PlayerSleepInBedEvent event) {
-		Player player = event.getEntity();
-		Level level = player.level();
-		if (CommonConfigHandler.canSleepDuringHorde.get() || level.isClientSide) return;
+		if (CommonConfigHandler.canSleepDuringHorde.get() || !(event.getEntity() instanceof ServerPlayer)) return;
+		ServerPlayer player = (ServerPlayer) event.getEntity();
+		ServerLevel level = player.serverLevel();
 		HordeEvent horde = HordeSavedData.getData((ServerLevel) player.level()).getEvent(player);
 		if (horde == null) return;
 		if (level.isDay() |! (level.dimensionType().bedWorks() && (horde.isHordeDay(player) || horde.isActive(player)))) return;

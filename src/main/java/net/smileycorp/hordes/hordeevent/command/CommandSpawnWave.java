@@ -11,7 +11,6 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.hordeevent.HordeSpawnTable;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
@@ -37,12 +36,12 @@ public class CommandSpawnWave {
 
 	public static int execute(CommandContext<CommandSourceStack> ctx, int count, ResourceLocation table) throws CommandSyntaxException {
 		CommandSourceStack source = ctx.getSource();
-		if (source.getEntity() instanceof Player) return execute(ctx, count, Lists.newArrayList(source.getPlayerOrException()), table);
+		if (source.getEntity() instanceof ServerPlayer) return execute(ctx, count, Lists.newArrayList(source.getPlayerOrException()), table);
 		return 0;
 	}
 
 	public static int execute(CommandContext<CommandSourceStack> ctx, int count, Collection<ServerPlayer> players, ResourceLocation table) throws CommandSyntaxException {
-		for (Player player : players) {
+		for (ServerPlayer player : players) {
 			HordeEvent horde = HordeSavedData.getData(ctx.getSource().getLevel()).getEvent(player);
 			try {
 				HordeSpawnTable current = horde.getSpawntable();

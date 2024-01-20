@@ -8,6 +8,7 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.smileycorp.hordes.client.ClientConfigHandler;
@@ -39,24 +40,28 @@ public class Hordes {
 
 	@SubscribeEvent
 	public static void constructMod(FMLConstructModEvent event) {
+		MinecraftForge.EVENT_BUS.register(new MiscEventHandler());
+		MinecraftForge.EVENT_BUS.register(new HordeEventHandler());
+		MinecraftForge.EVENT_BUS.register(new InfectionEventHandler());
+		HordesInfection.EFFECTS.register(FMLJavaModLoadingContext.get().getModEventBus());
+		HordesEntities.ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
+	}
+
+	@SubscribeEvent
+	public static void commonSetup(FMLCommonSetupEvent event) {
+		DataRegistry.init();
 		//Horde Event
-		if (CommonConfigHandler.enableHordeEvent.get()) {
-			HordeEventPacketHandler.initPackets();
-			MinecraftForge.EVENT_BUS.register(new HordeEventHandler());
-		} else {
+		if (CommonConfigHandler.enableHordeEvent.get()) HordeEventPacketHandler.initPackets();
+		else {
+			MinecraftForge.EVENT_BUS.unregister(new HordeEventHandler());
 			MinecraftForge.EVENT_BUS.unregister(HordeEventHandler.class);
 		}
 		//Mob Infection
-		if (CommonConfigHandler.enableMobInfection.get()) {
-			InfectionPacketHandler.initPackets();
-			MinecraftForge.EVENT_BUS.register(new InfectionEventHandler());
-		} else {
+		if (CommonConfigHandler.enableMobInfection.get()) InfectionPacketHandler.initPackets();
+		else {
+			MinecraftForge.EVENT_BUS.unregister(new InfectionEventHandler());
 			MinecraftForge.EVENT_BUS.unregister(InfectionEventHandler.class);
 		}
-		DataRegistry.init();
-		MinecraftForge.EVENT_BUS.register(new MiscEventHandler());
-		HordesInfection.EFFECTS.register(FMLJavaModLoadingContext.get().getModEventBus());
-		HordesEntities.ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
 	}
 
 	@SubscribeEvent
