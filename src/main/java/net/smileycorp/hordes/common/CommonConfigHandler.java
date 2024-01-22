@@ -43,13 +43,16 @@ public class CommonConfigHandler {
 	public static ConfigValue<Boolean> infectionEntitiesAggroConversions;
 	public static ConfigValue<Double> effectStageTickReduction;
 
-	//misc
+	//zombie players
 	public static ConfigValue<Boolean> zombieGraves;
 	public static ConfigValue<Boolean> drownedGraves;
 	public static ConfigValue<Boolean> drownedPlayers;
 	public static ConfigValue<Boolean> zombiePlayersFireImmune;
 	public static ConfigValue<Boolean> zombiePlayersBurn;
 	public static ConfigValue<Boolean> zombiePlayersOnlyHurtByPlayers;
+	public static ConfigValue<Boolean> zombiePlayersStoreItems;
+
+	//misc
 	public static ConfigValue<Boolean> zombiesBurn;
 	public static ConfigValue<Boolean> skeletonsBurn;
 	public static ConfigValue<Boolean> zombieVillagersCanBeCured;
@@ -102,7 +105,7 @@ public class CommonConfigHandler {
 		infectionEntitiesAggroConversions = builder.comment("Do entities on the infectionEntities list automatically target entities on the infectionConversionList").define("infectionEntitiesAggroConversions", true);
 		effectStageTickReduction = builder.comment("What factor should the infection potion effect timer be multiplied by for each cured infection? (Resets on death, set to 1 to disable scaling)").define("effectStageTickReduction", 0.95);
 
-		//misc
+		//zombie players
 		builder.pop();
 		builder.push("Misc");
 		zombieGraves = builder.comment("Whether to use zombie players as graves all the time. (Even if infection is disabled)").define("zombieGraves", false);
@@ -111,6 +114,9 @@ public class CommonConfigHandler {
 		zombiePlayersFireImmune = builder.comment("Whether zombie players and drowned players should be immune to fire damage").define("zombiePlayersFireImmune", false);
 		zombiePlayersBurn = builder.comment("Whether zombie players and drowned players burn in sunlight.").define("zombiePlayersBurn", false);
 		zombiePlayersOnlyHurtByPlayers = builder.comment("Whether zombie players and drowned players are immune to all damage from non player sources.").define("zombiePlayersOnlyHurtByPlayers", false);
+		zombiePlayersStoreItems = builder.comment("Whether zombie players store items dropped by the player that spawned them.").define("zombiePlayersStoreItems", true);
+
+		//misc
 		zombiesBurn = builder.comment("Whether zombies and drowneds burn in sunlight.").define("zombiesBurn", false);
 		skeletonsBurn = builder.comment("Whether skeletons and strays burn in sunlight.").define("skeletonsBurn", false);
 		zombieVillagersCanBeCured = builder.comment("Whether zombie villagers have vanilla curing mechanics or not").define("zombieVillagersCanBeCured", false);

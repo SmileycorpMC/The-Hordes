@@ -67,13 +67,15 @@ public class MiscEventHandler {
 			ZombifyPlayer cap = optional.resolve().get();
 			Mob zombie = cap.getZombie();
 			if (zombie == null) return;
-			Collection<ItemEntity> drops = event.getDrops();
-			((PlayerZombie)zombie).setInventory(drops);
+			if (CommonConfigHandler.zombiePlayersStoreItems.get()) {
+				Collection<ItemEntity> drops = event.getDrops();
+				((PlayerZombie) zombie).setInventory(drops);
+				drops.clear();
+				event.setCanceled(true);
+			}
 			zombie.setPersistenceRequired();
 			player.level().addFreshEntity(zombie);
-			drops.clear();
 			cap.clearZombie();
-			event.setCanceled(true);
 			player.removeEffect(HordesInfection.INFECTED.get());
 		}
 	}
