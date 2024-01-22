@@ -107,15 +107,6 @@ public class HordeEventHandler {
 		if (horde != null && horde.isActive(player)) event.setResult(Result.DENY);
 	}
 
-	//remove entities from horde when they die
-	@SubscribeEvent
-	public void onDeath(LivingDeathEvent event) {
-		ServerPlayer player = HordeSpawn.getHordePlayer(event.getEntity());
-		if (player == null) return;
-		HordeEvent horde = HordeSavedData.getData((ServerLevel) player.level()).getEvent(player);
-		if (horde != null) horde.removeEntity((Mob) event.getEntity());
-	}
-
 	//sync entity capabilities when added to level
 	@SubscribeEvent(priority=EventPriority.LOWEST)
 	public void update(LivingTickEvent event) {
