@@ -7,7 +7,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
-import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.HordesEntities;
 import net.smileycorp.hordes.common.entities.PlayerZombie;
 import net.smileycorp.hordes.common.event.SpawnZombiePlayerEvent;
@@ -28,12 +27,11 @@ public interface ZombifyPlayer {
 
 		@Override
 		public PlayerZombie createZombie(Player player) {
-			EntityType<? extends PlayerZombie> type = (player.isUnderWater() && (CommonConfigHandler.drownedPlayers.get() || CommonConfigHandler.drownedGraves.get()))
-					? HordesEntities.DROWNED_PLAYER.get() : HordesEntities.ZOMBIE_PLAYER.get();
-			SpawnZombiePlayerEvent event = new SpawnZombiePlayerEvent(player, type);
+			HordesEntities.ZOMBIE_PLAYER.get();
+			SpawnZombiePlayerEvent event = new SpawnZombiePlayerEvent(player, HordesEntities.ZOMBIE_PLAYER.get());
 			MinecraftForge.EVENT_BUS.post(event);
 			if (event.isCanceled()) return null;
-			type = event.getEntityType();
+			EntityType<? extends PlayerZombie> type = event.getEntityType();
 			zombie = type.create(player.level());
 			zombie.setPlayer(player);
 			zombie.asEntity().setPos(player.getX(), player.getY(), player.getZ());

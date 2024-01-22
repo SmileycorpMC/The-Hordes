@@ -40,7 +40,8 @@ public class CommandSpawnZombie {
 
 	private enum Type {
 		ZOMBIE(HordesEntities.ZOMBIE_PLAYER.get()),
-		DROWNED(HordesEntities.DROWNED_PLAYER.get());
+		DROWNED(HordesEntities.DROWNED_PLAYER.get()),
+		HUSK(HordesEntities.HUSK_PLAYER.get());
 
 		private final EntityType<? extends PlayerZombie> type;
 

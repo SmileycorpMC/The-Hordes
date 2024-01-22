@@ -18,6 +18,7 @@ public class ClientConfigHandler {
 	private static TextColor hordeMessageColour = null;
 	private static Color zombiePlayerColour = null;
 	private static Color drownedPlayerColour = null;
+	private static Color huskPlayerColour = null;
 	private static Color hordeEventSkyColour = null;
 	private static Color hordeEventMoonColour = null;
 
@@ -36,6 +37,7 @@ public class ClientConfigHandler {
 	public static ConfigValue<Boolean> playerInfectSound;
 	private static ConfigValue<List<? extends Integer>> configZombiePlayerColour;
 	private static ConfigValue<List<? extends Integer>> configDrownedPlayerColour;
+	private static ConfigValue<List<? extends Integer>> configHuskPlayerColour;
 
 	//load config properties
 	static {
@@ -62,6 +64,8 @@ public class ClientConfigHandler {
 				.defineList("zombiePlayerColour", Lists.newArrayList(121, 156, 101), (x) -> (int)x >= 0 && (int)x < 256);
 		configDrownedPlayerColour = builder.comment("Colour tint for drowned players.")
 				.defineList("drownedPlayerColour", Lists.newArrayList(144, 255, 255), (x) -> (int)x >= 0 && (int)x < 256);
+		configHuskPlayerColour = builder.comment("Colour tint for husk players.")
+				.defineList("huskPlayerColour", Lists.newArrayList(130, 95, 27), (x) -> (int)x >= 0 && (int)x < 256);
 		builder.pop();
 		config = builder.build();
 	}
@@ -109,6 +113,15 @@ public class ClientConfigHandler {
 			else drownedPlayerColour = new Color(144, 255, 255);
 		}
 		return drownedPlayerColour;
+	}
+
+	public static Color getHuskPlayerColour() {
+		if (huskPlayerColour == null) {
+			List<? extends Integer> rgb = configHuskPlayerColour.get();
+			if (rgb.size() >= 3) huskPlayerColour = new Color(rgb.get(0), rgb.get(1), + rgb.get(2));
+			else huskPlayerColour = new Color(130, 95, 27);
+		}
+		return huskPlayerColour;
 	}
 
 }

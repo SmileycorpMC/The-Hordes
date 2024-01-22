@@ -9,8 +9,11 @@
 
 	"entity.hordes.ZombiePlayer.chat":"%1$s's Zombie",
 	"entity.hordes.DrownedPlayer.chat":"Drowned %1$s",
+	"entity.hordes.HuskPlayer.chat":"%1$s's Husk",
+	
 	"entity.hordes.ZombiePlayer.name":"Player Zombie",
 	"entity.hordes.DrownedPlayer.name":"Drowned Player",
+	"entity.hordes.HuskPlayer.name":"Player Husk",
 	
 	"entity.hordes.ZombifiedPiglinBrute.name":"Zombified Piglin Brute",
 	"entity.hordes.ZombieWanderingTrader.name":"Zombie Wandering Trader",
