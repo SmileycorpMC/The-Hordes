@@ -20,7 +20,7 @@ public class CommandSpawnZombie {
 		command.then(Commands.literal("spawnZombie")
 				.requires((commandSource) -> commandSource.hasPermission(1)).then(Commands.argument("username", StringArgumentType.string())
 						.then(Commands.argument("pos", Vec3Argument.vec3()).executes(CommandSpawnZombie::execute)
-								.then(Commands.argument("drowned", EnumArgument.enumArgument(Type.class)).executes(CommandSpawnZombie::execute)))));
+								.then(Commands.argument("type", EnumArgument.enumArgument(Type.class)).executes(CommandSpawnZombie::execute)))));
 	}
 
 	public static int execute(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {

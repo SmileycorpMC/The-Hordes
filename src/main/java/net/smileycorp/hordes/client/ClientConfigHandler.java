@@ -34,6 +34,7 @@ public class ClientConfigHandler {
 	//infection
 	public static ConfigValue<Boolean> playerInfectionVisuals;
 	public static ConfigValue<Boolean> playerInfectSound;
+	public static ConfigValue<Boolean> infectionProtectSound;
 	private static ConfigValue<List<? extends Integer>> configZombiePlayerColour;
 	private static ConfigValue<List<? extends Integer>> configDrownedPlayerColour;
 
@@ -57,7 +58,8 @@ public class ClientConfigHandler {
 		builder.pop();
 		builder.push("Infection");
 		playerInfectionVisuals = builder.comment("Tint the player's screen and display other visual effects if they are infected.").define("playerInfectionVisuals", true);
-		playerInfectSound = builder.comment("Play a sound when the player becomes infected.").define("playerInfectSound", true);
+		playerInfectSound = builder.comment("Play a sound when the player becomes infected?").define("playerInfectSound", true);
+		infectionProtectSound = builder.comment("Play a sound when infection gets prevented?").define("infectionProtectSound", false);
 		configZombiePlayerColour = builder.comment("Colour tint for zombie players.")
 				.defineList("zombiePlayerColour", Lists.newArrayList(121, 156, 101), (x) -> (int)x >= 0 && (int)x < 256);
 		configDrownedPlayerColour = builder.comment("Colour tint for drowned players.")

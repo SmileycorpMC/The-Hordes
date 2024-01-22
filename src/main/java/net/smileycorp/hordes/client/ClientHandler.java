@@ -31,6 +31,7 @@ import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.client.render.ZombiePlayerRenderer;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.HordesEntities;
+import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.common.entities.PlayerZombie;
 import net.smileycorp.hordes.hordeevent.capability.HordeEventClient;
@@ -119,12 +120,21 @@ public class ClientHandler {
 
 	}
 
-	public static void onInfect() {
-		if (ClientConfigHandler.playerInfectSound.get()) {
+	public static void onInfect(boolean prevented) {
+		HordesLogger.logInfo(prevented);
+		if (ClientConfigHandler.playerInfectSound.get() &! prevented) {
 			Minecraft mc = Minecraft.getInstance();
 			Level level = mc.level;
 			LocalPlayer player = mc.player;
-			level.playSound(player, player.blockPosition(), SoundEvents.ZOMBIE_VILLAGER_CONVERTED, SoundSource.HOSTILE, 0.75f, level.random.nextFloat());
+			level.playSound(player, player.blockPosition(), Constants.INFECT_SOUND, SoundSource.PLAYERS, 0.75f, level.random.nextFloat());
+			HordesLogger.logInfo(Constants.INFECT_SOUND);
+		}
+		if (ClientConfigHandler.infectionProtectSound.get() && prevented) {
+			Minecraft mc = Minecraft.getInstance();
+			Level level = mc.level;
+			LocalPlayer player = mc.player;
+			level.playSound(player, player.blockPosition(), Constants.IMMUNE_SOUND, SoundSource.PLAYERS, 0.75f, level.random.nextFloat());
+			HordesLogger.logInfo(Constants.IMMUNE_SOUND);
 		}
 	}
 

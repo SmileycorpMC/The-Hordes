@@ -26,6 +26,7 @@ public class HordesInfection {
 	public static final TagKey<Item> INFECTION_CURES_TAG = TagKey.create(Registries.ITEM, Constants.loc("infection_cures"));
 
 	public static final RegistryObject<MobEffect> INFECTED = EFFECTS.register("infected", InfectedEffect::new);
+	public static final RegistryObject<MobEffect> IMMUNITY = EFFECTS.register("immunity", ImmuneEffect::new);
 
 	public static final ResourceKey<DamageType> INFECTION_DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE, Constants.loc("infection"));
 

@@ -6,6 +6,8 @@
 	"message.hordes.title":"The Hordes",
 	
 	"hordes.subtitle.hordeHowls":"Zombie Howls",
+	"hordes.subtitle.infected": "Player Infected",
+	"hordes.subtitle.immune": "Player Infection Blocked",
 
 	"entity.hordes.ZombiePlayer.chat":"%1$s's Zombie",
 	"entity.hordes.DrownedPlayer.chat":"Drowned %1$s",
@@ -21,6 +23,7 @@
 	"entity.hordes.ZombieWitch.name":"Zombie Witch",
 
 	"effect.hordes.infected":"Infection",
+	"effect.hordes.immunity":"Immunity",
 	"death.attack.infection":"%1$s succumbed to infection.",
 	"death.attack.infection.zombified":"%1$s was zombified.",
 

@@ -155,7 +155,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 		}
 		if (player instanceof ServerPlayer) {
 			HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new HordeSoundMessage(basedir, startEvent.getSound()),
-					((ServerPlayer) player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+					player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 		}
 		for (int n = 0; n<count; n++) {
 			if (entitiesSpawned.size() > CommonConfigHandler.hordeSpawnMax.get()) {
@@ -401,7 +401,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 
 	public void sync(ServerPlayer player) {
 		HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new UpdateClientHordeMessage(isActive(player) ? day : nextDay, CommonConfigHandler.dayLength.get()),
-				((ServerPlayer) player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+				player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 		sentDay = true;
 	}
 
