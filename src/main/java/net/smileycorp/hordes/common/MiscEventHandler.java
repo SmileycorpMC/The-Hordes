@@ -4,7 +4,6 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Drowned;
@@ -65,16 +64,16 @@ public class MiscEventHandler {
 			LazyOptional<ZombifyPlayer> optional = player.getCapability(HordesCapabilities.ZOMBIFY_PLAYER, null);
 			if (!optional.isPresent()) return;
 			ZombifyPlayer cap = optional.resolve().get();
-			Mob zombie = cap.getZombie();
+			PlayerZombie zombie = cap.getZombie();
 			if (zombie == null) return;
 			if (CommonConfigHandler.zombiePlayersStoreItems.get()) {
 				Collection<ItemEntity> drops = event.getDrops();
-				((PlayerZombie) zombie).setInventory(drops);
+				zombie.storeDrops(drops);
 				drops.clear();
 				event.setCanceled(true);
 			}
-			zombie.setPersistenceRequired();
-			player.level().addFreshEntity(zombie);
+			zombie.asEntity().setPersistenceRequired();
+			player.level().addFreshEntity(zombie.asEntity());
 			cap.clearZombie();
 			player.removeEffect(HordesInfection.INFECTED.get());
 		}

@@ -2,6 +2,7 @@ package net.smileycorp.hordes.common.entities;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.NonNullList;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
@@ -11,7 +12,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface PlayerZombie {
+public interface PlayerZombie<T extends Mob & PlayerZombie<T>> {
 
 	void setPlayer(Player player);
 
@@ -23,7 +24,7 @@ public interface PlayerZombie {
 
 	Optional<UUID> getPlayerUUID();
 
-	void setInventory(Collection<ItemEntity> drops);
+	void storeDrops(Collection<ItemEntity> drops);
 
 	void setInventory(NonNullList<ItemStack> drops);
 
@@ -99,6 +100,10 @@ public interface PlayerZombie {
 		setXCloak(getXCloak() + (d0 * 0.25D));
 		setYCloak(getYCloak() + (d1 * 0.25D));
 		setZCloak(getZCloak() + (d2 * 0.25D));
+	}
+
+	default T asEntity() {
+		return (T) this;
 	}
 
 }

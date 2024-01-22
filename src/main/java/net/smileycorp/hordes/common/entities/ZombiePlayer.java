@@ -32,7 +32,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 
-public class ZombiePlayer extends Zombie implements PlayerZombie {
+public class ZombiePlayer extends Zombie implements PlayerZombie<ZombiePlayer> {
 
 	protected static final EntityDataAccessor<Optional<UUID>> PLAYER = SynchedEntityData.defineId(ZombiePlayer.class, EntityDataSerializers.OPTIONAL_UUID);
 	protected static final EntityDataAccessor<Boolean> SHOW_CAPE = SynchedEntityData.defineId(ZombiePlayer.class, EntityDataSerializers.BOOLEAN);
@@ -102,7 +102,7 @@ public class ZombiePlayer extends Zombie implements PlayerZombie {
 	}
 
 	@Override
-	public void setInventory(Collection<ItemEntity> list) {
+	public void storeDrops(Collection<ItemEntity> list) {
 		playerItems.clear();
 		for (ItemEntity item : list) {
 			ItemStack stack = item.getItem();
@@ -142,7 +142,7 @@ public class ZombiePlayer extends Zombie implements PlayerZombie {
 				if (drowned instanceof PlayerZombie) ((PlayerZombie) drowned).copyFrom(this);
 			}
 			if (!this.isSilent()) {
-				level().levelEvent((Player)null, 1040, this.blockPosition(), 0);
+				level().levelEvent(null, 1040, this.blockPosition(), 0);
 			}
 		}
 	}

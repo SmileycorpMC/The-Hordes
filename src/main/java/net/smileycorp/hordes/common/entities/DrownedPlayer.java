@@ -31,7 +31,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 
-public class DrownedPlayer extends Drowned implements PlayerZombie {
+public class DrownedPlayer extends Drowned implements PlayerZombie<DrownedPlayer> {
 
 	protected static final EntityDataAccessor<Optional<UUID>> PLAYER = SynchedEntityData.defineId(DrownedPlayer.class, EntityDataSerializers.OPTIONAL_UUID);
 	protected static final EntityDataAccessor<Boolean> SHOW_CAPE = SynchedEntityData.defineId(DrownedPlayer.class, EntityDataSerializers.BOOLEAN);
@@ -101,7 +101,7 @@ public class DrownedPlayer extends Drowned implements PlayerZombie {
 	}
 
 	@Override
-	public void setInventory(Collection<ItemEntity> list) {
+	public void storeDrops(Collection<ItemEntity> list) {
 		playerItems.clear();
 		for (ItemEntity item : list) {
 			ItemStack stack = item.getItem();
