@@ -25,10 +25,10 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.server.ServerLifecycleHooks;
-import net.smileycorp.atlas.api.entity.ai.GoToEntityPositionGoal;
 import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Constants;
+import net.smileycorp.hordes.common.ai.HordeTrackPlayerGoal;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 import net.smileycorp.hordes.hordeevent.capability.HordeEventClient;
@@ -120,7 +120,7 @@ public class HordeEventHandler {
 		HordeEvent horde = HordeSavedData.getData((ServerLevel) player.level()).getEvent(player);
 		if (horde != null) {
 			horde.registerEntity(entity);
-			entity.goalSelector.addGoal(6, new GoToEntityPositionGoal(entity, player));
+			entity.goalSelector.addGoal(6, new HordeTrackPlayerGoal(entity, player));
 		}
 		cap.setSynced();
 	}

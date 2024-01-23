@@ -32,7 +32,7 @@ import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.common.event.*;
 import net.smileycorp.hordes.hordeevent.HordeSpawnEntry;
 import net.smileycorp.hordes.hordeevent.HordeSpawnTable;
-import net.smileycorp.hordes.hordeevent.HordeTrackPlayerGoal;
+import net.smileycorp.hordes.common.ai.HordeTrackPlayerGoal;
 import net.smileycorp.hordes.hordeevent.data.HordeScriptLoader;
 import net.smileycorp.hordes.hordeevent.data.HordeTableLoader;
 import net.smileycorp.hordes.hordeevent.data.functions.HordeScript;
@@ -254,7 +254,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 		for (WrappedGoal entry : entity.goalSelector.getRunningGoals().toArray(WrappedGoal[]::new)) {
 			if (!(entry.getGoal() instanceof GoToEntityPositionGoal)) continue;
 			entity.goalSelector.removeGoal(entry.getGoal());
-			entity.goalSelector.addGoal(6, new GoToEntityPositionGoal(entity, player));
+			entity.goalSelector.addGoal(6, new HordeTrackPlayerGoal(entity, player));
 			return;
 		}
 	}
