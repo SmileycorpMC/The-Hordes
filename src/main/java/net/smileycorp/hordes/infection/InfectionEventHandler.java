@@ -163,7 +163,7 @@ public class InfectionEventHandler {
 	public void canApplyEffect(MobEffectEvent.Applicable event) {
 		LivingEntity entity = event.getEntity();
 		if (event.getEffectInstance().getEffect() == HordesInfection.INFECTED.get()
-				&& entity.hasEffect(HordesInfection.IMMUNITY.get())) {
+				&& InfectedEffect.preventInfection(entity)) {
 			event.setResult(Result.DENY);
 			if (entity instanceof ServerPlayer) InfectionPacketHandler.NETWORK_INSTANCE.sendTo(new InfectMessage(true),
 					((ServerPlayer) entity).connection.connection, NetworkDirection.PLAY_TO_CLIENT);

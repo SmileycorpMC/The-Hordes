@@ -4,6 +4,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
@@ -65,10 +66,16 @@ public class InfectedEffect extends MobEffect {
 	}
 
 	public static void apply(LivingEntity entity) {
-		boolean prevented = entity.hasEffect(HordesInfection.IMMUNITY.get());
+		boolean prevented = preventInfection(entity);
 		if (entity instanceof ServerPlayer) InfectionPacketHandler.NETWORK_INSTANCE.sendTo(new InfectMessage(prevented),
 				((ServerPlayer) entity).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 		if (!prevented) entity.addEffect(new MobEffectInstance(HordesInfection.INFECTED.get(), getInfectionTime(entity)));
+	}
+
+	public static boolean preventInfection(LivingEntity entity) {
+		if (entity.hasEffect(HordesInfection.IMMUNITY.get())) return true;
+		for (EquipmentSlot slot : EquipmentSlot.values()) if (slot.isArmor() &! entity.getItemBySlot(slot).is(HordesInfection.IMMUNE_WEARABLES_TAG)) return false;
+		return false;
 	}
 
 	public static int getInfectionTime(LivingEntity entity) {
