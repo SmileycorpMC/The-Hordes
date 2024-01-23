@@ -28,6 +28,7 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Constants;
+import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.ai.HordeTrackPlayerGoal;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
@@ -78,7 +79,8 @@ public class HordeEventHandler {
 	public void playerTick(PlayerTickEvent event) {
 		if (event.phase != Phase.END || !(event.player instanceof ServerPlayer) || event.player instanceof FakePlayer) return;
 		ServerPlayer player = (ServerPlayer) event.player;
-		ServerLevel level = player.serverLevel();
+		HordesLogger.logInfo(player.getStats().getValue(Stats.CUSTOM.get(Stats.PLAY_TIME)));
+		ServerLevel level = ServerLifecycleHooks.getCurrentServer().overworld();
 		if (CommonConfigHandler.pauseEventServer.get() && level.players().isEmpty()) return;
 		HordeEvent horde = HordeSavedData.getData(level).getEvent(player);
 		if (horde == null) return;
@@ -88,8 +90,7 @@ public class HordeEventHandler {
 			horde.update(player);
 			return;
 		}
-		int day = (int) Math.floor(CommonConfigHandler.hordeEventByPlayerTime.get() ? player.getStats().getValue(Stats.CUSTOM.get(Stats.PLAY_TIME))
-				: level.getDayTime() / CommonConfigHandler.dayLength.get());
+		int day = horde.getCurrentDay(player);
 		int time = Math.round(level.getDayTime() % CommonConfigHandler.dayLength.get());
 		if (time >= CommonConfigHandler.hordeStartTime.get() && day >= horde.getNextDay() && (day > 0 || CommonConfigHandler.spawnFirstDay.get())) {
 			horde.tryStartEvent(player, CommonConfigHandler.hordeSpawnDuration.get(), false);

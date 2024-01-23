@@ -5,6 +5,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -22,17 +23,16 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.network.NetworkDirection;
 import net.smileycorp.atlas.api.IOngoingEvent;
-import net.smileycorp.atlas.api.entity.ai.GoToEntityPositionGoal;
 import net.smileycorp.atlas.api.network.GenericStringMessage;
 import net.smileycorp.atlas.api.util.DirectionUtils;
 import net.smileycorp.atlas.api.util.WeightedOutputs;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.HordesLogger;
+import net.smileycorp.hordes.common.ai.HordeTrackPlayerGoal;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.common.event.*;
 import net.smileycorp.hordes.hordeevent.HordeSpawnEntry;
 import net.smileycorp.hordes.hordeevent.HordeSpawnTable;
-import net.smileycorp.hordes.common.ai.HordeTrackPlayerGoal;
 import net.smileycorp.hordes.hordeevent.data.HordeScriptLoader;
 import net.smileycorp.hordes.hordeevent.data.HordeTableLoader;
 import net.smileycorp.hordes.hordeevent.data.functions.HordeScript;
@@ -117,7 +117,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 	public void spawnWave(ServerPlayer player, int count) {
 		cleanSpawns();
 		HordeSpawnTable table = loadedTable;
-		if (table == null) {
+		if (table == null || table == HordeTableLoader.INSTANCE.getFallbackTable()) {
 			HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, HordeTableLoader.INSTANCE.getFallbackTable(), this);
 			postEvent(buildTableEvent);
 			table = buildTableEvent.spawntable;
@@ -233,7 +233,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 	public boolean isHordeDay(ServerPlayer player) {
 		Level level = player.level();
 		if (level.isClientSide |! (level.dimension() == Level.OVERWORLD)) return false;
-		return isActive(player) || Math.floor(level.getDayTime() / CommonConfigHandler.dayLength.get()) >= nextDay;
+		return isActive(player) || getCurrentDay(player) >= nextDay;
 	}
 
 	public boolean isActive(ServerPlayer player) {
@@ -252,7 +252,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 
 	private void fixGoals(ServerPlayer player, Mob entity) {
 		for (WrappedGoal entry : entity.goalSelector.getRunningGoals().toArray(WrappedGoal[]::new)) {
-			if (!(entry.getGoal() instanceof GoToEntityPositionGoal)) continue;
+			if (!(entry.getGoal() instanceof HordeTrackPlayerGoal)) continue;
 			entity.goalSelector.removeGoal(entry.getGoal());
 			entity.goalSelector.addGoal(6, new HordeTrackPlayerGoal(entity, player));
 			return;
@@ -284,7 +284,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 			timer = duration;
 			hasChanged = true;
 			sendMessage(player, startEvent.getMessage());
-			if (isCommand) day = (int) Math.floor(level.getDayTime() / CommonConfigHandler.dayLength.get());
+			if (isCommand) day = getCurrentDay(player);
 			else day = nextDay;
 		} else {
 			loadedTable = null;
@@ -325,7 +325,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 		sendMessage(player, endEvent.getMessage());
 		for (Mob entity : entitiesSpawned) {
 			for (WrappedGoal entry : entity.goalSelector.getRunningGoals().toArray(WrappedGoal[]::new)) {
-				if (!(entry.getGoal() instanceof GoToEntityPositionGoal)) continue;
+				if (!(entry.getGoal() instanceof HordeTrackPlayerGoal)) continue;
 				entity.goalSelector.removeGoal(entry.getGoal());
 				break;
 			}
@@ -413,4 +413,8 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 		return ticksExisted;
 	}
 
+	public int getCurrentDay(ServerPlayer player) {
+		return (int) Math.floor(CommonConfigHandler.hordeEventByPlayerTime.get() ? player.getStats().getValue(Stats.CUSTOM.get(Stats.PLAY_TIME))
+				: player.level().getDayTime() / CommonConfigHandler.dayLength.get());
+	}
 }

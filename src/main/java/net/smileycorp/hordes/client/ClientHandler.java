@@ -31,7 +31,6 @@ import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.client.render.ZombiePlayerRenderer;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.HordesEntities;
-import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.common.entities.PlayerZombie;
 import net.smileycorp.hordes.hordeevent.capability.HordeEventClient;
