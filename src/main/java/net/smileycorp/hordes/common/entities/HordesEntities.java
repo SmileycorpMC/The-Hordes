@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.common;
+package net.smileycorp.hordes.common.entities;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
@@ -9,10 +9,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-import net.smileycorp.hordes.common.entities.DrownedPlayer;
-import net.smileycorp.hordes.common.entities.HuskPlayer;
-import net.smileycorp.hordes.common.entities.PlayerZombie;
-import net.smileycorp.hordes.common.entities.ZombiePlayer;
+import net.smileycorp.hordes.common.Constants;
 
 public class HordesEntities {
     public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, Constants.MODID);

@@ -26,7 +26,6 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
-import net.smileycorp.hordes.common.HordesEntities;
 
 import java.util.Collection;
 import java.util.Optional;

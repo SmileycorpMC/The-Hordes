@@ -65,7 +65,7 @@ public class ClientConfigHandler {
 		configDrownedPlayerColour = builder.comment("Colour tint for drowned players.")
 				.defineList("drownedPlayerColour", Lists.newArrayList(144, 255, 255), (x) -> (int)x >= 0 && (int)x < 256);
 		configHuskPlayerColour = builder.comment("Colour tint for husk players.")
-				.defineList("huskPlayerColour", Lists.newArrayList(130, 95, 27), (x) -> (int)x >= 0 && (int)x < 256);
+				.defineList("huskPlayerColour", Lists.newArrayList(193, 168, 5), (x) -> (int)x >= 0 && (int)x < 256);
 		builder.pop();
 		config = builder.build();
 	}
@@ -119,7 +119,7 @@ public class ClientConfigHandler {
 		if (huskPlayerColour == null) {
 			List<? extends Integer> rgb = configHuskPlayerColour.get();
 			if (rgb.size() >= 3) huskPlayerColour = new Color(rgb.get(0), rgb.get(1), + rgb.get(2));
-			else huskPlayerColour = new Color(130, 95, 27);
+			else huskPlayerColour = new Color(193, 168, 5);
 		}
 		return huskPlayerColour;
 	}

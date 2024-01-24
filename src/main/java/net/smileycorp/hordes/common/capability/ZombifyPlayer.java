@@ -7,7 +7,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
-import net.smileycorp.hordes.common.HordesEntities;
+import net.smileycorp.hordes.common.entities.HordesEntities;
 import net.smileycorp.hordes.common.entities.PlayerZombie;
 import net.smileycorp.hordes.common.event.SpawnZombiePlayerEvent;
 

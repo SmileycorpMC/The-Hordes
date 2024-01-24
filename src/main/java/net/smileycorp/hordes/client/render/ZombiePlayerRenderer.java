@@ -28,8 +28,9 @@ public class ZombiePlayerRenderer<T extends Zombie & PlayerZombie> extends Human
 
 	protected final ZombiePlayerModel<T> defaultModel;
 	protected final ZombiePlayerModel<T> slimModel;
+	private final boolean isTall;
 
-	public ZombiePlayerRenderer(EntityRendererProvider.Context ctx, Color colour, ResourceLocation overlay, boolean isDrowned) {
+	public ZombiePlayerRenderer(EntityRendererProvider.Context ctx, Color colour, ResourceLocation overlay, boolean isDrowned, boolean isTall) {
 		super(ctx, new ZombiePlayerModel<T>(ctx.bakeLayer(DEFAULT), colour, isDrowned), 0.5F);
 		addLayer(new HumanoidArmorLayer<>(this, new ZombieModel<T>(ctx.bakeLayer(ModelLayers.ZOMBIE_INNER_ARMOR)),
 				new ZombieModel<T>(ctx.bakeLayer(ModelLayers.ZOMBIE_OUTER_ARMOR)), ctx.getModelManager()));
@@ -39,12 +40,19 @@ public class ZombiePlayerRenderer<T extends Zombie & PlayerZombie> extends Human
 			new ZombiePlayerModel<T>(ctx.bakeLayer(SLIM)), overlay));
 		defaultModel = model;
 		slimModel = new ZombiePlayerModel<T>(ctx.bakeLayer(SLIM), colour, isDrowned);
+		this.isTall = isTall;
 	}
 
 	@Override
 	public ResourceLocation getTextureLocation(T entity) {
 		Optional<UUID> optional = entity.getPlayerUUID();
 		return PlayerTextureRenderer.getTexture(optional, Type.SKIN);
+	}
+
+	@Override
+	protected void scale(T entity, PoseStack poseStack, float p_114909_) {
+		if (isTall) poseStack.scale(1.0625F, 1.0625F, 1.0625F);
+		super.scale(entity, poseStack, p_114909_);
 	}
 
 	@Override

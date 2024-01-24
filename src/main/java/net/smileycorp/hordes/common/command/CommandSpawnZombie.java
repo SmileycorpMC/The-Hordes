@@ -11,7 +11,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.server.command.EnumArgument;
-import net.smileycorp.hordes.common.HordesEntities;
+import net.smileycorp.hordes.common.entities.HordesEntities;
 import net.smileycorp.hordes.common.entities.PlayerZombie;
 
 public class CommandSpawnZombie {
@@ -20,7 +20,7 @@ public class CommandSpawnZombie {
 		command.then(Commands.literal("spawnZombie")
 				.requires((commandSource) -> commandSource.hasPermission(1)).then(Commands.argument("username", StringArgumentType.string())
 						.then(Commands.argument("pos", Vec3Argument.vec3()).executes(CommandSpawnZombie::execute)
-								.then(Commands.argument("drowned", EnumArgument.enumArgument(Type.class)).executes(CommandSpawnZombie::execute)))));
+								.then(Commands.argument("type", EnumArgument.enumArgument(Type.class)).executes(CommandSpawnZombie::execute)))));
 	}
 
 	public static int execute(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
