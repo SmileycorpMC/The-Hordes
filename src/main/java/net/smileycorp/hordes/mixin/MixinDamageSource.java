@@ -21,7 +21,7 @@ public class MixinDamageSource {
         if (!(entity instanceof Player && this.equals(HordesInfection.getInfectionDamage(entity)))) return;
         String msg = "death.attack.infection";
         LazyOptional<ZombifyPlayer> optional = entity.getCapability(HordesCapabilities.ZOMBIFY_PLAYER);
-        if (optional.isPresent() && optional.resolve().get().wasZombified()) msg += ".zombified";
+        if (optional.isPresent() && optional.orElseGet(null).wasZombified()) msg += ".zombified";
         callback.setReturnValue(Component.translatable(msg, entity.getDisplayName()));
     }
 

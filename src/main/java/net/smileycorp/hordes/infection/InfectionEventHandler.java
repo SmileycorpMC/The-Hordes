@@ -80,7 +80,7 @@ public class InfectionEventHandler {
 		if (InfectionDataLoader.INSTANCE.applyImmunity(entity, stack.getItem())) return;
 		if (!(entity.hasEffect(HordesInfection.INFECTED.get()) && HordesInfection.isCure(stack))) return;
 		LazyOptional<Infection> optional = entity.getCapability(HordesCapabilities.INFECTION);
-		if (optional.isPresent()) optional.resolve().get().increaseInfection();
+		if (optional.isPresent()) optional.orElseGet(null).increaseInfection();
 		entity.removeEffect(HordesInfection.INFECTED.get());
 		if (entity.level().isClientSide) return;
 		InfectionPacketHandler.NETWORK_INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(()->entity.level().getChunkAt(entity.getOnPos())),
@@ -96,7 +96,7 @@ public class InfectionEventHandler {
 		if (!(entity.hasEffect(HordesInfection.INFECTED.get()) || HordesInfection.isCure(stack))) return;
 		entity.removeEffect(HordesInfection.INFECTED.get());
 		LazyOptional<Infection> optional = entity.getCapability(HordesCapabilities.INFECTION);
-		if (optional.isPresent()) optional.resolve().get().increaseInfection();
+		if (optional.isPresent()) optional.orElseGet(null).increaseInfection();
 		event.setCanceled(true);
 		event.setCancellationResult(InteractionResult.FAIL);
 	}

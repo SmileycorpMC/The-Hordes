@@ -101,11 +101,11 @@ public abstract class MixinMob extends LivingEntity {
 		Mob converted = (Mob) entity;
 		LazyOptional<HordeSpawn> beforeOptional = getCapability(HordesCapabilities.HORDESPAWN);
 		LazyOptional<HordeSpawn> afterOptional = converted.getCapability(HordesCapabilities.HORDESPAWN);
-		if (!(beforeOptional.isPresent() || afterOptional.isPresent() || beforeOptional.resolve().get().isHordeSpawned())) return converted;
-		String uuid = beforeOptional.resolve().get().getPlayerUUID();
+		if (!(beforeOptional.isPresent() || afterOptional.isPresent() || beforeOptional.orElseGet(null).isHordeSpawned())) return converted;
+		String uuid = beforeOptional.orElseGet(null).getPlayerUUID();
 		if (!DataUtils.isValidUUID(uuid)) return converted;
-		afterOptional.resolve().get().setPlayerUUID(uuid);
-		beforeOptional.resolve().get().setPlayerUUID("");
+		afterOptional.orElseGet(null).setPlayerUUID(uuid);
+		beforeOptional.orElseGet(null).setPlayerUUID("");
 		HordeEvent horde = HordeSavedData.getData((ServerLevel) level()).getEvent(UUID.fromString(uuid));
 		if (horde != null) {
 			Player player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(UUID.fromString(uuid));
@@ -125,8 +125,8 @@ public abstract class MixinMob extends LivingEntity {
 		Mob converted = callback.getReturnValue();
 		LazyOptional<HordeSpawn> optional = converted.getCapability(HordesCapabilities.HORDESPAWN);
 		if (!optional.isPresent()) return;
-		if (!optional.resolve().get().isHordeSpawned()) return;
-		String uuid = optional.resolve().get().getPlayerUUID();
+		if (!optional.orElseGet(null).isHordeSpawned()) return;
+		String uuid = optional.orElseGet(null).getPlayerUUID();
 		if (DataUtils.isValidUUID(uuid)) {
 			Player player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(UUID.fromString(uuid));
 			if (player != null) converted.goalSelector.addGoal(6, new HordeTrackPlayerGoal(converted, player));

@@ -81,7 +81,7 @@ public class InfectedEffect extends MobEffect {
 	public static int getInfectionTime(LivingEntity entity) {
 		int time = CommonConfigHandler.ticksForEffectStage.get();
 		LazyOptional<Infection> optional = entity.getCapability(HordesCapabilities.INFECTION);
-		if (optional.isPresent()) time = (int)((double)time * Math.pow(CommonConfigHandler.effectStageTickReduction.get(), optional.resolve().get().getInfectionCount()));
+		if (optional.isPresent()) time = (int)((double)time * Math.pow(CommonConfigHandler.effectStageTickReduction.get(), optional.orElseGet(null).getInfectionCount()));
 		return time;
 	}
 

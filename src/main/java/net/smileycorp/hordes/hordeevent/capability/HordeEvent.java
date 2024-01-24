@@ -205,7 +205,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 		entity.getAttribute(Attributes.FOLLOW_RANGE).addPermanentModifier(new AttributeModifier(FOLLOW_RANGE_MODIFIER,
 				"hordes:horde_range", 75, AttributeModifier.Operation.ADDITION));
 		LazyOptional<HordeSpawn> optional = entity.getCapability(HordesCapabilities.HORDESPAWN);
-		if (optional.isPresent()) { optional.resolve().get().setPlayerUUID(player.getUUID().toString());
+		if (optional.isPresent()) { optional.orElseGet(null).setPlayerUUID(player.getUUID().toString());
 			registerEntity(entity);
 			hasChanged = true;
 		}
@@ -222,7 +222,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 			if (entity.isAlive() |! entity.isRemoved()) continue;
 			LazyOptional<HordeSpawn> optional = entity.getCapability(HordesCapabilities.HORDESPAWN, null);
 			if (optional.isPresent()) {
-				HordeSpawn cap = optional.resolve().get();
+				HordeSpawn cap = optional.orElseGet(null);
 				cap.setPlayerUUID("");
 				toRemove.add(entity);
 			}
@@ -331,7 +331,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 			}
 			LazyOptional<HordeSpawn> cap = entity.getCapability(HordesCapabilities.HORDESPAWN);
 			if (!cap.isPresent()) continue;
-			cap.resolve().get().setPlayerUUID("");
+			cap.orElseGet(null).setPlayerUUID("");
 			entity.getAttribute(Attributes.FOLLOW_RANGE).removeModifier(FOLLOW_RANGE_MODIFIER);
 		}
 		hasChanged = true;
@@ -345,40 +345,8 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 		if (!entitiesSpawned.contains(enemy)) entitiesSpawned.add(enemy);
 	}
 
-	public String toString(String player) {
-		return "OngoingHordeEvent@" + Integer.toHexString(hashCode()) + "[player = " + (player == null ? "null" : player) + ", isActive = " + (timer > 0) +
-				", ticksLeft=" + timer + ", entityCount=" + entitiesSpawned.size()+", nextDay=" + nextDay + ", day=" + day+"]";
-	}
-
-	private void logInfo(Object message) {
-		HordesLogger.logInfo("[" + this + "]" + message);
-	}
-
-	private void logError(Object message, Exception e) {
-		HordesLogger.logError("["+this+"]" + message, e);
-	}
-
-	public List<String> getEntityStrings() {
-		List<String> result = new ArrayList<>();
-		result.add("	entities: {" + (entitiesSpawned.isEmpty() ? "}" : ""));
-		List<Mob> entitylist = new ArrayList<>(entitiesSpawned);
-		for (int i = 0; i < entitylist.size(); i += 10) {
-			List<Mob> sublist = entitylist.subList(i, Math.min(i+9, entitylist.size()-1));
-			StringBuilder builder = new StringBuilder();
-			builder.append("		");
-			for (Mob entity : sublist) {
-				builder.append(entity.getClass().getSimpleName() + "@");
-				builder.append(Integer.toHexString(entity.hashCode()));
-				if (entitylist.indexOf(entity) < entitylist.size()-1) builder.append(", ");
-			}
-			builder.append("}");
-			result.add(builder.toString());
-		}
-		return result;
-	}
-
 	private void postEvent(HordePlayerEvent event) {
-		for (HordeScript script : HordeScriptLoader.INSTANCE.getScripts(event)) {
+		if (event.getClass() == HordeBuildSpawntableEvent.class) for (HordeScript script : HordeScriptLoader.INSTANCE.getScripts(event)) {
 			if (script.shouldApply(event.getEntityWorld(), event.getEntity(), event.getEntityWorld().random)) {
 				script.apply(event);
 				HordesLogger.logInfo("Applying script " + script.getName());
@@ -417,4 +385,37 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 		return (int) Math.floor(CommonConfigHandler.hordeEventByPlayerTime.get() ? player.getStats().getValue(Stats.CUSTOM.get(Stats.PLAY_TIME))
 				: player.level().getDayTime() / CommonConfigHandler.dayLength.get());
 	}
+
+	private void logInfo(Object message) {
+		HordesLogger.logInfo("[" + this + "]" + message);
+	}
+
+	private void logError(Object message, Exception e) {
+		HordesLogger.logError("["+this+"]" + message, e);
+	}
+
+	public String toString(String player) {
+		return "OngoingHordeEvent@" + Integer.toHexString(hashCode()) + "[player = " + (player == null ? "null" : player) + ", isActive = " + (timer > 0) +
+				", ticksLeft=" + timer + ", entityCount=" + entitiesSpawned.size()+", nextDay=" + nextDay + ", day=" + day+"]";
+	}
+
+	public List<String> getEntityStrings() {
+		List<String> result = new ArrayList<>();
+		result.add("	entities: {" + (entitiesSpawned.isEmpty() ? "}" : ""));
+		List<Mob> entitylist = new ArrayList<>(entitiesSpawned);
+		for (int i = 0; i < entitylist.size(); i += 10) {
+			List<Mob> sublist = entitylist.subList(i, Math.min(i+9, entitylist.size()-1));
+			StringBuilder builder = new StringBuilder();
+			builder.append("		");
+			for (Mob entity : sublist) {
+				builder.append(entity.getClass().getSimpleName() + "@");
+				builder.append(Integer.toHexString(entity.hashCode()));
+				if (entitylist.indexOf(entity) < entitylist.size() -1) builder.append(", ");
+			}
+			builder.append("}");
+			result.add(builder.toString());
+		}
+		return result;
+	}
+
 }

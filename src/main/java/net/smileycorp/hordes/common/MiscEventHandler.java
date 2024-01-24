@@ -53,7 +53,7 @@ public class MiscEventHandler {
 				&& CommonConfigHandler.enableMobInfection.get()) || CommonConfigHandler.zombieGraves.get()) {
 			LazyOptional<ZombifyPlayer> optional = entity.getCapability(HordesCapabilities.ZOMBIFY_PLAYER, null);
 			if (!optional.isPresent()) return;
-			optional.resolve().get().createZombie((Player) entity);
+			optional.orElseGet(null).createZombie((Player) entity);
 		}
 	}
 
@@ -66,7 +66,7 @@ public class MiscEventHandler {
 		if ((player.hasEffect(HordesInfection.INFECTED.get()) && CommonConfigHandler.enableMobInfection.get()) || CommonConfigHandler.zombieGraves.get()) {
 			LazyOptional<ZombifyPlayer> optional = player.getCapability(HordesCapabilities.ZOMBIFY_PLAYER, null);
 			if (!optional.isPresent()) return;
-			ZombifyPlayer cap = optional.resolve().get();
+			ZombifyPlayer cap = optional.orElseGet(null);
 			PlayerZombie zombie = cap.getZombie();
 			if (zombie == null) return;
 			if (CommonConfigHandler.zombiePlayersStoreItems.get()) {

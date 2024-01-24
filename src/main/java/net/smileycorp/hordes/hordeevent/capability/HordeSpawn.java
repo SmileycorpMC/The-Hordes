@@ -34,7 +34,7 @@ public interface HordeSpawn {
 		if (entity.level().isClientSide |!(entity instanceof Mob)) return null;
 		LazyOptional<HordeSpawn> optional = entity.getCapability(HordesCapabilities.HORDESPAWN);
 		if (!optional.isPresent()) return null;
-		HordeSpawn cap = optional.resolve().get();
+		HordeSpawn cap = optional.orElseGet(null);
 		if (!cap.isHordeSpawned()) return null;
 		String uuid = cap.getPlayerUUID();
 		if (!DataUtils.isValidUUID(uuid)) return null;

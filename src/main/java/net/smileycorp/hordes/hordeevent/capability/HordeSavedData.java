@@ -77,18 +77,6 @@ public class HordeSavedData extends SavedData {
 		return events.get(uuid);
 	}
 
-	public List<String> getDebugText() {
-		List<String> out = new ArrayList<>();
-		out.add(toString());
-		out.add("Existing events: {");
-		for (Entry<UUID, HordeEvent> entry : events.entrySet()) {
-			out.add("	" +entry.getValue().toString(getName(entry.getKey())));
-			out.addAll(entry.getValue().getEntityStrings());
-		}
-		out.add("}");
-		return out;
-	}
-
 	public String getName(UUID uuid) {
 		Player player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(uuid);
 		if (player != null) return player.getName().getString();
@@ -99,8 +87,20 @@ public class HordeSavedData extends SavedData {
 
 	@Override
 	public String toString() {
-		return super.toString() + "[current_day: " + (int)Math.floor((int)level.getDayTime()/(int)CommonConfigHandler.dayLength.get()) +
-				", current_time: " + level.getDayTime()%(int)CommonConfigHandler.dayLength.get() + "next_day="+ next_day +"]";
+		return super.toString() + "[current_day: " + (int)Math.floor((float)level.getDayTime() / (float)CommonConfigHandler.dayLength.get()) +
+				", current_time: " + level.getDayTime() % CommonConfigHandler.dayLength.get() + ", next_day="+ next_day +"]";
+	}
+
+	public List<String> getDebugText() {
+		List<String> out = new ArrayList<>();
+		out.add(toString());
+		out.add("Existing events: {");
+		for (Entry<UUID, HordeEvent> entry : events.entrySet()) {
+			out.add("	" +entry.getValue().toString(getName(entry.getKey())));
+			out.addAll(entry.getValue().getEntityStrings());
+		}
+		out.add("}");
+		return out;
 	}
 
 	public static HordeSavedData getData(ServerLevel level) {
