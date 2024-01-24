@@ -15,6 +15,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.Husk;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -31,10 +32,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 
-public class ZombiePlayer extends Zombie implements PlayerZombie<ZombiePlayer> {
+public class HuskPlayer extends Husk implements PlayerZombie<HuskPlayer> {
 
-	protected static final EntityDataAccessor<Optional<UUID>> PLAYER = SynchedEntityData.defineId(ZombiePlayer.class, EntityDataSerializers.OPTIONAL_UUID);
-	protected static final EntityDataAccessor<Boolean> SHOW_CAPE = SynchedEntityData.defineId(ZombiePlayer.class, EntityDataSerializers.BOOLEAN);
+	protected static final EntityDataAccessor<Optional<UUID>> PLAYER = SynchedEntityData.defineId(HuskPlayer.class, EntityDataSerializers.OPTIONAL_UUID);
+	protected static final EntityDataAccessor<Boolean> SHOW_CAPE = SynchedEntityData.defineId(HuskPlayer.class, EntityDataSerializers.BOOLEAN);
 
 	protected NonNullList<ItemStack> playerItems = NonNullList.<ItemStack>create();
 
@@ -45,15 +46,15 @@ public class ZombiePlayer extends Zombie implements PlayerZombie<ZombiePlayer> {
 	public double yCloak;
 	public double zCloak;
 
-	public ZombiePlayer(EntityType<? extends ZombiePlayer> type, Level level) {
+	public HuskPlayer(EntityType<? extends HuskPlayer> type, Level level) {
 		super(type, level);
 	}
 
-	public ZombiePlayer(Level level) {
-		this(HordesEntities.ZOMBIE_PLAYER.get() ,level);
+	public HuskPlayer(Level level) {
+		this(HordesEntities.HUSK_PLAYER.get() ,level);
 	}
 
-	public ZombiePlayer(Player player) {
+	public HuskPlayer(Player player) {
 		this(player.level());
 		setPlayer(player);
 	}
@@ -132,23 +133,16 @@ public class ZombiePlayer extends Zombie implements PlayerZombie<ZombiePlayer> {
 
 	@Override
 	protected void doUnderWaterConversion() {
-		if (CommonConfigHandler.drownedPlayers.get()) {
-			Zombie drowned = convertTo(HordesEntities.DROWNED_PLAYER.get(), true);
-			if (drowned != null) {
-				drowned.handleAttributes(drowned.level().getCurrentDifficultyAt(drowned.blockPosition()).getSpecialMultiplier());
-				drowned.setCanBreakDoors(drowned.supportsBreakDoorGoal() && this.canBreakDoors());
-				ForgeEventFactory.onLivingConvert(this, drowned);
-				if (drowned instanceof PlayerZombie) ((PlayerZombie) drowned).copyFrom(this);
-			}
-			if (!this.isSilent()) {
-				level().levelEvent(null, 1040, this.blockPosition(), 0);
-			}
+		Zombie zombie = convertTo(HordesEntities.ZOMBIE_PLAYER.get(), true);
+		if (zombie != null) {
+			zombie.handleAttributes(zombie.level().getCurrentDifficultyAt(zombie.blockPosition()).getSpecialMultiplier());
+			zombie.setCanBreakDoors(zombie.supportsBreakDoorGoal() && this.canBreakDoors());
+			ForgeEventFactory.onLivingConvert(this, zombie);
+			if (zombie instanceof PlayerZombie) ((PlayerZombie) zombie).copyFrom(this);
 		}
-	}
-
-	@Override
-	public boolean isSunSensitive() {
-		return CommonConfigHandler.zombiePlayersBurn.get();
+		if (!this.isSilent()) {
+			level().levelEvent(null, 1040, this.blockPosition(), 0);
+		}
 	}
 
 	@Override
@@ -172,7 +166,7 @@ public class ZombiePlayer extends Zombie implements PlayerZombie<ZombiePlayer> {
 		if (compound.contains("player")) {
 			entityData.set(PLAYER, Optional.of(compound.getUUID("player")));
 		}
-		NonNullList<ItemStack> read = NonNullList.<ItemStack>withSize(compound.getList("Items", 10).size(), ItemStack.EMPTY);
+		NonNullList<ItemStack> read = NonNullList.withSize(compound.getList("Items", 10).size(), ItemStack.EMPTY);
 		ContainerHelper.loadAllItems(compound, read);
 		playerItems = read;
 	}
@@ -180,9 +174,9 @@ public class ZombiePlayer extends Zombie implements PlayerZombie<ZombiePlayer> {
 	@Override
 	public MutableComponent getDisplayName() {
 		MutableComponent textcomponentstring = PlayerTeam.formatNameForTeam(getTeam(),
-				TextUtils.translatableComponent("entity.hordes.ZombiePlayer.chat", "Zombie Player", getCustomName()));
-		textcomponentstring.getStyle().withHoverEvent(this.createHoverEvent());
-		textcomponentstring.getStyle().withInsertion(this.getEncodeId());
+				TextUtils.translatableComponent("entity.hordes.HuskPlayer.chat", "Husk Player", getCustomName()));
+		textcomponentstring.getStyle().withHoverEvent(createHoverEvent());
+		textcomponentstring.getStyle().withInsertion(getEncodeId());
 		return textcomponentstring;
 	}
 

@@ -15,6 +15,7 @@ import net.smileycorp.hordes.client.ClientConfigHandler;
 import net.smileycorp.hordes.client.ClientHandler;
 import net.smileycorp.hordes.common.data.ConfigFilesGenerator;
 import net.smileycorp.hordes.common.data.DataRegistry;
+import net.smileycorp.hordes.common.entities.HordesEntities;
 import net.smileycorp.hordes.hordeevent.HordeEventHandler;
 import net.smileycorp.hordes.hordeevent.network.HordeEventPacketHandler;
 import net.smileycorp.hordes.infection.HordesInfection;

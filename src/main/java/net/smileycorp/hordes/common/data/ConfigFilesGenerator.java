@@ -41,6 +41,7 @@ public class ConfigFilesGenerator {
         DataUtils.copyFileFromMod("assets/hordes/sounds.json", "hordes");
         DataUtils.copyFileFromMod("assets/hordes/sounds/horde_spawn.ogg", "hordes");
         DataUtils.copyFileFromMod("assets/hordes/textures/entity/layer/drowned_player_outer_layer.png", "hordes");
+        DataUtils.copyFileFromMod("assets/hordes/textures/entity/layer/husk_player_outer_layer.png", "hordes");
         DataUtils.copyFileFromMod("assets/hordes/textures/entity/layer/zombie_player_outer_layer.png", "hordes");
         DataUtils.copyFileFromMod("assets/hordes/textures/entity/zombie_evoker.png", "hordes");
         DataUtils.copyFileFromMod("assets/hordes/textures/entity/zombie_illusioner.png", "hordes");
@@ -67,6 +68,7 @@ public class ConfigFilesGenerator {
         DataUtils.copyFileFromMod("data/hordes/tags/entity_types/infection_entities.json", "hordes");
         DataUtils.copyFileFromMod("data/hordes/tags/items/infection_cures.json", "hordes");
         DataUtils.copyFileFromMod("data/hordes/tags/items/infection_immune_wearables.json", "hordes");
+        DataUtils.copyFileFromMod("data/hordes/tags/worldgen/biome/husk_player_spawn_biomes.json", "hordes");
         HordesLogger.logInfo("Generated data files.");
     }
 

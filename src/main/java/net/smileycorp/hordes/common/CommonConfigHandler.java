@@ -45,8 +45,8 @@ public class CommonConfigHandler {
 
 	//zombie players
 	public static ConfigValue<Boolean> zombieGraves;
-	public static ConfigValue<Boolean> drownedGraves;
 	public static ConfigValue<Boolean> drownedPlayers;
+	public static ConfigValue<Boolean> huskPlayers;
 	public static ConfigValue<Boolean> zombiePlayersFireImmune;
 	public static ConfigValue<Boolean> zombiePlayersBurn;
 	public static ConfigValue<Boolean> zombiePlayersOnlyHurtByPlayers;
@@ -109,15 +109,15 @@ public class CommonConfigHandler {
 		builder.pop();
 		builder.push("Misc");
 		zombieGraves = builder.comment("Whether to use zombie players as graves all the time. (Even if infection is disabled)").define("zombieGraves", false);
-		drownedGraves = builder.comment("Whether to always spawn a drowned if a player dies underwater. (Even if infection or zombieGraves are disabled)").define("drownedGraves", false);
 		drownedPlayers = builder.comment("Whether to spawn drowned players when a player dies underwater instead of a zombie player. (Whether the zombie is spawned from infection or zombieGraves being true)").define("drownedPlayers", true);
-		zombiePlayersFireImmune = builder.comment("Whether zombie players and drowned players should be immune to fire damage").define("zombiePlayersFireImmune", false);
+		huskPlayers = builder.comment("Whether to spawn husk players when a player dies in a desert biome instead of a zombie player. (Whether the zombie is spawned from infection or zombieGraves being true)").define("huskPlayers", true);
+		zombiePlayersFireImmune = builder.comment("Whether zombie players, drowned players and husk players should be immune to fire damage").define("zombiePlayersFireImmune", false);
 		zombiePlayersBurn = builder.comment("Whether zombie players and drowned players burn in sunlight.").define("zombiePlayersBurn", false);
-		zombiePlayersOnlyHurtByPlayers = builder.comment("Whether zombie players and drowned players are immune to all damage from non player sources.").define("zombiePlayersOnlyHurtByPlayers", false);
-		zombiePlayersStoreItems = builder.comment("Whether zombie players store items dropped by the player that spawned them.").define("zombiePlayersStoreItems", true);
+		zombiePlayersOnlyHurtByPlayers = builder.comment("Whether zombie players, drowned players and husk players are immune to all damage from non player sources.").define("zombiePlayersOnlyHurtByPlayers", false);
+		zombiePlayersStoreItems = builder.comment("Whether zombie players, drowned players and husk players store items dropped by the player that spawned them.").define("zombiePlayersStoreItems", true);
 
 		//misc
-		zombiesBurn = builder.comment("Whether zombies and drowneds burn in sunlight.").define("zombiesBurn", false);
+		zombiesBurn = builder.comment("Whether zombies and drowned burn in sunlight.").define("zombiesBurn", false);
 		skeletonsBurn = builder.comment("Whether skeletons and strays burn in sunlight.").define("skeletonsBurn", false);
 		zombieVillagersCanBeCured = builder.comment("Whether zombie villagers have vanilla curing mechanics or not").define("zombieVillagersCanBeCured", false);
 		piglinsHoglinsConvert = builder.comment("Whether piglins and hoglins automatically convert to zombies in the overworld").define("piglinsHoglinsConvert", false);

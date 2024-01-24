@@ -11,7 +11,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.server.command.EnumArgument;
-import net.smileycorp.hordes.common.HordesEntities;
+import net.smileycorp.hordes.common.entities.HordesEntities;
 import net.smileycorp.hordes.common.entities.PlayerZombie;
 
 public class CommandSpawnZombie {
@@ -40,7 +40,8 @@ public class CommandSpawnZombie {
 
 	private enum Type {
 		ZOMBIE(HordesEntities.ZOMBIE_PLAYER.get()),
-		DROWNED(HordesEntities.DROWNED_PLAYER.get());
+		DROWNED(HordesEntities.DROWNED_PLAYER.get()),
+		HUSK(HordesEntities.HUSK_PLAYER.get());
 
 		private final EntityType<? extends PlayerZombie> type;
 
