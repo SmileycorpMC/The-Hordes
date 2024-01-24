@@ -33,7 +33,7 @@ public class MixinMobEffectInstance {
 			if (amplifier < 3) {
 				amplifier = amplifier + 1;
 				duration = InfectedEffect.getInfectionTime(entity);
-				if (entity instanceof ServerPlayer) InfectionPacketHandler.NETWORK_INSTANCE.sendTo(new InfectMessage(), ((ServerPlayer) entity).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+				if (entity instanceof ServerPlayer) InfectionPacketHandler.NETWORK_INSTANCE.sendTo(new InfectMessage(false), ((ServerPlayer) entity).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 				callback.setReturnValue(true);
 				callback.cancel();
 			}

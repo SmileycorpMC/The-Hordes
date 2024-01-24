@@ -15,6 +15,8 @@
 	"commands.hordes.HordeClean.success":"Cleared all existing horde world data",
 	"commands.hordes.HordeReset.usage":"/hordes reset <optional: player>",
 	"commands.hordes.HordeReset.success":"Reset all horde data for player %1$s",
+	"commands.hordes.ListEntities.usage":"/hordes listEntities",
+	"commands.hordes.ListEntities.success":"Output a list of all entities to %1$s",
 	
 	"commands.hordes.SpawnZombie.usage":"/hordes spawnZombie <username> <pos> <type>",
 	

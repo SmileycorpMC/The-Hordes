@@ -19,6 +19,7 @@ public class HordeCommands {
 		CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
 		LiteralArgumentBuilder<CommandSourceStack> command = Commands.literal("hordes");
 		CommandSpawnZombie.register(command);
+		CommandListEntities.register(command);
 		if (CommonConfigHandler.enableHordeEvent.get()) {
 			CommandSpawnWave.register(command);
 			CommandStartHordeEvent.register(command);

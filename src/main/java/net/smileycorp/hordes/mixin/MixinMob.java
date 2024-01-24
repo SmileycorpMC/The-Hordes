@@ -1,5 +1,7 @@
 package net.smileycorp.hordes.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -18,10 +20,10 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.server.ServerLifecycleHooks;
-import net.smileycorp.atlas.api.entity.ai.GoToEntityPositionGoal;
 import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.ai.FleeEntityGoal;
+import net.smileycorp.hordes.common.ai.HordeTrackPlayerGoal;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 import net.smileycorp.hordes.hordeevent.capability.HordeSavedData;
@@ -33,7 +35,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -93,9 +94,9 @@ public abstract class MixinMob extends LivingEntity {
 	}
 
 	//copy horde data to converted entities after conversion before capabilities are cleared
-	@Redirect(method = "convertTo", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/EntityType;create(Lnet/minecraft/world/level/Level;)Lnet/minecraft/world/entity/Entity;"))
-	private Entity convertTo(EntityType instance, Level level) {
-		Entity entity = instance.create(level);
+	@WrapOperation(method = "convertTo", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/EntityType;create(Lnet/minecraft/world/level/Level;)Lnet/minecraft/world/entity/Entity;"))
+	private Entity convertTo(EntityType instance, Level level, Operation<Entity> original) {
+		Entity entity = original.call(instance, level);
 		if (!(entity instanceof Mob)) return entity;
 		Mob converted = (Mob) entity;
 		LazyOptional<HordeSpawn> beforeOptional = getCapability(HordesCapabilities.HORDESPAWN);
@@ -113,7 +114,7 @@ public abstract class MixinMob extends LivingEntity {
 			converted.targetSelector.getRunningGoals().forEach(WrappedGoal::stop);
 			if (converted instanceof PathfinderMob) converted.targetSelector.addGoal(1, new HurtByTargetGoal((PathfinderMob) converted));
 			converted.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(converted, Player.class, true));
-			if (player != null) converted.goalSelector.addGoal(6, new GoToEntityPositionGoal(converted, player));
+			if (player != null) converted.goalSelector.addGoal(6, new HordeTrackPlayerGoal(converted, player));
 		}
 		return converted;
 	}
@@ -128,7 +129,7 @@ public abstract class MixinMob extends LivingEntity {
 		String uuid = optional.resolve().get().getPlayerUUID();
 		if (DataUtils.isValidUUID(uuid)) {
 			Player player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(UUID.fromString(uuid));
-			if (player != null) converted.goalSelector.addGoal(6, new GoToEntityPositionGoal(converted, player));
+			if (player != null) converted.goalSelector.addGoal(6, new HordeTrackPlayerGoal(converted, player));
 		}
 	}
 

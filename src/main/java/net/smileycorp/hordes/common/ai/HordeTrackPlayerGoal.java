@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.hordeevent;
+package net.smileycorp.hordes.common.ai;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
@@ -13,7 +13,7 @@ public class HordeTrackPlayerGoal extends Goal {
 
     protected final Mob entity;
     protected final Entity target;
-    protected final PathNavigation pather;
+    protected PathNavigation pather;
     protected int timeToRecalcPath;
     protected float waterCost;
 
@@ -45,6 +45,7 @@ public class HordeTrackPlayerGoal extends Goal {
     public void tick() {
         if (timeToRecalcPath-- <= 0) {
             timeToRecalcPath = CommonConfigHandler.hordePathingInterval.get();
+            pather = entity.getNavigation();
             pather.moveTo(pather.createPath(target.blockPosition(), 1), CommonConfigHandler.hordeEntitySpeed.get());
         }
 

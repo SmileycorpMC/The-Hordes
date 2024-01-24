@@ -121,12 +121,18 @@ public class ClientHandler {
 
 	}
 
-	public static void onInfect() {
-		if (ClientConfigHandler.playerInfectSound.get()) {
+	public static void onInfect(boolean prevented) {
+		if (ClientConfigHandler.playerInfectSound.get() &! prevented) {
 			Minecraft mc = Minecraft.getInstance();
 			Level level = mc.level;
 			LocalPlayer player = mc.player;
-			level.playSound(player, player.blockPosition(), SoundEvents.ZOMBIE_VILLAGER_CONVERTED, SoundSource.HOSTILE, 0.75f, level.random.nextFloat());
+			level.playSound(player, player.blockPosition(), Constants.INFECT_SOUND, SoundSource.PLAYERS, 0.75f, level.random.nextFloat());
+		}
+		if (ClientConfigHandler.infectionProtectSound.get() && prevented) {
+			Minecraft mc = Minecraft.getInstance();
+			Level level = mc.level;
+			LocalPlayer player = mc.player;
+			level.playSound(player, player.blockPosition(), Constants.IMMUNE_SOUND, SoundSource.PLAYERS, 0.75f, level.random.nextFloat());
 		}
 	}
 

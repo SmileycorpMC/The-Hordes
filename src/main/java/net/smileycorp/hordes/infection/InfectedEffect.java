@@ -1,8 +1,10 @@
 package net.smileycorp.hordes.infection;
 
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
@@ -11,10 +13,13 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.network.NetworkDirection;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.infection.capability.Infection;
+import net.smileycorp.hordes.infection.network.InfectMessage;
+import net.smileycorp.hordes.infection.network.InfectionPacketHandler;
 
 import java.util.List;
 import java.util.UUID;
@@ -61,7 +66,16 @@ public class InfectedEffect extends MobEffect {
 	}
 
 	public static void apply(LivingEntity entity) {
-		entity.addEffect(new MobEffectInstance(HordesInfection.INFECTED.get(), getInfectionTime(entity)));
+		boolean prevented = preventInfection(entity);
+		if (entity instanceof ServerPlayer) InfectionPacketHandler.NETWORK_INSTANCE.sendTo(new InfectMessage(prevented),
+				((ServerPlayer) entity).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+		if (!prevented) entity.addEffect(new MobEffectInstance(HordesInfection.INFECTED.get(), getInfectionTime(entity)));
+	}
+
+	public static boolean preventInfection(LivingEntity entity) {
+		if (entity.hasEffect(HordesInfection.IMMUNITY.get())) return true;
+		for (EquipmentSlot slot : EquipmentSlot.values()) if (slot.isArmor() &! entity.getItemBySlot(slot).is(HordesInfection.IMMUNE_WEARABLES_TAG)) return false;
+		return false;
 	}
 
 	public static int getInfectionTime(LivingEntity entity) {
