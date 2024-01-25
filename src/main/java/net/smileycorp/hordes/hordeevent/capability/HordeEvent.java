@@ -17,7 +17,6 @@ import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
@@ -52,7 +51,6 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 	private long ticksExisted = 0;
 	private int day = 0;
 	private int nextDay = -1;
-	private boolean hasChanged = false;
 
 	private HordeSpawnTable loadedTable;
 	boolean sentDay;
@@ -86,7 +84,6 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 		nbt.putInt("nextDay", nextDay);
 		nbt.putInt("day", day);
 		if (loadedTable != null) nbt.putString("loadedTable", loadedTable.getName().toString());
-		hasChanged = false;
 		return nbt;
 	}
 
@@ -96,7 +93,6 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 		if (timer % CommonConfigHandler.hordeSpawnInterval.get() == 0) spawnWave(player, getMobCount(player, level));
 		timer--;
 		if (timer == 0) stopEvent(player, false);
-		hasChanged = true;
 	}
 
 	private int getMobCount(ServerPlayer player, Level level) {
@@ -110,7 +106,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 
 	private boolean shouldReduce(ServerPlayer player, ServerPlayer other) {
 		if (other == player || player.distanceTo(other) > 25) return false;
-		HordeEvent horde = HordeSavedData.getData((ServerLevel) other.level()).getEvent(other);
+		HordeEvent horde = HordeSavedData.getData(other.serverLevel()).getEvent(other);
 		return horde != null && horde.isActive(other);
 	}
 
@@ -126,7 +122,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 			logError("Cannot load wave spawntable, cancelling spawns.", new Exception());
 			return;
 		}
-		Level level = player.level();
+		ServerLevel level = player.serverLevel();
 		HordeStartWaveEvent startEvent = new HordeStartWaveEvent(player, this, count);
 		postEvent(startEvent);
 		if (startEvent.isCanceled()) return;
@@ -153,11 +149,9 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 			logInfo("Stopping wave spawn because count is " + count);
 			return;
 		}
-		if (player instanceof ServerPlayer) {
-			HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new HordeSoundMessage(basedir, startEvent.getSound()),
+		HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new HordeSoundMessage(basedir, startEvent.getSound()),
 					player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
-		}
-		for (int n = 0; n<count; n++) {
+		for (int n = 0; n < count; n++) {
 			if (entitiesSpawned.size() > CommonConfigHandler.hordeSpawnMax.get()) {
 				logInfo("Can't spawn wave because max cap has been reached");
 				return;
@@ -170,14 +164,14 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 				AtomicBoolean cancelled = new AtomicBoolean(false);
 				CompoundTag nbt = entry.getNBT();
 				nbt.putString("id", entry.getName().toString());
-				Mob newEntity = (Mob) EntityType.loadEntityRecursive(nbt, level, (entity)->loadEntity(level, player, (Mob) entity, pos, cancelled));
+				Mob newEntity = (Mob) EntityType.loadEntityRecursive(nbt, level, (entity) -> loadEntity(level, player, (Mob) entity, pos, cancelled));
 				if (cancelled.get()) continue;
 				newEntity.readAdditionalSaveData(entry.getNBT());
-				if (!((ServerLevel)level).tryAddFreshEntityWithPassengers(newEntity)) {
+				if (!(level.tryAddFreshEntityWithPassengers(newEntity))) {
 					logError("Unable to spawn entity from " + type, new Exception());
 					continue;
 				}
-				finalizeEntity(newEntity , level, player);
+				finalizeEntity(newEntity, player);
 			} catch (Exception e) {
 				e.printStackTrace();
 				logError("Unable to spawn entity from " + type, e);
@@ -185,13 +179,13 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 		}
 	}
 
-	private Entity loadEntity(Level level, ServerPlayer player, Mob entity, BlockPos pos, AtomicBoolean cancel) {
+	private Entity loadEntity(ServerLevel level, ServerPlayer player, Mob entity, BlockPos pos, AtomicBoolean cancel) {
 		HordeSpawnEntityEvent spawnEntityEvent = new HordeSpawnEntityEvent(player, entity, pos, this);
 		postEvent(spawnEntityEvent);
 		if (!spawnEntityEvent.isCanceled()) {
 			entity = spawnEntityEvent.entity;
 			pos = spawnEntityEvent.pos;
-			entity.finalizeSpawn((ServerLevelAccessor) level, level.getCurrentDifficultyAt(pos), null, null, null);
+			entity.finalizeSpawn(level, level.getCurrentDifficultyAt(pos), null, null, null);
 			entity.setPos(pos.getX(), pos.getY(), pos.getZ());
 			return entity;
 		} else {
@@ -201,19 +195,18 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 		}
 	}
 
-	private void finalizeEntity(Mob entity, Level level, ServerPlayer player) {
+	private void finalizeEntity(Mob entity, ServerPlayer player) {
 		entity.getAttribute(Attributes.FOLLOW_RANGE).addPermanentModifier(new AttributeModifier(FOLLOW_RANGE_MODIFIER,
 				"hordes:horde_range", 75, AttributeModifier.Operation.ADDITION));
 		LazyOptional<HordeSpawn> optional = entity.getCapability(HordesCapabilities.HORDESPAWN);
 		if (optional.isPresent()) { optional.orElseGet(null).setPlayerUUID(player.getUUID().toString());
 			registerEntity(entity);
-			hasChanged = true;
 		}
 		entity.targetSelector.getRunningGoals().forEach(WrappedGoal::stop);
 		if (entity instanceof PathfinderMob) entity.targetSelector.addGoal(1, new HurtByTargetGoal((PathfinderMob) entity));
 		entity.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(entity, ServerPlayer.class, true));
 		entity.goalSelector.addGoal(6, new HordeTrackPlayerGoal(entity, player));
-		for (Entity passenger : entity.getPassengers()) if (passenger instanceof Mob) finalizeEntity((Mob) passenger, level, player);
+		for (Entity passenger : entity.getPassengers()) if (passenger instanceof Mob) finalizeEntity((Mob) passenger, player);
 	}
 
 	private void cleanSpawns() {
@@ -231,8 +224,8 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 	}
 
 	public boolean isHordeDay(ServerPlayer player) {
-		Level level = player.level();
-		if (level.isClientSide |! (level.dimension() == Level.OVERWORLD)) return false;
+		ServerLevel level = player.serverLevel();
+		if (level.dimension() != Level.OVERWORLD) return false;
 		return isActive(player) || getCurrentDay(player) >= nextDay;
 	}
 
@@ -240,14 +233,9 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 		return timer > 0;
 	}
 
-	public boolean hasChanged() {
-		return hasChanged;
-	}
-
 	public void setPlayer(ServerPlayer player) {
 		cleanSpawns();
-		entitiesSpawned.forEach(entity->fixGoals(player, entity));
-		hasChanged = true;
+		entitiesSpawned.forEach(entity -> fixGoals(player, entity));
 	}
 
 	private void fixGoals(ServerPlayer player, Mob entity) {
@@ -266,7 +254,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 			logError("player is null for " + this, new NullPointerException());
 			return;
 		}
-		Level level = player.level();
+		ServerLevel level = player.serverLevel();
 		if (level.dimension() != Level.OVERWORLD) return;
 		HordeStartEvent startEvent = new HordeStartEvent(player, this, isCommand);
 		postEvent(startEvent);
@@ -282,7 +270,6 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 		}
 		if (!table.getSpawnTable(day).isEmpty()) {
 			timer = duration;
-			hasChanged = true;
 			sendMessage(player, startEvent.getMessage());
 			if (isCommand) day = getCurrentDay(player);
 			else day = nextDay;
@@ -291,7 +278,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 			logInfo("Spawntable is empty, canceling event start.");
 		}
 		if (!isCommand) nextDay = CommonConfigHandler.hordeEventByPlayerTime.get() ? nextDay + CommonConfigHandler.hordeSpawnDays.get()
-				: HordeSavedData.getData((ServerLevel) level).getNextDay();
+				: HordeSavedData.getData(level).getNextDay();
 	}
 
 	public void setSpawntable(HordeSpawnTable table) {
@@ -334,7 +321,6 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 			cap.orElseGet(null).setPlayerUUID("");
 			entity.getAttribute(Attributes.FOLLOW_RANGE).removeModifier(FOLLOW_RANGE_MODIFIER);
 		}
-		hasChanged = true;
 	}
 
 	public void removeEntity(Mob entity) {
