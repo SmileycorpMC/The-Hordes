@@ -3,7 +3,6 @@ package net.smileycorp.hordes.hordeevent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
@@ -29,7 +28,6 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.ai.HordeTrackPlayerGoal;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
@@ -80,7 +78,6 @@ public class HordeEventHandler {
 	public void playerTick(PlayerTickEvent event) {
 		if (event.phase != Phase.END || !(event.player instanceof ServerPlayer) || event.player instanceof FakePlayer) return;
 		ServerPlayer player = (ServerPlayer) event.player;
-		HordesLogger.logInfo(player.getStats().getValue(Stats.CUSTOM.get(Stats.PLAY_TIME)));
 		ServerLevel level = ServerLifecycleHooks.getCurrentServer().overworld();
 		if (CommonConfigHandler.pauseEventServer.get() && level.players().isEmpty()) return;
 		HordeEvent horde = HordeSavedData.getData(level).getEvent(player);
