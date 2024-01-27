@@ -82,7 +82,6 @@ public class HordeEventHandler {
 		if (CommonConfigHandler.pauseEventServer.get() && level.players().isEmpty()) return;
 		HordeEvent horde = HordeSavedData.getData(level).getEvent(player);
 		if (horde == null) return;
-		horde.updateTicksExisted();
 		if (!horde.hasSynced()) horde.sync(player);
 		if (horde.isActive(player)) {
 			horde.update(player);

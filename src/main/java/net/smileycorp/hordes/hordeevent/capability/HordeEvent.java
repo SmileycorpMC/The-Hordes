@@ -48,7 +48,6 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 
 	private Set<Mob> entitiesSpawned = new HashSet<>();
 	private int timer = 0;
-	private long ticksExisted = 0;
 	private int day = 0;
 	private int nextDay = -1;
 
@@ -64,9 +63,6 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 		if (nbt.contains("timer")) {
 			timer = nbt.getInt("timer");
 		}
-		if (nbt.contains("ticksExisted")) {
-			ticksExisted = nbt.getLong("ticksExisted");
-		}
 		if (nbt.contains("nextDay")) {
 			nextDay = nbt.getInt("nextDay");
 		}
@@ -80,7 +76,6 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 
 	public CompoundTag writeToNBT(CompoundTag nbt) {
 		nbt.putInt("timer", timer);
-		nbt.putLong("ticksExisted", ticksExisted);
 		nbt.putInt("nextDay", nextDay);
 		nbt.putInt("day", day);
 		if (loadedTable != null) nbt.putString("loadedTable", loadedTable.getName().toString());
@@ -357,14 +352,6 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 		HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new UpdateClientHordeMessage(isActive(player) ? day : nextDay, CommonConfigHandler.dayLength.get()),
 				player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 		sentDay = true;
-	}
-
-	public void updateTicksExisted() {
-		ticksExisted++;
-	}
-
-	public long getTicksExisted() {
-		return ticksExisted;
 	}
 
 	public int getCurrentDay(ServerPlayer player) {
