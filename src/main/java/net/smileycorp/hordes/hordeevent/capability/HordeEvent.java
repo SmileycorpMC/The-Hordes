@@ -245,6 +245,10 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 	public void tryStartEvent(ServerPlayer player, int duration, boolean isCommand) {
 		cleanSpawns();
 		if (CommonConfigHandler.hordesCommandOnly.get() &! isCommand) return;
+		if (!isCommand) {
+			logInfo("Trying to start horde event on day " + getCurrentDay(player) + " with nextDay " + nextDay + " and time "
+					+ player.level().getDayTime() % CommonConfigHandler.dayLength.get());
+		}
 		if (player == null) {
 			logError("player is null for " + this, new NullPointerException());
 			return;
@@ -355,8 +359,8 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 	}
 
 	public int getCurrentDay(ServerPlayer player) {
-		return (int) Math.floor(CommonConfigHandler.hordeEventByPlayerTime.get() ? player.getStats().getValue(Stats.CUSTOM.get(Stats.PLAY_TIME))
-				: player.level().getDayTime() / CommonConfigHandler.dayLength.get());
+		return (int) Math.floor((CommonConfigHandler.hordeEventByPlayerTime.get() ? player.getStats().getValue(Stats.CUSTOM.get(Stats.PLAY_TIME))
+				: player.level().getDayTime()) / CommonConfigHandler.dayLength.get());
 	}
 
 	private void logInfo(Object message) {
