@@ -1,9 +1,6 @@
 package net.smileycorp.hordes.common.ai;
 
-import java.util.List;
-
 import com.google.common.base.Predicate;
-
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAIBase;
@@ -14,6 +11,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.smileycorp.atlas.api.util.DirectionUtils;
+
+import java.util.List;
 
 public class FleeEntityTask extends EntityAIBase {
 

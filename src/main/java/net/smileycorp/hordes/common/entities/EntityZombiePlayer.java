@@ -1,11 +1,7 @@
 package net.smileycorp.hordes.common.entities;
 
-import java.util.List;
-import java.util.UUID;
-
 import com.google.common.base.Optional;
 import com.mojang.authlib.GameProfile;
-
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityZombie;
@@ -25,6 +21,9 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.smileycorp.hordes.common.ConfigHandler;
+
+import java.util.List;
+import java.util.UUID;
 
 
 public class EntityZombiePlayer extends EntityZombie {

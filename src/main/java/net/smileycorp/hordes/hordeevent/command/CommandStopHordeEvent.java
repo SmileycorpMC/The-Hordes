@@ -5,8 +5,8 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
-import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.Constants;
+import net.smileycorp.hordes.common.Hordes;
 
 public class CommandStopHordeEvent extends CommandBase {
 

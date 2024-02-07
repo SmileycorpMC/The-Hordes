@@ -1,9 +1,6 @@
 package net.smileycorp.hordes.client;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
+import com.mojang.authlib.GameProfile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelZombie;
 import net.minecraft.client.network.NetworkPlayerInfo;
@@ -15,7 +12,9 @@ import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.util.ResourceLocation;
 import net.smileycorp.hordes.common.entities.EntityZombiePlayer;
 
-import com.mojang.authlib.GameProfile;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class RenderZombiePlayer extends RenderBiped<EntityZombiePlayer> {
 

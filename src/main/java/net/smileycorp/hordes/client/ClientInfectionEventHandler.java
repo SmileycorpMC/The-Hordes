@@ -1,7 +1,5 @@
 package net.smileycorp.hordes.client;
 
-import java.awt.Color;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
@@ -13,8 +11,9 @@ import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.infection.HordesInfection;
-
 import org.lwjgl.opengl.GL11;
+
+import java.awt.*;
 
 public class ClientInfectionEventHandler {
 

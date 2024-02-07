@@ -1,7 +1,5 @@
 package net.smileycorp.hordes.infection;
 
-import java.util.Random;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
@@ -39,6 +37,8 @@ import net.smileycorp.hordes.common.ai.EntityAINearestAttackableConversion;
 import net.smileycorp.hordes.common.event.InfectionDeathEvent;
 import net.smileycorp.hordes.infection.InfectionPacketHandler.InfectMessage;
 import net.smileycorp.hordes.infection.capability.IInfection;
+
+import java.util.Random;
 
 @EventBusSubscriber(modid=Constants.modid)
 public class InfectionEventHandler {

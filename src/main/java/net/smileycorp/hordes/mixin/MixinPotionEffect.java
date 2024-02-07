@@ -1,11 +1,5 @@
 package net.smileycorp.hordes.mixin;
 
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
@@ -13,6 +7,11 @@ import net.minecraft.potion.PotionEffect;
 import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.infection.HordesInfection;
 import net.smileycorp.hordes.infection.InfectionRegister;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PotionEffect.class)
 public class MixinPotionEffect {

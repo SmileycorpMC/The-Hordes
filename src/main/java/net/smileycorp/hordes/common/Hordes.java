@@ -1,8 +1,5 @@
 package net.smileycorp.hordes.common;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -17,6 +14,8 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.smileycorp.hordes.hordeevent.IHordeSpawn;
 import net.smileycorp.hordes.hordeevent.IOngoingHordeEvent;
 import net.smileycorp.hordes.infection.capability.IInfection;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Mod(modid = Constants.modid, name=Constants.name, version = Constants.version, dependencies = Constants.dependencies)
 public class Hordes {

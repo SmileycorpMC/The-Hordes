@@ -1,8 +1,5 @@
 package net.smileycorp.hordes.infection;
 
-import java.util.List;
-import java.util.UUID;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -18,6 +15,9 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.Constants;
+
+import java.util.List;
+import java.util.UUID;
 
 public class PotionInfected extends Potion {
 	

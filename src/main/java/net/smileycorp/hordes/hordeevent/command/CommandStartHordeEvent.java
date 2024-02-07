@@ -7,8 +7,8 @@ import net.minecraft.command.NumberInvalidException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentTranslation;
-import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.Constants;
+import net.smileycorp.hordes.common.Hordes;
 
 public class CommandStartHordeEvent extends CommandBase {
 

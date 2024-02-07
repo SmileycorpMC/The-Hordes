@@ -1,7 +1,5 @@
 package net.smileycorp.hordes.integration.jei;
 
-import java.util.List;
-
 import mezz.jei.api.IGuiHelper;
 import mezz.jei.api.gui.IDrawable;
 import mezz.jei.api.gui.IGuiItemStackGroup;
@@ -13,6 +11,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.translation.I18n;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.infection.PotionInfected;
+
+import java.util.List;
 
 @SuppressWarnings("deprecation")
 public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapper> {

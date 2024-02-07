@@ -1,7 +1,5 @@
 package net.smileycorp.hordes.client;
 
-import java.util.Random;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.entity.Entity;
@@ -13,14 +11,12 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.ChatType;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.*;
 import net.minecraft.world.World;
 import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.infection.CureEntityMessage;
+
+import java.util.Random;
 
 public class ClientHandler {
 

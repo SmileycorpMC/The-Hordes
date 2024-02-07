@@ -1,7 +1,5 @@
 package net.smileycorp.hordes.common;
 
-import java.util.List;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
@@ -15,6 +13,8 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.smileycorp.hordes.common.entities.EntityZombiePlayer;
 import net.smileycorp.hordes.infection.HordesInfection;
+
+import java.util.List;
 
 public class MiscEventHandler {
 

@@ -1,17 +1,17 @@
 package net.smileycorp.hordes.hordeevent.command;
 
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.hordeevent.WorldDataHordeEvent;
+
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 
 public class CommandDebugHordeEvent extends CommandBase {
 

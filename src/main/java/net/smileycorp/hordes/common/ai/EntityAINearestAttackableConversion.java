@@ -1,12 +1,12 @@
 package net.smileycorp.hordes.common.ai;
 
-import java.util.Collections;
-import java.util.List;
-
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.smileycorp.hordes.infection.InfectionRegister;
+
+import java.util.Collections;
+import java.util.List;
 
 public class EntityAINearestAttackableConversion extends EntityAINearestAttackableTarget<EntityLivingBase> {
 

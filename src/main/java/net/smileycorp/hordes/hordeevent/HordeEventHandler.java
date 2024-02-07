@@ -1,7 +1,5 @@
 package net.smileycorp.hordes.hordeevent;
 
-import java.util.UUID;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
@@ -35,8 +33,10 @@ import net.smileycorp.atlas.api.entity.ai.EntityAIFindNearestTargetPredicate;
 import net.smileycorp.atlas.api.entity.ai.EntityAIGoToEntityPos;
 import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.hordes.common.ConfigHandler;
-import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.Constants;
+import net.smileycorp.hordes.common.Hordes;
+
+import java.util.UUID;
 
 @EventBusSubscriber(modid=Constants.modid)
 public class HordeEventHandler {

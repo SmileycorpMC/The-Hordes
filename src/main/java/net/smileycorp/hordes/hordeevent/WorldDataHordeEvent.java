@@ -1,14 +1,6 @@
 package net.smileycorp.hordes.hordeevent;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.UUID;
-
+import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
@@ -16,10 +8,11 @@ import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.hordes.common.ConfigHandler;
-import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.Constants;
+import net.smileycorp.hordes.common.Hordes;
 
-import com.mojang.authlib.GameProfile;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class WorldDataHordeEvent extends WorldSavedData {
 
