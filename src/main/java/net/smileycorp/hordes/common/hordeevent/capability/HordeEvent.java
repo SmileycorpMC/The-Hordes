@@ -29,6 +29,7 @@ import net.smileycorp.atlas.api.util.DirectionUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.HordesLogger;
+import net.smileycorp.hordes.common.ai.HordeTrackPlayerGoal;
 import net.smileycorp.hordes.common.event.*;
 import net.smileycorp.hordes.common.hordeevent.HordeSpawnEntry;
 import net.smileycorp.hordes.common.hordeevent.HordeSpawnTable;
@@ -215,7 +216,7 @@ class HordeEvent implements IHordeEvent {
 			entity.targetSelector.addGoal(1, new HurtByTargetGoal((PathfinderMob) entity));
 		}
 		entity.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(entity, Player.class, true));
-		entity.goalSelector.addGoal(6, new GoToEntityPositionGoal(entity, player)); //TODO: debug ai not working correctly on drowned mobs that aren't in water
+		entity.goalSelector.addGoal(6, new HordeTrackPlayerGoal(entity, player)); //TODO: debug ai not working correctly on drowned mobs that aren't in water
 		for (Entity passenger : entity.getPassengers()) if (passenger instanceof Mob) finalizeEntity((Mob) passenger, level, player);
 	}
 
@@ -256,16 +257,16 @@ class HordeEvent implements IHordeEvent {
 		Set<Mob> toRemove = new HashSet<>();
 		for (Mob entity : entitiesSpawned) {
 			if (entity!=null) {
-				GoToEntityPositionGoal task = null;
+				HordeTrackPlayerGoal task = null;
 				for (WrappedGoal entry : entity.goalSelector.getRunningGoals().toArray(WrappedGoal[]::new)) {
-					if (entry.getGoal() instanceof GoToEntityPositionGoal) {
-						task = (GoToEntityPositionGoal) entry.getGoal();
+					if (entry.getGoal() instanceof HordeTrackPlayerGoal) {
+						task = (HordeTrackPlayerGoal) entry.getGoal();
 						break;
 					}
 				}
 				if (task!=null) {
 					entity.goalSelector.removeGoal(task);
-					entity.goalSelector.addGoal(6, new GoToEntityPositionGoal(entity, player));
+					entity.goalSelector.addGoal(6, new HordeTrackPlayerGoal(entity, player));
 				}
 			} else toRemove.add(entity);
 		}

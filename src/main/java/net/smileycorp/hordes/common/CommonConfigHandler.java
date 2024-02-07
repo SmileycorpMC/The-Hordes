@@ -24,6 +24,7 @@ public class CommonConfigHandler {
 	public static ConfigValue<Integer> hordeSpawnDays;
 	public static ConfigValue<Integer> hordeSpawnVariation;
 	public static ConfigValue<Integer> dayLength;
+	public static ConfigValue<Integer> hordePathingInterval;
 	public static ConfigValue<Boolean> spawnFirstDay;
 	public static ConfigValue<Boolean> canSleepDuringHorde;
 	public static ConfigValue<Double> hordeMultiplayerScaling;
@@ -83,6 +84,7 @@ public class CommonConfigHandler {
 		hordeSpawnVariation = builder.comment("Amount of days a horde event can be randomly delayed by").define("hordeSpawnVariation", 0);
 		hordeSpawnMax = builder.comment("Max cap for the number of entities that can exist from the horde at once.").define("hordeSpawnMax", 160);
 		dayLength = builder.comment("Length of a day (use only if you have another day that changes the length of the day/night cycle) Default is 24000").define("dayLength", 24000);
+		hordePathingInterval = builder.comment("How many ticks does the horde pathing ai take before recalculating? (Increase this if you are having server slowdown during horde events.)").define("hordePathingInterval", 10);
 		spawnFirstDay = builder.comment("Set to true to enable the horde spawning on the first day. (Game day 0)").define("spawnFirstDay", false);
 		canSleepDuringHorde = builder.comment("Set to false to disable the use of beds during a horde event.").define("canSleepDuringHorde", false);
 		hordeMultiplayerScaling = builder.comment("How much should the size of each horde scale down by when multiple players are near each other?").define("hordeMultiplayerScaling", 0.8);
