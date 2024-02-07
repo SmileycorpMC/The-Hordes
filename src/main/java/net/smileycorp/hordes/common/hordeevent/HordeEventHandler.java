@@ -33,11 +33,11 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.server.ServerLifecycleHooks;
-import net.smileycorp.atlas.api.entity.ai.GoToEntityPositionGoal;
 import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.ai.HordeTrackPlayerGoal;
 import net.smileycorp.hordes.common.hordeevent.capability.HordeSavedData;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeSpawn;
@@ -56,7 +56,7 @@ public class HordeEventHandler {
 		if (entity instanceof Mob) {
 			event.addCapability(Constants.loc("HordeSpawn"), new IHordeSpawn.Provider());
 		}
-		if (entity instanceof Player && !(entity instanceof FakePlayer)) {
+		if (entity instanceof Player && !(entity instanceof FakePlayer) &! entity.level.isClientSide) {
 			event.addCapability(Constants.loc("HordeEvent"), new IHordeEvent.Provider());
 		}
 	}
@@ -182,7 +182,7 @@ public class HordeEventHandler {
 							LazyOptional<IHordeEvent> optionalp = player.getCapability(Hordes.HORDE_EVENT, null);
 							if (optionalp.isPresent()) {
 								optionalp.resolve().get().registerEntity(entity);
-								entity.goalSelector.addGoal(6, new GoToEntityPositionGoal(entity, player));
+								entity.goalSelector.addGoal(6, new HordeTrackPlayerGoal(entity, player));
 							}
 							cap.setSynced();
 						}

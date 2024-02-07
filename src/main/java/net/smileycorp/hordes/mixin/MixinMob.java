@@ -16,11 +16,11 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.server.ServerLifecycleHooks;
-import net.smileycorp.atlas.api.entity.ai.GoToEntityPositionGoal;
 import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.ai.FleeEntityGoal;
+import net.smileycorp.hordes.common.ai.HordeTrackPlayerGoal;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeSpawn;
 import net.smileycorp.hordes.common.infection.HordesInfection;
@@ -128,7 +128,7 @@ public abstract class MixinMob extends LivingEntity {
 				String uuid = optional.resolve().get().getPlayerUUID();
 				if (DataUtils.isValidUUID(uuid)) {
 					Player player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(UUID.fromString(uuid));
-					if (player != null) converted.goalSelector.addGoal(6, new GoToEntityPositionGoal(converted, player));
+					if (player != null) converted.goalSelector.addGoal(6, new HordeTrackPlayerGoal(converted, player));
 				}
 			}
 		}
