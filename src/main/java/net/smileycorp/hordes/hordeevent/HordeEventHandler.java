@@ -30,11 +30,11 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import net.smileycorp.atlas.api.entity.ai.EntityAIFindNearestTargetPredicate;
-import net.smileycorp.atlas.api.entity.ai.EntityAIGoToEntityPos;
 import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.ai.EntityAIHordeTrackPlayer;
 
 import java.util.UUID;
 
@@ -122,10 +122,10 @@ public class HordeEventHandler {
 					}
 					String uuid = cap.getPlayerUUID();
 					EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(UUID.fromString(uuid));
-					if (player!=null) {
+					if (player != null) {
 						if (player.hasCapability(Hordes.HORDE_EVENT, null)) {
 							IOngoingHordeEvent horde = player.getCapability(Hordes.HORDE_EVENT, null);
-							entity.tasks.addTask(6, new EntityAIGoToEntityPos(entity, player));
+							entity.tasks.addTask(6, new EntityAIHordeTrackPlayer(entity, player));
 							horde.registerEntity(entity);
 						}
 					}

@@ -14,7 +14,7 @@ import net.smileycorp.atlas.api.util.DirectionUtils;
 
 import java.util.List;
 
-public class FleeEntityTask extends EntityAIBase {
+public class EntityAIFleeEntity extends EntityAIBase {
 
 	protected final EntityLiving entity;
 	protected final World world;
@@ -24,7 +24,7 @@ public class FleeEntityTask extends EntityAIBase {
 	protected final double speed, range;
 	protected final Predicate<EntityLivingBase> predicate;
 
-	public FleeEntityTask(EntityLiving entity, double speed, double range, Predicate<EntityLivingBase> predicate) {
+	public EntityAIFleeEntity(EntityLiving entity, double speed, double range, Predicate<EntityLivingBase> predicate) {
 		super();
 		this.entity=entity;
 		world = entity.world;

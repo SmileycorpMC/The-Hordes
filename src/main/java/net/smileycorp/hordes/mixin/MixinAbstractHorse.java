@@ -10,7 +10,7 @@ import net.minecraft.inventory.ContainerHorseChest;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.smileycorp.hordes.common.ConfigHandler;
-import net.smileycorp.hordes.common.ai.HorseFleeTask;
+import net.smileycorp.hordes.common.ai.EntityAIHorseFlee;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -46,7 +46,7 @@ public abstract class MixinAbstractHorse extends EntityAnimal {
 			tasks.taskEntries.removeIf(g->g.action instanceof EntityAIPanic);
 		}
 		if (getCreatureAttribute() != EnumCreatureAttribute.UNDEAD && ConfigHandler.zombiesScareHorses) {
-			tasks.addTask(1, new HorseFleeTask(this));
+			tasks.addTask(1, new EntityAIHorseFlee(this));
 		}
 	}
 

@@ -3,9 +3,9 @@ package net.smileycorp.hordes.common.ai;
 import net.minecraft.entity.EntityLiving;
 import net.smileycorp.hordes.infection.InfectionRegister;
 
-public class HorseFleeTask extends FleeEntityTask {
+public class EntityAIHorseFlee extends EntityAIFleeEntity {
 
-	public HorseFleeTask(EntityLiving entity) {
+	public EntityAIHorseFlee(EntityLiving entity) {
 		super(entity, 2D, 15, InfectionRegister::canCauseInfection);
 	}
 

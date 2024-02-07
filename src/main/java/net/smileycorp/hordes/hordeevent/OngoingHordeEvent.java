@@ -1,12 +1,5 @@
 package net.smileycorp.hordes.hordeevent;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.apache.commons.lang3.ArrayUtils;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
@@ -24,17 +17,19 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
 import net.smileycorp.atlas.api.SimpleStringMessage;
 import net.smileycorp.atlas.api.entity.ai.EntityAIFindNearestTargetPredicate;
-import net.smileycorp.atlas.api.entity.ai.EntityAIGoToEntityPos;
 import net.smileycorp.atlas.api.recipe.WeightedOutputs;
 import net.smileycorp.atlas.api.util.DirectionUtils;
 import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
-import net.smileycorp.hordes.common.event.HordeBuildSpawntableEvent;
-import net.smileycorp.hordes.common.event.HordeEndEvent;
-import net.smileycorp.hordes.common.event.HordeSpawnEntityEvent;
-import net.smileycorp.hordes.common.event.HordeStartEvent;
-import net.smileycorp.hordes.common.event.HordeStartWaveEvent;
+import net.smileycorp.hordes.common.ai.EntityAIHordeTrackPlayer;
+import net.smileycorp.hordes.common.event.*;
 import net.smileycorp.hordes.integration.mobspropertiesrandomness.MPRIntegration;
+import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class OngoingHordeEvent implements IOngoingHordeEvent {
 
@@ -202,7 +197,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 		} else {
 			entity.targetTasks.addTask(1, new EntityAIFindNearestTargetPredicate(entity, e -> e instanceof EntityPlayer));
 		}
-		entity.tasks.addTask(6, new EntityAIGoToEntityPos(entity, player));
+		entity.tasks.addTask(6, new EntityAIHordeTrackPlayer(entity, player));
 		for (Entity passenger : entity.getPassengers()) if (passenger instanceof EntityLiving) finalizeEntity((EntityLiving) passenger, world, player);
 	}
 
@@ -248,20 +243,20 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 
 	@Override
 	public void setPlayer(EntityPlayer player) {
-		this.player=player;
+		this.player = player;
 		Set<EntityLiving> toRemove = new HashSet<>();
 		for (EntityLiving entity : entitiesSpawned) {
-			if (entity!=null) {
-				EntityAIGoToEntityPos task = null;
+			if (entity != null) {
+				EntityAIHordeTrackPlayer task = null;
 				for (EntityAITaskEntry entry : entity.tasks.taskEntries) {
-					if (entry.action instanceof EntityAIGoToEntityPos) {
-						task = (EntityAIGoToEntityPos) entry.action;
+					if (entry.action instanceof EntityAIHordeTrackPlayer) {
+						task = (EntityAIHordeTrackPlayer) entry.action;
 						break;
 					}
 				}
-				if (task!=null) {
+				if (task != null) {
 					entity.tasks.removeTask(task);
-					entity.tasks.addTask(6, new EntityAIGoToEntityPos(entity, player));
+					entity.tasks.addTask(6, new EntityAIHordeTrackPlayer(entity, player));
 				}
 			} else toRemove.add(entity);
 		}
