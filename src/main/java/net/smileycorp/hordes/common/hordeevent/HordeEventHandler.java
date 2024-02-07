@@ -39,6 +39,7 @@ import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.ai.HordeTrackPlayerGoal;
 import net.smileycorp.hordes.common.hordeevent.capability.HordeSavedData;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
 import net.smileycorp.hordes.common.hordeevent.capability.IHordeSpawn;
@@ -183,7 +184,7 @@ public class HordeEventHandler {
 							LazyOptional<IHordeEvent> optionalp = player.getCapability(Hordes.HORDE_EVENT, null);
 							if (optionalp.isPresent()) {
 								optionalp.resolve().get().registerEntity(entity);
-								entity.goalSelector.addGoal(6, new GoToEntityPositionGoal(entity, player));
+								entity.goalSelector.addGoal(6, new HordeTrackPlayerGoal(entity, player));
 							}
 							cap.setSynced();
 						}
