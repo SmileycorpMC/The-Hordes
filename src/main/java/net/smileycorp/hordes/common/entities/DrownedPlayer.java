@@ -23,7 +23,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.util.TextUtils;
-import net.smileycorp.hordes.common.CommonConfigHandler;
+import net.smileycorp.hordes.config.ZombiePlayersConfig;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -131,12 +131,12 @@ public class DrownedPlayer extends Drowned implements PlayerZombie<DrownedPlayer
 
 	@Override
 	public boolean isSunSensitive() {
-		return CommonConfigHandler.zombiePlayersBurn.get();
+		return ZombiePlayersConfig.zombiePlayersBurn.get();
 	}
 
 	@Override
 	public boolean fireImmune() {
-		return CommonConfigHandler.zombiePlayersFireImmune.get();
+		return ZombiePlayersConfig.zombiePlayersFireImmune.get();
 	}
 
 	@Override

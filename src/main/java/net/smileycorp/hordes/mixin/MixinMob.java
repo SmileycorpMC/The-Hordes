@@ -21,7 +21,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.util.DataUtils;
-import net.smileycorp.hordes.common.CommonConfigHandler;
+import net.smileycorp.hordes.config.CommonConfigHandler;
 import net.smileycorp.hordes.common.ai.FleeEntityGoal;
 import net.smileycorp.hordes.common.ai.HordeTrackPlayerGoal;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
@@ -57,7 +57,7 @@ public abstract class MixinMob extends LivingEntity {
 		if (!hasEffect(HordesInfection.INFECTED.get())) return;
 		if (!HordesInfection.isCure(stack)) return;
 		removeEffect(HordesInfection.INFECTED.get());
-		if (!player.level().isClientSide) InfectionPacketHandler.NETWORK_INSTANCE.send(
+		if (!player.level().isClientSide) InfectionPacketHandler.send(
 				PacketDistributor.TRACKING_CHUNK.with(() -> player.level().getChunkAt(getOnPos())),
 				new CureEntityMessage(this));
 		if (!player.isCreative()) {

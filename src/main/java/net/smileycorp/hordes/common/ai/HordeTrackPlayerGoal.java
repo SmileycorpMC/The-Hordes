@@ -5,7 +5,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
-import net.smileycorp.hordes.common.CommonConfigHandler;
+import net.smileycorp.hordes.config.HordeEventConfig;
 
 import java.util.EnumSet;
 
@@ -18,7 +18,7 @@ public class HordeTrackPlayerGoal extends Goal {
     protected float waterCost;
 
     public HordeTrackPlayerGoal(Mob entity, Entity target) {
-        timeToRecalcPath = entity.getRandom().nextInt(CommonConfigHandler.hordePathingInterval.get());
+        timeToRecalcPath = entity.getRandom().nextInt(HordeEventConfig.hordePathingInterval.get());
         this.entity = entity;
         this.target = target;
         pather = entity.getNavigation();
@@ -44,9 +44,9 @@ public class HordeTrackPlayerGoal extends Goal {
 
     public void tick() {
         if (timeToRecalcPath-- <= 0) {
-            timeToRecalcPath = CommonConfigHandler.hordePathingInterval.get();
+            timeToRecalcPath = HordeEventConfig.hordePathingInterval.get();
             pather = entity.getNavigation();
-            pather.moveTo(pather.createPath(target.blockPosition(), 1), CommonConfigHandler.hordeEntitySpeed.get());
+            pather.moveTo(pather.createPath(target.blockPosition(), 1), HordeEventConfig.hordeEntitySpeed.get());
         }
 
     }

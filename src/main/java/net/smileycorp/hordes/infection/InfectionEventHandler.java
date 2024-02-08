@@ -31,13 +31,12 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.PacketDistributor;
 import net.smileycorp.atlas.api.util.DirectionUtils;
-import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
+import net.smileycorp.hordes.config.InfectionConfig;
 import net.smileycorp.hordes.common.event.InfectionDeathEvent;
 import net.smileycorp.hordes.infection.capability.Infection;
 import net.smileycorp.hordes.infection.data.InfectionDataLoader;
@@ -45,7 +44,6 @@ import net.smileycorp.hordes.infection.network.CureEntityMessage;
 import net.smileycorp.hordes.infection.network.InfectMessage;
 import net.smileycorp.hordes.infection.network.InfectionPacketHandler;
 
-@EventBusSubscriber(modid=Constants.MODID)
 public class InfectionEventHandler {
 
 	//attach required entity capabilities for event to function
@@ -66,7 +64,7 @@ public class InfectionEventHandler {
 	@SubscribeEvent
 	public void onEntityAdded(EntityJoinLevelEvent event) {
 		Entity entity = event.getEntity();
-		if (!(entity instanceof Mob && CommonConfigHandler.infectionEntitiesAggroConversions.get()) || entity.level().isClientSide) return;
+		if (!(entity instanceof Mob && InfectionConfig.infectionEntitiesAggroConversions.get()) || entity.level().isClientSide) return;
 		if (HordesInfection.canCauseInfection((LivingEntity) entity)) {
 			((Mob) entity).targetSelector.addGoal(3, new NearestAttackableTargetGoal<>((Mob) entity, LivingEntity.class,
 					10, true, false, InfectionDataLoader.INSTANCE::canBeInfected));
@@ -83,7 +81,7 @@ public class InfectionEventHandler {
 		if (optional.isPresent()) optional.orElseGet(null).increaseInfection();
 		entity.removeEffect(HordesInfection.INFECTED.get());
 		if (entity.level().isClientSide) return;
-		InfectionPacketHandler.NETWORK_INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(()->entity.level().getChunkAt(entity.getOnPos())),
+		InfectionPacketHandler.send(PacketDistributor.TRACKING_CHUNK.with(()-> entity.level().getChunkAt(entity.getOnPos())),
 				new CureEntityMessage(entity));
 	}
 
@@ -109,10 +107,10 @@ public class InfectionEventHandler {
 		RandomSource rand = level.random;
 		if (level.isClientSide |! (entity instanceof LivingEntity && attacker instanceof LivingEntity)) return;
 		if (!HordesInfection.canCauseInfection((LivingEntity) attacker) || entity.hasEffect(HordesInfection.INFECTED.get())) return;
-		if ((entity instanceof Player && CommonConfigHandler.infectPlayers.get())) {
-			if (rand.nextFloat() <= CommonConfigHandler.playerInfectChance.get()) InfectedEffect.apply(entity);
-		} else if ((entity instanceof Villager && CommonConfigHandler.infectVillagers.get())) {
-			if (rand.nextFloat() <= CommonConfigHandler.villagerInfectChance.get()) {
+		if ((entity instanceof Player && InfectionConfig.infectPlayers.get())) {
+			if (rand.nextFloat() <= InfectionConfig.playerInfectChance.get()) InfectedEffect.apply(entity);
+		} else if ((entity instanceof Villager && InfectionConfig.infectVillagers.get())) {
+			if (rand.nextFloat() <= InfectionConfig.villagerInfectChance.get()) {
 				InfectedEffect.apply(entity);
 			}
 		} else if (InfectionDataLoader.INSTANCE.canBeInfected(entity))
@@ -165,7 +163,7 @@ public class InfectionEventHandler {
 		if (event.getEffectInstance().getEffect() == HordesInfection.INFECTED.get()
 				&& InfectedEffect.preventInfection(entity)) {
 			event.setResult(Result.DENY);
-			if (entity instanceof ServerPlayer) InfectionPacketHandler.NETWORK_INSTANCE.sendTo(new InfectMessage(true),
+			if (entity instanceof ServerPlayer) InfectionPacketHandler.sendTo(new InfectMessage(true),
 					((ServerPlayer) entity).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 		}
 	}
@@ -175,7 +173,7 @@ public class InfectionEventHandler {
 		LivingEntity entity = event.getEntity();
 		if (event.getEffectInstance().getEffect() == HordesInfection.IMMUNITY.get() && entity.hasEffect(HordesInfection.INFECTED.get())) {
 			entity.removeEffect(HordesInfection.INFECTED.get());
-			InfectionPacketHandler.NETWORK_INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(()->entity.level().getChunkAt(entity.getOnPos())),
+			InfectionPacketHandler.send(PacketDistributor.TRACKING_CHUNK.with(()->entity.level().getChunkAt(entity.getOnPos())),
 					new CureEntityMessage(entity));
 		}
 	}

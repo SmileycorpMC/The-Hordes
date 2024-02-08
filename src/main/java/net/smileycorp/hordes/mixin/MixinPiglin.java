@@ -10,7 +10,8 @@ import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
 import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.smileycorp.hordes.common.CommonConfigHandler;
+import net.smileycorp.hordes.config.CommonConfigHandler;
+import net.smileycorp.hordes.config.InfectionConfig;
 import net.smileycorp.hordes.infection.HordesInfection;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -32,7 +33,7 @@ public abstract class MixinPiglin extends AbstractPiglin {
 
 	@Inject(at=@At("TAIL"), method = "customServerAiStep", cancellable = true)
 	public void customServerAiStep(CallbackInfo callback) {
-		if (!(CommonConfigHandler.enableMobInfection.get() && CommonConfigHandler.piglinsCureThemself.get())) return;
+		if (!(InfectionConfig.enableMobInfection.get() && CommonConfigHandler.piglinsCureThemself.get())) return;
 		if (!hasEffect(HordesInfection.INFECTED.get())) return;
 		if (!getBrain().checkMemory(MemoryModuleType.ATTACK_TARGET, MemoryStatus.VALUE_ABSENT)) return;
 		if (!getItemBySlot(EquipmentSlot.OFFHAND).isEmpty()) return;

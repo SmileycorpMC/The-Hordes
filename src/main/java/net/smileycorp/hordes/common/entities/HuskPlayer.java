@@ -25,7 +25,7 @@ import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.util.TextUtils;
-import net.smileycorp.hordes.common.CommonConfigHandler;
+import net.smileycorp.hordes.config.ZombiePlayersConfig;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -147,7 +147,7 @@ public class HuskPlayer extends Husk implements PlayerZombie<HuskPlayer> {
 
 	@Override
 	public boolean fireImmune() {
-		return CommonConfigHandler.zombiePlayersFireImmune.get();
+		return ZombiePlayersConfig.zombiePlayersFireImmune.get();
 	}
 
 	@Override

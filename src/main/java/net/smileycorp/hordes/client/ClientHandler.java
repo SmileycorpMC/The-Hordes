@@ -33,6 +33,7 @@ import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.common.entities.HordesEntities;
 import net.smileycorp.hordes.common.entities.PlayerZombie;
+import net.smileycorp.hordes.config.ClientConfigHandler;
 import net.smileycorp.hordes.hordeevent.capability.HordeEventClient;
 import net.smileycorp.hordes.infection.client.ClientInfectionEventHandler;
 import net.smileycorp.hordes.infection.network.CureEntityMessage;

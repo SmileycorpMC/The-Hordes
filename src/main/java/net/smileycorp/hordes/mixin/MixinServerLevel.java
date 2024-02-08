@@ -2,7 +2,7 @@ package net.smileycorp.hordes.mixin;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.smileycorp.hordes.common.CommonConfigHandler;
+import net.smileycorp.hordes.config.HordeEventConfig;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -19,7 +19,7 @@ public abstract class MixinServerLevel {
 
     @Inject(at = @At("HEAD"), method = "tick", cancellable = true)
     public void tick(BooleanSupplier bool, CallbackInfo callback) {
-        if (CommonConfigHandler.pauseEventServer.get() && players().isEmpty()) callback.cancel();
+        if (HordeEventConfig.pauseEventServer.get() && players().isEmpty()) callback.cancel();
     }
 
 }

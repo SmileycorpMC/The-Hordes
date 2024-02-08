@@ -4,8 +4,8 @@ import com.google.gson.JsonElement;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
-import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.HordesLogger;
+import net.smileycorp.hordes.config.HordeEventConfig;
 
 public class DayCondition implements Condition {
 
@@ -17,7 +17,7 @@ public class DayCondition implements Condition {
 
 	@Override
 	public boolean apply(Level level, LivingEntity entity, RandomSource rand) {
-		return level.getDayTime() / (float) CommonConfigHandler.dayLength.get() > day;
+		return level.getDayTime() / (float) HordeEventConfig.dayLength.get() > day;
 	}
 
 	public static DayCondition deserialize(JsonElement json) {

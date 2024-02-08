@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.client;
+package net.smileycorp.hordes.config;
 
 import com.google.common.collect.Lists;
 import net.minecraft.network.chat.TextColor;

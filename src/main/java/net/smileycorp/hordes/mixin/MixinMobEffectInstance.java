@@ -5,6 +5,7 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.network.NetworkDirection;
+import net.smileycorp.hordes.config.InfectionConfig;
 import net.smileycorp.hordes.infection.HordesInfection;
 import net.smileycorp.hordes.infection.InfectedEffect;
 import net.smileycorp.hordes.infection.network.InfectMessage;
@@ -29,11 +30,12 @@ public class MixinMobEffectInstance {
 
 	@Inject(at=@At("HEAD"), method = "tick", cancellable = true)
 	public void tick(LivingEntity entity, Runnable onUpdate, CallbackInfoReturnable<Boolean> callback) {
-		if (duration <= 1 && effect == HordesInfection.INFECTED.get()) {
+		if (duration <= 1 && effect == HordesInfection.INFECTED.get() && InfectionConfig.enableMobInfection.get()) {
 			if (amplifier < 3) {
 				amplifier = amplifier + 1;
 				duration = InfectedEffect.getInfectionTime(entity);
-				if (entity instanceof ServerPlayer) InfectionPacketHandler.NETWORK_INSTANCE.sendTo(new InfectMessage(false), ((ServerPlayer) entity).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+				if (entity instanceof ServerPlayer) InfectionPacketHandler.sendTo(new InfectMessage(false),
+						((ServerPlayer) entity).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 				callback.setReturnValue(true);
 				callback.cancel();
 			}

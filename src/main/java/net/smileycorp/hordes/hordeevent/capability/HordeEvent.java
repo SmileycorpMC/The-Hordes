@@ -25,10 +25,10 @@ import net.smileycorp.atlas.api.IOngoingEvent;
 import net.smileycorp.atlas.api.network.GenericStringMessage;
 import net.smileycorp.atlas.api.util.DirectionUtils;
 import net.smileycorp.atlas.api.util.WeightedOutputs;
-import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.ai.HordeTrackPlayerGoal;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
+import net.smileycorp.hordes.config.HordeEventConfig;
 import net.smileycorp.hordes.common.event.*;
 import net.smileycorp.hordes.hordeevent.HordeSpawnEntry;
 import net.smileycorp.hordes.hordeevent.HordeSpawnTable;
@@ -55,7 +55,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 	boolean sentDay;
 
 	HordeEvent(HordeSavedData data){
-		nextDay = CommonConfigHandler.hordeEventByPlayerTime.get() ? CommonConfigHandler.hordeSpawnDays.get() : data.getNextDay();
+		nextDay = HordeEventConfig.hordeEventByPlayerTime.get() ? HordeEventConfig.hordeSpawnDays.get() : data.getNextDay();
 	}
 
 	public void readFromNBT(CompoundTag nbt) {
@@ -85,17 +85,17 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 	public void update(ServerPlayer player) {
 		Level level = player.level();
 		if (level.dimension() != Level.OVERWORLD) return;
-		if (timer % CommonConfigHandler.hordeSpawnInterval.get() == 0) spawnWave(player, getMobCount(player, level));
+		if (timer % HordeEventConfig.hordeSpawnInterval.get() == 0) spawnWave(player, getMobCount(player, level));
 		timer--;
 		if (timer == 0) stopEvent(player, false);
 	}
 
 	private int getMobCount(ServerPlayer player, Level level) {
-		int amount = (int) (CommonConfigHandler.hordeSpawnAmount.get() * (1 + (day / CommonConfigHandler.hordeSpawnDays.get())
-				* (CommonConfigHandler.hordeSpawnMultiplier.get() - 1)));
+		int amount = (int) (HordeEventConfig.hordeSpawnAmount.get() * (1 + (day / HordeEventConfig.hordeSpawnDays.get())
+				* (HordeEventConfig.hordeSpawnMultiplier.get() - 1)));
 		List<? extends Player> players = level.players();
 		for (Player other : players) if (shouldReduce(player, (ServerPlayer) other))
-			amount = (int) Math.floor(amount * CommonConfigHandler.hordeMultiplayerScaling.get());
+			amount = (int) Math.floor(amount * HordeEventConfig.hordeMultiplayerScaling.get());
 		return amount;
 	}
 
@@ -144,10 +144,10 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 			logInfo("Stopping wave spawn because count is " + count);
 			return;
 		}
-		HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new HordeSoundMessage(basedir, startEvent.getSound()),
+		HordeEventPacketHandler.sendTo(new HordeSoundMessage(basedir, startEvent.getSound()),
 					player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 		for (int n = 0; n < count; n++) {
-			if (entitiesSpawned.size() > CommonConfigHandler.hordeSpawnMax.get()) {
+			if (entitiesSpawned.size() > HordeEventConfig.hordeSpawnMax.get()) {
 				logInfo("Can't spawn wave because max cap has been reached");
 				return;
 			}
@@ -244,10 +244,10 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 
 	public void tryStartEvent(ServerPlayer player, int duration, boolean isCommand) {
 		cleanSpawns();
-		if (CommonConfigHandler.hordesCommandOnly.get() &! isCommand) return;
+		if (HordeEventConfig.hordesCommandOnly.get() &! isCommand) return;
 		if (!isCommand) {
 			logInfo("Trying to start horde event on day " + getCurrentDay(player) + " with nextDay " + nextDay + " and time "
-					+ player.level().getDayTime() % CommonConfigHandler.dayLength.get());
+					+ player.level().getDayTime() % HordeEventConfig.dayLength.get());
 		}
 		if (player == null) {
 			logError("player is null for " + this, new NullPointerException());
@@ -276,7 +276,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 			loadedTable = null;
 			logInfo("Spawntable is empty, canceling event start.");
 		}
-		if (!isCommand) nextDay = CommonConfigHandler.hordeEventByPlayerTime.get() ? nextDay + CommonConfigHandler.hordeSpawnDays.get()
+		if (!isCommand) nextDay = HordeEventConfig.hordeEventByPlayerTime.get() ? nextDay + HordeEventConfig.hordeSpawnDays.get()
 				: HordeSavedData.getData(level).getNextDay();
 	}
 
@@ -297,14 +297,14 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 	}
 
 	private void sendMessage(ServerPlayer player, String str) {
-		HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new GenericStringMessage(str), ((ServerPlayer) player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+		HordeEventPacketHandler.sendTo(new GenericStringMessage(str), ((ServerPlayer) player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 	}
 
 	public void stopEvent(ServerPlayer player, boolean isCommand) {
 		entitiesSpawned.clear();
 		HordeEndEvent endEvent = new HordeEndEvent(player, this, isCommand);
 		postEvent(endEvent);
-		HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new UpdateClientHordeMessage(nextDay, 0),
+		HordeEventPacketHandler.sendTo(new UpdateClientHordeMessage(nextDay, 0),
 				player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 		timer = 0;
 		loadedTable = null;
@@ -353,14 +353,14 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 	}
 
 	public void sync(ServerPlayer player) {
-		HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new UpdateClientHordeMessage(isActive(player) ? day : nextDay, CommonConfigHandler.dayLength.get()),
+		HordeEventPacketHandler.sendTo(new UpdateClientHordeMessage(isActive(player) ? day : nextDay, HordeEventConfig.dayLength.get()),
 				player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 		sentDay = true;
 	}
 
 	public int getCurrentDay(ServerPlayer player) {
-		return (int) Math.floor((CommonConfigHandler.hordeEventByPlayerTime.get() ? player.getStats().getValue(Stats.CUSTOM.get(Stats.PLAY_TIME))
-				: player.level().getDayTime()) / CommonConfigHandler.dayLength.get());
+		return (int) Math.floor((HordeEventConfig.hordeEventByPlayerTime.get() ? player.getStats().getValue(Stats.CUSTOM.get(Stats.PLAY_TIME))
+				: player.level().getDayTime()) / HordeEventConfig.dayLength.get());
 	}
 
 	private void logInfo(Object message) {

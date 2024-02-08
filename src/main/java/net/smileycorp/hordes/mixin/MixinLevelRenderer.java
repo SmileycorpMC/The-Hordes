@@ -7,7 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraftforge.common.util.LazyOptional;
-import net.smileycorp.hordes.client.ClientConfigHandler;
+import net.smileycorp.hordes.config.ClientConfigHandler;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.hordeevent.capability.HordeEventClient;
 import org.spongepowered.asm.mixin.Mixin;

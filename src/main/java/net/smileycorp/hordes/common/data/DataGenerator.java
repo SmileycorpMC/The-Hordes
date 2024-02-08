@@ -15,7 +15,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class ConfigFilesGenerator {
+public class DataGenerator {
 
     private static final Path CONFIG_FOLDER = FMLPaths.CONFIGDIR.get().resolve("hordes");
 

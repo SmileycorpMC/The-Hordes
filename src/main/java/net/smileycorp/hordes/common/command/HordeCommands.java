@@ -7,8 +7,8 @@ import net.minecraft.commands.Commands;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Constants;
+import net.smileycorp.hordes.config.HordeEventConfig;
 import net.smileycorp.hordes.hordeevent.command.*;
 
 @EventBusSubscriber(modid= Constants.MODID)
@@ -20,7 +20,7 @@ public class HordeCommands {
 		LiteralArgumentBuilder<CommandSourceStack> command = Commands.literal("hordes");
 		CommandSpawnZombie.register(command);
 		CommandListEntities.register(command);
-		if (CommonConfigHandler.enableHordeEvent.get()) {
+		if (HordeEventConfig.enableHordeEvent.get()) {
 			CommandSpawnWave.register(command);
 			CommandStartHordeEvent.register(command);
 			CommandStopHordeEvent.register(command);

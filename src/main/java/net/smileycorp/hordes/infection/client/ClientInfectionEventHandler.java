@@ -9,7 +9,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.client.event.CustomizeGuiOverlayEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.smileycorp.hordes.client.ClientConfigHandler;
+import net.smileycorp.hordes.config.ClientConfigHandler;
 import net.smileycorp.hordes.infection.HordesInfection;
 
 import java.awt.*;

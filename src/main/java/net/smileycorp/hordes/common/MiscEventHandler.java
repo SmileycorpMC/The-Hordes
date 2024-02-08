@@ -25,6 +25,8 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.common.capability.ZombifyPlayer;
+import net.smileycorp.hordes.config.InfectionConfig;
+import net.smileycorp.hordes.config.ZombiePlayersConfig;
 import net.smileycorp.hordes.common.entities.HordesEntities;
 import net.smileycorp.hordes.common.entities.PlayerZombie;
 import net.smileycorp.hordes.common.event.SpawnZombiePlayerEvent;
@@ -49,8 +51,8 @@ public class MiscEventHandler {
 	public void onDeath(LivingDeathEvent event) {
 		LivingEntity entity = event.getEntity();
 		if (!(entity instanceof Player) || entity instanceof FakePlayer || entity.level().isClientSide || entity.level().getDifficulty() == Difficulty.PEACEFUL) return;
-		if ((entity.hasEffect(HordesInfection.INFECTED.get()) && CommonConfigHandler.infectionSpawnsZombiePlayers.get()
-				&& CommonConfigHandler.enableMobInfection.get()) || CommonConfigHandler.zombieGraves.get()) {
+		if ((entity.hasEffect(HordesInfection.INFECTED.get()) && InfectionConfig.infectionSpawnsZombiePlayers.get()
+				&& InfectionConfig.enableMobInfection.get()) || ZombiePlayersConfig.zombieGraves.get()) {
 			LazyOptional<ZombifyPlayer> optional = entity.getCapability(HordesCapabilities.ZOMBIFY_PLAYER, null);
 			if (!optional.isPresent()) return;
 			optional.orElseGet(null).createZombie((Player) entity);
@@ -63,13 +65,13 @@ public class MiscEventHandler {
 		if (!(event.getEntity() instanceof Player) || event.getEntity() instanceof FakePlayer || event.getEntity().level().isClientSide
 				|| event.getEntity().level().getDifficulty() == Difficulty.PEACEFUL) return;
 		Player player = (Player) event.getEntity();
-		if ((player.hasEffect(HordesInfection.INFECTED.get()) && CommonConfigHandler.enableMobInfection.get()) || CommonConfigHandler.zombieGraves.get()) {
+		if ((player.hasEffect(HordesInfection.INFECTED.get()) && InfectionConfig.enableMobInfection.get()) || ZombiePlayersConfig.zombieGraves.get()) {
 			LazyOptional<ZombifyPlayer> optional = player.getCapability(HordesCapabilities.ZOMBIFY_PLAYER, null);
 			if (!optional.isPresent()) return;
 			ZombifyPlayer cap = optional.orElseGet(null);
 			PlayerZombie zombie = cap.getZombie();
 			if (zombie == null) return;
-			if (CommonConfigHandler.zombiePlayersStoreItems.get()) {
+			if (ZombiePlayersConfig.zombiePlayersStoreItems.get()) {
 				Collection<ItemEntity> drops = event.getDrops();
 				zombie.storeDrops(drops);
 				drops.clear();
@@ -117,11 +119,11 @@ public class MiscEventHandler {
 	@SubscribeEvent(receiveCanceled = true)
 	public void spawnZombiePlayer(SpawnZombiePlayerEvent event) {
 		Player player = event.getEntity();
-		if (player.isUnderWater() && CommonConfigHandler.drownedPlayers.get()) {
+		if (player.isUnderWater() && ZombiePlayersConfig.drownedPlayers.get()) {
 			event.setEntityType(HordesEntities.DROWNED_PLAYER.get());
 			return;
 		}
-		if (player.level().getBiome(player.blockPosition()).is(HordesEntities.HUSK_PLAYER_SPAWN_BIOMES) && CommonConfigHandler.huskPlayers.get())
+		if (player.level().getBiome(player.blockPosition()).is(HordesEntities.HUSK_PLAYER_SPAWN_BIOMES) && ZombiePlayersConfig.huskPlayers.get())
 			event.setEntityType(HordesEntities.HUSK_PLAYER.get());
 	}
 
