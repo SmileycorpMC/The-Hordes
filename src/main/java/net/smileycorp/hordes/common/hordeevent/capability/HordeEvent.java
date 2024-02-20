@@ -16,6 +16,7 @@ import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.CakeBlock;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
@@ -132,7 +133,7 @@ class HordeEvent implements IHordeEvent {
 		Vec3 basedir = DirectionUtils.getRandomDirectionVecXZ(rand);
 		BlockPos basepos = DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, 75, 7, 0);
 		int i = 0;
-		while (basepos.equals(player.blockPosition())) {
+		while (basepos.equals(player.blockPosition()) |! level.getBlockState(basepos.below()).getMaterial().isSolid()) {
 			basedir = DirectionUtils.getRandomDirectionVecXZ(rand);
 			basepos = DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, 75, 7, 0);
 			i++;
@@ -264,7 +265,7 @@ class HordeEvent implements IHordeEvent {
 						break;
 					}
 				}
-				if (task!=null) {
+				if (task != null) {
 					entity.goalSelector.removeGoal(task);
 					entity.goalSelector.addGoal(6, new HordeTrackPlayerGoal(entity, player));
 				}

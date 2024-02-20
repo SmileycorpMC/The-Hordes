@@ -24,7 +24,7 @@ repositories {
     }
 }
 
-version = '1.19.2-1.2.2'
+version = '1.19.2-1.2.3'
 group = 'net.smileycorp.hordes' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'The-Hordes'
 
