@@ -132,7 +132,7 @@ class HordeEvent implements IHordeEvent {
 		Vec3 basedir = DirectionUtils.getRandomDirectionVecXZ(rand);
 		BlockPos basepos = DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, 75, 7, 0);
 		int i = 0;
-		while (basepos.equals(player.blockPosition())) {
+		while (basepos.equals(player.blockPosition()) |! level.getBlockState(basepos.below()).getMaterial().isSolid()) {
 			basedir = DirectionUtils.getRandomDirectionVecXZ(rand);
 			basepos = DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, 75, 7, 0);
 			i++;
