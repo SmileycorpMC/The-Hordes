@@ -25,11 +25,11 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.common.capability.ZombifyPlayer;
-import net.smileycorp.hordes.config.InfectionConfig;
-import net.smileycorp.hordes.config.ZombiePlayersConfig;
 import net.smileycorp.hordes.common.entities.HordesEntities;
 import net.smileycorp.hordes.common.entities.PlayerZombie;
 import net.smileycorp.hordes.common.event.SpawnZombiePlayerEvent;
+import net.smileycorp.hordes.config.InfectionConfig;
+import net.smileycorp.hordes.config.ZombiePlayersConfig;
 import net.smileycorp.hordes.infection.HordesInfection;
 
 import java.util.Collection;
