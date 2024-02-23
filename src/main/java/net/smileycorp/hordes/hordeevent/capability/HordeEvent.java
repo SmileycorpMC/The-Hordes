@@ -47,7 +47,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 
 	private static UUID FOLLOW_RANGE_MODIFIER = UUID.fromString("51cfe045-4248-409e-be37-556d67de4b97");
-	private final RandomSource rand = RandomSource.create();
+	private final RandomSource rand;
 	private Set<Mob> entitiesSpawned = new HashSet<>();
 	private int timer = 0;
 	private int day = 0;
@@ -57,6 +57,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 
 	HordeEvent(HordeSavedData data){
 		nextDay = HordeEventConfig.hordeEventByPlayerTime.get() ? HordeEventConfig.hordeSpawnDays.get() : data.getNextDay();
+		rand = data.getRandom();
 	}
 
 	public void readFromNBT(CompoundTag nbt) {
@@ -119,15 +120,16 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 		postEvent(startEvent);
 		if (startEvent.isCanceled()) return;
 		count = startEvent.getCount();
-		Vec3 basedir = DirectionUtils.getRandomDirectionVecXZ(level.random);
+		Vec3 basedir = DirectionUtils.getRandomDirectionVecXZ(rand);
 		BlockPos basepos = DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, 75, 7, 0);
 		int i = 0;
-		while (basepos.equals(player.blockPosition()) || (!level.getBlockState(basepos.below()).isSolid())) {
-			basedir = DirectionUtils.getRandomDirectionVecXZ(level.random);
+		while (basepos.equals(player.blockPosition())) {
+			basedir = DirectionUtils.getRandomDirectionVecXZ(rand);
 			basepos = DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, 75, 7, 0);
-			if (i++ >=20) {
+			if (!spawnData.getSpawnType().canSpawn(level, basepos)) basepos = player.blockPosition();
+			if (i++ >= 20) {
 				logInfo("Unable to find unlit pos for horde " + this + " ignoring light level");
-				basedir = DirectionUtils.getRandomDirectionVecXZ(level.random);
+				basedir = DirectionUtils.getRandomDirectionVecXZ(rand);
 				basepos = DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, 75);
 				break;
 			}
@@ -148,9 +150,8 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 				logInfo("Can't spawn wave because max cap has been reached");
 				return;
 			}
-			Vec3 dir = DirectionUtils.getRandomDirectionVecXZ(level.random);
-			BlockPos pos = DirectionUtils.getClosestLoadedPos(level, basepos, dir, level.random.nextInt(10));
-			HordeSpawnEntry entry = spawntable.getResult(player.getRandom());
+			BlockPos pos = getSpawnPos(level, basepos);
+			HordeSpawnEntry entry = spawntable.getResult(rand);
 			EntityType<?> type = entry.getEntity();
 			try {
 				AtomicBoolean cancelled = new AtomicBoolean(false);
@@ -170,7 +171,16 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 			}
 		}
 	}
-
+	
+	private BlockPos getSpawnPos(ServerLevel level, BlockPos basepos) {
+		for (int j = 0; j < 5; j++) {
+			Vec3 dir = DirectionUtils.getRandomDirectionVecXZ(rand);
+			BlockPos pos = DirectionUtils.getClosestLoadedPos(level, basepos, dir, rand.nextInt(10));
+			if (spawnData.getSpawnType().canSpawn(level, pos)) return pos;
+		}
+		return basepos;
+	}
+	
 	private Entity loadEntity(ServerLevel level, ServerPlayer player, Mob entity, BlockPos pos, AtomicBoolean cancel) {
 		HordeSpawnEntityEvent spawnEntityEvent = new HordeSpawnEntityEvent(player, entity, pos, this);
 		postEvent(spawnEntityEvent);
