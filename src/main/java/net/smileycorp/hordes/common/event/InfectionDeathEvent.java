@@ -2,11 +2,10 @@ package net.smileycorp.hordes.common.event;
 
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.eventbus.api.Cancelable;
+import net.neoforged.bus.api.ICancellableEvent;
+import net.neoforged.neoforge.event.entity.living.LivingEvent;
 
-@Cancelable
-public class InfectionDeathEvent extends LivingEvent {
+public class InfectionDeathEvent extends LivingEvent implements ICancellableEvent {
 
 	protected final DamageSource source;
 

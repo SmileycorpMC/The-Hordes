@@ -4,7 +4,7 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.contents.LiteralContents;
+import net.minecraft.network.chat.contents.PlainTextContents;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -22,8 +22,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.scores.PlayerTeam;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.event.EventHooks;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.config.ZombiePlayersConfig;
 
@@ -92,7 +92,7 @@ public class HuskPlayer extends Husk implements PlayerZombie<HuskPlayer> {
 	@Override
 	public void setPlayer(GameProfile profile) {
 		if (profile == null) return;
-		if (profile.getName() != null) setCustomName(MutableComponent.create(new LiteralContents(profile.getName())));
+		if (profile.getName() != null) setCustomName(MutableComponent.create(new PlainTextContents.LiteralContents(profile.getName())));
 		entityData.set(PLAYER, Optional.of(profile.getId()));
 	}
 
@@ -137,7 +137,7 @@ public class HuskPlayer extends Husk implements PlayerZombie<HuskPlayer> {
 		if (zombie != null) {
 			zombie.handleAttributes(zombie.level().getCurrentDifficultyAt(zombie.blockPosition()).getSpecialMultiplier());
 			zombie.setCanBreakDoors(zombie.supportsBreakDoorGoal() && this.canBreakDoors());
-			ForgeEventFactory.onLivingConvert(this, zombie);
+			EventHooks.onLivingConvert(this, zombie);
 			if (zombie instanceof PlayerZombie) ((PlayerZombie) zombie).copyFrom(this);
 		}
 		if (!this.isSilent()) {

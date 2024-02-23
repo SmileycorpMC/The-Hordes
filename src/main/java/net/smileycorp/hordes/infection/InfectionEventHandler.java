@@ -1,5 +1,6 @@
 package net.smileycorp.hordes.infection;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -17,24 +18,22 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.event.AddReloadListenerEvent;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
-import net.minecraftforge.event.entity.living.LivingDamageEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
-import net.minecraftforge.event.entity.living.MobEffectEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.eventbus.api.Event.Result;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.bus.api.Event;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.EventHooks;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
+import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.smileycorp.atlas.api.util.DirectionUtils;
-import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.common.event.InfectionDeathEvent;
 import net.smileycorp.hordes.config.InfectionConfig;
@@ -48,13 +47,13 @@ public class InfectionEventHandler {
 
 	//attach required entity capabilities for event to function
 	@SubscribeEvent
-	public void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
-		Entity entity = event.getObject();
-		if (entity instanceof Player && !(entity instanceof FakePlayer) || entity instanceof Villager || InfectionDataLoader.INSTANCE.canBeInfected(entity)) {
-			event.addCapability(Constants.loc("InfectionCounter"), new Infection.Provider());
+	public void attachCapabilities(RegisterCapabilitiesEvent event) {
+		for (EntityType type : BuiltInRegistries.ENTITY_TYPE) {
+			event.registerEntity(HordesCapabilities.INFECTION, type, (entity, ctx) ->
+					entity instanceof Mob ? new Infection.Impl() : null);
 		}
 	}
-
+	
 	//register data listeners
 	@SubscribeEvent
 	public void addResourceReload(AddReloadListenerEvent event ) {
@@ -77,8 +76,8 @@ public class InfectionEventHandler {
 		ItemStack stack = event.getItem();
 		if (InfectionDataLoader.INSTANCE.applyImmunity(entity, stack.getItem())) return;
 		if (!(entity.hasEffect(HordesInfection.INFECTED.get()) && HordesInfection.isCure(stack))) return;
-		LazyOptional<Infection> optional = entity.getCapability(HordesCapabilities.INFECTION);
-		if (optional.isPresent()) optional.orElseGet(null).increaseInfection();
+		Infection infection = entity.getCapability(HordesCapabilities.INFECTION);
+		if (infection != null) infection.increaseInfection();
 		entity.removeEffect(HordesInfection.INFECTED.get());
 		if (entity.level().isClientSide) return;
 		InfectionPacketHandler.send(PacketDistributor.TRACKING_CHUNK.with(()-> entity.level().getChunkAt(entity.getOnPos())),
@@ -93,8 +92,8 @@ public class InfectionEventHandler {
 		LivingEntity entity = (LivingEntity) ((EntityHitResult) ray).getEntity();
 		if (!(entity.hasEffect(HordesInfection.INFECTED.get()) || HordesInfection.isCure(stack))) return;
 		entity.removeEffect(HordesInfection.INFECTED.get());
-		LazyOptional<Infection> optional = entity.getCapability(HordesCapabilities.INFECTION);
-		if (optional.isPresent()) optional.orElseGet(null).increaseInfection();
+		Infection infection = entity.getCapability(HordesCapabilities.INFECTION);
+		if (infection != null) infection.increaseInfection();
 		event.setCanceled(true);
 		event.setCancellationResult(InteractionResult.FAIL);
 	}
@@ -124,8 +123,8 @@ public class InfectionEventHandler {
 		Level level = entity.level();
 		if (level.isClientSide || !(source.is(HordesInfection.INFECTION_DAMAGE) || entity.hasEffect(HordesInfection.INFECTED.get()))) return;
 		InfectionDeathEvent newevent = new InfectionDeathEvent(entity, event.getSource());
-		MinecraftForge.EVENT_BUS.post(newevent);
-		if (newevent.getResult() == Result.DENY) {
+		NeoForge.EVENT_BUS.post(newevent);
+		if (newevent.getResult() == Event.Result.DENY) {
 			event.setCanceled(true);
 			if (!(entity instanceof OwnableEntity)) return;
 			LivingEntity owner = ((OwnableEntity) entity).getOwner();
@@ -148,12 +147,12 @@ public class InfectionEventHandler {
 				zombie.setGossips(villager.getGossips().store(NbtOps.INSTANCE));
 				zombie.setTradeOffers(villager.getOffers().createTag());
 				zombie.setVillagerXp(villager.getVillagerXp());
-				net.minecraftforge.event.ForgeEventFactory.onLivingConvert(villager, zombie);
+				EventHooks.onLivingConvert(villager, zombie);
 			}
-			event.setResult(Result.DENY);
+			event.setResult(Event.Result.DENY);
 		} else if (InfectionDataLoader.INSTANCE.canBeInfected(entity))  {
 			if (InfectionDataLoader.INSTANCE.convertEntity((Mob) entity)) return;
-			event.setResult(Result.DENY);
+			event.setResult(Event.Result.DENY);
 		}
 	}
 
@@ -162,7 +161,7 @@ public class InfectionEventHandler {
 		LivingEntity entity = event.getEntity();
 		if (event.getEffectInstance().getEffect() == HordesInfection.INFECTED.get()
 				&& InfectedEffect.preventInfection(entity)) {
-			event.setResult(Result.DENY);
+			event.setResult(Event.Result.DENY);
 			if (entity instanceof ServerPlayer) InfectionPacketHandler.sendTo(new InfectMessage(true),
 					((ServerPlayer) entity).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 		}

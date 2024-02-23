@@ -19,9 +19,8 @@ import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.network.NetworkDirection;
+import net.neoforged.neoforge.common.NeoForge;
 import net.smileycorp.atlas.api.IOngoingEvent;
 import net.smileycorp.atlas.api.network.GenericStringMessage;
 import net.smileycorp.atlas.api.util.DirectionUtils;
@@ -200,8 +199,8 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 	private void finalizeEntity(Mob entity, ServerPlayer player) {
 		entity.getAttribute(Attributes.FOLLOW_RANGE).addPermanentModifier(new AttributeModifier(FOLLOW_RANGE_MODIFIER,
 				"hordes:horde_range", 75, AttributeModifier.Operation.ADDITION));
-		LazyOptional<HordeSpawn> optional = entity.getCapability(HordesCapabilities.HORDESPAWN);
-		if (optional.isPresent()) { optional.orElseGet(null).setPlayerUUID(player.getUUID().toString());
+		HordeSpawn hordespawn = entity.getCapability(HordesCapabilities.HORDESPAWN);
+		if (hordespawn != null) { hordespawn.setPlayerUUID(player.getUUID().toString());
 			registerEntity(entity);
 		}
 		entity.targetSelector.getRunningGoals().forEach(WrappedGoal::stop);
@@ -215,10 +214,9 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 		List<Mob> toRemove = new ArrayList<>();
 		for (Mob entity : entitiesSpawned) {
 			if (entity.isAlive() |! entity.isRemoved()) continue;
-			LazyOptional<HordeSpawn> optional = entity.getCapability(HordesCapabilities.HORDESPAWN, null);
-			if (optional.isPresent()) {
-				HordeSpawn cap = optional.orElseGet(null);
-				cap.setPlayerUUID("");
+			HordeSpawn hordespawn = entity.getCapability(HordesCapabilities.HORDESPAWN, null);
+			if (hordespawn != null) {
+				hordespawn.setPlayerUUID("");
 				toRemove.add(entity);
 			}
 		}
@@ -328,9 +326,9 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 				entity.goalSelector.removeGoal(entry.getGoal());
 				break;
 			}
-			LazyOptional<HordeSpawn> cap = entity.getCapability(HordesCapabilities.HORDESPAWN);
-			if (!cap.isPresent()) continue;
-			cap.orElseGet(null).setPlayerUUID("");
+			HordeSpawn hordespawn = entity.getCapability(HordesCapabilities.HORDESPAWN);
+			if (hordespawn != null) continue;
+			hordespawn.setPlayerUUID("");
 			entity.getAttribute(Attributes.FOLLOW_RANGE).removeModifier(FOLLOW_RANGE_MODIFIER);
 		}
 	}
@@ -350,7 +348,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 				HordesLogger.logInfo("Applying script " + script.getName());
 			}
 		}
-		MinecraftForge.EVENT_BUS.post(event);
+		NeoForge.EVENT_BUS.post(event);
 	}
 
 	public void reset(ServerLevel level) {

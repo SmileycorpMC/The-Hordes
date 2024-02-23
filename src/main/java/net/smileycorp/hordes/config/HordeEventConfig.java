@@ -1,30 +1,30 @@
 package net.smileycorp.hordes.config;
 
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class HordeEventConfig {
    
     
-    public static ForgeConfigSpec.ConfigValue<Boolean> enableHordeEvent;
-    public static ForgeConfigSpec.ConfigValue<Boolean> hordesCommandOnly;
-    public static ForgeConfigSpec.ConfigValue<Integer> hordeSpawnAmount;
-    public static ForgeConfigSpec.ConfigValue<Double> hordeSpawnMultiplier;
-    public static ForgeConfigSpec.ConfigValue<Integer> hordeSpawnMax;
-    public static ForgeConfigSpec.ConfigValue<Integer> hordeSpawnDuration;
-    public static ForgeConfigSpec.ConfigValue<Integer> hordeSpawnInterval;
-    public static ForgeConfigSpec.ConfigValue<Integer> hordeStartTime;
-    public static ForgeConfigSpec.ConfigValue<Integer> hordeSpawnDays;
-    public static ForgeConfigSpec.ConfigValue<Integer> hordeSpawnVariation;
-    public static ForgeConfigSpec.ConfigValue<Integer> dayLength;
-    public static ForgeConfigSpec.ConfigValue<Integer> hordePathingInterval;
-    public static ForgeConfigSpec.ConfigValue<Double> hordeEntitySpeed;
-    public static ForgeConfigSpec.ConfigValue<Boolean> spawnFirstDay;
-    public static ForgeConfigSpec.ConfigValue<Boolean> canSleepDuringHorde;
-    public static ForgeConfigSpec.ConfigValue<Double> hordeMultiplayerScaling;
-    public static ForgeConfigSpec.ConfigValue<Boolean> pauseEventServer;
-    public static ForgeConfigSpec.ConfigValue<Boolean> hordeEventByPlayerTime;
+    public static ModConfigSpec.ConfigValue<Boolean> enableHordeEvent;
+    public static ModConfigSpec.ConfigValue<Boolean> hordesCommandOnly;
+    public static ModConfigSpec.ConfigValue<Integer> hordeSpawnAmount;
+    public static ModConfigSpec.ConfigValue<Double> hordeSpawnMultiplier;
+    public static ModConfigSpec.ConfigValue<Integer> hordeSpawnMax;
+    public static ModConfigSpec.ConfigValue<Integer> hordeSpawnDuration;
+    public static ModConfigSpec.ConfigValue<Integer> hordeSpawnInterval;
+    public static ModConfigSpec.ConfigValue<Integer> hordeStartTime;
+    public static ModConfigSpec.ConfigValue<Integer> hordeSpawnDays;
+    public static ModConfigSpec.ConfigValue<Integer> hordeSpawnVariation;
+    public static ModConfigSpec.ConfigValue<Integer> dayLength;
+    public static ModConfigSpec.ConfigValue<Integer> hordePathingInterval;
+    public static ModConfigSpec.ConfigValue<Double> hordeEntitySpeed;
+    public static ModConfigSpec.ConfigValue<Boolean> spawnFirstDay;
+    public static ModConfigSpec.ConfigValue<Boolean> canSleepDuringHorde;
+    public static ModConfigSpec.ConfigValue<Double> hordeMultiplayerScaling;
+    public static ModConfigSpec.ConfigValue<Boolean> pauseEventServer;
+    public static ModConfigSpec.ConfigValue<Boolean> hordeEventByPlayerTime;
     
-    static void build(ForgeConfigSpec.Builder builder) {
+    static void build(ModConfigSpec.Builder builder) {
         builder.push("Horde Event");
         enableHordeEvent = builder.comment("Set to false to completely disable the horde event and anything relating to it.").define("enableHordeEvent", true);
         hordesCommandOnly = builder.comment("Set to true to disable natural horde spawns (hordes can only be spawned with commands).").define("hordesCommandOnly", false);

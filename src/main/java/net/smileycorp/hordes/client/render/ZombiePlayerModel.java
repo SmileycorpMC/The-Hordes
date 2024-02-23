@@ -7,6 +7,7 @@ import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.resources.DefaultPlayerSkin;
+import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
@@ -38,7 +39,7 @@ public class ZombiePlayerModel<T extends Zombie & PlayerZombie> extends PlayerMo
 	public void prepareMobModel(T entity, float f1, float f2, float f3) {
 		if (!fixedArms) {
 			Optional<UUID> optional = entity.getPlayerUUID();
-			if (optional.isPresent()) if (DefaultPlayerSkin.getSkinModelName(optional.get()).equals("slim")) {
+			if (optional.isPresent()) if (DefaultPlayerSkin.get(optional.get()).model() == PlayerSkin.Model.SLIM) {
 				slim = true;
 			}
 			fixedArms = true;

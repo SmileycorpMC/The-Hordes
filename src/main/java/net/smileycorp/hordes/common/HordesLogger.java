@@ -5,7 +5,7 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.contents.LiteralContents;
+import net.minecraft.network.chat.contents.PlainTextContents;
 import net.smileycorp.hordes.hordeevent.capability.HordeSavedData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -75,9 +75,9 @@ public class HordesLogger {
 
     public static MutableComponent getFiletext() {
         String file = log_file.toAbsolutePath().toString();
-        MutableComponent text = MutableComponent.create(new LiteralContents(file));
+        MutableComponent text = MutableComponent.create(new PlainTextContents.LiteralContents(file));
         text.setStyle(Style.EMPTY.withUnderlined(true).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file))
-                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, MutableComponent.create(new LiteralContents(file)))));
+                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, MutableComponent.create(new PlainTextContents.LiteralContents(file)))));
         return text;
     }
 

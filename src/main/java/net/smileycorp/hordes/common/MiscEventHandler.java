@@ -2,7 +2,7 @@ package net.smileycorp.hordes.common;
 
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -10,18 +10,16 @@ import net.minecraft.world.entity.monster.Drowned;
 import net.minecraft.world.entity.monster.Husk;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
-import net.minecraftforge.event.entity.living.LivingConversionEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingDropsEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.common.util.FakePlayer;
+import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
+import net.neoforged.neoforge.event.entity.living.LivingConversionEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.common.capability.ZombifyPlayer;
@@ -34,7 +32,7 @@ import net.smileycorp.hordes.infection.HordesInfection;
 
 import java.util.Collection;
 
-@EventBusSubscriber(modid = Constants.MODID, bus = Bus.MOD)
+@Mod.EventBusSubscriber(modid = Constants.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class MiscEventHandler {
 
 	//send error messages if the logger has errors
@@ -53,9 +51,9 @@ public class MiscEventHandler {
 		if (!(entity instanceof Player) || entity instanceof FakePlayer || entity.level().isClientSide || entity.level().getDifficulty() == Difficulty.PEACEFUL) return;
 		if ((entity.hasEffect(HordesInfection.INFECTED.get()) && InfectionConfig.infectionSpawnsZombiePlayers.get()
 				&& InfectionConfig.enableMobInfection.get()) || ZombiePlayersConfig.zombieGraves.get()) {
-			LazyOptional<ZombifyPlayer> optional = entity.getCapability(HordesCapabilities.ZOMBIFY_PLAYER, null);
-			if (!optional.isPresent()) return;
-			optional.orElseGet(null).createZombie((Player) entity);
+			ZombifyPlayer cap = entity.getCapability(HordesCapabilities.ZOMBIFY_PLAYER, null);
+			if (cap == null) return;
+			cap.createZombie();
 		}
 	}
 
@@ -66,10 +64,9 @@ public class MiscEventHandler {
 				|| event.getEntity().level().getDifficulty() == Difficulty.PEACEFUL) return;
 		Player player = (Player) event.getEntity();
 		if ((player.hasEffect(HordesInfection.INFECTED.get()) && InfectionConfig.enableMobInfection.get()) || ZombiePlayersConfig.zombieGraves.get()) {
-			LazyOptional<ZombifyPlayer> optional = player.getCapability(HordesCapabilities.ZOMBIFY_PLAYER, null);
-			if (!optional.isPresent()) return;
-			ZombifyPlayer cap = optional.orElseGet(null);
-			PlayerZombie zombie = cap.getZombie();
+			ZombifyPlayer zombify = player.getCapability(HordesCapabilities.ZOMBIFY_PLAYER, null);
+			if (zombify == null) return;
+			PlayerZombie zombie = zombify.getZombie();
 			if (zombie == null) return;
 			if (ZombiePlayersConfig.zombiePlayersStoreItems.get()) {
 				Collection<ItemEntity> drops = event.getDrops();
@@ -79,18 +76,16 @@ public class MiscEventHandler {
 			}
 			zombie.asEntity().setPersistenceRequired();
 			player.level().addFreshEntity(zombie.asEntity());
-			cap.clearZombie();
+			zombify.clearZombie();
 			player.removeEffect(HordesInfection.INFECTED.get());
 		}
 	}
 
 	//attach zombie player provider to players
 	@SubscribeEvent
-	public void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
-		Entity entity = event.getObject();
-		if (entity instanceof Player &!(entity instanceof FakePlayer)) {
-			event.addCapability(Constants.loc("Zombify"), new ZombifyPlayer.Provider());
-		}
+	public void registerCapabilities(RegisterCapabilitiesEvent event) {
+		event.registerEntity(HordesCapabilities.ZOMBIFY_PLAYER, EntityType.PLAYER, (entity, ctx) ->
+				new ZombifyPlayer.Impl(entity));
 	}
 
 	//copy horse inventories if they convert to another entity, useful for copying armor and saddles to zombie horses

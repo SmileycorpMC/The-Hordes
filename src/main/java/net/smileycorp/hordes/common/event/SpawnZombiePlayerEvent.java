@@ -2,12 +2,11 @@ package net.smileycorp.hordes.common.event;
 
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.Cancelable;
+import net.neoforged.bus.api.ICancellableEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.smileycorp.hordes.common.entities.PlayerZombie;
 
-@Cancelable
-public class SpawnZombiePlayerEvent extends PlayerEvent {
+public class SpawnZombiePlayerEvent extends PlayerEvent implements ICancellableEvent {
 
 	private EntityType<? extends PlayerZombie> type;
 

@@ -1,18 +1,18 @@
 package net.smileycorp.hordes.config;
 
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class ZombiePlayersConfig {
     
-    public static ForgeConfigSpec.ConfigValue<Boolean> zombieGraves;
-    public static ForgeConfigSpec.ConfigValue<Boolean> drownedPlayers;
-    public static ForgeConfigSpec.ConfigValue<Boolean> huskPlayers;
-    public static ForgeConfigSpec.ConfigValue<Boolean> zombiePlayersFireImmune;
-    public static ForgeConfigSpec.ConfigValue<Boolean> zombiePlayersBurn;
-    public static ForgeConfigSpec.ConfigValue<Boolean> zombiePlayersOnlyHurtByPlayers;
-    public static ForgeConfigSpec.ConfigValue<Boolean> zombiePlayersStoreItems;
+    public static ModConfigSpec.ConfigValue<Boolean> zombieGraves;
+    public static ModConfigSpec.ConfigValue<Boolean> drownedPlayers;
+    public static ModConfigSpec.ConfigValue<Boolean> huskPlayers;
+    public static ModConfigSpec.ConfigValue<Boolean> zombiePlayersFireImmune;
+    public static ModConfigSpec.ConfigValue<Boolean> zombiePlayersBurn;
+    public static ModConfigSpec.ConfigValue<Boolean> zombiePlayersOnlyHurtByPlayers;
+    public static ModConfigSpec.ConfigValue<Boolean> zombiePlayersStoreItems;
     
-    static void build(ForgeConfigSpec.Builder builder) {
+    static void build(ModConfigSpec.Builder builder) {
         zombieGraves = builder.comment("Whether to use zombie players as graves all the time. (Even if infection is disabled)").define("zombieGraves", false);
         drownedPlayers = builder.comment("Whether to spawn drowned players when a player dies underwater instead of a zombie player. (Whether the zombie is spawned from infection or zombieGraves being true)").define("drownedPlayers", true);
         huskPlayers = builder.comment("Whether to spawn husk players when a player dies in a desert biome instead of a zombie player. (Whether the zombie is spawned from infection or zombieGraves being true)").define("huskPlayers", true);

@@ -1,14 +1,14 @@
 package net.smileycorp.hordes.config;
 
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec.ConfigValue;
 import net.smileycorp.hordes.common.HordesLogger;
 
 
 public class CommonConfigHandler {
 
-	public static final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
-	public static final ForgeConfigSpec config;
+	public static final ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
+	public static final ModConfigSpec config;
 	
 	//misc
 	public static ConfigValue<Boolean> zombiesBurn;

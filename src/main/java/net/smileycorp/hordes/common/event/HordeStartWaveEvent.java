@@ -1,11 +1,10 @@
 package net.smileycorp.hordes.common.event;
 
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.eventbus.api.Cancelable;
+import net.neoforged.bus.api.ICancellableEvent;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 
-@Cancelable
-public class HordeStartWaveEvent extends HordePlayerEvent {
+public class HordeStartWaveEvent extends HordePlayerEvent implements ICancellableEvent {
 	
 	protected int count;
 

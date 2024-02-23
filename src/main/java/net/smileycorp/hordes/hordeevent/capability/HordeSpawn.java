@@ -1,14 +1,10 @@
 package net.smileycorp.hordes.hordeevent.capability;
 
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilitySerializable;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 
@@ -32,11 +28,10 @@ public interface HordeSpawn {
 
 	static ServerPlayer getHordePlayer(Entity entity) {
 		if (entity.level().isClientSide |!(entity instanceof Mob)) return null;
-		LazyOptional<HordeSpawn> optional = entity.getCapability(HordesCapabilities.HORDESPAWN);
-		if (!optional.isPresent()) return null;
-		HordeSpawn cap = optional.orElseGet(null);
-		if (!cap.isHordeSpawned()) return null;
-		String uuid = cap.getPlayerUUID();
+		HordeSpawn hordespawn = entity.getCapability(HordesCapabilities.HORDESPAWN);
+		if (hordespawn == null) return null;
+		if (!hordespawn.isHordeSpawned()) return null;
+		String uuid = hordespawn.getPlayerUUID();
 		if (!DataUtils.isValidUUID(uuid)) return null;
 		return ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(UUID.fromString(uuid));
 	}
@@ -79,26 +74,6 @@ public interface HordeSpawn {
 		@Override
 		public void readNBT(StringTag tag) {
 			uuid = tag.getAsString();
-		}
-
-	}
-
-	class Provider implements ICapabilitySerializable<StringTag> {
-
-		protected HordeSpawn impl = new Impl();
-		@Override
-		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction facing) {
-			return cap == HordesCapabilities.HORDESPAWN ? LazyOptional.of(() -> impl).cast() : LazyOptional.empty();
-		}
-
-		@Override
-		public StringTag serializeNBT() {
-			return impl.writeNBT();
-		}
-
-		@Override
-		public void deserializeNBT(StringTag nbt) {
-			impl.readNBT(nbt);
 		}
 
 	}

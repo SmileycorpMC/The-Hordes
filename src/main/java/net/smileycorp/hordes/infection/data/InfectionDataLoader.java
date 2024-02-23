@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
@@ -15,8 +16,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.common.NeoForge;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.InfectEntityEvent;
 import net.smileycorp.hordes.infection.HordesInfection;
@@ -72,7 +72,7 @@ public class InfectionDataLoader extends SimpleJsonResourceReloadListener {
                     try {
                         JsonObject obj = element.getAsJsonObject();
                         ResourceLocation name = new ResourceLocation(obj.get("item").getAsString());
-                        Item item = ForgeRegistries.ITEMS.getValue(name);
+                        Item item = BuiltInRegistries.ITEM.get(name);
                         int duration = obj.get("duration").getAsInt();
                         immunityItems.put(item, duration);
                         HordesLogger.logInfo("Loaded immunity item " + name + " with duration " + duration);
@@ -87,7 +87,7 @@ public class InfectionDataLoader extends SimpleJsonResourceReloadListener {
     }
 
     public void tryToInfect(LivingEntity entity, LivingEntity attacker, DamageSource source, float amount) {
-        if (MinecraftForge.EVENT_BUS.post(new InfectEntityEvent(entity, attacker, source, amount))) return;
+        if (NeoForge.EVENT_BUS.post(new InfectEntityEvent(entity, attacker, source, amount)).isCanceled()) return;
         InfectionConversionEntry entry = conversionTable.get(entity.getType());
         if (entry != null && entry.shouldInfect(entity)) InfectedEffect.apply(entity);
     }

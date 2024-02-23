@@ -2,8 +2,8 @@ package net.smileycorp.hordes.common.data;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.minecraftforge.fml.loading.FMLLoader;
-import net.minecraftforge.fml.loading.FMLPaths;
+import net.neoforged.fml.loading.FMLLoader;
+import net.neoforged.fml.loading.FMLPaths;
 import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.hordes.common.HordesLogger;
 import org.apache.commons.io.FileUtils;

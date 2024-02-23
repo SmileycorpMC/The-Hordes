@@ -16,41 +16,36 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.event.EntityRenderersEvent.RegisterRenderers;
-import net.minecraftforge.client.event.RenderNameTagEvent;
-import net.minecraftforge.client.event.ViewportEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RenderNameTagEvent;
+import net.neoforged.neoforge.client.event.ViewportEvent;
+import net.neoforged.neoforge.common.NeoForge;
 import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.client.render.ZombiePlayerRenderer;
 import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.common.entities.HordesEntities;
 import net.smileycorp.hordes.common.entities.PlayerZombie;
 import net.smileycorp.hordes.config.ClientConfigHandler;
-import net.smileycorp.hordes.hordeevent.capability.HordeEventClient;
 import net.smileycorp.hordes.infection.client.ClientInfectionEventHandler;
 import net.smileycorp.hordes.infection.network.CureEntityMessage;
 
 import java.awt.*;
 
-@EventBusSubscriber(modid = Constants.MODID, value = Dist.CLIENT, bus = Bus.MOD)
+@Mod.EventBusSubscriber(modid = Constants.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ClientHandler {
 
 	@SubscribeEvent
 	public static void clientSetup(FMLClientSetupEvent event){
-		MinecraftForge.EVENT_BUS.register(new ClientHandler());
-		MinecraftForge.EVENT_BUS.register(new ClientInfectionEventHandler());
+		NeoForge.EVENT_BUS.register(new ClientHandler());
+		NeoForge.EVENT_BUS.register(new ClientInfectionEventHandler());
 	}
 
 	@SubscribeEvent
-	public static void registerEntityRenderers(RegisterRenderers event) {
+	public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
 		event.registerEntityRenderer(HordesEntities.ZOMBIE_PLAYER.get(), ctx -> new ZombiePlayerRenderer<>(ctx,
 				ClientConfigHandler.getZombiePlayerColour(), Constants.loc("textures/entity/layer/zombie_player_outer_layer.png"), false, false));
 		event.registerEntityRenderer(HordesEntities.DROWNED_PLAYER.get(), ctx -> new ZombiePlayerRenderer<>(ctx,
@@ -77,8 +72,7 @@ public class ClientHandler {
 		if (!ClientConfigHandler.hordeEventTintsSky.get()) return;
 		Minecraft mc = Minecraft.getInstance();
 		ClientLevel level = mc.level;
-		LazyOptional<HordeEventClient> optional = mc.player.getCapability(HordesCapabilities.HORDE_EVENT_CLIENT);
-		if (optional.isPresent() && optional.orElseGet(null).isHordeNight(level)) {
+		if (HordeEventClient.getInstance().isHordeNight(level)) {
 			float d = level.getSkyDarken((float)event.getPartialTick()) * 1.4f;
 			Color rgb = ClientConfigHandler.getHordeSkyColour();
 			event.setRed((1f - d) * (float)rgb.getRed()/255f + (d * event.getRed()));
@@ -99,9 +93,7 @@ public class ClientHandler {
 	}
 
 	public static void setHordeDay(int day, int day_length) {
-		LocalPlayer player = Minecraft.getInstance().player;
-		LazyOptional<HordeEventClient> optional = player.getCapability(HordesCapabilities.HORDE_EVENT_CLIENT);
-		if (optional.isPresent()) optional.orElseGet(null).setNextDay(day, day_length);
+		HordeEventClient.getInstance().setNextDay(day, day_length);
 	}
 
 	public static void displayMessage(String text) {

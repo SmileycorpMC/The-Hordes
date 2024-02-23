@@ -2,12 +2,11 @@ package net.smileycorp.hordes.common.event;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.eventbus.api.Cancelable;
+import net.neoforged.bus.api.ICancellableEvent;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 
-@Cancelable
-public class HordeStartEvent extends HordePlayerEvent {
+public class HordeStartEvent extends HordePlayerEvent implements ICancellableEvent {
 	
 	protected final BlockPos pos;
 	protected String message = Constants.hordeEventStart;

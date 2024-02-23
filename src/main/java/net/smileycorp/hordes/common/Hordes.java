@@ -1,16 +1,16 @@
 package net.smileycorp.hordes.common;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.DistExecutor;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLConstructModEvent;
+import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.neoforge.common.NeoForge;
 import net.smileycorp.hordes.client.ClientHandler;
 import net.smileycorp.hordes.common.data.DataGenerator;
 import net.smileycorp.hordes.common.data.DataRegistry;
@@ -44,7 +44,7 @@ public class Hordes {
 
 	@SubscribeEvent
 	public static void constructMod(FMLConstructModEvent event) {
-		MinecraftForge.EVENT_BUS.register(new MiscEventHandler());
+		NeoForge.EVENT_BUS.register(new MiscEventHandler());
 		HordesInfection.EFFECTS.register(FMLJavaModLoadingContext.get().getModEventBus());
 		HordesEntities.ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
 	}
@@ -55,18 +55,18 @@ public class Hordes {
 		//Horde Event
 		if (HordeEventConfig.enableHordeEvent.get()) {
 			HordeEventPacketHandler.initPackets();
-			MinecraftForge.EVENT_BUS.register(new HordeEventHandler());
+			NeoForge.EVENT_BUS.register(new HordeEventHandler());
 		}
 		//Mob Infection
 		if (InfectionConfig.enableMobInfection.get()) {
 			InfectionPacketHandler.initPackets();
-			MinecraftForge.EVENT_BUS.register(new InfectionEventHandler());
+			NeoForge.EVENT_BUS.register(new InfectionEventHandler());
 		}
 	}
 
 	@SubscribeEvent
 	public static void loadClient(FMLClientSetupEvent event) {
-		MinecraftForge.EVENT_BUS.register(new ClientHandler());
+		NeoForge.EVENT_BUS.register(new ClientHandler());
 	}
 
 }

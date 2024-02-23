@@ -1,11 +1,6 @@
 package net.smileycorp.hordes.infection.capability;
 
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.IntTag;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilitySerializable;
-import net.minecraftforge.common.util.LazyOptional;
-import net.smileycorp.hordes.common.capability.HordesCapabilities;
 
 public interface Infection {
 
@@ -39,26 +34,6 @@ public interface Infection {
 		@Override
 		public IntTag saveInfectionCount() {
 			return IntTag.valueOf(count);
-		}
-
-	}
-
-	class Provider implements ICapabilitySerializable<IntTag> {
-
-		protected Infection impl = new Impl();
-		@Override
-		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction facing) {
-			return cap == HordesCapabilities.INFECTION ? LazyOptional.of(() -> impl).cast() : LazyOptional.empty();
-		}
-
-		@Override
-		public IntTag serializeNBT() {
-			return impl.saveInfectionCount();
-		}
-
-		@Override
-		public void deserializeNBT(IntTag nbt) {
-			impl.loadInfectionCount(nbt);
 		}
 
 	}

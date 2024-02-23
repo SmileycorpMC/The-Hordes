@@ -1,23 +1,22 @@
 package net.smileycorp.hordes.config;
 
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class InfectionConfig {
     
+    public static ModConfigSpec.ConfigValue<Boolean> enableMobInfection;
+    public static ModConfigSpec.ConfigValue<Boolean> infectVillagers;
+    public static ModConfigSpec.ConfigValue<Boolean> infectPlayers;
+    public static ModConfigSpec.ConfigValue<Double> villagerInfectChance;
+    public static ModConfigSpec.ConfigValue<Double> playerInfectChance;
+    public static ModConfigSpec.ConfigValue<Integer> ticksForEffectStage;
+    public static ModConfigSpec.ConfigValue<Boolean> infectSlowness;
+    public static ModConfigSpec.ConfigValue<Boolean> infectHunger;
+    public static ModConfigSpec.ConfigValue<Boolean> infectionSpawnsZombiePlayers;
+    public static ModConfigSpec.ConfigValue<Boolean> infectionEntitiesAggroConversions;
+    public static ModConfigSpec.ConfigValue<Double> effectStageTickReduction;
     
-    public static ForgeConfigSpec.ConfigValue<Boolean> enableMobInfection;
-    public static ForgeConfigSpec.ConfigValue<Boolean> infectVillagers;
-    public static ForgeConfigSpec.ConfigValue<Boolean> infectPlayers;
-    public static ForgeConfigSpec.ConfigValue<Double> villagerInfectChance;
-    public static ForgeConfigSpec.ConfigValue<Double> playerInfectChance;
-    public static ForgeConfigSpec.ConfigValue<Integer> ticksForEffectStage;
-    public static ForgeConfigSpec.ConfigValue<Boolean> infectSlowness;
-    public static ForgeConfigSpec.ConfigValue<Boolean> infectHunger;
-    public static ForgeConfigSpec.ConfigValue<Boolean> infectionSpawnsZombiePlayers;
-    public static ForgeConfigSpec.ConfigValue<Boolean> infectionEntitiesAggroConversions;
-    public static ForgeConfigSpec.ConfigValue<Double> effectStageTickReduction;
-    
-    static void build(ForgeConfigSpec.Builder builder) {
+    static void build(ModConfigSpec.Builder builder) {
         builder.push("Infection");
         enableMobInfection = builder.comment("Set to false to completely disable mob infection and anything related to it.").define("enableMobInfection", true);
         infectVillagers = builder.comment("Can villagers be infected.").define("infectVillagers", true);

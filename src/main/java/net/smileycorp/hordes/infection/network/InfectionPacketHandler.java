@@ -1,9 +1,6 @@
 package net.smileycorp.hordes.infection.network;
 
 import net.minecraft.network.Connection;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.simple.SimpleChannel;
 import net.smileycorp.atlas.api.network.AbstractMessage;
 import net.smileycorp.atlas.api.network.NetworkUtils;
 import net.smileycorp.hordes.common.Constants;
