@@ -2,9 +2,9 @@ package net.smileycorp.hordes.hordeevent.capability;
 
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.StringTag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
@@ -30,11 +30,11 @@ public interface HordeSpawn {
 
 	void readNBT(StringTag tag);
 
-	static Player getHordePlayer(Entity entity) {
+	static ServerPlayer getHordePlayer(Entity entity) {
 		if (entity.level().isClientSide |!(entity instanceof Mob)) return null;
 		LazyOptional<HordeSpawn> optional = entity.getCapability(HordesCapabilities.HORDESPAWN);
 		if (!optional.isPresent()) return null;
-		HordeSpawn cap = optional.resolve().get();
+		HordeSpawn cap = optional.orElseGet(null);
 		if (!cap.isHordeSpawned()) return null;
 		String uuid = cap.getPlayerUUID();
 		if (!DataUtils.isValidUUID(uuid)) return null;

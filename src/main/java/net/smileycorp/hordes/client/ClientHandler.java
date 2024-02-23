@@ -30,9 +30,10 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.client.render.ZombiePlayerRenderer;
 import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.common.HordesEntities;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
+import net.smileycorp.hordes.common.entities.HordesEntities;
 import net.smileycorp.hordes.common.entities.PlayerZombie;
+import net.smileycorp.hordes.config.ClientConfigHandler;
 import net.smileycorp.hordes.hordeevent.capability.HordeEventClient;
 import net.smileycorp.hordes.infection.client.ClientInfectionEventHandler;
 import net.smileycorp.hordes.infection.network.CureEntityMessage;
@@ -51,9 +52,11 @@ public class ClientHandler {
 	@SubscribeEvent
 	public static void registerEntityRenderers(RegisterRenderers event) {
 		event.registerEntityRenderer(HordesEntities.ZOMBIE_PLAYER.get(), ctx -> new ZombiePlayerRenderer<>(ctx,
-				ClientConfigHandler.getZombiePlayerColour(), Constants.loc("textures/entity/layer/zombie_player_outer_layer.png"), false));
+				ClientConfigHandler.getZombiePlayerColour(), Constants.loc("textures/entity/layer/zombie_player_outer_layer.png"), false, false));
 		event.registerEntityRenderer(HordesEntities.DROWNED_PLAYER.get(), ctx -> new ZombiePlayerRenderer<>(ctx,
-				ClientConfigHandler.getDrownedPlayerColour(), Constants.loc("textures/entity/layer/drowned_player_outer_layer.png"), true));
+				ClientConfigHandler.getDrownedPlayerColour(), Constants.loc("textures/entity/layer/drowned_player_outer_layer.png"), true, false));
+		event.registerEntityRenderer(HordesEntities.HUSK_PLAYER.get(), ctx -> new ZombiePlayerRenderer<>(ctx,
+				ClientConfigHandler.getHuskPlayerColour(), Constants.loc("textures/entity/layer/husk_player_outer_layer.png"), false, true));
 	}
 
 	@SubscribeEvent
@@ -119,12 +122,18 @@ public class ClientHandler {
 
 	}
 
-	public static void onInfect() {
-		if (ClientConfigHandler.playerInfectSound.get()) {
+	public static void onInfect(boolean prevented) {
+		if (ClientConfigHandler.playerInfectSound.get() &! prevented) {
 			Minecraft mc = Minecraft.getInstance();
 			Level level = mc.level;
 			LocalPlayer player = mc.player;
-			level.playSound(player, player.blockPosition(), SoundEvents.ZOMBIE_VILLAGER_CONVERTED, SoundSource.HOSTILE, 0.75f, level.random.nextFloat());
+			level.playSound(player, player.blockPosition(), Constants.INFECT_SOUND, SoundSource.PLAYERS, 0.75f, level.random.nextFloat());
+		}
+		if (ClientConfigHandler.infectionProtectSound.get() && prevented) {
+			Minecraft mc = Minecraft.getInstance();
+			Level level = mc.level;
+			LocalPlayer player = mc.player;
+			level.playSound(player, player.blockPosition(), Constants.IMMUNE_SOUND, SoundSource.PLAYERS, 0.75f, level.random.nextFloat());
 		}
 	}
 

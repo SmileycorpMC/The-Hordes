@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.client;
+package net.smileycorp.hordes.config;
 
 import com.google.common.collect.Lists;
 import net.minecraft.network.chat.TextColor;
@@ -18,6 +18,7 @@ public class ClientConfigHandler {
 	private static TextColor hordeMessageColour = null;
 	private static Color zombiePlayerColour = null;
 	private static Color drownedPlayerColour = null;
+	private static Color huskPlayerColour = null;
 	private static Color hordeEventSkyColour = null;
 	private static Color hordeEventMoonColour = null;
 
@@ -34,8 +35,10 @@ public class ClientConfigHandler {
 	//infection
 	public static ConfigValue<Boolean> playerInfectionVisuals;
 	public static ConfigValue<Boolean> playerInfectSound;
+	public static ConfigValue<Boolean> infectionProtectSound;
 	private static ConfigValue<List<? extends Integer>> configZombiePlayerColour;
 	private static ConfigValue<List<? extends Integer>> configDrownedPlayerColour;
+	private static ConfigValue<List<? extends Integer>> configHuskPlayerColour;
 
 	//load config properties
 	static {
@@ -57,11 +60,14 @@ public class ClientConfigHandler {
 		builder.pop();
 		builder.push("Infection");
 		playerInfectionVisuals = builder.comment("Tint the player's screen and display other visual effects if they are infected.").define("playerInfectionVisuals", true);
-		playerInfectSound = builder.comment("Play a sound when the player becomes infected.").define("playerInfectSound", true);
+		playerInfectSound = builder.comment("Play a sound when the player becomes infected?").define("playerInfectSound", true);
+		infectionProtectSound = builder.comment("Play a sound when infection gets prevented?").define("infectionProtectSound", false);
 		configZombiePlayerColour = builder.comment("Colour tint for zombie players.")
 				.defineList("zombiePlayerColour", Lists.newArrayList(121, 156, 101), (x) -> (int)x >= 0 && (int)x < 256);
 		configDrownedPlayerColour = builder.comment("Colour tint for drowned players.")
 				.defineList("drownedPlayerColour", Lists.newArrayList(144, 255, 255), (x) -> (int)x >= 0 && (int)x < 256);
+		configHuskPlayerColour = builder.comment("Colour tint for husk players.")
+				.defineList("huskPlayerColour", Lists.newArrayList(193, 168, 5), (x) -> (int)x >= 0 && (int)x < 256);
 		builder.pop();
 		config = builder.build();
 	}
@@ -109,6 +115,15 @@ public class ClientConfigHandler {
 			else drownedPlayerColour = new Color(144, 255, 255);
 		}
 		return drownedPlayerColour;
+	}
+
+	public static Color getHuskPlayerColour() {
+		if (huskPlayerColour == null) {
+			List<? extends Integer> rgb = configHuskPlayerColour.get();
+			if (rgb.size() >= 3) huskPlayerColour = new Color(rgb.get(0), rgb.get(1), + rgb.get(2));
+			else huskPlayerColour = new Color(193, 168, 5);
+		}
+		return huskPlayerColour;
 	}
 
 }

@@ -1,7 +1,5 @@
 package net.smileycorp.hordes.common.data;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraftforge.fml.loading.FMLLoader;
@@ -17,9 +15,8 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class ConfigFilesGenerator {
+public class DataGenerator {
 
-    private static Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final Path CONFIG_FOLDER = FMLPaths.CONFIGDIR.get().resolve("hordes");
 
     public static boolean shouldGenerateFiles() {
@@ -44,6 +41,7 @@ public class ConfigFilesGenerator {
         DataUtils.copyFileFromMod("assets/hordes/sounds.json", "hordes");
         DataUtils.copyFileFromMod("assets/hordes/sounds/horde_spawn.ogg", "hordes");
         DataUtils.copyFileFromMod("assets/hordes/textures/entity/layer/drowned_player_outer_layer.png", "hordes");
+        DataUtils.copyFileFromMod("assets/hordes/textures/entity/layer/husk_player_outer_layer.png", "hordes");
         DataUtils.copyFileFromMod("assets/hordes/textures/entity/layer/zombie_player_outer_layer.png", "hordes");
         DataUtils.copyFileFromMod("assets/hordes/textures/entity/zombie_evoker.png", "hordes");
         DataUtils.copyFileFromMod("assets/hordes/textures/entity/zombie_illusioner.png", "hordes");
@@ -52,18 +50,25 @@ public class ConfigFilesGenerator {
         DataUtils.copyFileFromMod("assets/hordes/textures/entity/zombie_wandering_trader.png", "hordes");
         DataUtils.copyFileFromMod("assets/hordes/textures/entity/zombie_witch.png", "hordes");
         DataUtils.copyFileFromMod("assets/hordes/textures/entity/zombified_piglin_brute.png", "hordes");
+        DataUtils.copyFileFromMod("assets/hordes/textures/gui/jei/cure_list.png", "hordes");
+        DataUtils.copyFileFromMod("assets/hordes/textures/mob_effect/immunity.png", "hordes");
+        DataUtils.copyFileFromMod("assets/hordes/textures/mob_effect/infected.png", "hordes");
+        DataUtils.copyFileFromMod("assets/hordes/textures/mob_effect/infected.png.mcmeta", "hordes");
         HordesLogger.logInfo("Generated asset files.");
     }
 
     public static void generateData() {
+        DataUtils.copyFileFromMod("data/hordes/horde_data/immunity_items.json", "hordes");
         DataUtils.copyFileFromMod("data/hordes/horde_data/infection_conversions.json", "hordes");
         DataUtils.copyFileFromMod("data/hordes/horde_data/scripts/default.json", "hordes");
         DataUtils.copyFileFromMod("data/hordes/horde_data/tables/default.json", "hordes");
-        DataUtils.copyFileFromMod("data/hordes/horde_data/tables/skeletons.json", "hordes");
-        DataUtils.copyFileFromMod("data/hordes/horde_data/tables/mixed_mobs.json", "hordes");
         DataUtils.copyFileFromMod("data/hordes/horde_data/tables/illagers.json", "hordes");
+        DataUtils.copyFileFromMod("data/hordes/horde_data/tables/mixed_mobs.json", "hordes");
+        DataUtils.copyFileFromMod("data/hordes/horde_data/tables/skeletons.json", "hordes");
         DataUtils.copyFileFromMod("data/hordes/tags/entity_types/infection_entities.json", "hordes");
         DataUtils.copyFileFromMod("data/hordes/tags/items/infection_cures.json", "hordes");
+        DataUtils.copyFileFromMod("data/hordes/tags/items/infection_immune_wearables.json", "hordes");
+        DataUtils.copyFileFromMod("data/hordes/tags/worldgen/biome/husk_player_spawn_biomes.json", "hordes");
         HordesLogger.logInfo("Generated data files.");
     }
 

@@ -23,15 +23,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.util.TextUtils;
-import net.smileycorp.hordes.common.CommonConfigHandler;
-import net.smileycorp.hordes.common.HordesEntities;
+import net.smileycorp.hordes.config.ZombiePlayersConfig;
 
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
 
-public class DrownedPlayer extends Drowned implements PlayerZombie {
+public class DrownedPlayer extends Drowned implements PlayerZombie<DrownedPlayer> {
 
 	protected static final EntityDataAccessor<Optional<UUID>> PLAYER = SynchedEntityData.defineId(DrownedPlayer.class, EntityDataSerializers.OPTIONAL_UUID);
 	protected static final EntityDataAccessor<Boolean> SHOW_CAPE = SynchedEntityData.defineId(DrownedPlayer.class, EntityDataSerializers.BOOLEAN);
@@ -101,7 +100,7 @@ public class DrownedPlayer extends Drowned implements PlayerZombie {
 	}
 
 	@Override
-	public void setInventory(Collection<ItemEntity> list) {
+	public void storeDrops(Collection<ItemEntity> list) {
 		playerItems.clear();
 		for (ItemEntity item : list) {
 			ItemStack stack = item.getItem();
@@ -132,12 +131,12 @@ public class DrownedPlayer extends Drowned implements PlayerZombie {
 
 	@Override
 	public boolean isSunSensitive() {
-		return CommonConfigHandler.zombiePlayersBurn.get();
+		return ZombiePlayersConfig.zombiePlayersBurn.get();
 	}
 
 	@Override
 	public boolean fireImmune() {
-		return CommonConfigHandler.zombiePlayersFireImmune.get();
+		return ZombiePlayersConfig.zombiePlayersFireImmune.get();
 	}
 
 	@Override

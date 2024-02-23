@@ -32,6 +32,10 @@ public class HordesLogger {
         }
     }
 
+    public static void logSilently(Object message) {
+        writeToFile(message);
+    }
+
     public static void logInfo(Object message) {
         writeToFile(message);
         logger.info(message);

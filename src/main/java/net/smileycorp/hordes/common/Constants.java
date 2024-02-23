@@ -1,6 +1,7 @@
 package net.smileycorp.hordes.common;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 
 public class Constants {
 
@@ -12,6 +13,8 @@ public class Constants {
 	public static final String hordeTrySleep = "message.hordes.TrySleep";
 
 	public static final ResourceLocation HORDE_SOUND = loc("horde_spawn");
+	public static final SoundEvent INFECT_SOUND = SoundEvent.createVariableRangeEvent(loc("infect"));
+	public static final SoundEvent IMMUNE_SOUND = SoundEvent.createVariableRangeEvent(loc("immune"));
 
 	public static String name(String name) {
 		return name(MODID, name);

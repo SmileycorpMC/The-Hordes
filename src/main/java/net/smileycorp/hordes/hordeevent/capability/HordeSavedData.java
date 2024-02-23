@@ -4,12 +4,13 @@ import com.google.common.collect.Maps;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.util.DataUtils;
-import net.smileycorp.hordes.common.CommonConfigHandler;
+import net.smileycorp.hordes.config.HordeEventConfig;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -66,7 +67,7 @@ public class HordeSavedData extends SavedData {
 		if (level instanceof ServerLevel) ((ServerLevel)level).getChunkSource().getDataStorage().set(DATA, this);
 	}
 
-	public HordeEvent getEvent(Player player) {
+	public HordeEvent getEvent(ServerPlayer player) {
 		return player == null ? null : getEvent(player.getUUID());
 	}
 
@@ -74,6 +75,20 @@ public class HordeSavedData extends SavedData {
 		if (uuid == null) return null;
 		if (!events.containsKey(uuid)) events.put(uuid, new HordeEvent(this));
 		return events.get(uuid);
+	}
+
+	public String getName(UUID uuid) {
+		Player player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(uuid);
+		if (player != null) return player.getName().getString();
+		Optional<GameProfile> profile = ServerLifecycleHooks.getCurrentServer().getProfileCache().get(uuid);
+		if (profile.isPresent() && profile.get().getName() != null) return profile.get().getName();
+		return uuid.toString();
+	}
+
+	@Override
+	public String toString() {
+		return super.toString() + "[current_day: " + (int)Math.floor((float)level.getDayTime() / (float) HordeEventConfig.dayLength.get()) +
+				", current_time: " + level.getDayTime() % HordeEventConfig.dayLength.get() + ", next_day="+ next_day +"]";
 	}
 
 	public List<String> getDebugText() {
@@ -88,25 +103,9 @@ public class HordeSavedData extends SavedData {
 		return out;
 	}
 
-	public String getName(UUID uuid) {
-		Player player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(uuid);
-		if (player != null) return player.getName().getString();
-		Optional<GameProfile> profile = ServerLifecycleHooks.getCurrentServer().getProfileCache().get(uuid);
-		if (profile.isPresent() && profile.get().getName() != null) return profile.get().getName();
-		return uuid.toString();
-	}
-
-	@Override
-	public String toString() {
-		return super.toString() + "[current_day: " + (int)Math.floor((int)level.getDayTime()/(int)CommonConfigHandler.dayLength.get()) +
-				", current_time: " + level.getDayTime()%(int)CommonConfigHandler.dayLength.get() + "next_day="+ next_day +"]";
-	}
-
 	public static HordeSavedData getData(ServerLevel level) {
-		HordeSavedData data = (HordeSavedData) level.getChunkSource().getDataStorage().computeIfAbsent((nbt) -> getDataFromNBT(level, nbt), () -> getCleanData(level), DATA);
-		if (data == null) {
-			data = getCleanData(level);
-		}
+		HordeSavedData data = level.getChunkSource().getDataStorage().computeIfAbsent((nbt) -> getDataFromNBT(level, nbt), () -> getCleanData(level), DATA);
+		if (data == null) data = getCleanData(level);
 		level.getChunkSource().getDataStorage().set(DATA, data);
 		return data;
 	}
@@ -120,10 +119,10 @@ public class HordeSavedData extends SavedData {
 	public static HordeSavedData getCleanData(ServerLevel level) {
 		HordeSavedData data = new HordeSavedData();
 		data.level = level;
-		int day = Math.round(level.getDayTime()/CommonConfigHandler.dayLength.get());
-		double multiplier = Math.ceil(day / CommonConfigHandler.hordeSpawnDays.get());
-		if (!(CommonConfigHandler.spawnFirstDay.get() && day == 0)) multiplier += 1;
-		int nextDay = (int) Math.floor(((multiplier*CommonConfigHandler.hordeSpawnDays.get()) + level.random.nextInt(CommonConfigHandler.hordeSpawnVariation.get() + 1)));
+		int day = Math.round(level.getDayTime()/ HordeEventConfig.dayLength.get());
+		double multiplier = Math.ceil(day / HordeEventConfig.hordeSpawnDays.get());
+		if (!(HordeEventConfig.spawnFirstDay.get() && day == 0)) multiplier += 1;
+		int nextDay = (int) Math.floor(((multiplier* HordeEventConfig.hordeSpawnDays.get()) + level.random.nextInt(HordeEventConfig.hordeSpawnVariation.get() + 1)));
 		data.setNextDay(nextDay);
 		return data;
 	}

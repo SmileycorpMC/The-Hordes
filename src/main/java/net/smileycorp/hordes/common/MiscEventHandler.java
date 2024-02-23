@@ -4,10 +4,10 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Drowned;
+import net.minecraft.world.entity.monster.Husk;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.util.FakePlayer;
@@ -25,7 +25,11 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.common.capability.ZombifyPlayer;
+import net.smileycorp.hordes.common.entities.HordesEntities;
 import net.smileycorp.hordes.common.entities.PlayerZombie;
+import net.smileycorp.hordes.common.event.SpawnZombiePlayerEvent;
+import net.smileycorp.hordes.config.InfectionConfig;
+import net.smileycorp.hordes.config.ZombiePlayersConfig;
 import net.smileycorp.hordes.infection.HordesInfection;
 
 import java.util.Collection;
@@ -47,11 +51,11 @@ public class MiscEventHandler {
 	public void onDeath(LivingDeathEvent event) {
 		LivingEntity entity = event.getEntity();
 		if (!(entity instanceof Player) || entity instanceof FakePlayer || entity.level().isClientSide || entity.level().getDifficulty() == Difficulty.PEACEFUL) return;
-		if ((entity.hasEffect(HordesInfection.INFECTED.get()) && CommonConfigHandler.infectionSpawnsZombiePlayers.get() && CommonConfigHandler.enableMobInfection.get())
-				|| CommonConfigHandler.zombieGraves.get() || (entity.isUnderWater() && CommonConfigHandler.drownedGraves.get())) {
+		if ((entity.hasEffect(HordesInfection.INFECTED.get()) && InfectionConfig.infectionSpawnsZombiePlayers.get()
+				&& InfectionConfig.enableMobInfection.get()) || ZombiePlayersConfig.zombieGraves.get()) {
 			LazyOptional<ZombifyPlayer> optional = entity.getCapability(HordesCapabilities.ZOMBIFY_PLAYER, null);
 			if (!optional.isPresent()) return;
-			optional.resolve().get().createZombie((Player) entity);
+			optional.orElseGet(null).createZombie((Player) entity);
 		}
 	}
 
@@ -61,19 +65,21 @@ public class MiscEventHandler {
 		if (!(event.getEntity() instanceof Player) || event.getEntity() instanceof FakePlayer || event.getEntity().level().isClientSide
 				|| event.getEntity().level().getDifficulty() == Difficulty.PEACEFUL) return;
 		Player player = (Player) event.getEntity();
-		if ((player.hasEffect(HordesInfection.INFECTED.get()) && CommonConfigHandler.enableMobInfection.get()) || CommonConfigHandler.zombieGraves.get()) {
+		if ((player.hasEffect(HordesInfection.INFECTED.get()) && InfectionConfig.enableMobInfection.get()) || ZombiePlayersConfig.zombieGraves.get()) {
 			LazyOptional<ZombifyPlayer> optional = player.getCapability(HordesCapabilities.ZOMBIFY_PLAYER, null);
 			if (!optional.isPresent()) return;
-			ZombifyPlayer cap = optional.resolve().get();
-			Mob zombie = cap.getZombie();
+			ZombifyPlayer cap = optional.orElseGet(null);
+			PlayerZombie zombie = cap.getZombie();
 			if (zombie == null) return;
-			Collection<ItemEntity> drops = event.getDrops();
-			((PlayerZombie)zombie).setInventory(drops);
-			zombie.setPersistenceRequired();
-			player.level().addFreshEntity(zombie);
-			drops.clear();
+			if (ZombiePlayersConfig.zombiePlayersStoreItems.get()) {
+				Collection<ItemEntity> drops = event.getDrops();
+				zombie.storeDrops(drops);
+				drops.clear();
+				event.setCanceled(true);
+			}
+			zombie.asEntity().setPersistenceRequired();
+			player.level().addFreshEntity(zombie.asEntity());
 			cap.clearZombie();
-			event.setCanceled(true);
 			player.removeEffect(HordesInfection.INFECTED.get());
 		}
 	}
@@ -102,11 +108,23 @@ public class MiscEventHandler {
 		}
 	}
 
-	//register attributes for zombie/drowned players
+	//register attributes for zombie players
 	@SubscribeEvent
 	public static void registerAttributes(EntityAttributeCreationEvent event) {
 		event.put(HordesEntities.ZOMBIE_PLAYER.get(), Zombie.createAttributes().build());
 		event.put(HordesEntities.DROWNED_PLAYER.get(), Drowned.createAttributes().build());
+		event.put(HordesEntities.HUSK_PLAYER.get(), Husk.createAttributes().build());
+	}
+
+	@SubscribeEvent(receiveCanceled = true)
+	public void spawnZombiePlayer(SpawnZombiePlayerEvent event) {
+		Player player = event.getEntity();
+		if (player.isUnderWater() && ZombiePlayersConfig.drownedPlayers.get()) {
+			event.setEntityType(HordesEntities.DROWNED_PLAYER.get());
+			return;
+		}
+		if (player.level().getBiome(player.blockPosition()).is(HordesEntities.HUSK_PLAYER_SPAWN_BIOMES) && ZombiePlayersConfig.huskPlayers.get())
+			event.setEntityType(HordesEntities.HUSK_PLAYER.get());
 	}
 
 }
