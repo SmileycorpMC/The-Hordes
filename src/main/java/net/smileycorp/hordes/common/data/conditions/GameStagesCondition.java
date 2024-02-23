@@ -26,7 +26,7 @@ public class GameStagesCondition implements Condition {
 		try {
 			return new GameStagesCondition(json.getAsString());
 		} catch(Exception e) {
-			HordesLogger.logError("Incorrect parameters for condition hordes:gamestage", e);
+			HordesLogger.logError("Incorrect parameters for condition gamestages:gamestage", e);
 		}
 		return null;
 	}

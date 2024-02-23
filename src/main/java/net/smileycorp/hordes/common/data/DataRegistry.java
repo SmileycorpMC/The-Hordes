@@ -9,7 +9,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.ModList;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.atlas.api.data.LogicalOperation;
-import net.smileycorp.hordes.common.CommonConfigHandler;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.data.conditions.*;
@@ -17,6 +16,7 @@ import net.smileycorp.hordes.common.data.values.EntityNBTGetter;
 import net.smileycorp.hordes.common.data.values.EntityPosGetter;
 import net.smileycorp.hordes.common.data.values.LevelNBTGetter;
 import net.smileycorp.hordes.common.data.values.ValueGetter;
+import net.smileycorp.hordes.config.HordeEventConfig;
 import net.smileycorp.hordes.hordeevent.data.functions.FunctionRegistry;
 
 import java.util.Map;
@@ -31,7 +31,7 @@ public class DataRegistry {
 	public static void init() {
 		registerValueGetters();
 		registerConditionDeserializers();
-		if (CommonConfigHandler.enableHordeEvent.get()) FunctionRegistry.registerFunctionSerializers();
+		if (HordeEventConfig.enableHordeEvent.get()) FunctionRegistry.registerFunctionSerializers();
 	}
 
 	private static void registerValueGetters() {
@@ -48,7 +48,8 @@ public class DataRegistry {
 		registerConditionDeserializer(Constants.loc("random"), RandomCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("biome"), BiomeCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("day"), DayCondition::deserialize);
-		if (ModList.get().isLoaded("gamestages")) registerConditionDeserializer(Constants.loc("gamestage"), GameStagesCondition::deserialize);
+		registerConditionDeserializer(Constants.loc("local_difficulty"), LocalDifficultyCondition::deserialize);
+		if (ModList.get().isLoaded("gamestages")) registerConditionDeserializer(new ResourceLocation("gamestages:gamestage"), GameStagesCondition::deserialize);
 	}
 
 	public static ValueGetter readValue(DataType type, JsonObject json) {

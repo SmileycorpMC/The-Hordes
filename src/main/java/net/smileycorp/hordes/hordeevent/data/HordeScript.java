@@ -8,16 +8,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.data.DataRegistry;
 import net.smileycorp.hordes.common.data.conditions.Condition;
-import net.smileycorp.hordes.common.data.values.ValueGetter;
-import net.smileycorp.hordes.common.event.HordeBuildSpawntableEvent;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
 import net.smileycorp.hordes.hordeevent.data.functions.FunctionRegistry;
 import net.smileycorp.hordes.hordeevent.data.functions.HordeFunction;
-import net.smileycorp.hordes.hordeevent.data.functions.SetSpawntableFunction;
 
 import java.util.List;
 

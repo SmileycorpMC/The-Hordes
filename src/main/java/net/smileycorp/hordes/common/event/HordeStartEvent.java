@@ -8,7 +8,7 @@ import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 
 @Cancelable
 public class HordeStartEvent extends HordePlayerEvent {
-
+	
 	protected final BlockPos pos;
 	protected String message = Constants.hordeEventStart;
 	protected final boolean wasCommand;
@@ -26,16 +26,6 @@ public class HordeStartEvent extends HordePlayerEvent {
 	//Whether the event was started with a command
 	public boolean wasCommand() {
 		return wasCommand;
-	}
-
-	//get the translation key for the start message
-	public String getMessage() {
-		return message;
-	}
-
-	//set the translation key for the start message
-	public void setMessage(String message) {
-		this.message = message;
 	}
 
 }
