@@ -52,7 +52,8 @@ public class HordeScript<T extends HordePlayerEvent> {
 			HordeFunction<? extends HordePlayerEvent> function = pair.getSecond();
 			if (function == null || clazz == null) throw new Exception("invalid function: " + obj.get("function").getAsString());
 			List<Condition> conditions = Lists.newArrayList();
-			for (JsonElement condition : obj.get("conditions").getAsJsonArray()) conditions.add(DataRegistry.readCondition(condition.getAsJsonObject()));
+			if (obj.has("conditions")) obj.get("conditions").getAsJsonArray().forEach(condition ->
+					conditions.add(DataRegistry.readCondition(condition.getAsJsonObject())));
 			return new HordeScript(function, clazz,  key, conditions.toArray(new Condition[]{}));
 		} catch (Exception e) {
 			HordesLogger.logError("Error loading script " + key + " " + e.getCause() + " " + e.getMessage(), e);

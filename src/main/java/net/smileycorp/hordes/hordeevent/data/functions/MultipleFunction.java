@@ -1,5 +1,7 @@
 package net.smileycorp.hordes.hordeevent.data.functions;
 
+import com.mojang.datafixers.util.Pair;
+import net.smileycorp.hordes.common.data.conditions.Condition;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
 
 import java.util.List;
@@ -7,9 +9,9 @@ import java.util.List;
 public class MultipleFunction<T extends HordePlayerEvent> implements HordeFunction<T> {
     
     private final Class<T> clazz;
-    private final List<HordeFunction<T>> functions;
+    private final List<Pair<List<Condition>, HordeFunction<T>>> functions;
     
-    public MultipleFunction(Class<T> clazz, List<HordeFunction<T>> functions) {
+    public MultipleFunction(Class<T> clazz, List<Pair<List<Condition>, HordeFunction<T>>> functions) {
         this.clazz = clazz;
         this.functions = functions;
     }
@@ -17,7 +19,12 @@ public class MultipleFunction<T extends HordePlayerEvent> implements HordeFuncti
     @Override
     public void apply(T event) {
         if (event.getClass() != clazz) return;
-        for (HordeFunction<T> function : functions) function.apply(event);
+       functions.forEach(pair -> tryApply(pair, event));
+    }
+    
+    private void tryApply(Pair<List<Condition>, HordeFunction<T>> pair, T event) {
+        for (Condition condition : pair.getFirst()) if (!condition.apply(event.getEntityWorld(), event.getEntity(), event.getRandom())) return;
+        pair.getSecond().apply(event);
     }
     
     @Override

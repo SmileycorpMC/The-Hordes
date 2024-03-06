@@ -74,7 +74,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 
 	public CompoundTag writeToNBT(CompoundTag nbt) {
 		nbt.putInt("timer", timer);
-		nbt.putInt("next_day", nextDay);
+		nbt.putInt("nextDay", nextDay);
 		nbt.putInt("day", day);
 		if (spawnData != null) nbt.put("spawnData", spawnData.save());
 		return nbt;

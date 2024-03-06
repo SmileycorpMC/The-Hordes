@@ -8,6 +8,8 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.resources.ResourceLocation;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.HordesLogger;
+import net.smileycorp.hordes.common.data.DataRegistry;
+import net.smileycorp.hordes.common.data.conditions.Condition;
 import net.smileycorp.hordes.common.event.HordeBuildSpawnDataEvent;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
 
@@ -28,29 +30,37 @@ public class FunctionRegistry {
     }
 
     public static Pair<Class<? extends HordePlayerEvent>, HordeFunction<? extends HordePlayerEvent>> readFunction(JsonObject json) {
-        if (json.has("function") && json.has("value")) {
-            if (json.get("function").equals("hordes:multiple")) {
-                Class<? extends HordePlayerEvent> clazz = null;
-                List<HordeFunction<?>> functions = Lists.newArrayList();
-                for (JsonElement element : json.get("value").getAsJsonArray()) {
-                    Pair<Class<? extends HordePlayerEvent>, HordeFunction<? extends HordePlayerEvent>> pair = readFunction(element.getAsJsonObject());
-                    if (clazz == null && pair.getFirst() != null) {
-                        clazz = pair.getFirst();
-                        functions.add(pair.getSecond());
-                    }
-                    else if (clazz == pair.getFirst());
+        if (!(json.has("function") && json.has("value"))) return Pair.of(null, null);
+        if (json.get("function").equals("hordes:multiple")) {
+            Class<? extends HordePlayerEvent> clazz = null;
+            List<Pair<List<Condition>, HordeFunction<?>>> functions = Lists.newArrayList();
+            for (JsonElement element : json.get("value").getAsJsonArray()) {
+                JsonObject obj = element.getAsJsonObject();
+                Pair<Class<? extends HordePlayerEvent>, HordeFunction<? extends HordePlayerEvent>> pair = readFunction(obj);
+                if (clazz == null && pair.getFirst() != null) {
+                    List<Condition> conditions = Lists.newArrayList();
+                    if (obj.has("conditions")) obj.get("conditions").getAsJsonArray().forEach(condition ->
+                            conditions.add(DataRegistry.readCondition(condition.getAsJsonObject())));
+                    clazz = pair.getFirst();
+                    functions.add(pair.mapFirst(c -> conditions));
                 }
-                return Pair.of(clazz, new MultipleFunction(clazz, functions));
+                else if (clazz == pair.getFirst()) {
+                    List<Condition> conditions = Lists.newArrayList();
+                    if (obj.has("conditions")) obj.get("conditions").getAsJsonArray().forEach(condition ->
+                            conditions.add(DataRegistry.readCondition(condition.getAsJsonObject())));
+                    functions.add(pair.mapFirst(c -> conditions));
+                }
             }
-            try {
-                Pair<Class<? extends HordePlayerEvent>, Function<JsonElement, HordeFunction<? extends HordePlayerEvent>>> pair
-                        = DESERIALIZERS.get(new ResourceLocation(json.get("function").getAsString()));
-                return pair.mapSecond(serializer -> serializer.apply(json.get("value")));
-            } catch (Exception e) {
-                HordesLogger.logError("Failed to read condition " + json, e);
-            }
+            return Pair.of(clazz, new MultipleFunction(clazz, functions));
         }
-        return Pair.of(null, null);
+        try {
+            Pair<Class<? extends HordePlayerEvent>, Function<JsonElement, HordeFunction<? extends HordePlayerEvent>>> pair
+                    = DESERIALIZERS.get(new ResourceLocation(json.get("function").getAsString()));
+            return pair.mapSecond(serializer -> serializer.apply(json.get("value")));
+        } catch (Exception e) {
+            HordesLogger.logError("Failed to read condition " + json, e);
+            return Pair.of(null, null);
+        }
     }
 
     public static <T extends HordePlayerEvent> void registerFunctionDeserializer(ResourceLocation name, Class<T> clazz, Function<JsonElement, HordeFunction<T>> serializer) {
