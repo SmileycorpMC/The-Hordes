@@ -16,9 +16,9 @@ public class HordesEntities {
 
     public static final TagKey<Biome> HUSK_PLAYER_SPAWN_BIOMES = TagKey.create(Registries.BIOME, Constants.loc("husk_player_spawn_biomes"));
 
-    public static final DeferredHolder<EntityType, EntityType<ZombiePlayer>> ZOMBIE_PLAYER = zombiePlayer("zombie_player", ZombiePlayer::new);
-    public static final DeferredHolder<EntityType, EntityType<HuskPlayer>> HUSK_PLAYER = zombiePlayer("husk_player", HuskPlayer::new);
-    public static final DeferredHolder<EntityType, EntityType<DrownedPlayer>> DROWNED_PLAYER = zombiePlayer("drowned_player", DrownedPlayer::new);
+    public static final DeferredHolder<EntityType<?>, EntityType<ZombiePlayer>> ZOMBIE_PLAYER = zombiePlayer("zombie_player", ZombiePlayer::new);
+    public static final DeferredHolder<EntityType<?>, EntityType<HuskPlayer>> HUSK_PLAYER = zombiePlayer("husk_player", HuskPlayer::new);
+    public static final DeferredHolder<EntityType<?>, EntityType<DrownedPlayer>> DROWNED_PLAYER = zombiePlayer("drowned_player", DrownedPlayer::new);
 
     private static <T extends Entity & PlayerZombie> DeferredHolder<EntityType<?>, EntityType<T>> zombiePlayer(String name, EntityType.EntityFactory<T> factory) {
         return ENTITIES.register(name, () -> EntityType.Builder.of(factory, MobCategory.MONSTER).sized(0.6F, 1.95F).clientTrackingRange(8).build(name));
