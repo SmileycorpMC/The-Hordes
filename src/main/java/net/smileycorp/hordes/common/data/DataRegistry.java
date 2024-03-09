@@ -44,11 +44,13 @@ public class DataRegistry {
 	public static void registerConditionDeserializers() {
 		for (LogicalOperation operation : LogicalOperation.values())
 			registerConditionDeserializer(Constants.loc(operation.getName()), e -> LogicalCondition.deserialize(operation, e));
+		registerConditionDeserializer(Constants.loc("not"), NotCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("comparison"), ComparisonCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("random"), RandomCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("biome"), BiomeCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("day"), DayCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("local_difficulty"), LocalDifficultyCondition::deserialize);
+		registerConditionDeserializer(Constants.loc("advancement"), AdvancementCondition::deserialize);
 		if (ModList.get().isLoaded("gamestages")) registerConditionDeserializer(new ResourceLocation("gamestages:gamestage"), GameStagesCondition::deserialize);
 	}
 
