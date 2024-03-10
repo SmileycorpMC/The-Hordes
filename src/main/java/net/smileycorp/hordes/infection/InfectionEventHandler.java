@@ -160,6 +160,7 @@ public class InfectionEventHandler {
 	@SubscribeEvent
 	public void canApplyEffect(MobEffectEvent.Applicable event) {
 		LivingEntity entity = event.getEntity();
+		if (entity.level().isClientSide()) return;
 		if (event.getEffectInstance().getEffect() == HordesInfection.INFECTED.get()
 				&& InfectedEffect.preventInfection(entity)) {
 			event.setResult(Result.DENY);
@@ -171,6 +172,7 @@ public class InfectionEventHandler {
 	@SubscribeEvent
 	public void applyEffect(MobEffectEvent.Added event) {
 		LivingEntity entity = event.getEntity();
+		if (entity.level().isClientSide()) return;
 		if (event.getEffectInstance().getEffect() == HordesInfection.IMMUNITY.get() && entity.hasEffect(HordesInfection.INFECTED.get())) {
 			entity.removeEffect(HordesInfection.INFECTED.get());
 			InfectionPacketHandler.send(PacketDistributor.TRACKING_CHUNK.with(()->entity.level().getChunkAt(entity.getOnPos())),
