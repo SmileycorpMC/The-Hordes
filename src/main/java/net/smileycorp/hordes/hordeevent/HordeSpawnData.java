@@ -3,6 +3,8 @@ package net.smileycorp.hordes.hordeevent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.smileycorp.hordes.common.Constants;
+import net.smileycorp.hordes.config.HordeEventConfig;
+import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 import net.smileycorp.hordes.hordeevent.data.HordeTableLoader;
 
 import java.util.Locale;
@@ -10,17 +12,25 @@ import java.util.Locale;
 public class HordeSpawnData {
     
     private HordeSpawnTable table = HordeTableLoader.INSTANCE.getFallbackTable();
-    private HordeSpawnType spawnType = HordeSpawnType.AVOID_FLUIDS;
+    private HordeSpawnType spawnType = HordeSpawnTypes.AVOID_FLUIDS;
     private ResourceLocation spawnSound = Constants.HORDE_SOUND;
     private String startMessage = Constants.hordeEventStart;
-    
     private String endMessage = Constants.hordeEventEnd;
+    private int spawnDuration = HordeEventConfig.hordeSpawnDuration.get();
+    private int spawnInterval = HordeEventConfig.hordeSpawnInterval.get();
+    private int spawnAmount;
     
-    public HordeSpawnData() {};
+    private double entitySpeed = HordeEventConfig.hordeEntitySpeed.get();
     
-    public HordeSpawnData(CompoundTag tag) {
+    public HordeSpawnData(HordeEvent horde) {
+        spawnAmount = (int) (HordeEventConfig.hordeSpawnAmount.get() * (1 + (horde.getDay() / HordeEventConfig.hordeSpawnDays.get())
+                * (HordeEventConfig.hordeSpawnMultiplier.get() - 1)));
+    }
+    
+    public HordeSpawnData(HordeEvent horde, CompoundTag tag) {
+        this(horde);
         if (tag.contains("table")) table = HordeTableLoader.INSTANCE.getTable(new ResourceLocation(tag.getString("table")));
-        if (tag.contains("spawnType")) spawnType = HordeSpawnType.valueOf(tag.getString("spawnType").toUpperCase(Locale.US));
+        if (tag.contains("spawnType")) spawnType = HordeSpawnTypes.fromNBT(tag.get("spawnType"));
         if (tag.contains("spawnSound")) spawnSound = new ResourceLocation(tag.getString("spawnSound"));
         if (tag.contains("startMessage")) startMessage = tag.getString("startMessage");
         if (tag.contains("endMessage")) endMessage = tag.getString("endMessage");
@@ -74,6 +84,38 @@ public class HordeSpawnData {
     
     public void setEndMessage(String endMessage) {
         this.endMessage = endMessage;
+    }
+    
+    public int getSpawnDuration() {
+        return spawnDuration;
+    }
+    
+    public void setSpawnDuration(int spawnDuration) {
+        this.spawnDuration = spawnDuration;
+    }
+    
+    public int getSpawnInterval() {
+        return spawnInterval;
+    }
+    
+    public void setSpawnInterval(int spawnInterval) {
+        this.spawnInterval = spawnInterval;
+    }
+    
+    public int getSpawnAmount() {
+        return spawnAmount;
+    }
+    
+    public void setSpawnAmount(int spawnAmount) {
+        this.spawnAmount = spawnAmount;
+    }
+    
+    public double getEntitySpeed() {
+        return entitySpeed;
+    }
+    
+    public void setEntitySpeed(double entitySpeed) {
+        this.entitySpeed = entitySpeed;
     }
     
 }

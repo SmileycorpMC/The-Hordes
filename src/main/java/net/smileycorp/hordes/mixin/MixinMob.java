@@ -22,7 +22,6 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.hordes.common.ai.FleeEntityGoal;
-import net.smileycorp.hordes.common.ai.HordeTrackPlayerGoal;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.config.CommonConfigHandler;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
@@ -108,13 +107,12 @@ public abstract class MixinMob extends LivingEntity {
 		beforeOptional.orElseGet(null).setPlayerUUID("");
 		HordeEvent horde = HordeSavedData.getData((ServerLevel) level()).getEvent(UUID.fromString(uuid));
 		if (horde != null) {
-			Player player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(UUID.fromString(uuid));
-			horde.registerEntity(converted);
+			ServerPlayer player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(UUID.fromString(uuid));
+			horde.registerEntity(converted, player);
 			horde.removeEntity((Mob) (LivingEntity) this);
 			converted.targetSelector.getRunningGoals().forEach(WrappedGoal::stop);
 			if (converted instanceof PathfinderMob) converted.targetSelector.addGoal(1, new HurtByTargetGoal((PathfinderMob) converted));
 			converted.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(converted, Player.class, true));
-			if (player != null) converted.goalSelector.addGoal(6, new HordeTrackPlayerGoal(converted, player));
 		}
 		return converted;
 	}
@@ -128,8 +126,12 @@ public abstract class MixinMob extends LivingEntity {
 		if (!optional.orElseGet(null).isHordeSpawned()) return;
 		String uuid = optional.orElseGet(null).getPlayerUUID();
 		if (DataUtils.isValidUUID(uuid)) {
-			Player player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(UUID.fromString(uuid));
-			if (player != null) converted.goalSelector.addGoal(6, new HordeTrackPlayerGoal(converted, player));
+			ServerPlayer player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(UUID.fromString(uuid));
+			if (player == null) return;
+			HordeEvent horde = HordeSavedData.getData((ServerLevel)level()).getEvent(player);
+			if (horde == null) return;
+			if (!horde.isActive(player)) return;
+			horde.registerEntity((Mob)(LivingEntity)this, player);
 		}
 	}
 

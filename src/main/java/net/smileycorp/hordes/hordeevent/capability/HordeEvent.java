@@ -65,9 +65,9 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 		if (nbt.contains("timer")) timer = nbt.getInt("timer");
 		if (nbt.contains("nextDay")) nextDay = nbt.getInt("nextDay");
 		if (nbt.contains("day")) day = nbt.getInt("day");
-		if (nbt.contains("spawnData")) spawnData = new HordeSpawnData(nbt.getCompound("spawnData"));
+		if (nbt.contains("spawnData")) spawnData = new HordeSpawnData(this, nbt.getCompound("spawnData"));
 		if (nbt.contains("loadedTable")) {
-			spawnData = new HordeSpawnData();
+			spawnData = new HordeSpawnData(this);
 			spawnData.setTable(HordeTableLoader.INSTANCE.getTable(new ResourceLocation(nbt.getString("loadedTable"))));
 		}
 	}
@@ -83,14 +83,13 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 	public void update(ServerPlayer player) {
 		Level level = player.level();
 		if (level.dimension() != Level.OVERWORLD) return;
-		if (timer % HordeEventConfig.hordeSpawnInterval.get() == 0) spawnWave(player, getMobCount(player, level));
+		if (timer % spawnData.getSpawnInterval() == 0) spawnWave(player, getMobCount(player, level));
 		timer--;
 		if (timer == 0) stopEvent(player, false);
 	}
 
 	private int getMobCount(ServerPlayer player, Level level) {
-		int amount = (int) (HordeEventConfig.hordeSpawnAmount.get() * (1 + (day / HordeEventConfig.hordeSpawnDays.get())
-				* (HordeEventConfig.hordeSpawnMultiplier.get() - 1)));
+		int amount = spawnData.getSpawnAmount();
 		List<? extends Player> players = level.players();
 		for (Player other : players) if (shouldReduce(player, (ServerPlayer) other))
 			amount = (int) Math.floor(amount * HordeEventConfig.hordeMultiplayerScaling.get());
@@ -201,13 +200,13 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 		entity.getAttribute(Attributes.FOLLOW_RANGE).addPermanentModifier(new AttributeModifier(FOLLOW_RANGE_MODIFIER,
 				"hordes:horde_range", 75, AttributeModifier.Operation.ADDITION));
 		LazyOptional<HordeSpawn> optional = entity.getCapability(HordesCapabilities.HORDESPAWN);
-		if (optional.isPresent()) { optional.orElseGet(null).setPlayerUUID(player.getUUID().toString());
-			registerEntity(entity);
+		if (optional.isPresent()) {
+			optional.orElseGet(null).setPlayerUUID(player.getUUID().toString());
+			registerEntity(entity, player);
 		}
 		entity.targetSelector.getRunningGoals().forEach(WrappedGoal::stop);
 		if (entity instanceof PathfinderMob) entity.targetSelector.addGoal(1, new HurtByTargetGoal((PathfinderMob) entity));
 		entity.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(entity, ServerPlayer.class, true));
-		entity.goalSelector.addGoal(6, new HordeTrackPlayerGoal(entity, player));
 		for (Entity passenger : entity.getPassengers()) if (passenger instanceof Mob) finalizeEntity((Mob) passenger, player);
 	}
 
@@ -244,7 +243,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 		for (WrappedGoal entry : entity.goalSelector.getRunningGoals().toArray(WrappedGoal[]::new)) {
 			if (!(entry.getGoal() instanceof HordeTrackPlayerGoal)) continue;
 			entity.goalSelector.removeGoal(entry.getGoal());
-			entity.goalSelector.addGoal(6, new HordeTrackPlayerGoal(entity, player));
+			entity.goalSelector.addGoal(6, new HordeTrackPlayerGoal(entity, player, spawnData.getEntitySpeed()));
 			return;
 		}
 	}
@@ -279,7 +278,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 			logInfo("Spawntable is empty, canceling event start.");
 		}
 		else {
-			timer = duration;
+			timer = duration <= 0 ? spawnData.getSpawnDuration() : duration;
 			sendMessage(player, spawnData.getStartMessage());
 			if (isCommand) day = getCurrentDay(player);
 			else day = nextDay;
@@ -293,7 +292,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 			spawnData = null;
 			return;
 		}
-		if (spawnData == null) spawnData = new HordeSpawnData();
+		if (spawnData == null) spawnData = new HordeSpawnData(this);
 		spawnData.setTable(table);
 	}
 
@@ -310,12 +309,12 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 	}
 
 	private void sendMessage(ServerPlayer player, String str) {
-		HordeEventPacketHandler.sendTo(new GenericStringMessage(str), ((ServerPlayer) player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+		HordeEventPacketHandler.sendTo(new GenericStringMessage(str), player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 	}
 
 	public void stopEvent(ServerPlayer player, boolean isCommand) {
 		entitiesSpawned.clear();
-		HordeEndEvent endEvent = new HordeEndEvent(player, this, isCommand);
+		HordeEndEvent endEvent = new HordeEndEvent(player, this, isCommand, spawnData.getEndMessage());
 		postEvent(endEvent);
 		HordeEventPacketHandler.sendTo(new UpdateClientHordeMessage(nextDay, 0),
 				player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
@@ -339,8 +338,9 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 		entitiesSpawned.remove(entity);
 	}
 
-	public void registerEntity(Mob enemy) {
+	public void registerEntity(Mob enemy, ServerPlayer player) {
 		if (!entitiesSpawned.contains(enemy)) entitiesSpawned.add(enemy);
+		enemy.goalSelector.addGoal(6, new HordeTrackPlayerGoal(enemy, player, spawnData.getEntitySpeed()));
 	}
 
 	private void postEvent(HordePlayerEvent event) {
@@ -369,6 +369,10 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 		HordeEventPacketHandler.sendTo(new UpdateClientHordeMessage(isActive(player) ? day : nextDay, HordeEventConfig.dayLength.get()),
 				player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 		sentDay = true;
+	}
+	
+	public int getDay() {
+		return day;
 	}
 
 	public int getCurrentDay(ServerPlayer player) {

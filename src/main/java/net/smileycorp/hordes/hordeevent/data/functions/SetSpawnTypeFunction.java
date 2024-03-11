@@ -1,32 +1,31 @@
 package net.smileycorp.hordes.hordeevent.data.functions;
 
 import com.google.gson.JsonElement;
-import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
-import net.smileycorp.hordes.common.data.values.ValueGetter;
 import net.smileycorp.hordes.common.event.HordeBuildSpawnDataEvent;
 import net.smileycorp.hordes.hordeevent.HordeSpawnType;
-
-import java.util.Locale;
+import net.smileycorp.hordes.hordeevent.HordeSpawnTypes;
 
 public class SetSpawnTypeFunction implements HordeFunction<HordeBuildSpawnDataEvent> {
 
-    private final ValueGetter<String> getter;
+    private final HordeSpawnType type;
 
-    public SetSpawnTypeFunction(ValueGetter<String> getter) {
-        this.getter = getter;
+    public SetSpawnTypeFunction(HordeSpawnType type) {
+        this.type = type;
     }
 
     @Override
     public void apply(HordeBuildSpawnDataEvent event) {
-        event.getSpawnData().setSpawnType(HordeSpawnType.valueOf(getter.get(event.getEntityWorld(), event.getEntity(), event.getRandom()).toUpperCase(Locale.US)));
+        event.getSpawnData().setSpawnType(type);
     }
 
     public static SetSpawnTypeFunction deserialize(JsonElement json) {
         try {
-            return new SetSpawnTypeFunction(ValueGetter.readValue(DataType.STRING, json));
+            HordeSpawnType type = HordeSpawnTypes.fromJson(json);
+            if (type == null) throw new NullPointerException();
+            return new SetSpawnTypeFunction(type);
         } catch(Exception e) {
-            HordesLogger.logError("Incorrect parameters for function hordes:set_start_message", e);
+            HordesLogger.logError("Incorrect parameters for function hordes:set_spawn_type", e);
         }
         return null;
     }

@@ -13,14 +13,16 @@ public class HordeTrackPlayerGoal extends Goal {
 
     protected final Mob entity;
     protected final Entity target;
+    protected final double speed;
     protected PathNavigation pather;
     protected int timeToRecalcPath;
     protected float waterCost;
 
-    public HordeTrackPlayerGoal(Mob entity, Entity target) {
+    public HordeTrackPlayerGoal(Mob entity, Entity target, double speed) {
         timeToRecalcPath = entity.getRandom().nextInt(HordeEventConfig.hordePathingInterval.get());
         this.entity = entity;
         this.target = target;
+        this.speed = speed;
         pather = entity.getNavigation();
         this.setFlags(EnumSet.of(Flag.LOOK, Flag.MOVE));
     }
@@ -46,7 +48,7 @@ public class HordeTrackPlayerGoal extends Goal {
         if (timeToRecalcPath-- <= 0) {
             timeToRecalcPath = HordeEventConfig.hordePathingInterval.get();
             pather = entity.getNavigation();
-            pather.moveTo(pather.createPath(target.blockPosition(), 1), HordeEventConfig.hordeEntitySpeed.get());
+            pather.moveTo(pather.createPath(target.blockPosition(), 1), speed);
         }
 
     }
