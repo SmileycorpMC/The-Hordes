@@ -12,6 +12,7 @@ import net.smileycorp.hordes.common.data.DataRegistry;
 import net.smileycorp.hordes.common.data.conditions.Condition;
 import net.smileycorp.hordes.common.event.HordeBuildSpawnDataEvent;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
+import net.smileycorp.hordes.hordeevent.data.functions.spawndata.*;
 
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ public class FunctionRegistry {
     private static Map<ResourceLocation, Pair<Class<? extends HordePlayerEvent>, Function<JsonElement, HordeFunction<? extends HordePlayerEvent>>>> DESERIALIZERS = Maps.newHashMap();
 
     public static void registerFunctionSerializers() {
+        //build spawndata functions
         registerFunctionDeserializer(Constants.loc("set_spawntable"), HordeBuildSpawnDataEvent.class, SetSpawntableFunction::deserialize);
         registerFunctionDeserializer(Constants.loc("set_spawn_type"), HordeBuildSpawnDataEvent.class, SetSpawnTypeFunction::deserialize);
         registerFunctionDeserializer(Constants.loc("set_spawn_sound"), HordeBuildSpawnDataEvent.class, SetSpawnSoundFunction::deserialize);

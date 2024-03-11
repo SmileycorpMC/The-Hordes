@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.hordeevent.data.functions;
+package net.smileycorp.hordes.hordeevent.data.functions.spawndata;
 
 import com.google.gson.JsonElement;
 import net.minecraft.resources.ResourceLocation;
@@ -6,6 +6,7 @@ import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.data.values.ValueGetter;
 import net.smileycorp.hordes.common.event.HordeBuildSpawnDataEvent;
+import net.smileycorp.hordes.hordeevent.data.functions.HordeFunction;
 
 public class SetSpawnSoundFunction implements HordeFunction<HordeBuildSpawnDataEvent> {
 
