@@ -22,6 +22,7 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -89,9 +90,10 @@ public class InfectionEventHandler {
 	public void onItemUse(PlayerInteractEvent.RightClickItem event) {
 		ItemStack stack = event.getItemStack();
 		HitResult ray = DirectionUtils.getEntityRayTrace(event.getLevel(), event.getEntity(), 5);
-		if (!(ray instanceof EntityHitResult && ((EntityHitResult) ray).getEntity() instanceof LivingEntity)) return;
+		if (!(ray instanceof EntityHitResult)) return;
+		if (!(((EntityHitResult) ray).getEntity() instanceof LivingEntity)) return;
 		LivingEntity entity = (LivingEntity) ((EntityHitResult) ray).getEntity();
-		if (!(entity.hasEffect(HordesInfection.INFECTED.get()) || HordesInfection.isCure(stack))) return;
+		if (entity instanceof Player |!(entity.hasEffect(HordesInfection.INFECTED.get()) || HordesInfection.isCure(stack))) return;
 		entity.removeEffect(HordesInfection.INFECTED.get());
 		LazyOptional<Infection> optional = entity.getCapability(HordesCapabilities.INFECTION);
 		if (optional.isPresent()) optional.orElseGet(null).increaseInfection();
@@ -148,7 +150,7 @@ public class InfectionEventHandler {
 				zombie.setGossips(villager.getGossips().store(NbtOps.INSTANCE));
 				zombie.setTradeOffers(villager.getOffers().createTag());
 				zombie.setVillagerXp(villager.getVillagerXp());
-				net.minecraftforge.event.ForgeEventFactory.onLivingConvert(villager, zombie);
+				ForgeEventFactory.onLivingConvert(villager, zombie);
 			}
 			event.setResult(Result.DENY);
 		} else if (InfectionDataLoader.INSTANCE.canBeInfected(entity))  {
