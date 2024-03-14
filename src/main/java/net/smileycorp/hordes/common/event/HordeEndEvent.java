@@ -2,19 +2,19 @@ package net.smileycorp.hordes.common.event;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
-import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 
 public class HordeEndEvent extends HordePlayerEvent {
 
 	protected final BlockPos pos;
-	protected String message = Constants.hordeEventEnd;
+	protected String message;
 	protected final boolean wasCommand;
 
-	public HordeEndEvent(Player player, HordeEvent horde, boolean wasCommand) {
+	public HordeEndEvent(Player player, HordeEvent horde, boolean wasCommand, String message) {
 		super(player, horde);
 		pos = player.blockPosition();
 		this.wasCommand = wasCommand;
+		this.message = message;
 	}
 
 	public BlockPos getPlayerPos() {

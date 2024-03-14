@@ -1,5 +1,6 @@
 package net.smileycorp.hordes.common.event;
 
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -31,4 +32,9 @@ public class HordePlayerEvent extends PlayerEvent {
 	public int getDay() {
 		return day;
 	}
+	
+	public RandomSource getRandom() {
+		return horde.getRandom();
+	}
+	
 }

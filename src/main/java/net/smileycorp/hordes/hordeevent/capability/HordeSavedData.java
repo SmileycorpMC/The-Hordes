@@ -5,6 +5,7 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -18,9 +19,8 @@ import java.util.Map.Entry;
 public class HordeSavedData extends SavedData {
 
 	public static final String DATA = "hordes";
-
+	private final RandomSource rand = RandomSource.create();
 	private int next_day = 0;
-
 	protected Level level = null;
 
 	private Map<UUID, HordeEvent> events = Maps.newHashMap();
@@ -84,6 +84,10 @@ public class HordeSavedData extends SavedData {
 		if (profile.isPresent() && profile.get().getName() != null) return profile.get().getName();
 		return uuid.toString();
 	}
+	
+	public RandomSource getRandom() {
+		return rand;
+	}
 
 	@Override
 	public String toString() {
@@ -126,6 +130,5 @@ public class HordeSavedData extends SavedData {
 		data.setNextDay(nextDay);
 		return data;
 	}
-
-
+	
 }
