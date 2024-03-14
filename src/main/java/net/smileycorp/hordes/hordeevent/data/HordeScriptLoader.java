@@ -11,7 +11,6 @@ import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
-import net.smileycorp.hordes.hordeevent.data.functions.HordeScript;
 
 import java.util.Collection;
 import java.util.List;

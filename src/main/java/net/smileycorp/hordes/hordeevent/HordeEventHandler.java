@@ -26,7 +26,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.common.ai.HordeTrackPlayerGoal;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.config.HordeEventConfig;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
@@ -88,7 +87,7 @@ public class HordeEventHandler {
 		int day = horde.getCurrentDay(player);
 		int time = Math.round(level.getDayTime() % HordeEventConfig.dayLength.get());
 		if (time >= HordeEventConfig.hordeStartTime.get() && day >= horde.getNextDay() && (day > 0 || HordeEventConfig.spawnFirstDay.get())) {
-			horde.tryStartEvent(player, HordeEventConfig.hordeSpawnDuration.get(), false);
+			horde.tryStartEvent(player, -1, false);
 		}
 
 	}
@@ -114,10 +113,7 @@ public class HordeEventHandler {
 		if (entity instanceof PathfinderMob) entity.targetSelector.addGoal(1, new HurtByTargetGoal((PathfinderMob) entity));
 		entity.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(entity, Player.class, true));
 		HordeEvent horde = HordeSavedData.getData((ServerLevel) player.level()).getEvent(player);
-		if (horde != null) {
-			horde.registerEntity(entity);
-			entity.goalSelector.addGoal(6, new HordeTrackPlayerGoal(entity, player));
-		}
+		if (horde != null) if (horde.isActive(player)) horde.registerEntity(entity, player);
 		cap.setSynced();
 	}
 

@@ -16,6 +16,8 @@ import net.smileycorp.hordes.common.data.values.EntityNBTGetter;
 import net.smileycorp.hordes.common.data.values.EntityPosGetter;
 import net.smileycorp.hordes.common.data.values.LevelNBTGetter;
 import net.smileycorp.hordes.common.data.values.ValueGetter;
+import net.smileycorp.hordes.config.HordeEventConfig;
+import net.smileycorp.hordes.hordeevent.data.functions.FunctionRegistry;
 
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -28,8 +30,8 @@ public class DataRegistry {
 
 	public static void init() {
 		registerValueGetters();
-		registerDeserializers();
-		registerFunctions();
+		registerConditionDeserializers();
+		if (HordeEventConfig.enableHordeEvent.get()) FunctionRegistry.registerFunctionSerializers();
 	}
 
 	private static void registerValueGetters() {
@@ -39,25 +41,26 @@ public class DataRegistry {
 	}
 
 
-	public static void registerDeserializers() {
+	public static void registerConditionDeserializers() {
 		for (LogicalOperation operation : LogicalOperation.values())
 			registerConditionDeserializer(Constants.loc(operation.getName()), e -> LogicalCondition.deserialize(operation, e));
+		registerConditionDeserializer(Constants.loc("not"), NotCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("comparison"), ComparisonCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("random"), RandomCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("biome"), BiomeCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("day"), DayCondition::deserialize);
-		if (ModList.get().isLoaded("gamestages")) registerConditionDeserializer(Constants.loc("gamestage"), GameStagesCondition::deserialize);
-	}
-
-	public static void registerFunctions() {
-		//TODO: add function deserializers
+		registerConditionDeserializer(Constants.loc("local_difficulty"), LocalDifficultyCondition::deserialize);
+		registerConditionDeserializer(Constants.loc("advancement"), AdvancementCondition::deserialize);
+		if (ModList.get().isLoaded("gamestages")) registerConditionDeserializer(new ResourceLocation("gamestages:gamestage"), GameStagesCondition::deserialize);
 	}
 
 	public static ValueGetter readValue(DataType type, JsonObject json) {
 		if (json.has("name") && json.has("value")) {
 			try {
-				return VALUE_GETTERS.get(new ResourceLocation(json.get("name").getAsString()))
-						.apply(json.get("value").getAsString(), type);
+				ResourceLocation loc = new ResourceLocation(json.get("name").getAsString());
+				BiFunction<String, DataType, ValueGetter> getter = VALUE_GETTERS.get(loc);
+				if (getter == null) throw new NullPointerException("value getter " + loc + " is not registered");
+				return getter.apply(json.get("value").getAsString(), type);
 			} catch (Exception e) {
 				HordesLogger.logError("Failed to read value " + json, e);
 			}
@@ -68,7 +71,10 @@ public class DataRegistry {
 	public static Condition readCondition(JsonObject json) {
 		if (json.has("name") && json.has("value")) {
 			try {
-				return CONDITION_DESERIALIZERS.get(new ResourceLocation(json.get("name").getAsString())).apply(json.get("value"));
+				ResourceLocation loc = new ResourceLocation(json.get("name").getAsString());
+				Function<JsonElement, Condition> deserializer = CONDITION_DESERIALIZERS.get(loc);
+				if (deserializer == null) throw new NullPointerException("condition " + loc + " is not registered");
+				return deserializer.apply(json.get("value"));
 			} catch (Exception e) {
 				HordesLogger.logError("Failed to read condition " + json, e);
 			}

@@ -112,9 +112,7 @@ public class InfectionEventHandler {
 		if ((entity instanceof Player && InfectionConfig.infectPlayers.get())) {
 			if (rand.nextFloat() <= InfectionConfig.playerInfectChance.get()) InfectedEffect.apply(entity);
 		} else if ((entity instanceof Villager && InfectionConfig.infectVillagers.get())) {
-			if (rand.nextFloat() <= InfectionConfig.villagerInfectChance.get()) {
-				InfectedEffect.apply(entity);
-			}
+			if (rand.nextFloat() <= InfectionConfig.villagerInfectChance.get()) InfectedEffect.apply(entity);
 		} else if (InfectionDataLoader.INSTANCE.canBeInfected(entity))
 			InfectionDataLoader.INSTANCE.tryToInfect(entity, (LivingEntity) attacker, event.getSource(), event.getAmount());
 	}

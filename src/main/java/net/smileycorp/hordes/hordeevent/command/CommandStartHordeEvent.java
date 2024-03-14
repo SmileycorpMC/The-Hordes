@@ -44,7 +44,7 @@ public class CommandStartHordeEvent {
 		for (ServerPlayer player : players) {
 			HordeEvent horde = HordeSavedData.getData(ctx.getSource().getLevel()).getEvent(player);
 			try {
-				horde.setSpawntable(HordeTableLoader.INSTANCE.getTable(table));
+				if (table != null) horde.setSpawntable(HordeTableLoader.INSTANCE.getTable(table));
 				horde.tryStartEvent(player, length, true);
 			} catch (Exception e) {
 				HordesLogger.logError("Failed to run startHordeEvent command", e);
