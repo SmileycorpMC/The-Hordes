@@ -35,34 +35,13 @@ public class FunctionRegistry {
         registerFunctionDeserializer(Constants.loc("set_entity_speed"), HordeBuildSpawnDataEvent.class, SetEntitySpeedFunction::deserialize);
     }
 
-    public static Pair<Class<? extends HordePlayerEvent>, HordeFunction<? extends HordePlayerEvent>> readFunction(JsonObject json) {
+    public static <T extends HordePlayerEvent> Pair<Class<T>, HordeFunction<T>> readFunction(JsonObject json) {
         if (!(json.has("function") && json.has("value"))) return Pair.of(null, null);
-        if (json.get("function").equals("hordes:multiple")) {
-            Class<? extends HordePlayerEvent> clazz = null;
-            List<Pair<List<Condition>, HordeFunction<?>>> functions = Lists.newArrayList();
-            for (JsonElement element : json.get("value").getAsJsonArray()) {
-                JsonObject obj = element.getAsJsonObject();
-                Pair<Class<? extends HordePlayerEvent>, HordeFunction<? extends HordePlayerEvent>> pair = readFunction(obj);
-                if (clazz == null && pair.getFirst() != null) {
-                    List<Condition> conditions = Lists.newArrayList();
-                    if (obj.has("conditions")) obj.get("conditions").getAsJsonArray().forEach(condition ->
-                            conditions.add(DataRegistry.readCondition(condition.getAsJsonObject())));
-                    clazz = pair.getFirst();
-                    functions.add(pair.mapFirst(c -> conditions));
-                }
-                else if (clazz == pair.getFirst()) {
-                    List<Condition> conditions = Lists.newArrayList();
-                    if (obj.has("conditions")) obj.get("conditions").getAsJsonArray().forEach(condition ->
-                            conditions.add(DataRegistry.readCondition(condition.getAsJsonObject())));
-                    functions.add(pair.mapFirst(c -> conditions));
-                }
-            }
-            return Pair.of(clazz, new MultipleFunction(clazz, functions));
-        }
+        if (json.get("function").equals("hordes:multiple")) return MultipleFunction.deserialize(json.get("value").getAsJsonArray());
         try {
             Pair<Class<? extends HordePlayerEvent>, Function<JsonElement, HordeFunction<? extends HordePlayerEvent>>> pair
                     = DESERIALIZERS.get(new ResourceLocation(json.get("function").getAsString()));
-            return pair.mapSecond(serializer -> serializer.apply(json.get("value")));
+            return Pair.of((Class<T>) pair.getFirst(), (HordeFunction<T>) pair.getSecond().apply(json.get("value")));
         } catch (Exception e) {
             HordesLogger.logError("Failed to read condition " + json, e);
             return Pair.of(null, null);
