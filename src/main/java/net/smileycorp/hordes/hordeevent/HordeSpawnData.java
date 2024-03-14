@@ -7,8 +7,6 @@ import net.smileycorp.hordes.config.HordeEventConfig;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 import net.smileycorp.hordes.hordeevent.data.HordeTableLoader;
 
-import java.util.Locale;
-
 public class HordeSpawnData {
     
     private HordeSpawnTable table = HordeTableLoader.INSTANCE.getFallbackTable();
@@ -34,15 +32,23 @@ public class HordeSpawnData {
         if (tag.contains("spawnSound")) spawnSound = new ResourceLocation(tag.getString("spawnSound"));
         if (tag.contains("startMessage")) startMessage = tag.getString("startMessage");
         if (tag.contains("endMessage")) endMessage = tag.getString("endMessage");
+        if (tag.contains("spawnDuration")) spawnDuration = tag.getInt("spawnDuration");
+        if (tag.contains("spawnInterval")) spawnInterval = tag.getInt("spawnInterval");
+        if (tag.contains("spawnAmount")) spawnAmount = tag.getInt("spawnAmount");
+        if (tag.contains("entitySpeed")) entitySpeed = tag.getDouble("entitySpeed");
     }
     
     public CompoundTag save() {
         CompoundTag tag = new CompoundTag();
         if (table != null) tag.putString("table", table.getName().toString());
-        if (spawnType != null) tag.putString("spawnType", spawnType.toString().toLowerCase(Locale.US));
+        if (spawnType != null) tag.put("spawnType", HordeSpawnTypes.toNbt(spawnType));
         if (spawnSound != null) tag.putString("spawnSound", spawnSound.toString());
         if (startMessage != null) tag.putString("startMessage", startMessage);
         if (endMessage != null) tag.putString("endMessage", endMessage);
+        tag.putInt("spawnDuration", spawnDuration);
+        tag.putInt("spawnInterval", spawnInterval);
+        tag.putInt("spawnAmount", spawnAmount);
+        tag.putDouble("entitySpeed", entitySpeed);
         return tag;
     }
     
@@ -116,6 +122,21 @@ public class HordeSpawnData {
     
     public void setEntitySpeed(double entitySpeed) {
         this.entitySpeed = entitySpeed;
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder(getClass().getSimpleName()+"[");
+        builder.append("table=" + table.getName() + ", ");
+        builder.append("spawnType=" + HordeSpawnTypes.toString(spawnType) + ", ");
+        builder.append("spawnSound=" + spawnSound + ", ");
+        builder.append("startMessage=" + startMessage + ", ");
+        builder.append("endMessage=" + endMessage + ", ");
+        builder.append("spawnDuration=" + spawnDuration + ", ");
+        builder.append("spawnInterval=" + spawnInterval + ", ");
+        builder.append("spawnAmount=" + spawnAmount + ", ");
+        builder.append("entitySpeed=" + entitySpeed + "]");
+        return builder.toString();
     }
     
 }

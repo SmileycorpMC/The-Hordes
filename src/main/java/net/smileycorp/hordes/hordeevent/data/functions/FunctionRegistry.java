@@ -1,6 +1,5 @@
 package net.smileycorp.hordes.hordeevent.data.functions;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -8,13 +7,10 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.resources.ResourceLocation;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.HordesLogger;
-import net.smileycorp.hordes.common.data.DataRegistry;
-import net.smileycorp.hordes.common.data.conditions.Condition;
 import net.smileycorp.hordes.common.event.HordeBuildSpawnDataEvent;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
 import net.smileycorp.hordes.hordeevent.data.functions.spawndata.*;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -37,13 +33,15 @@ public class FunctionRegistry {
 
     public static <T extends HordePlayerEvent> Pair<Class<T>, HordeFunction<T>> readFunction(JsonObject json) {
         if (!(json.has("function") && json.has("value"))) return Pair.of(null, null);
-        if (json.get("function").equals("hordes:multiple")) return MultipleFunction.deserialize(json.get("value").getAsJsonArray());
+        if (json.get("function").getAsString().equals("hordes:multiple")) return MultipleFunction.deserialize(json.get("value").getAsJsonArray());
         try {
+            ResourceLocation loc = new ResourceLocation(json.get("function").getAsString());
             Pair<Class<? extends HordePlayerEvent>, Function<JsonElement, HordeFunction<? extends HordePlayerEvent>>> pair
-                    = DESERIALIZERS.get(new ResourceLocation(json.get("function").getAsString()));
+                    = DESERIALIZERS.get(loc);
+            if (pair == null) throw new NullPointerException("function " + loc + " is not registered");
             return Pair.of((Class<T>) pair.getFirst(), (HordeFunction<T>) pair.getSecond().apply(json.get("value")));
         } catch (Exception e) {
-            HordesLogger.logError("Failed to read condition " + json, e);
+            HordesLogger.logError("Failed to read function " + json, e);
             return Pair.of(null, null);
         }
     }

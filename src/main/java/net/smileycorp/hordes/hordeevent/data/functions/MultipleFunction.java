@@ -10,7 +10,6 @@ import net.smileycorp.hordes.common.data.conditions.Condition;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
 
 import java.util.List;
-import java.util.function.Function;
 
 public class MultipleFunction<T extends HordePlayerEvent> implements HordeFunction<T> {
     

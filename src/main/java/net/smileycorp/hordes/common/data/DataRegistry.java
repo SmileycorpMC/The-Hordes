@@ -57,8 +57,10 @@ public class DataRegistry {
 	public static ValueGetter readValue(DataType type, JsonObject json) {
 		if (json.has("name") && json.has("value")) {
 			try {
-				return VALUE_GETTERS.get(new ResourceLocation(json.get("name").getAsString()))
-						.apply(json.get("value").getAsString(), type);
+				ResourceLocation loc = new ResourceLocation(json.get("name").getAsString());
+				BiFunction<String, DataType, ValueGetter> getter = VALUE_GETTERS.get(loc);
+				if (getter == null) throw new NullPointerException("value getter " + loc + " is not registered");
+				return getter.apply(json.get("value").getAsString(), type);
 			} catch (Exception e) {
 				HordesLogger.logError("Failed to read value " + json, e);
 			}
@@ -69,7 +71,10 @@ public class DataRegistry {
 	public static Condition readCondition(JsonObject json) {
 		if (json.has("name") && json.has("value")) {
 			try {
-				return CONDITION_DESERIALIZERS.get(new ResourceLocation(json.get("name").getAsString())).apply(json.get("value"));
+				ResourceLocation loc = new ResourceLocation(json.get("name").getAsString());
+				Function<JsonElement, Condition> deserializer = CONDITION_DESERIALIZERS.get(loc);
+				if (deserializer == null) throw new NullPointerException("condition " + loc + " is not registered");
+				return deserializer.apply(json.get("value"));
 			} catch (Exception e) {
 				HordesLogger.logError("Failed to read condition " + json, e);
 			}

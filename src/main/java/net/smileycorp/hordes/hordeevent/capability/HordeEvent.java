@@ -40,6 +40,7 @@ import net.smileycorp.hordes.hordeevent.data.HordeTableLoader;
 import net.smileycorp.hordes.hordeevent.network.HordeEventPacketHandler;
 import net.smileycorp.hordes.hordeevent.network.HordeSoundMessage;
 import net.smileycorp.hordes.hordeevent.network.UpdateClientHordeMessage;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -104,8 +105,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 
 	public void spawnWave(ServerPlayer player, int count) {
 		cleanSpawns();
-		HordeSpawnData data = spawnData;
-		if (data == null) {
+		if (spawnData == null) {
 			HordeBuildSpawnDataEvent buildTableEvent = new HordeBuildSpawnDataEvent(player, this);
 			postEvent(buildTableEvent);
 			spawnData = buildTableEvent.getSpawnData();
@@ -267,13 +267,12 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 			spawnData = null;
 			return;
 		}
-		HordeSpawnData data = spawnData;
-		if (data == null) {
+		if (spawnData == null) {
 			HordeBuildSpawnDataEvent event = new HordeBuildSpawnDataEvent(player, this);
 			postEvent(event);
-			data = event.getSpawnData();
+			spawnData = event.getSpawnData();
 		}
-		if (data == null || data.getTable() == null || data.getTable().getSpawnTable(day).isEmpty()) {
+		if (spawnData == null || spawnData.getTable() == null || spawnData.getTable().getSpawnTable(day).isEmpty()) {
 			spawnData = null;
 			logInfo("Spawntable is empty, canceling event start.");
 		}
@@ -338,9 +337,14 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 		entitiesSpawned.remove(entity);
 	}
 
-	public void registerEntity(Mob enemy, ServerPlayer player) {
-		if (!entitiesSpawned.contains(enemy)) entitiesSpawned.add(enemy);
-		enemy.goalSelector.addGoal(6, new HordeTrackPlayerGoal(enemy, player, spawnData.getEntitySpeed()));
+	public void registerEntity(Mob entity, ServerPlayer player) {
+		if (!isActive(player) || spawnData == null) {
+			LazyOptional<HordeSpawn> optional = entity.getCapability(HordesCapabilities.HORDESPAWN);
+			if (optional.isPresent()) optional.orElseGet(null).setPlayerUUID("");
+			return;
+		}
+		if (!entitiesSpawned.contains(entity)) entitiesSpawned.add(entity);
+		entity.goalSelector.addGoal(6, new HordeTrackPlayerGoal(entity, player, spawnData.getEntitySpeed()));
 	}
 
 	private void postEvent(HordePlayerEvent event) {

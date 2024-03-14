@@ -4,16 +4,11 @@ import com.google.common.collect.Maps;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.smileycorp.atlas.api.util.Func;
 import net.smileycorp.hordes.common.HordesLogger;
 
@@ -35,7 +30,20 @@ public class HordeSpawnTypes {
     public static final HordeSpawnType IGNORE_FLUIDS = register("ignore_fluids", Func::True);
     
     public static HordeSpawnType register(String name, HordeSpawnType spawnType) {
-        return SPAWN_TYPES.put(name, spawnType);
+        SPAWN_TYPES.put(name, spawnType);
+        return spawnType;
+    }
+    
+    public static String toString(HordeSpawnType spawnType) {
+        if (spawnType instanceof CustomSpawnType) return spawnType.toString();
+        for (Map.Entry<String, HordeSpawnType> entry : SPAWN_TYPES.entrySet()) if (entry.getValue().equals(spawnType)) return entry.getKey();
+        return null;
+    }
+    
+    public static Tag toNbt(HordeSpawnType spawnType) {
+        if (spawnType instanceof CustomSpawnType) return ((CustomSpawnType)spawnType).toNbt();
+        for (Map.Entry<String, HordeSpawnType> entry : SPAWN_TYPES.entrySet()) if (entry.getValue().equals(spawnType)) return StringTag.valueOf(entry.getKey());
+        return null;
     }
     
     public static HordeSpawnType fromNBT(Tag tag) {
@@ -45,7 +53,7 @@ public class HordeSpawnTypes {
         } else if (tag instanceof ListTag) {
             try {
                 List<String> strings = ((ListTag) tag).stream().map(Tag::getAsString).collect(Collectors.toList());
-                return custom(strings);
+                return new CustomSpawnType(strings);
             } catch (Exception e) {
                 HordesLogger.logError("Failed reading nbt " + tag, e);
             }
@@ -60,30 +68,12 @@ public class HordeSpawnTypes {
         } else if (tag instanceof JsonArray) {
             try {
                 List<String> strings = ((JsonArray) tag).asList().stream().map(JsonElement::getAsString).collect(Collectors.toList());
-                return custom(strings);
+                return new CustomSpawnType(strings);
             } catch (Exception e) {
                 HordesLogger.logError("Failed reading nbt " + tag, e);
             }
         }
         return AVOID_FLUIDS;
-    }
-    
-    private static HordeSpawnType custom(List<String> strings) {
-        return ((level, pos) -> {
-            BlockState state = level.getBlockState(pos.below());
-            for (String string : strings) {
-                try {
-                    if (string.contains("#")) {
-                        if (state.is(TagKey.create(Registries.BLOCK, new ResourceLocation(string.replace("#", ""))))) return true;
-                    } else {
-                        if (state.is(ForgeRegistries.BLOCKS.getValue(new ResourceLocation(string)))) return true;
-                    }
-                } catch (Exception e) {
-                    HordesLogger.logError("Failed logging parameter " + string, e);
-                }
-            }
-            return false;
-        });
     }
     
 }
