@@ -62,6 +62,7 @@ public class DataGenerator {
         DataUtils.copyFileFromMod("data/hordes/horde_data/infection_conversions.json", "hordes");
         DataUtils.copyFileFromMod("data/hordes/horde_data/scripts/default.json", "hordes");
         DataUtils.copyFileFromMod("data/hordes/horde_data/tables/default.json", "hordes");
+        DataUtils.copyFileFromMod("data/hordes/horde_data/tables/drowned.json", "hordes");
         DataUtils.copyFileFromMod("data/hordes/horde_data/tables/illagers.json", "hordes");
         DataUtils.copyFileFromMod("data/hordes/horde_data/tables/mixed_mobs.json", "hordes");
         DataUtils.copyFileFromMod("data/hordes/horde_data/tables/skeletons.json", "hordes");
