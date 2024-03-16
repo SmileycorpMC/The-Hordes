@@ -1,5 +1,6 @@
 package net.smileycorp.hordes.common.data.values;
 
+import net.minecraft.advancements.critereon.NbtPredicate;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -14,7 +15,7 @@ public class EntityNBTGetter<T extends Comparable<T>> extends NBTGetter<T> {
 
 	@Override
 	protected CompoundTag getNBT(Level level, LivingEntity entity, RandomSource rand) {
-		return entity.saveWithoutId(new CompoundTag());
+		return NbtPredicate.getEntityTagToCompare(entity);
 	}
 
 }

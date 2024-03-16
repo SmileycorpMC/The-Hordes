@@ -31,15 +31,15 @@ public class ZombiePlayerRenderer<T extends Zombie & PlayerZombie> extends Human
 	private final boolean isTall;
 
 	public ZombiePlayerRenderer(EntityRendererProvider.Context ctx, Color colour, ResourceLocation overlay, boolean isDrowned, boolean isTall) {
-		super(ctx, new ZombiePlayerModel<T>(ctx.bakeLayer(DEFAULT), colour, isDrowned), 0.5F);
-		addLayer(new HumanoidArmorLayer<>(this, new ZombieModel<T>(ctx.bakeLayer(ModelLayers.ZOMBIE_INNER_ARMOR)),
-				new ZombieModel<T>(ctx.bakeLayer(ModelLayers.ZOMBIE_OUTER_ARMOR)), ctx.getModelManager()));
+		super(ctx, new ZombiePlayerModel<>(ctx.bakeLayer(DEFAULT), colour, isDrowned), 0.5F);
+		addLayer(new HumanoidArmorLayer<>(this, new ZombieModel<>(ctx.bakeLayer(ModelLayers.ZOMBIE_INNER_ARMOR)),
+				new ZombieModel<>(ctx.bakeLayer(ModelLayers.ZOMBIE_OUTER_ARMOR)), ctx.getModelManager()));
 		addLayer(new ZombiePlayerCapeLayer<>(this));
-		addLayer(new ZombiePlayerElytraLayer<T>(this, ctx.getModelSet()));
-		addLayer(new ZombiePlayerOverlayLayer(this, new ZombiePlayerModel<T>(ctx.bakeLayer(DEFAULT)),
-			new ZombiePlayerModel<T>(ctx.bakeLayer(SLIM)), overlay));
+		addLayer(new ZombiePlayerElytraLayer<>(this, ctx.getModelSet()));
+		addLayer(new ZombiePlayerOverlayLayer(this, new ZombiePlayerModel<>(ctx.bakeLayer(DEFAULT)),
+			new ZombiePlayerModel<>(ctx.bakeLayer(SLIM)), overlay));
 		defaultModel = model;
-		slimModel = new ZombiePlayerModel<T>(ctx.bakeLayer(SLIM), colour, isDrowned);
+		slimModel = new ZombiePlayerModel<>(ctx.bakeLayer(SLIM), colour, isDrowned);
 		this.isTall = isTall;
 	}
 
