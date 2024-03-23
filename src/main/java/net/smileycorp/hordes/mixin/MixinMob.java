@@ -137,9 +137,8 @@ public abstract class MixinMob extends LivingEntity {
 
 	@Inject(at=@At("HEAD"), method = "registerGoals", cancellable = true)
 	public void registerGoals(CallbackInfo callback) {
-		if (CommonConfigHandler.piglinsHuntZombies.get() && ((LivingEntity)this) instanceof Piglin) {
+		if (CommonConfigHandler.piglinsHuntZombies.get() && ((LivingEntity)this) instanceof Piglin)
 			goalSelector.addGoal(1, new FleeEntityGoal((Mob)(LivingEntity)this, 1.5, 5, HordesInfection::canCauseInfection));
-		}
 	}
 
 	@Inject(at = @At("HEAD"), method = "canBeLeashed")

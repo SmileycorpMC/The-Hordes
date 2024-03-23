@@ -23,6 +23,8 @@ public class CommonConfigHandler {
 	public static ConfigValue<Boolean> piglinsHuntZombies;
 	public static ConfigValue<Boolean> piglinsCureThemself;
 	public static ConfigValue<Boolean> zoglinsAttackUndead;
+	public static ConfigValue<Boolean> zoglinsAttackMobs;
+	public static ConfigValue<Boolean> illagersHuntZombies;
 
 	//load config properties
 	static {
@@ -41,7 +43,9 @@ public class CommonConfigHandler {
 		aggressiveZombiePiglins = builder.comment("Whether zombie piglins are hostile by default").define("zombiePiglinsHostile", true);
 		piglinsHuntZombies = builder.comment("Whether piglins kill zombie mobs").define("piglinsHuntZombies", true);
 		piglinsCureThemself = builder.comment("Whether piglins use cures they find and keep in their inventory to heal infection.").define("piglinsCureThemself", true);
+		illagersHuntZombies = builder.comment("Whether illagers kill zombie mobs").define("illagersHuntZombies", true);
 		zoglinsAttackUndead = builder.comment("Whether zoglins are agressive towards other undead mobs").define("zoglinsAttackUndead", false);
+		zoglinsAttackMobs = builder.comment("Whether zoglins are agressive towards non-undead monsters").define("zoglinsAttackMobs", true);
 		ZombiePlayersConfig.build(builder);
 		builder.pop();
 		config = builder.build();
