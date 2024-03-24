@@ -100,7 +100,8 @@ public abstract class MixinMob extends LivingEntity {
 		Mob converted = (Mob) entity;
 		LazyOptional<HordeSpawn> beforeOptional = getCapability(HordesCapabilities.HORDESPAWN);
 		LazyOptional<HordeSpawn> afterOptional = converted.getCapability(HordesCapabilities.HORDESPAWN);
-		if (!(beforeOptional.isPresent() || afterOptional.isPresent() || beforeOptional.orElseGet(null).isHordeSpawned())) return converted;
+		if (!(beforeOptional.isPresent() || afterOptional.isPresent())) return converted;
+		if (!beforeOptional.orElseGet(null).isHordeSpawned()) return converted;
 		String uuid = beforeOptional.orElseGet(null).getPlayerUUID();
 		if (!DataUtils.isValidUUID(uuid)) return converted;
 		afterOptional.orElseGet(null).setPlayerUUID(uuid);
