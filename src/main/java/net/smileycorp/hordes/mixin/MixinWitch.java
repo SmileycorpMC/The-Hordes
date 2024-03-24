@@ -39,10 +39,10 @@ public abstract class MixinWitch extends Raider implements RangedAttackMob {
     }
     
     @WrapOperation(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;distanceToSqr(Lnet/minecraft/world/entity/Entity;)D"))
-    public double aiStep$distanceToSqr(LivingEntity instance, Entity entity, Operation<Double> original) {
-        double distance = original.call(entity);
-        if (CommonConfigHandler.illagersHuntZombies.get() && instance.getMobType() == MobType.UNDEAD)
-            return HordesInfection.canCauseInfection(instance) && distance < 25 ? 122 : 0;
+    public double aiStep$distanceToSqr(Witch witch, Operation<Double> original, @Local(ordinal = 0) LivingEntity entity) {
+        double distance = original.call(witch);
+        if (CommonConfigHandler.illagersHuntZombies.get() && entity.getMobType() == MobType.UNDEAD)
+            return HordesInfection.canCauseInfection(entity) && distance < 100 ? 122 : 0;
         return distance;
     }
     
