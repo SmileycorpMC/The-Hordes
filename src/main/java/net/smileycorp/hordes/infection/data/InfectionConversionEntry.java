@@ -11,6 +11,7 @@ import net.minecraft.world.entity.monster.Zombie;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingConversionEvent;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.smileycorp.atlas.api.util.Func;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.data.DataRegistry;
 
@@ -31,8 +32,7 @@ public class InfectionConversionEntry {
 	}
 
 	public LivingEntity convertEntity(Mob entity) {
-		LivingConversionEvent.Pre preEvent = new LivingConversionEvent.Pre(entity, result, (i) -> {
-		});
+		LivingConversionEvent.Pre preEvent = new LivingConversionEvent.Pre(entity, result, Func::Void);
 		MinecraftForge.EVENT_BUS.post(preEvent);
 		LivingEntity zombie = entity.convertTo(result, true);
 		if (zombie instanceof AgeableMob) ((AgeableMob) zombie).setAge(entity.isBaby() ? -1000000 : 0);

@@ -24,7 +24,6 @@ public abstract class MixinZombieVillager extends Zombie {
 	public void interact(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> callback) {
 		if (CommonConfigHandler.zombieVillagersCanBeCured.get() &!((CustomTexture)this).hasCustomTexture()) return;
 		callback.setReturnValue(super.mobInteract(player, hand));
-		callback.cancel();
 	}
 
 }

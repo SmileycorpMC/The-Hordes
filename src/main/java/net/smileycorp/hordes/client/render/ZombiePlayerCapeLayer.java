@@ -32,12 +32,12 @@ public class ZombiePlayerCapeLayer<T extends Zombie & PlayerZombie> extends Rend
 				if (loc != null) {
 					poseStack.pushPose();
 					poseStack.translate(0.0D, 0.0D, 0.125D);
-					double d0 = Mth.lerp((double)p_225628_7_, entity.getXCloakO(), entity.getXCloak()) - Mth.lerp((double)p_225628_7_, entity.xo, entity.getX());
-					double d1 = Mth.lerp((double)p_225628_7_, entity.getYCloakO(), entity.getYCloak()) - Mth.lerp((double)p_225628_7_, entity.yo, entity.getY());
-					double d2 = Mth.lerp((double)p_225628_7_, entity.getZCloakO(), entity.getZCloak()) - Mth.lerp((double)p_225628_7_, entity.zo, entity.getZ());
+					double d0 = Mth.lerp(p_225628_7_, entity.getXCloakO(), entity.getXCloak()) - Mth.lerp((double)p_225628_7_, entity.xo, entity.getX());
+					double d1 = Mth.lerp(p_225628_7_, entity.getYCloakO(), entity.getYCloak()) - Mth.lerp((double)p_225628_7_, entity.yo, entity.getY());
+					double d2 = Mth.lerp(p_225628_7_, entity.getZCloakO(), entity.getZCloak()) - Mth.lerp((double)p_225628_7_, entity.zo, entity.getZ());
 					float f = entity.yBodyRotO + (entity.yBodyRot - entity.yBodyRotO);
-					double d3 = (double)Mth.sin(f * ((float)Math.PI / 180F));
-					double d4 = (double)(-Mth.cos(f * ((float)Math.PI / 180F)));
+					double d3 = Mth.sin(f * ((float)Math.PI / 180F));
+					double d4 = -Mth.cos(f * ((float)Math.PI / 180F));
 					float f1 = (float)d1 * 10.0F;
 					f1 = Mth.clamp(f1, -6.0F, 32.0F);
 					float f2 = (float)(d0 * d3 + d2 * d4) * 100.0F;

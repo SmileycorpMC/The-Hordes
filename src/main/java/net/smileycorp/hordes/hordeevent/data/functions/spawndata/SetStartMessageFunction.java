@@ -28,4 +28,5 @@ public class SetStartMessageFunction implements HordeFunction<HordeBuildSpawnDat
         }
         return null;
     }
+    
 }

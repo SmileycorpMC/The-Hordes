@@ -46,10 +46,8 @@ public abstract class MixinZombieHorse extends AbstractHorse {
 
 	@Inject(at=@At("TAIL"), method = "createAttributes", cancellable = true)
 	private static void createAttributes(CallbackInfoReturnable<AttributeSupplier.Builder> callback) {
-		if (CommonConfigHandler.aggressiveZombieHorses.get()) {
-			callback.setReturnValue(callback.getReturnValue()
+		if (CommonConfigHandler.aggressiveZombieHorses.get()) callback.setReturnValue(callback.getReturnValue()
 					.add(Attributes.FOLLOW_RANGE, 35.0D).add(Attributes.ATTACK_DAMAGE, 3.0D));
-		}
 	}
 
 }

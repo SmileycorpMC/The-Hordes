@@ -30,4 +30,5 @@ public class SetSpawnTypeFunction implements HordeFunction<HordeBuildSpawnDataEv
         }
         return null;
     }
+    
 }

@@ -42,4 +42,5 @@ public class ZombiePlayerOverlayLayer<T extends Zombie & PlayerZombie> extends R
         model.renderToBuffer(poseStack, vertexconsumer, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
         poseStack.popPose();
     }
+    
 }

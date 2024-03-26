@@ -18,18 +18,15 @@ public class ClientInfectionEventHandler {
 
 	@SubscribeEvent
 	public void renderOverlay(CustomizeGuiOverlayEvent event){
-		if (ClientConfigHandler.playerInfectionVisuals.get()) {
-			Minecraft mc = Minecraft.getInstance();
-			LocalPlayer player = mc.player;
-			if (player!= null) {
-				if (player.hasEffect(HordesInfection.INFECTED.get())) {
-					int level = player.getEffect(HordesInfection.INFECTED.get()).getAmplifier();
-					Color colour = new Color(0.4745f, 0.6117f, 0.3961f, 0.01f*level);
-					Window window = mc.getWindow();
-					event.getGuiGraphics().fill(0, 0, window.getWidth(), window.getHeight(), colour.getRGB());
-				}
-			}
-		}
+		if (!ClientConfigHandler.playerInfectionVisuals.get()) return;
+		Minecraft mc = Minecraft.getInstance();
+		LocalPlayer player = mc.player;
+		if (player == null) return;
+		if (!player.hasEffect(HordesInfection.INFECTED.get())) return;
+		int level = player.getEffect(HordesInfection.INFECTED.get()).getAmplifier();
+		Color colour = new Color(0.4745f, 0.6117f, 0.3961f, 0.01f*level);
+		Window window = mc.getWindow();
+		event.getGuiGraphics().fill(0, 0, window.getWidth(), window.getHeight(), colour.getRGB());
 	}
 
 	@SubscribeEvent

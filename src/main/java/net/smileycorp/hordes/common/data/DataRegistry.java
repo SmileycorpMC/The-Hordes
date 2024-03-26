@@ -40,7 +40,6 @@ public class DataRegistry {
 		registerValueGetter(Constants.loc("player_pos"), EntityPosGetter::new);
 	}
 
-
 	public static void registerConditionDeserializers() {
 		for (LogicalOperation operation : LogicalOperation.values())
 			registerConditionDeserializer(Constants.loc(operation.getName()), e -> LogicalCondition.deserialize(operation, e));

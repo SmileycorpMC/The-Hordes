@@ -12,10 +12,7 @@ public abstract class MixinHoglin {
 
 	@Inject(at=@At("HEAD"), method = "isImmuneToZombification", cancellable = true)
 	public void isImmuneToZombification(CallbackInfoReturnable<Boolean> callback) {
-		if (!CommonConfigHandler.piglinsHoglinsConvert.get()) {
-			callback.setReturnValue(true);
-			callback.cancel();
-		}
+		if (!CommonConfigHandler.piglinsHoglinsConvert.get()) callback.setReturnValue(true);
 	}
 
 }

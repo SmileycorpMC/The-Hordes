@@ -5,8 +5,7 @@ import net.smileycorp.hordes.hordeevent.HordeSpawnData;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 
 public class HordeBuildSpawnDataEvent extends HordePlayerEvent {
-
-
+	
 	private final HordeSpawnData spawnData;
 
 	public HordeBuildSpawnDataEvent(Player player, HordeEvent horde) {

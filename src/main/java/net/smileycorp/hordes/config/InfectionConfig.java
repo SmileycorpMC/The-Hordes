@@ -4,7 +4,6 @@ import net.minecraftforge.common.ForgeConfigSpec;
 
 public class InfectionConfig {
     
-    
     public static ForgeConfigSpec.ConfigValue<Boolean> enableMobInfection;
     public static ForgeConfigSpec.ConfigValue<Boolean> infectVillagers;
     public static ForgeConfigSpec.ConfigValue<Boolean> infectPlayers;

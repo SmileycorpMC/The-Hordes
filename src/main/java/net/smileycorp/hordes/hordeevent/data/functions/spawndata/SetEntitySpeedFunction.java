@@ -28,4 +28,5 @@ public class SetEntitySpeedFunction implements HordeFunction<HordeBuildSpawnData
         }
         return null;
     }
+    
 }

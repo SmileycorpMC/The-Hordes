@@ -85,5 +85,4 @@ public class HordesLogger {
         has_errors = false;
     }
 
-
 }

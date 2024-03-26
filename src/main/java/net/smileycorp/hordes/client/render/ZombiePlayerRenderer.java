@@ -67,4 +67,5 @@ public class ZombiePlayerRenderer<T extends Zombie & PlayerZombie> extends Human
 	public static LayerDefinition createLayer(boolean slim) {
 		return LayerDefinition.create(ZombiePlayerModel.createMesh(CubeDeformation.NONE, slim), 64, 64);
 	}
+	
 }

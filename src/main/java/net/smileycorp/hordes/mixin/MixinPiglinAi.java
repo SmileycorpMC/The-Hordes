@@ -24,44 +24,27 @@ public abstract class MixinPiglinAi {
 
 	@Inject(at=@At("HEAD"), method = "isNearZombified(Lnet/minecraft/world/entity/monster/piglin/Piglin;)Z", cancellable = true)
 	private static void isNearZombified(Piglin piglin, CallbackInfoReturnable<Boolean> callback) {
-		if (CommonConfigHandler.piglinsHuntZombies.get()) {
-			callback.setReturnValue(false);
-			callback.cancel();
-		}
+		if (CommonConfigHandler.piglinsHuntZombies.get()) callback.setReturnValue(false);
 	}
 
 	@Inject(at=@At("HEAD"), method = "isZombified", cancellable = true)
 	private static void isZombified(EntityType<?> type, CallbackInfoReturnable<Boolean> callback) {
-		if (CommonConfigHandler.piglinsHuntZombies.get() && type.is(HordesInfection.INFECTION_ENTITIES_TAG)) {
-			callback.setReturnValue(true);
-			callback.cancel();
-		}
+		if (CommonConfigHandler.piglinsHuntZombies.get() && type.is(HordesInfection.INFECTION_ENTITIES_TAG)) callback.setReturnValue(true);
 	}
 
 	@Inject(at=@At("TAIL"), method = "findNearestValidAttackTarget", cancellable = true)
 	private static void findNearestValidAttackTarget(Piglin piglin, CallbackInfoReturnable<Optional<? extends LivingEntity>> callback ) {
-		if (CommonConfigHandler.piglinsHuntZombies.get()) {
-			if (!callback.getReturnValue().isPresent()) {
-				ItemStack stack = piglin.getItemInHand(InteractionHand.MAIN_HAND);
-				if (stack != null) {
-					if (stack.is(Items.CROSSBOW)) {
-						Brain<Piglin> brain = piglin.getBrain();
-						if (brain.hasMemoryValue(MemoryModuleType.NEAREST_VISIBLE_ZOMBIFIED)) {
-							callback.setReturnValue(brain.getMemory(MemoryModuleType.NEAREST_VISIBLE_ZOMBIFIED));
-							callback.cancel();
-						}
-					}
-				}
-			}
-		}
+		if (!CommonConfigHandler.piglinsHuntZombies.get() || callback.getReturnValue().isPresent()) return;
+		ItemStack stack = piglin.getItemInHand(InteractionHand.MAIN_HAND);
+		if (stack == null) return;
+		if (!stack.is(Items.CROSSBOW)) return;
+		Brain<Piglin> brain = piglin.getBrain();
+		if (brain.hasMemoryValue(MemoryModuleType.NEAREST_VISIBLE_ZOMBIFIED)) callback.setReturnValue(brain.getMemory(MemoryModuleType.NEAREST_VISIBLE_ZOMBIFIED));
 	}
 
 	@Inject(at=@At("HEAD"), method = "admireGoldItem", cancellable = true)
 	private static void admireGoldItem(LivingEntity entity, CallbackInfo callback) {
-		if (entity.hasEffect(HordesInfection.INFECTED.get()) && entity.getOffhandItem().is(HordesInfection.INFECTION_CURES_TAG)) {
-			entity.startUsingItem(InteractionHand.OFF_HAND);
-			callback.cancel();
-		}
+		if (entity.hasEffect(HordesInfection.INFECTED.get()) && entity.getOffhandItem().is(HordesInfection.INFECTION_CURES_TAG)) entity.startUsingItem(InteractionHand.OFF_HAND);
 	}
 
 }

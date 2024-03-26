@@ -32,4 +32,5 @@ public class SetSpawntableFunction implements HordeFunction<HordeBuildSpawnDataE
         }
         return null;
     }
+    
 }

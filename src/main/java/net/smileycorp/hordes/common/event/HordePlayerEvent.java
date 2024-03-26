@@ -11,7 +11,6 @@ public class HordePlayerEvent extends PlayerEvent {
 
 	protected final Level level;
 	protected final HordeEvent horde;
-
 	protected final int day;
 
 	public HordePlayerEvent(Player player, HordeEvent horde) {

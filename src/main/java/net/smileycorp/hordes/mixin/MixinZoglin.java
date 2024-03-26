@@ -16,10 +16,7 @@ public abstract class MixinZoglin {
 	@Inject(at=@At("HEAD"), method = "isTargetable", cancellable = true)
 	protected void isTargetable(LivingEntity entity, CallbackInfoReturnable<Boolean> callback) {
 		if ((!CommonConfigHandler.zoglinsAttackUndead.get() && entity.getMobType() == MobType.UNDEAD) ||
-				(!CommonConfigHandler.zoglinsAttackMobs.get() && entity instanceof Monster)) {
-			callback.setReturnValue(false);
-			callback.cancel();
-		}
+				(!CommonConfigHandler.zoglinsAttackMobs.get() && entity instanceof Monster)) callback.setReturnValue(false);
 	}
 
 }

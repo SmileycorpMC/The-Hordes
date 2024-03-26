@@ -3,7 +3,6 @@ package net.smileycorp.hordes.config;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 public class HordeEventConfig {
-   
     
     public static ForgeConfigSpec.ConfigValue<Boolean> enableHordeEvent;
     public static ForgeConfigSpec.ConfigValue<Boolean> hordesCommandOnly;
@@ -46,4 +45,5 @@ public class HordeEventConfig {
         hordeEventByPlayerTime = builder.comment("Are horde events tracked by player play time instead of world time.").define("hordeEventByPlayerTime", true);
         builder.pop();
     }
+    
 }

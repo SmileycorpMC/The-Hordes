@@ -71,25 +71,18 @@ public abstract class MixinMob extends LivingEntity {
 			}
 		}
 		callback.setReturnValue(InteractionResult.sidedSuccess(player.level().isClientSide));
-		callback.cancel();
 	}
 
 	//disables skeletons burning based on the config
 	@Inject(at=@At("HEAD"), method = "isSunBurnTick", cancellable = true)
 	public void isSunBurnTick(CallbackInfoReturnable<Boolean> callback) {
-		if ((LivingEntity)this instanceof AbstractSkeleton &! CommonConfigHandler.skeletonsBurn.get()) {
-			callback.setReturnValue(false);
-			callback.cancel();
-		}
+		if ((LivingEntity)this instanceof AbstractSkeleton &! CommonConfigHandler.skeletonsBurn.get()) callback.setReturnValue(false);
 	}
 
 	//despawns zombie horses in peaceful if they are set as aggressive in the config
 	@Inject(at=@At("HEAD"), method = "shouldDespawnInPeaceful", cancellable = true)
 	public void shouldDespawnInPeaceful(CallbackInfoReturnable<Boolean> callback) {
-		if ((LivingEntity)this instanceof ZombieHorse && CommonConfigHandler.aggressiveZombieHorses.get()) {
-			callback.setReturnValue(true);
-			callback.cancel();
-		}
+		if ((LivingEntity)this instanceof ZombieHorse && CommonConfigHandler.aggressiveZombieHorses.get()) callback.setReturnValue(true);
 	}
 
 	//copy horde data to converted entities after conversion before capabilities are cleared
@@ -144,8 +137,6 @@ public abstract class MixinMob extends LivingEntity {
 
 	@Inject(at = @At("HEAD"), method = "canBeLeashed")
 	public void canBeLeashed(Player player, CallbackInfoReturnable<Boolean> callback) {
-		if (((LivingEntity)this) instanceof ZombieHorse && CommonConfigHandler.aggressiveZombieHorses.get()) {
-			callback.setReturnValue(false);
-		}
+		if (((LivingEntity)this) instanceof ZombieHorse && CommonConfigHandler.aggressiveZombieHorses.get()) callback.setReturnValue(false);
 	}
 }

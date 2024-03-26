@@ -70,4 +70,5 @@ public class HordeScript<T extends HordePlayerEvent> {
 	public ResourceLocation getName() {
 		return name;
 	}
+	
 }

@@ -29,4 +29,5 @@ public class SetSpawnSoundFunction implements HordeFunction<HordeBuildSpawnDataE
         }
         return null;
     }
+    
 }

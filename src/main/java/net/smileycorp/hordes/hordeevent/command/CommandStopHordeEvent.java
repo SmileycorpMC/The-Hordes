@@ -41,4 +41,5 @@ public class CommandStopHordeEvent {
 		}
 		return 0;
 	}
+	
 }

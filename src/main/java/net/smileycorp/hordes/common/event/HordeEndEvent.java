@@ -35,4 +35,5 @@ public class HordeEndEvent extends HordePlayerEvent {
 	public void setMessage(String message) {
 		this.message = message;
 	}
+	
 }

@@ -61,4 +61,5 @@ public class HordeTableLoader extends SimpleJsonResourceReloadListener {
     public static CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
         return SharedSuggestionProvider.suggestResource(INSTANCE.SPAWN_TABLES.keySet(), builder);
     }
+    
 }

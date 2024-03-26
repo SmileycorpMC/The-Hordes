@@ -28,4 +28,5 @@ public class SetSpawnDurationFunction implements HordeFunction<HordeBuildSpawnDa
         }
         return null;
     }
+    
 }

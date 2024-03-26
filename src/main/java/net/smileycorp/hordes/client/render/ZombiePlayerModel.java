@@ -38,9 +38,7 @@ public class ZombiePlayerModel<T extends Zombie & PlayerZombie> extends PlayerMo
 	public void prepareMobModel(T entity, float f1, float f2, float f3) {
 		if (!fixedArms) {
 			Optional<UUID> optional = entity.getPlayerUUID();
-			if (optional.isPresent()) if (DefaultPlayerSkin.getSkinModelName(optional.get()).equals("slim")) {
-				slim = true;
-			}
+			if (optional.isPresent()) if (DefaultPlayerSkin.getSkinModelName(optional.get()).equals("slim")) slim = true;
 			fixedArms = true;
 		}
 		if (isDrowned) {
@@ -48,11 +46,8 @@ public class ZombiePlayerModel<T extends Zombie & PlayerZombie> extends PlayerMo
 			leftArmPose = HumanoidModel.ArmPose.EMPTY;
 			ItemStack itemstack = entity.getItemInHand(InteractionHand.MAIN_HAND);
 			if (itemstack.is(Items.TRIDENT) && entity.isAggressive()) {
-				if (entity.getMainArm() == HumanoidArm.RIGHT) {
-					this.rightArmPose = HumanoidModel.ArmPose.THROW_SPEAR;
-				} else {
-					this.leftArmPose = HumanoidModel.ArmPose.THROW_SPEAR;
-				}
+				if (entity.getMainArm() == HumanoidArm.RIGHT) rightArmPose = HumanoidModel.ArmPose.THROW_SPEAR;
+				else leftArmPose = HumanoidModel.ArmPose.THROW_SPEAR;
 			}
 		}
 		super.prepareMobModel(entity, f1, f2, f3);
@@ -63,24 +58,22 @@ public class ZombiePlayerModel<T extends Zombie & PlayerZombie> extends PlayerMo
 		super.setupAnim(entity, p_225597_2_, p_225597_3_, p_225597_4_, p_225597_5_, p_225597_6_);
 		AnimationUtils.animateZombieArms(leftArm, rightArm, entity.isAggressive(), attackTime, p_225597_4_);
 		if (isDrowned) {
-			if (this.leftArmPose == HumanoidModel.ArmPose.THROW_SPEAR) {
-				this.leftArm.xRot = this.leftArm.xRot * 0.5F - (float)Math.PI;
-				this.leftArm.yRot = 0.0F;
+			if (leftArmPose == HumanoidModel.ArmPose.THROW_SPEAR) {
+				leftArm.xRot = leftArm.xRot * 0.5F - (float)Math.PI;
+				leftArm.yRot = 0.0F;
 			}
-
-			if (this.rightArmPose == HumanoidModel.ArmPose.THROW_SPEAR) {
-				this.rightArm.xRot = this.rightArm.xRot * 0.5F - (float)Math.PI;
-				this.rightArm.yRot = 0.0F;
+			if (rightArmPose == HumanoidModel.ArmPose.THROW_SPEAR) {
+				rightArm.xRot = rightArm.xRot * 0.5F - (float)Math.PI;
+				rightArm.yRot = 0.0F;
 			}
-
-			if (this.swimAmount > 0.0F) {
-				this.rightArm.xRot = this.rotlerpRad(this.swimAmount, this.rightArm.xRot, -2.5132742F) + this.swimAmount * 0.35F * Mth.sin(0.1F * p_225597_4_);
-				this.leftArm.xRot = this.rotlerpRad(this.swimAmount, this.leftArm.xRot, -2.5132742F) - this.swimAmount * 0.35F * Mth.sin(0.1F * p_225597_4_);
-				this.rightArm.zRot = this.rotlerpRad(this.swimAmount, this.rightArm.zRot, -0.15F);
-				this.leftArm.zRot = this.rotlerpRad(this.swimAmount, this.leftArm.zRot, 0.15F);
-				this.leftLeg.xRot -= this.swimAmount * 0.55F * Mth.sin(0.1F * p_225597_4_);
-				this.rightLeg.xRot += this.swimAmount * 0.55F * Mth.sin(0.1F * p_225597_4_);
-				this.head.xRot = 0.0F;
+			if (swimAmount > 0.0F) {
+				rightArm.xRot = rotlerpRad(swimAmount, rightArm.xRot, -2.5132742F) + swimAmount * 0.35F * Mth.sin(0.1F * p_225597_4_);
+				leftArm.xRot = rotlerpRad(swimAmount, leftArm.xRot, -2.5132742F) - swimAmount * 0.35F * Mth.sin(0.1F * p_225597_4_);
+				rightArm.zRot = rotlerpRad(swimAmount, rightArm.zRot, -0.15F);
+				leftArm.zRot = rotlerpRad(swimAmount, leftArm.zRot, 0.15F);
+				leftLeg.xRot -= swimAmount * 0.55F * Mth.sin(0.1F * p_225597_4_);
+				rightLeg.xRot += swimAmount * 0.55F * Mth.sin(0.1F * p_225597_4_);
+				head.xRot = 0.0F;
 			}
 		}
 		leftPants.copyFrom(leftLeg);

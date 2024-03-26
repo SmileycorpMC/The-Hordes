@@ -25,6 +25,5 @@ public class JEIPluginInfection implements IModPlugin {
 	public ResourceLocation getPluginUid() {
 		return Constants.loc("infection");
 	}
-
-
+	
 }

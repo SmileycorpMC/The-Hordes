@@ -28,4 +28,5 @@ public class SetEndMessageFunction implements HordeFunction<HordeBuildSpawnDataE
         }
         return null;
     }
+    
 }

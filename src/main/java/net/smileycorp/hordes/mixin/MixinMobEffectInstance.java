@@ -37,12 +37,10 @@ public class MixinMobEffectInstance {
 				if (entity instanceof ServerPlayer) InfectionPacketHandler.sendTo(new InfectMessage(false),
 						((ServerPlayer) entity).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 				callback.setReturnValue(true);
-				callback.cancel();
 			}
 			else {
 				entity.hurt(HordesInfection.getInfectionDamage(entity), Float.MAX_VALUE);
 				callback.setReturnValue(false);
-				callback.cancel();
 			}
 		}
 	}
