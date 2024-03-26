@@ -28,9 +28,7 @@ public class HordeSavedData extends SavedData {
 	public void load(CompoundTag nbt) {
 		if (nbt.contains("next_day")) {
 			int next = nbt.getInt("next_day");
-			if (next > next_day) {
-				next_day = next;
-			}
+			if (next > next_day) next_day = next;
 		}
 		if (nbt.contains("events")) {
 			CompoundTag events = nbt.getCompound("events");
@@ -48,7 +46,11 @@ public class HordeSavedData extends SavedData {
 		nbt.putInt("next_day", next_day);
 		CompoundTag events = new CompoundTag();
 		for (Entry<UUID, HordeEvent> entry : this.events.entrySet()) {
-			events.put(entry.getKey().toString(), entry.getValue().writeToNBT(new CompoundTag()));
+			UUID uuid = entry.getKey();
+			CompoundTag tag = new CompoundTag();
+			ServerPlayer player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(uuid);
+			if (player != null) tag.putString("username", player.getName().getString());
+			events.put(uuid.toString(), entry.getValue().writeToNBT(tag));
 		}
 		nbt.put("events", events);
 		return nbt;

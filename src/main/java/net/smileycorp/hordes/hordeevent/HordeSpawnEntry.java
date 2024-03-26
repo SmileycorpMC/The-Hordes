@@ -14,18 +14,22 @@ public class HordeSpawnEntry {
 	protected final int weight;
 	protected final int minDay;
 	protected final int maxDay;
+	protected final int minSpawns;
+	protected final int maxSpawns;
 	protected CompoundTag nbt = null;
 
 	public HordeSpawnEntry(EntityType<?> type) {
-		this(type, 0, 0, 0);
+		this(type, 0, 0, 0, 0, 0);
 	}
 
-	HordeSpawnEntry(EntityType<?> type, int weight, int minDay, int maxDay) {
+	HordeSpawnEntry(EntityType<?> type, int weight, int minDay, int maxDay, int minSpawns, int maxSpawns) {
 		this.name = ForgeRegistries.ENTITY_TYPES.getKey(type);
 		this.type = type;
 		this.weight = weight;
 		this.minDay = minDay;
 		this.maxDay = maxDay;
+		this.minSpawns = minSpawns;
+		this.maxSpawns = maxSpawns;
 	}
 
 	public int getWeight() {

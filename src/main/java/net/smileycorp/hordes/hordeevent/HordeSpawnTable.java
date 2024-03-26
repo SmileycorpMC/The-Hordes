@@ -40,10 +40,10 @@ public class HordeSpawnTable {
         for(HordeSpawnEntry entry : spawns) {
             if (entry.getMinDay() <= day && (entry.getMaxDay() == 0 || entry.getMaxDay() >= day)) {
                 spawnmap.add(new AbstractMap.SimpleEntry<>(entry, entry.getWeight()));
-                HordesLogger.logInfo("Adding entry " + entry.toString() + " to hordespawn on day " + day);
+                HordesLogger.logInfo("Adding entry " + entry + " to hordespawn on day " + day);
             }
         }
-        return new WeightedOutputs<>(1, spawnmap);
+        return new WeightedSpawnTable(spawnmap);
     }
 
     public List<HordeSpawnEntry> getEntriesFor(Mob entity) {
@@ -89,6 +89,8 @@ public class HordeSpawnTable {
                 int weight = 0;
                 int minDay = 0;
                 int maxDay = 0;
+                int minSpawns = 0;
+                int maxSpawns = 0;
                 CompoundTag nbt = null;
                 if (element.isJsonObject()) {
                     JsonObject obj = element.getAsJsonObject();
@@ -97,6 +99,8 @@ public class HordeSpawnTable {
                     if (obj.has("weight")) weight = obj.get("weight").getAsInt();
                     if (obj.has("first_day")) minDay = obj.get("first_day").getAsInt();
                     if (obj.has("last_day")) maxDay = obj.get("last_day").getAsInt();
+                    if (obj.has("min_spawns")) minSpawns = obj.get("max_spawns").getAsInt();
+                    if (obj.has("max_spawns")) maxSpawns = obj.get("max_spawns").getAsInt();
                     if (obj.has("nbt")) nbt = DataRegistry.parseNBT(entity, obj.get("nbt").getAsString());
                 } else {
                     //check if it matches the syntax for a registry name
@@ -134,11 +138,11 @@ public class HordeSpawnTable {
                         } else throw new Exception("Entry " + name + " is not in the correct format");
                     }
                     if (type == null) throw new Exception("Entry " + name + " is not in the correct format");
-                    HordeSpawnEntry entry = new HordeSpawnEntry(type, weight, minDay, maxDay);
+                    HordeSpawnEntry entry = new HordeSpawnEntry(type, weight, minDay, maxDay, minSpawns, maxSpawns);
                     if (nbt != null) entry.setNBT(nbt);
                 }
                 HordesLogger.logInfo("Loaded entity " + entity + " as " + type.toString() + " with weight " + weight + ", min day " + minDay + " and max day " + maxDay);
-                HordeSpawnEntry entry = new HordeSpawnEntry(type, weight, minDay, maxDay);
+                HordeSpawnEntry entry = new HordeSpawnEntry(type, weight, minDay, maxDay, minSpawns, maxSpawns);
                 if (nbt != null) entry.setNBT(nbt);
                 spawns.add(entry);
             } catch (Exception e) {

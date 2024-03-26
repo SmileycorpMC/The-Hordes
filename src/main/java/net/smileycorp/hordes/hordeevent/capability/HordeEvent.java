@@ -71,7 +71,8 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 			spawnData.setTable(HordeTableLoader.INSTANCE.getTable(new ResourceLocation(nbt.getString("loadedTable"))));
 		}
 	}
-
+	
+	@Override
 	public CompoundTag writeToNBT(CompoundTag nbt) {
 		nbt.putInt("timer", timer);
 		nbt.putInt("nextDay", nextDay);
