@@ -27,7 +27,7 @@ public class BinaryOperationValueGetter<T extends Number & Comparable<T>> implem
     public static <T extends Number & Comparable<T>> BinaryOperationValueGetter deserialize(BinaryOperation operation, DataType<T> type, JsonObject element) {
         ValueGetter<T> getter1 = ValueGetter.readValue(type, element.get("value1"));
         ValueGetter<T> getter2 = ValueGetter.readValue(type, element.get("value2"));
-        if (getter1 == null || getter2 == null) {
+        if (getter1 == null || getter2 == null |! type.isNumber()) {
             HordesLogger.logError("invalid values for hordes:" + operation.getName(), new NullPointerException());
             return null;
         }
