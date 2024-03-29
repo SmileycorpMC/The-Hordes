@@ -16,7 +16,7 @@ public interface ValueGetter<T extends Comparable<T>> {
     default T get(HordePlayerEvent event) {
         return get(event.getEntityWorld(), event.getEntity(), event.getPlayer(), event.getRandom());
     }
-
+    
     static <T extends Comparable<T>> ValueGetter<T> readValue(DataType<T> type, JsonElement value) {
         if (value.isJsonObject()) {
             return DataRegistry.readValue(type, value.getAsJsonObject());

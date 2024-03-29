@@ -18,6 +18,7 @@ import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
@@ -149,7 +150,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 				logInfo("Can't spawn wave because max cap has been reached");
 				return;
 			}
-			BlockPos pos = getSpawnPos(level, basepos);
+			Vec3 pos = getSpawnPos(level, basepos.getCenter());
 			HordeSpawnEntry entry = spawntable.getResult(rand);
 			EntityType<?> type = entry.getEntity();
 			try {
@@ -171,23 +172,24 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 		}
 	}
 	
-	private BlockPos getSpawnPos(ServerLevel level, BlockPos basepos) {
+	private Vec3 getSpawnPos(ServerLevel level, Vec3 basepos) {
 		for (int j = 0; j < 5; j++) {
-			Vec3 dir = DirectionUtils.getRandomDirectionVecXZ(rand);
-			BlockPos pos = DirectionUtils.getClosestLoadedPos(level, basepos, dir, rand.nextInt(10));
-			if (spawnData.getSpawnType().canSpawn(level, pos)) return pos;
+			double x = basepos.x() + rand.nextInt(10);
+			double z = basepos.z() + rand.nextInt(10);
+			Vec3 pos = new Vec3(x, level.getHeight(Heightmap.Types.MOTION_BLOCKING, (int)x, (int)z), z);
+			if (spawnData.getSpawnType().canSpawn(level, BlockPos.containing(pos))) return pos;
 		}
 		return basepos;
 	}
 	
-	private Entity loadEntity(ServerLevel level, ServerPlayer player, Mob entity, BlockPos pos, AtomicBoolean cancel) {
+	private Entity loadEntity(ServerLevel level, ServerPlayer player, Mob entity, Vec3 pos, AtomicBoolean cancel) {
 		HordeSpawnEntityEvent spawnEntityEvent = new HordeSpawnEntityEvent(player, entity, pos, this);
 		postEvent(spawnEntityEvent);
 		if (!spawnEntityEvent.isCanceled()) {
-			entity = spawnEntityEvent.entity;
-			pos = spawnEntityEvent.pos;
-			entity.finalizeSpawn(level, level.getCurrentDifficultyAt(pos), null, null, null);
-			entity.setPos(pos.getX(), pos.getY(), pos.getZ());
+			entity = spawnEntityEvent.getEntity();
+			pos = spawnEntityEvent.getPos();
+			entity.finalizeSpawn(level, level.getCurrentDifficultyAt(BlockPos.containing(pos)), null, null, null);
+			entity.setPos(pos.x(), pos.y(), pos.z());
 			return entity;
 		} else {
 			logInfo("Entity spawn event has been cancelled, not spawning entity  of class " + entity.getType());

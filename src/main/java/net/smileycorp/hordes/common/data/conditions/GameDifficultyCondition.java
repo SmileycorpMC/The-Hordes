@@ -6,30 +6,33 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
+import net.smileycorp.hordes.common.data.values.ValueGetter;
 
 public class GameDifficultyCondition implements Condition {
 
-	protected Difficulty difficulty;
+	protected ValueGetter<?> difficulty;
 
-	public GameDifficultyCondition(Difficulty difficulty) {
+	public GameDifficultyCondition(ValueGetter<?> difficulty) {
 		this.difficulty = difficulty;
 	}
 
 	@Override
 	public boolean apply(Level level, LivingEntity entity, ServerPlayer player, RandomSource rand) {
-		return level.getDifficulty() == difficulty;
+		Comparable value = difficulty.get(level, entity, player, rand);
+		return level.getDifficulty() == (value instanceof String ? Difficulty.byName((String) value) : Difficulty.byId((Integer) value));
 	}
 
 	public static GameDifficultyCondition deserialize(JsonElement json) {
 		try {
-			if (json.isJsonPrimitive()) {
-				Difficulty difficulty = null;
-				if (json.getAsJsonPrimitive().isString()) difficulty = Difficulty.byName(json.getAsString());
-				if (json.getAsJsonPrimitive().isNumber()) difficulty = Difficulty.byId(json.getAsInt());
-				if (difficulty == null) throw new NullPointerException();
-				return new GameDifficultyCondition(difficulty);
+			ValueGetter getter;
+			try {
+				getter = ValueGetter.readValue(DataType.STRING, json);
+			} catch (Exception e) {
+				getter = ValueGetter.readValue(DataType.INT, json);
 			}
+			return new GameDifficultyCondition(getter);
 		} catch(Exception e) {
 			HordesLogger.logError("Incorrect parameters for condition hordes:game_difficulty", e);
 		}

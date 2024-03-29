@@ -5,24 +5,26 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
+import net.smileycorp.hordes.common.data.values.ValueGetter;
 
 public class RandomCondition implements Condition {
 
-	protected float chance;
+	protected ValueGetter<Double> chance;
 
-	public RandomCondition(float chance) {
+	public RandomCondition(ValueGetter<Double> chance) {
 		this.chance = chance;
 	}
 
 	@Override
 	public boolean apply(Level level, LivingEntity entity, ServerPlayer player, RandomSource rand) {
-		return rand.nextFloat() <= chance;
+		return rand.nextFloat() <= chance.get(level, entity, player, rand);
 	}
 
 	public static RandomCondition deserialize(JsonElement json) {
 		try {
-			return new RandomCondition(json.getAsFloat());
+			return new RandomCondition(ValueGetter.readValue(DataType.DOUBLE, json));
 		} catch(Exception e) {
 			HordesLogger.logError("Incorrect parameters for condition hordes:random", e);
 		}
