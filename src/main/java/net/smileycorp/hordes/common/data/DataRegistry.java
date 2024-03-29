@@ -7,15 +7,14 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.ModList;
+import net.smileycorp.atlas.api.data.BinaryOperation;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.atlas.api.data.LogicalOperation;
+import net.smileycorp.atlas.api.data.UnaryOperation;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.data.conditions.*;
-import net.smileycorp.hordes.common.data.values.EntityNBTGetter;
-import net.smileycorp.hordes.common.data.values.EntityPosGetter;
-import net.smileycorp.hordes.common.data.values.LevelNBTGetter;
-import net.smileycorp.hordes.common.data.values.ValueGetter;
+import net.smileycorp.hordes.common.data.values.*;
 import net.smileycorp.hordes.config.HordeEventConfig;
 import net.smileycorp.hordes.hordeevent.data.functions.FunctionRegistry;
 
@@ -25,7 +24,7 @@ import java.util.function.Function;
 
 public class DataRegistry {
 
-	private static Map<ResourceLocation, BiFunction<String, DataType, ValueGetter>> VALUE_GETTERS = Maps.newHashMap();
+	private static Map<ResourceLocation, BiFunction<JsonObject, DataType, ValueGetter>> VALUE_GETTERS = Maps.newHashMap();
 	private static Map<ResourceLocation, Function<JsonElement, Condition>> CONDITION_DESERIALIZERS = Maps.newHashMap();
 
 	public static void init() {
@@ -35,9 +34,13 @@ public class DataRegistry {
 	}
 
 	private static void registerValueGetters() {
-		registerValueGetter(Constants.loc("level_nbt"), LevelNBTGetter::new);
-		registerValueGetter(Constants.loc("player_nbt"), EntityNBTGetter::new);
-		registerValueGetter(Constants.loc("player_pos"), EntityPosGetter::new);
+		for (UnaryOperation operation : UnaryOperation.values())
+			registerValueGetter(Constants.loc(operation.getName()), (obj, type) -> UnaryOperationValueGetter.deserialize(operation, type, obj));
+		for (BinaryOperation operation : BinaryOperation.values())
+			registerValueGetter(Constants.loc(operation.getName()), (obj, type) -> BinaryOperationValueGetter.deserialize(operation, type, obj));
+		registerValueGetter(Constants.loc("level_nbt"), LevelNBTGetter::deserialize);
+		registerValueGetter(Constants.loc("player_nbt"), EntityNBTGetter::deserialize);
+		registerValueGetter(Constants.loc("player_pos"), EntityPosGetter::deserialize);
 	}
 
 	public static void registerConditionDeserializers() {
@@ -58,9 +61,9 @@ public class DataRegistry {
 		if (json.has("name") && json.has("value")) {
 			try {
 				ResourceLocation loc = new ResourceLocation(json.get("name").getAsString());
-				BiFunction<String, DataType, ValueGetter> getter = VALUE_GETTERS.get(loc);
+				BiFunction<JsonObject, DataType, ValueGetter> getter = VALUE_GETTERS.get(loc);
 				if (getter == null) throw new NullPointerException("value getter " + loc + " is not registered");
-				return getter.apply(json.get("value").getAsString(), type);
+				return getter.apply(json, type);
 			} catch (Exception e) {
 				HordesLogger.logError("Failed to read value " + json, e);
 			}
@@ -82,7 +85,7 @@ public class DataRegistry {
 		return null;
 	}
 
-	public static void registerValueGetter(ResourceLocation name, BiFunction<String, DataType, ValueGetter> getter) {
+	public static void registerValueGetter(ResourceLocation name, BiFunction<JsonObject, DataType, ValueGetter> getter) {
 		VALUE_GETTERS.put(name, getter);
 	}
 

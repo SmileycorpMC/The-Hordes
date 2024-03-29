@@ -12,15 +12,15 @@ import java.util.List;
 
 public class RandomValue<T extends Comparable<T>> implements ValueGetter<T> {
 
-    private final List<T> values = Lists.newArrayList();
+    private final List<ValueGetter<T>> values = Lists.newArrayList();
 
     public RandomValue(DataType<T> type, JsonArray json) {
-        for (JsonElement element : json) values.add(type.readFromJson(element));
+        json.forEach(element -> values.add(ValueGetter.readValue(type, element)));
     }
 
     @Override
     public T get(Level level, LivingEntity entity, RandomSource rand) {
-        return values.get(rand.nextInt(values.size()));
+        return values.get(rand.nextInt(values.size())).get(level, entity, rand);
     }
 
 }
