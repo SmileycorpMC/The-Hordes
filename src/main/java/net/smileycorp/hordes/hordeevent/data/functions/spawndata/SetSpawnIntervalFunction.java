@@ -17,7 +17,7 @@ public class SetSpawnIntervalFunction implements HordeFunction<HordeBuildSpawnDa
 
     @Override
     public void apply(HordeBuildSpawnDataEvent event) {
-        event.getSpawnData().setSpawnInterval(getter.get(event.getEntityWorld(), event.getEntity(), event.getRandom()));
+        event.getSpawnData().setSpawnInterval(getter.get(event));
     }
 
     public static SetSpawnIntervalFunction deserialize(JsonElement json) {

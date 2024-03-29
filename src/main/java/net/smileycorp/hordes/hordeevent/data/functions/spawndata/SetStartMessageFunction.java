@@ -17,7 +17,7 @@ public class SetStartMessageFunction implements HordeFunction<HordeBuildSpawnDat
 
     @Override
     public void apply(HordeBuildSpawnDataEvent event) {
-        event.getSpawnData().setStartMessage(getter.get(event.getEntityWorld(), event.getEntity(), event.getRandom()));
+        event.getSpawnData().setStartMessage(getter.get(event));
     }
 
     public static SetStartMessageFunction deserialize(JsonElement json) {

@@ -6,8 +6,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.data.DataRegistry;
@@ -41,8 +42,8 @@ public class HordeScript<T extends HordePlayerEvent> {
 		return type;
 	}
 
-	public boolean shouldApply(Level level, Player player, RandomSource rand) {
-		for (Condition condition : conditions)  if (!condition.apply(level, player, rand)) return false;
+	public boolean shouldApply(Level level, LivingEntity entity, ServerPlayer player, RandomSource rand) {
+		for (Condition condition : conditions)  if (!condition.apply(level, entity, player, rand)) return false;
 		return true;
 	}
 

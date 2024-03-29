@@ -17,9 +17,7 @@ public class AdvancementCondition implements Condition {
 	}
 
 	@Override
-	public boolean apply(Level level, LivingEntity entity, RandomSource rand) {
-		if (!(entity instanceof ServerPlayer)) return false;
-		ServerPlayer player = (ServerPlayer) entity;
+	public boolean apply(Level level, LivingEntity entity, ServerPlayer player, RandomSource rand) {
 		return player.getAdvancements().getOrStartProgress(player.getServer().getAdvancements().getAdvancement(advancement)).isDone();
 	}
 

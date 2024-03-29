@@ -18,7 +18,7 @@ public class SetSpawnSoundFunction implements HordeFunction<HordeBuildSpawnDataE
 
     @Override
     public void apply(HordeBuildSpawnDataEvent event) {
-        event.getSpawnData().setSpawnSound(new ResourceLocation(getter.get(event.getEntityWorld(), event.getEntity(), event.getRandom())));
+        event.getSpawnData().setSpawnSound(new ResourceLocation(getter.get(event)));
     }
 
     public static SetSpawnSoundFunction deserialize(JsonElement json) {

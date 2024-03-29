@@ -1,6 +1,7 @@
 package net.smileycorp.hordes.common.data.conditions;
 
 import com.google.gson.JsonElement;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -16,7 +17,7 @@ public class DayCondition implements Condition {
 	}
 
 	@Override
-	public boolean apply(Level level, LivingEntity entity, RandomSource rand) {
+	public boolean apply(Level level, LivingEntity entity, ServerPlayer player, RandomSource rand) {
 		return level.getDayTime() / (float) HordeEventConfig.dayLength.get() > day;
 	}
 

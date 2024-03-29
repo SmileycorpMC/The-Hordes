@@ -19,9 +19,7 @@ public class SetSpawntableFunction implements HordeFunction<HordeBuildSpawnDataE
 
     @Override
     public void apply(HordeBuildSpawnDataEvent event) {
-        event.getSpawnData().setTable(HordeTableLoader.INSTANCE.getTable(
-                new ResourceLocation(getter.get(event.getEntityWorld(),
-                        event.getEntity(), event.getRandom()))));
+        event.getSpawnData().setTable(HordeTableLoader.INSTANCE.getTable(new ResourceLocation(getter.get(event))));
     }
 
     public static SetSpawntableFunction deserialize(JsonElement json) {

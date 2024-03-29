@@ -17,7 +17,7 @@ public class SetSpawnDurationFunction implements HordeFunction<HordeBuildSpawnDa
 
     @Override
     public void apply(HordeBuildSpawnDataEvent event) {
-        event.getSpawnData().setSpawnDuration(getter.get(event.getEntityWorld(), event.getEntity(), event.getRandom()));
+        event.getSpawnData().setSpawnDuration(getter.get(event));
     }
 
     public static SetSpawnDurationFunction deserialize(JsonElement json) {

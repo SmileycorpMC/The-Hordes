@@ -1,7 +1,7 @@
 package net.smileycorp.hordes.common.data.values;
 
-import com.google.gson.JsonElement;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -19,15 +19,15 @@ public abstract class NBTGetter<T extends Comparable<T>> implements ValueGetter<
 	}
 
 	@Override
-	public T get(Level level, LivingEntity entity, RandomSource rand) {
+	public T get(Level level, LivingEntity entity, ServerPlayer player, RandomSource rand) {
 		try {
-			return new NBTExplorer<>(value.get(level, entity, rand), type).findValue(getNBT(level, entity, rand));
+			return new NBTExplorer<>(value.get(level, entity, player, rand), type).findValue(getNBT(level, entity, player, rand));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-	protected abstract CompoundTag getNBT(Level level, LivingEntity entity, RandomSource rand);
+	protected abstract CompoundTag getNBT(Level level, LivingEntity entity, ServerPlayer player, RandomSource rand);
 
 }

@@ -9,20 +9,20 @@ import net.smileycorp.hordes.hordeevent.data.functions.HordeFunction;
 
 public class SetEntitySpeedFunction implements HordeFunction<HordeBuildSpawnDataEvent> {
 
-    private final ValueGetter<Integer> getter;
+    private final ValueGetter<Double> getter;
 
-    public SetEntitySpeedFunction(ValueGetter<Integer> getter) {
+    public SetEntitySpeedFunction(ValueGetter<Double> getter) {
         this.getter = getter;
     }
 
     @Override
     public void apply(HordeBuildSpawnDataEvent event) {
-        event.getSpawnData().setEntitySpeed(getter.get(event.getEntityWorld(), event.getEntity(), event.getRandom()));
+        event.getSpawnData().setEntitySpeed(getter.get(event));
     }
 
     public static SetEntitySpeedFunction deserialize(JsonElement json) {
         try {
-            return new SetEntitySpeedFunction(ValueGetter.readValue(DataType.INT, json));
+            return new SetEntitySpeedFunction(ValueGetter.readValue(DataType.DOUBLE, json));
         } catch(Exception e) {
             HordesLogger.logError("Incorrect parameters for function hordes:set_entity_speed", e);
         }

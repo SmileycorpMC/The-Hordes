@@ -1,7 +1,7 @@
 package net.smileycorp.hordes.common.event;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 
 public class HordeEndEvent extends HordePlayerEvent {
@@ -10,7 +10,7 @@ public class HordeEndEvent extends HordePlayerEvent {
 	protected String message;
 	protected final boolean wasCommand;
 
-	public HordeEndEvent(Player player, HordeEvent horde, boolean wasCommand, String message) {
+	public HordeEndEvent(ServerPlayer player, HordeEvent horde, boolean wasCommand, String message) {
 		super(player, horde);
 		pos = player.blockPosition();
 		this.wasCommand = wasCommand;

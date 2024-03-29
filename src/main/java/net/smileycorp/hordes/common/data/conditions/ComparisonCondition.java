@@ -2,6 +2,7 @@ package net.smileycorp.hordes.common.data.conditions;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -23,8 +24,8 @@ public class ComparisonCondition<T extends Comparable<T>> implements Condition {
 	}
 
 	@Override
-	public boolean apply(Level level, LivingEntity entity, RandomSource rand) {
-		return operation.apply(value1.get(level, entity, rand), value2.get(level, entity, rand));
+	public boolean apply(Level level, LivingEntity entity, ServerPlayer player, RandomSource rand) {
+		return operation.apply(value1.get(level, entity, player, rand), value2.get(level, entity, player, rand));
 	}
 
 	public static ComparisonCondition deserialize(JsonElement json) {

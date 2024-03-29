@@ -28,7 +28,7 @@ public class MultipleFunction<T extends HordePlayerEvent> implements HordeFuncti
     }
     
     private void tryApply(Pair<List<Condition>, HordeFunction<T>> pair, T event) {
-        for (Condition condition : pair.getFirst()) if (!condition.apply(event.getEntityWorld(), event.getEntity(), event.getRandom())) return;
+        for (Condition condition : pair.getFirst()) if (!condition.apply(event.getEntityWorld(), event.getEntity(), event.getPlayer(), event.getRandom())) return;
         pair.getSecond().apply(event);
     }
     

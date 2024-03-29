@@ -1,6 +1,7 @@
 package net.smileycorp.hordes.common.data.values;
 
 import com.google.gson.JsonObject;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -20,8 +21,8 @@ public class BinaryOperationValueGetter<T extends Number & Comparable<T>> implem
     }
     
     @Override
-    public T get(Level level, LivingEntity entity, RandomSource rand) {
-        return (T) operation.apply(value1.get(level, entity, rand), value2.get(level, entity, rand));
+    public T get(Level level, LivingEntity entity, ServerPlayer player, RandomSource rand) {
+        return (T) operation.apply(value1.get(level, entity, player, rand), value2.get(level, entity, player, rand));
     }
     
     public static <T extends Number & Comparable<T>> BinaryOperationValueGetter deserialize(BinaryOperation operation, DataType<T> type, JsonObject element) {

@@ -1,6 +1,7 @@
 package net.smileycorp.hordes.common.data.conditions;
 
 import com.google.gson.JsonElement;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.LivingEntity;
@@ -16,7 +17,7 @@ public class GameDifficultyCondition implements Condition {
 	}
 
 	@Override
-	public boolean apply(Level level, LivingEntity entity, RandomSource rand) {
+	public boolean apply(Level level, LivingEntity entity, ServerPlayer player, RandomSource rand) {
 		return level.getDifficulty() == difficulty;
 	}
 

@@ -1,6 +1,6 @@
 package net.smileycorp.hordes.common.event;
 
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 
@@ -9,7 +9,7 @@ public class HordeStartWaveEvent extends HordePlayerEvent {
 	
 	protected int count;
 
-	public HordeStartWaveEvent(Player player, HordeEvent horde, int count) {
+	public HordeStartWaveEvent(ServerPlayer player, HordeEvent horde, int count) {
 		super(player, horde);
 		this.count = count;
 	}

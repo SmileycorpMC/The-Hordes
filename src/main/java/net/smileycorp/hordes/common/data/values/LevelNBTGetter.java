@@ -1,9 +1,9 @@
 package net.smileycorp.hordes.common.data.values;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -18,7 +18,7 @@ public class LevelNBTGetter<T extends Comparable<T>> extends NBTGetter<T> {
 	}
 
 	@Override
-	protected CompoundTag getNBT(Level level, LivingEntity entity, RandomSource rand)  {
+	protected CompoundTag getNBT(Level level, LivingEntity entity, ServerPlayer player, RandomSource rand)  {
 		MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
 		CompoundTag nbt = server.getWorldData().createTag(server.registryAccess(), new CompoundTag());
 		return nbt;

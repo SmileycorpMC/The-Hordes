@@ -17,7 +17,7 @@ public class SetSpawnAmountFunction implements HordeFunction<HordeBuildSpawnData
 
     @Override
     public void apply(HordeBuildSpawnDataEvent event) {
-        event.getSpawnData().setSpawnAmount(getter.get(event.getEntityWorld(), event.getEntity(), event.getRandom()));
+        event.getSpawnData().setSpawnAmount(getter.get(event));
     }
 
     public static SetSpawnAmountFunction deserialize(JsonElement json) {
