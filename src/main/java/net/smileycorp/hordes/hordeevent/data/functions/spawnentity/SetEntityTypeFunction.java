@@ -11,11 +11,11 @@ import net.smileycorp.hordes.common.data.values.ValueGetter;
 import net.smileycorp.hordes.common.event.HordeSpawnEntityEvent;
 import net.smileycorp.hordes.hordeevent.data.functions.HordeFunction;
 
-public class ChangeEntityTypeFunction implements HordeFunction<HordeSpawnEntityEvent> {
+public class SetEntityTypeFunction implements HordeFunction<HordeSpawnEntityEvent> {
     
     private final ValueGetter<String> getter;
     
-    public ChangeEntityTypeFunction(ValueGetter<String> getter) {
+    public SetEntityTypeFunction(ValueGetter<String> getter) {
         this.getter = getter;
     }
     
@@ -30,11 +30,11 @@ public class ChangeEntityTypeFunction implements HordeFunction<HordeSpawnEntityE
         }
     }
     
-    public static ChangeEntityTypeFunction deserialize(JsonElement json) {
+    public static SetEntityTypeFunction deserialize(JsonElement json) {
         try {
-            return new ChangeEntityTypeFunction(ValueGetter.readValue(DataType.STRING, json));
+            return new SetEntityTypeFunction(ValueGetter.readValue(DataType.STRING, json));
         } catch(Exception e) {
-            HordesLogger.logError("Incorrect parameters for function hordes:change_entity_type", e);
+            HordesLogger.logError("Incorrect parameters for function hordes:set_entity_type", e);
         }
         return null;
     }

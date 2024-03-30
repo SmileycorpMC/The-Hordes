@@ -39,8 +39,10 @@ public class DataRegistry {
 		for (BinaryOperation operation : BinaryOperation.values())
 			registerValueGetter(Constants.loc(operation.getName()), (obj, type) -> BinaryOperationValueGetter.deserialize(operation, type, obj));
 		registerValueGetter(Constants.loc("level_nbt"), LevelNBTGetter::deserialize);
-		registerValueGetter(Constants.loc("player_nbt"), EntityNBTGetter::deserialize);
-		registerValueGetter(Constants.loc("player_pos"), EntityPosGetter::deserialize);
+		registerValueGetter(Constants.loc("player_nbt"), PlayerNBTGetter::deserialize);
+		registerValueGetter(Constants.loc("player_pos"), PlayerPosGetter::deserialize);
+		registerValueGetter(Constants.loc("entity_nbt"), EntityNBTGetter::deserialize);
+		registerValueGetter(Constants.loc("entity_pos"), EntityPosGetter::deserialize);
 	}
 
 	public static void registerConditionDeserializers() {
@@ -54,6 +56,7 @@ public class DataRegistry {
 		registerConditionDeserializer(Constants.loc("local_difficulty"), LocalDifficultyCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("game_difficulty"), GameDifficultyCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("advancement"), AdvancementCondition::deserialize);
+		registerConditionDeserializer(Constants.loc("entity_type"), EntityTypeCondition::deserialize);
 		if (ModList.get().isLoaded("gamestages")) registerConditionDeserializer(new ResourceLocation("gamestages:gamestage"), GameStagesCondition::deserialize);
 	}
 
