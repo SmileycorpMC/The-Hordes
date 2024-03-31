@@ -85,6 +85,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 	public void update(ServerPlayer player) {
 		Level level = player.level();
 		if (level.dimension() != Level.OVERWORLD) return;
+		if (spawnData == null) return;
 		if (timer % spawnData.getSpawnInterval() == 0) spawnWave(player, getMobCount(player, level));
 		timer--;
 		if (timer == 0) stopEvent(player, false);
