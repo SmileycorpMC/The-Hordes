@@ -34,10 +34,11 @@ public class DataRegistry {
 	}
 
 	private static void registerValueGetters() {
-		for (UnaryOperation operation : UnaryOperation.values())
-			registerValueGetter(Constants.loc(operation.getName()), (obj, type) -> UnaryOperationValueGetter.deserialize(operation, type, obj));
-		for (BinaryOperation operation : BinaryOperation.values())
-			registerValueGetter(Constants.loc(operation.getName()), (obj, type) -> BinaryOperationValueGetter.deserialize(operation, type, obj));
+		UnaryOperation.values().forEach(operation -> registerValueGetter(Constants.loc(operation.getName()),
+				(obj, type) -> UnaryOperationValueGetter.deserialize(operation, type, obj)));
+		BinaryOperation.values().forEach(operation -> registerValueGetter(Constants.loc(operation.getName()),
+				(obj, type) -> BinaryOperationValueGetter.deserialize(operation, type, obj)));
+		registerValueGetter(Constants.loc("weighted_random"), WeightedRandomValueGetter::deserialize);
 		registerValueGetter(Constants.loc("level_nbt"), LevelNBTGetter::deserialize);
 		registerValueGetter(Constants.loc("player_nbt"), PlayerNBTGetter::deserialize);
 		registerValueGetter(Constants.loc("player_pos"), PlayerPosGetter::deserialize);
