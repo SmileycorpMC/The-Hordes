@@ -146,13 +146,12 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 		}
 		HordeEventPacketHandler.sendTo(new HordeSoundMessage(basedir, spawnData.getSpawnSound()),
 					player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
-		for (int n = 0; n < count; n++) {
+		for (HordeSpawnEntry entry : spawntable.getResults(rand, count)) {
 			if (entitiesSpawned.size() > HordeEventConfig.hordeSpawnMax.get()) {
 				logInfo("Can't spawn wave because max cap has been reached");
 				return;
 			}
 			Vec3 pos = getSpawnPos(level, basepos.getCenter());
-			HordeSpawnEntry entry = spawntable.getResult(rand);
 			EntityType<?> type = entry.getEntity();
 			try {
 				AtomicBoolean cancelled = new AtomicBoolean(false);

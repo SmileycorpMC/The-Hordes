@@ -99,7 +99,7 @@ public class HordeSpawnTable {
                     if (obj.has("weight")) weight = obj.get("weight").getAsInt();
                     if (obj.has("first_day")) minDay = obj.get("first_day").getAsInt();
                     if (obj.has("last_day")) maxDay = obj.get("last_day").getAsInt();
-                    if (obj.has("min_spawns")) minSpawns = obj.get("max_spawns").getAsInt();
+                    if (obj.has("min_spawns")) minSpawns = obj.get("min_spawns").getAsInt();
                     if (obj.has("max_spawns")) maxSpawns = obj.get("max_spawns").getAsInt();
                     if (obj.has("nbt")) nbt = DataRegistry.parseNBT(entity, obj.get("nbt").getAsString());
                 } else {

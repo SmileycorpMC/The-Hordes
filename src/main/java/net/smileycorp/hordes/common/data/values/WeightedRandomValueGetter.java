@@ -32,7 +32,7 @@ public class WeightedRandomValueGetter<T extends Comparable<T>> implements Value
             try {
                 JsonObject entry = element.getAsJsonObject();
                 ValueGetter<T> getter = ValueGetter.readValue(type, entry.get("value"));
-                if (getter != null) values.put(getter, entry.get("key").getAsInt());
+                if (getter != null) values.put(getter, entry.get("weight").getAsInt());
             } catch (Exception e) {
                 HordesLogger.logError("invalid entry for " + element + " for hordes:weighted_random", e);
             }
