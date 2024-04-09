@@ -38,6 +38,7 @@ public class DataGenerator {
 
     public static void generateAssets() {
         DataUtils.copyFileFromMod("assets/hordes/lang/en_us.json", "hordes");
+        DataUtils.copyFileFromMod("assets/hordes/lang/ru_ru.json", "hordes");
         DataUtils.copyFileFromMod("assets/hordes/sounds.json", "hordes");
         DataUtils.copyFileFromMod("assets/hordes/sounds/horde_spawn.ogg", "hordes");
         DataUtils.copyFileFromMod("assets/hordes/textures/entity/layer/drowned_player_outer_layer.png", "hordes");
