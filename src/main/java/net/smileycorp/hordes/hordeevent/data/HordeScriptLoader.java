@@ -15,6 +15,7 @@ import net.smileycorp.hordes.common.event.HordePlayerEvent;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class HordeScriptLoader extends SimpleJsonResourceReloadListener {
 
@@ -46,12 +47,15 @@ public class HordeScriptLoader extends SimpleJsonResourceReloadListener {
     }
 
     public Collection<HordeScript> getScripts(HordePlayerEvent event) {
-        List<HordeScript> list = Lists.newArrayList();
-        for (HordeScript script : getScripts()) {
-            HordesLogger.logInfo("Checking script " + script.getName());
-            if (script.getType() == event.getClass()) list.add(script);
-        }
-        return list;
+        return getScripts().stream().filter(script -> script.getType() == event.getClass()).collect(Collectors.toList());
     }
-
+    
+    public void applyScripts(HordePlayerEvent event) {
+        getScripts().stream().filter(script -> script.getType() == event.getClass()
+                && script.shouldApply(event.getEntityWorld(), event.getEntity(), event.getPlayer(), event.getRandom())).forEach(script -> {
+            script.apply(event);
+            HordesLogger.logInfo("Applying script " + script.getName() + " for event " + event);
+        });
+    }
+    
 }
