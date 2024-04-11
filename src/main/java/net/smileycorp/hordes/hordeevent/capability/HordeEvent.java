@@ -31,6 +31,7 @@ import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.ai.HordeTrackPlayerGoal;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.common.event.*;
+import net.smileycorp.hordes.config.CommonConfigHandler;
 import net.smileycorp.hordes.config.HordeEventConfig;
 import net.smileycorp.hordes.hordeevent.HordeSpawnData;
 import net.smileycorp.hordes.hordeevent.HordeSpawnEntry;
@@ -56,7 +57,8 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 	boolean sentDay;
 
 	HordeEvent(HordeSavedData data){
-		nextDay = HordeEventConfig.hordeEventByPlayerTime.get() ? HordeEventConfig.hordeSpawnDays.get() : data.getNextDay();
+		nextDay = HordeEventConfig.hordeEventByPlayerTime.get() ? HordeEventConfig.spawnFirstDay.get() ? 0 :HordeEventConfig.hordeSpawnDays.get()
+				: data.getNextDay();
 		rand = data.getRandom();
 	}
 
