@@ -5,18 +5,12 @@ import com.google.gson.JsonParser;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.loading.moddiscovery.ModFile;
-import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.hordes.common.HordesLogger;
 import org.apache.commons.io.FileUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
-import java.net.URI;
-import java.nio.file.*;
-import java.util.Collections;
-import java.util.Iterator;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class DataGenerator {
 

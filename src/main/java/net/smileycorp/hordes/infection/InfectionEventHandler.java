@@ -4,7 +4,6 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
@@ -28,6 +27,7 @@ import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.living.MobEffectEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -58,7 +58,7 @@ public class InfectionEventHandler {
 
 	//register data listeners
 	@SubscribeEvent
-	public void addResourceReload(AddReloadListenerEvent event ) {
+	public void addResourceReload(AddReloadListenerEvent event) {
 		event.addListener(InfectionDataLoader.INSTANCE);
 	}
 
@@ -71,6 +71,12 @@ public class InfectionEventHandler {
 					10, true, false, InfectionDataLoader.INSTANCE::canBeInfected));
 		}
 	}
+	
+	@SubscribeEvent
+	public void logIn(PlayerEvent.PlayerLoggedInEvent event) {
+		if (event.getEntity() instanceof ServerPlayer)
+			InfectionDataLoader.INSTANCE.syncData(((ServerPlayer)event.getEntity()).connection.connection);
+	}
 
 	@SubscribeEvent
 	public void onItemStackConsume(LivingEntityUseItemEvent.Finish event) {
@@ -80,7 +86,7 @@ public class InfectionEventHandler {
 		if (!(entity.hasEffect(HordesInfection.INFECTED.get()) && HordesInfection.isCure(stack))) return;
 		LazyOptional<Infection> optional = entity.getCapability(HordesCapabilities.INFECTION);
 		if (optional.isPresent()) optional.orElseGet(null).increaseInfection();
-		entity.removeEffect(HordesInfection.INFECTED.get());
+		if (!entity.removeEffect(HordesInfection.INFECTED.get())) return;
 		if (entity.level().isClientSide) return;
 		InfectionPacketHandler.send(PacketDistributor.TRACKING_CHUNK.with(()-> entity.level().getChunkAt(entity.getOnPos())),
 				new CureEntityMessage(entity));
@@ -106,14 +112,9 @@ public class InfectionEventHandler {
 		LivingEntity entity = event.getEntity();
 		Entity attacker = event.getSource().getDirectEntity();
 		Level level = entity.level();
-		RandomSource rand = level.random;
 		if (level.isClientSide |! (entity instanceof LivingEntity && attacker instanceof LivingEntity)) return;
 		if (!HordesInfection.canCauseInfection((LivingEntity) attacker) || entity.hasEffect(HordesInfection.INFECTED.get())) return;
-		if ((entity instanceof Player && InfectionConfig.infectPlayers.get())) {
-			if (rand.nextFloat() <= InfectionConfig.playerInfectChance.get()) InfectedEffect.apply(entity);
-		} else if ((entity instanceof Villager && InfectionConfig.infectVillagers.get())) {
-			if (rand.nextFloat() <= InfectionConfig.villagerInfectChance.get()) InfectedEffect.apply(entity);
-		} else if (InfectionDataLoader.INSTANCE.canBeInfected(entity))
+		if (InfectionDataLoader.INSTANCE.canBeInfected(entity))
 			InfectionDataLoader.INSTANCE.tryToInfect(entity, (LivingEntity) attacker, event.getSource(), event.getAmount());
 	}
 
@@ -138,6 +139,7 @@ public class InfectionEventHandler {
 	public void onInfectDeath(InfectionDeathEvent event) {
 		LivingEntity entity = event.getEntity();
 		Level level = entity.level();
+		if (entity instanceof Player) return;
 		if (entity instanceof Villager && level instanceof ServerLevel) {
 			Villager villager = (Villager) entity;
 			ZombieVillager zombie = villager.convertTo(EntityType.ZOMBIE_VILLAGER, false);
@@ -174,8 +176,8 @@ public class InfectionEventHandler {
 		LivingEntity entity = event.getEntity();
 		if (entity.level().isClientSide()) return;
 		if (event.getEffectInstance().getEffect() == HordesInfection.IMMUNITY.get() && entity.hasEffect(HordesInfection.INFECTED.get())) {
-			entity.removeEffect(HordesInfection.INFECTED.get());
-			InfectionPacketHandler.send(PacketDistributor.TRACKING_CHUNK.with(()->entity.level().getChunkAt(entity.getOnPos())),
+			if (entity.removeEffect(HordesInfection.INFECTED.get()))
+				InfectionPacketHandler.send(PacketDistributor.TRACKING_CHUNK.with(()->entity.level().getChunkAt(entity.getOnPos())),
 					new CureEntityMessage(entity));
 		}
 	}

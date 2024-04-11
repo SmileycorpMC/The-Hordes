@@ -27,6 +27,8 @@ public class InfectionPacketHandler {
 		NETWORK_INSTANCE = NetworkUtils.createChannel(Constants.loc("Infection"));
 		NetworkUtils.registerMessage(NETWORK_INSTANCE, 0, InfectMessage.class);
 		NetworkUtils.registerMessage(NETWORK_INSTANCE, 1, CureEntityMessage.class);
+		NetworkUtils.registerMessage(NETWORK_INSTANCE, 2, SyncImmunityItemsMessage.class);
+		NetworkUtils.registerMessage(NETWORK_INSTANCE, 3, SyncWearableProtectionMessage.class);
 	}
 
 }

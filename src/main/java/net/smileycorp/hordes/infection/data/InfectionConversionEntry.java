@@ -48,9 +48,9 @@ public class InfectionConversionEntry {
 	}
 
 	public boolean shouldInfect(LivingEntity entity) {
-		return (entity.level().random.nextFloat() <= infectChance);
+		return entity.getRandom().nextFloat() <= InfectionDataLoader.INSTANCE.getModifiedInfectChance(entity, infectChance);
 	}
-
+	
 	public static InfectionConversionEntry deserialize(JsonObject json) throws Exception {
 		EntityType<?> entity = ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(json.get("entity").getAsString()));
 		EntityType<?> converts_to = ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(json.get("converts_to").getAsString()));

@@ -30,5 +30,8 @@
 	"death.attack.infection":"%1$s succumbed to infection.",
 	"death.attack.infection.zombified":"%1$s was zombified.",
 
+	"tooltip.hordes.cure": "Cures infection",
+	"tooltip.hordes.wearableProtection": "%1$s protection against infection",
+
 	"jei.category.hordes.InfectionCures":"Infection Cures"
 }

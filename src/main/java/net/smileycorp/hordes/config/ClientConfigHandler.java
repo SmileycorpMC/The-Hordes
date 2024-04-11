@@ -36,6 +36,9 @@ public class ClientConfigHandler {
 	public static ConfigValue<Boolean> playerInfectionVisuals;
 	public static ConfigValue<Boolean> playerInfectSound;
 	public static ConfigValue<Boolean> infectionProtectSound;
+	public static ConfigValue<Boolean> cureTooltip;
+	public static ConfigValue<Boolean> immunityTooltip;
+	public static ConfigValue<Boolean> wearableProtectionTooltip;
 	private static ConfigValue<List<? extends Integer>> configZombiePlayerColour;
 	private static ConfigValue<List<? extends Integer>> configDrownedPlayerColour;
 	private static ConfigValue<List<? extends Integer>> configHuskPlayerColour;
@@ -62,12 +65,15 @@ public class ClientConfigHandler {
 		playerInfectionVisuals = builder.comment("Tint the player's screen and display other visual effects if they are infected.").define("playerInfectionVisuals", true);
 		playerInfectSound = builder.comment("Play a sound when the player becomes infected?").define("playerInfectSound", true);
 		infectionProtectSound = builder.comment("Play a sound when infection gets prevented?").define("infectionProtectSound", false);
+		cureTooltip = builder.comment("Show a tooltip on items that can cure infection?").define("cureTooltip", true);
+		immunityTooltip = builder.comment("Show a tooltip on items that give infection immunity?").define("immunityTooltip", true);
+		wearableProtectionTooltip = builder.comment("Show a tooltip on wearable items that grant some protection against infection?").define("wearableProtectionTooltip", true);
 		configZombiePlayerColour = builder.comment("Colour tint for zombie players.")
-				.defineList("zombiePlayerColour", Lists.newArrayList(121, 156, 101), (x) -> (int)x >= 0 && (int)x < 256);
+				.defineList("zombiePlayerColour", Lists.newArrayList(121, 156, 101), x -> (int)x >= 0 && (int)x < 256);
 		configDrownedPlayerColour = builder.comment("Colour tint for drowned players.")
-				.defineList("drownedPlayerColour", Lists.newArrayList(144, 255, 255), (x) -> (int)x >= 0 && (int)x < 256);
+				.defineList("drownedPlayerColour", Lists.newArrayList(144, 255, 255), x -> (int)x >= 0 && (int)x < 256);
 		configHuskPlayerColour = builder.comment("Colour tint for husk players.")
-				.defineList("huskPlayerColour", Lists.newArrayList(193, 168, 5), (x) -> (int)x >= 0 && (int)x < 256);
+				.defineList("huskPlayerColour", Lists.newArrayList(193, 168, 5), x -> (int)x >= 0 && (int)x < 256);
 		builder.pop();
 		config = builder.build();
 	}

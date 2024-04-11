@@ -64,8 +64,8 @@ public class ClientHandler {
 		event.registerLayerDefinition(ZombiePlayerRenderer.DEFAULT, () -> ZombiePlayerRenderer.createLayer(false));
 		event.registerLayerDefinition(ZombiePlayerRenderer.SLIM, () -> ZombiePlayerRenderer.createLayer(true));
 	}
-
-    @SubscribeEvent
+	
+	@SubscribeEvent
 	public void renderNameplate(RenderNameTagEvent event) {
 		if (event.getEntity() instanceof PlayerZombie) {
 			event.setContent(event.getEntity().getCustomName());
