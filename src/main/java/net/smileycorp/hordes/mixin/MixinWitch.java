@@ -50,13 +50,13 @@ public abstract class MixinWitch extends Raider implements RangedAttackMob {
         return original.call(stack, potion);
     }
     
-    @WrapOperation(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;distanceToSqr(Lnet/minecraft/world/entity/Entity;)D"))
-    public double aiStep$distanceToSqr(LivingEntity entity, Entity witch, Operation<Double> original) {
+    /*@WrapOperation(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;distanceToSqr(Lnet/minecraft/world/entity/Entity;)D"))
+    public double aiStep$distanceToSqr(LivingEntity witch, Operation<Double> original) {
         double distance = original.call(witch);
         if (CommonConfigHandler.illagersHuntZombies.get() && entity.getMobType() == MobType.UNDEAD)
             return HordesInfection.canCauseInfection(entity) && distance < 100 ? 122 : 0;
         return distance;
-    }
+    }*/
     
     @Inject(at=@At("HEAD"), method = "registerGoals", cancellable = true)
     public void registerGoals(CallbackInfo callback) {
