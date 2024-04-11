@@ -15,34 +15,44 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.monster.Zombie;
 import net.smileycorp.atlas.api.client.PlayerTextureRenderer;
 import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.common.entities.IZombiePlayer;
+import net.smileycorp.hordes.common.entities.PlayerZombie;
 
 import java.awt.*;
 import java.util.Optional;
 import java.util.UUID;
 
-public class ZombiePlayerRenderer<T extends Zombie & IZombiePlayer> extends HumanoidMobRenderer<T, ZombiePlayerModel<T>> {
+public class ZombiePlayerRenderer<T extends Zombie & PlayerZombie> extends HumanoidMobRenderer<T, ZombiePlayerModel<T>> {
 
 	public static final ModelLayerLocation DEFAULT = new ModelLayerLocation(Constants.loc("zombie_player"), "default");
 	public static final ModelLayerLocation SLIM = new ModelLayerLocation(Constants.loc("zombie_player"), "slim");
 
 	protected final ZombiePlayerModel<T> defaultModel;
 	protected final ZombiePlayerModel<T> slimModel;
+	private final boolean isTall;
 
-	public ZombiePlayerRenderer(EntityRendererProvider.Context ctx, Color colour) {
-		super(ctx, new ZombiePlayerModel<T>(ctx.bakeLayer(DEFAULT), colour), 0.5F);
-		addLayer(new HumanoidArmorLayer<>(this, new ZombieModel<T>(ctx.bakeLayer(ModelLayers.ZOMBIE_INNER_ARMOR)),
-				new ZombieModel<T>(ctx.bakeLayer(ModelLayers.ZOMBIE_OUTER_ARMOR))));
+	public ZombiePlayerRenderer(EntityRendererProvider.Context ctx, Color colour, ResourceLocation overlay, boolean isDrowned, boolean isTall) {
+		super(ctx, new ZombiePlayerModel<>(ctx.bakeLayer(DEFAULT), colour, isDrowned), 0.5F);
+		addLayer(new HumanoidArmorLayer<>(this, new ZombieModel<>(ctx.bakeLayer(ModelLayers.ZOMBIE_INNER_ARMOR)),
+				new ZombieModel<>(ctx.bakeLayer(ModelLayers.ZOMBIE_OUTER_ARMOR))));
 		addLayer(new ZombiePlayerCapeLayer<>(this));
-		addLayer(new ZombiePlayerElytraLayer<T>(this, ctx.getModelSet()));
+		addLayer(new ZombiePlayerElytraLayer<>(this, ctx.getModelSet()));
+		addLayer(new ZombiePlayerOverlayLayer(this, new ZombiePlayerModel<>(ctx.bakeLayer(DEFAULT)),
+				new ZombiePlayerModel<>(ctx.bakeLayer(SLIM)), overlay));
 		defaultModel = model;
-		slimModel = new ZombiePlayerModel<T>(ctx.bakeLayer(SLIM), colour);
+		slimModel = new ZombiePlayerModel<>(ctx.bakeLayer(SLIM), colour, isDrowned);
+		this.isTall = isTall;
 	}
 
 	@Override
 	public ResourceLocation getTextureLocation(T entity) {
 		Optional<UUID> optional = entity.getPlayerUUID();
 		return PlayerTextureRenderer.getTexture(optional, Type.SKIN);
+	}
+	
+	@Override
+	protected void scale(T entity, PoseStack poseStack, float p_114909_) {
+		if (isTall) poseStack.scale(1.0625F, 1.0625F, 1.0625F);
+		super.scale(entity, poseStack, p_114909_);
 	}
 
 	@Override

@@ -1,0 +1,45 @@
+package net.smileycorp.hordes.hordeevent.network;
+
+import net.minecraft.network.Connection;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.network.NetworkEvent.Context;
+import net.minecraftforge.network.PacketDistributor;
+import net.minecraftforge.network.simple.SimpleChannel;
+import net.smileycorp.atlas.api.network.NetworkUtils;
+import net.smileycorp.atlas.api.network.SimpleAbstractMessage;
+import net.smileycorp.atlas.api.network.SimpleStringMessage;
+import net.smileycorp.hordes.client.ClientHandler;
+import net.smileycorp.hordes.common.Constants;
+import net.smileycorp.hordes.config.HordeEventConfig;
+
+import java.util.function.Supplier;
+
+public class HordeEventPacketHandler {
+
+	private static SimpleChannel NETWORK_INSTANCE;
+	
+	public static void sendTo(SimpleAbstractMessage message, Connection manager, NetworkDirection direction) {
+		if (!HordeEventConfig.enableHordeEvent.get()) return;
+		NETWORK_INSTANCE.sendTo(message, manager, direction);
+	}
+	
+	public static void send(PacketDistributor.PacketTarget target, SimpleAbstractMessage message) {
+		if (!HordeEventConfig.enableHordeEvent.get()) return;
+		NETWORK_INSTANCE.send(target, message);
+	}
+
+	public static void initPackets() {
+		NETWORK_INSTANCE = NetworkUtils.createChannel(Constants.loc("HordeEvent"));
+		NetworkUtils.registerMessage(NETWORK_INSTANCE,0, HordeSoundMessage.class, (msg, ctx) -> msg.process(ctx.get()));
+		NetworkUtils.registerMessage(NETWORK_INSTANCE,1, SimpleStringMessage.class, HordeEventPacketHandler::processNotificationMessage);
+		NetworkUtils.registerMessage(NETWORK_INSTANCE,2, UpdateClientHordeMessage.class, (msg, ctx) -> msg.process(ctx.get()));
+	}
+
+	public static void processNotificationMessage(SimpleStringMessage message, Supplier<Context> ctx) {
+		ctx.get().enqueueWork(() -> DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> ClientHandler.displayMessage(message.getText())));
+		ctx.get().setPacketHandled(true);
+	}
+
+}

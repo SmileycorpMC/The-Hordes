@@ -3,7 +3,6 @@ package net.smileycorp.hordes.common.entities;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.BaseComponent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -11,6 +10,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -24,15 +24,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.server.ServerLifecycleHooks;
-import net.smileycorp.hordes.common.CommonConfigHandler;
-import net.smileycorp.hordes.common.infection.HordesInfection;
+import net.smileycorp.hordes.config.ZombiePlayersConfig;
 
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
 
-public class ZombiePlayer extends Zombie implements IZombiePlayer {
+public class ZombiePlayer extends Zombie implements PlayerZombie<ZombiePlayer> {
 
 	protected static final EntityDataAccessor<Optional<UUID>> PLAYER = SynchedEntityData.defineId(ZombiePlayer.class, EntityDataSerializers.OPTIONAL_UUID);
 	protected static final EntityDataAccessor<Boolean> SHOW_CAPE = SynchedEntityData.defineId(ZombiePlayer.class, EntityDataSerializers.BOOLEAN);
@@ -51,7 +50,7 @@ public class ZombiePlayer extends Zombie implements IZombiePlayer {
 	}
 
 	public ZombiePlayer(Level level) {
-		this(HordesInfection.ZOMBIE_PLAYER.get() ,level);
+		this(HordesEntities.ZOMBIE_PLAYER.get() ,level);
 	}
 
 	public ZombiePlayer(Player player) {
@@ -102,7 +101,7 @@ public class ZombiePlayer extends Zombie implements IZombiePlayer {
 	}
 
 	@Override
-	public void setInventory(Collection<ItemEntity> list) {
+	public void storeDrops(Collection<ItemEntity> list) {
 		playerItems.clear();
 		for (ItemEntity item : list) {
 			ItemStack stack = item.getItem();
@@ -133,34 +132,28 @@ public class ZombiePlayer extends Zombie implements IZombiePlayer {
 
 	@Override
 	protected void doUnderWaterConversion() {
-		if (CommonConfigHandler.drownedPlayers.get()) {
-			Zombie drowned = convertTo(HordesInfection.DROWNED_PLAYER.get(), true);
+		if (ZombiePlayersConfig.drownedPlayers.get()) {
+			Zombie drowned = convertTo(HordesEntities.DROWNED_PLAYER.get(), true);
 			if (drowned != null) {
 				drowned.handleAttributes(drowned.level.getCurrentDifficultyAt(drowned.blockPosition()).getSpecialMultiplier());
 				drowned.setCanBreakDoors(drowned.supportsBreakDoorGoal() && this.canBreakDoors());
 				ForgeEventFactory.onLivingConvert(this, drowned);
-				if (drowned instanceof IZombiePlayer) ((IZombiePlayer) drowned).copyFrom(this);
+				if (drowned instanceof PlayerZombie) ((PlayerZombie) drowned).copyFrom(this);
 			}
 			if (!this.isSilent()) {
-				level.levelEvent((Player)null, 1040, this.blockPosition(), 0);
+				level.levelEvent(null, 1040, this.blockPosition(), 0);
 			}
 		}
 	}
 
 	@Override
 	public boolean isSunSensitive() {
-		return CommonConfigHandler.zombiePlayersBurn.get();
+		return ZombiePlayersConfig.zombiePlayersBurn.get();
 	}
 
 	@Override
 	public boolean fireImmune() {
-		return CommonConfigHandler.zombiePlayersFireImmune.get();
-	}
-
-	@Override
-	public boolean hurt(DamageSource source, float amount) {
-		if (CommonConfigHandler.zombiePlayersOnlyHurtByPlayers.get() &! (source.getEntity() instanceof Player)) return false;
-		return super.hurt(source, amount);
+		return ZombiePlayersConfig.zombiePlayersFireImmune.get();
 	}
 
 	@Override
@@ -185,15 +178,16 @@ public class ZombiePlayer extends Zombie implements IZombiePlayer {
 	}
 
 	@Override
-	public BaseComponent getDisplayName() {
-		MutableComponent textcomponentstring = PlayerTeam.formatNameForTeam(getTeam(), new TranslatableComponent("entity.hordes.ZombiePlayer.chat", getCustomName()));
+	public MutableComponent getDisplayName() {
+		MutableComponent textcomponentstring = PlayerTeam.formatNameForTeam(getTeam(),
+				new TranslatableComponent("entity.hordes.ZombiePlayer.chat", getCustomName()));
 		textcomponentstring.getStyle().withHoverEvent(this.createHoverEvent());
 		textcomponentstring.getStyle().withInsertion(this.getEncodeId());
-		return (BaseComponent) textcomponentstring;
+		return textcomponentstring;
 	}
 
 	@Override
-	public void copyFrom(IZombiePlayer entity) {
+	public void copyFrom(PlayerZombie entity) {
 		Optional<UUID> optional = entity.getPlayerUUID();
 		if(optional.isPresent()) setPlayer(optional.get());
 		setInventory(entity.getInventory());
@@ -208,6 +202,11 @@ public class ZombiePlayer extends Zombie implements IZombiePlayer {
 	public void tick() {
 		super.tick();
 		moveCloak(this);
+	}
+
+	@Override
+	public void checkDespawn() {
+		if (level.getDifficulty() == Difficulty.PEACEFUL) super.checkDespawn();
 	}
 
 	@Override

@@ -15,7 +15,7 @@ apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.18.2-1.2.3'
+version = '1.18.2-1.5.0'
 group = 'net.smileycorp.hordes' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'The-Hordes'
 
@@ -75,18 +75,30 @@ minecraft {
 }
 
 mixin {
-    add sourceSets.main, "hordes.mixin.refmap.json"
+    add sourceSets.main, "hordes.refmap.json"
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
-   
+	maven {
+        url "https://www.cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
 }
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.18.2-40.1.73'
-	compileOnly fileTree(dir: 'libs', include: ['*.jar'])
+	implementation fg.deobf('curse.maven:jei-238222:5068328')
+	implementation fg.deobf('curse.maven:atlaslib-463826:4567244')
+	implementation fg.deobf('curse.maven:gamestages-268655:4066389')
+	compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.5"))
+    implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.3.5")) {
+        jarJar.ranged(it, "[0.3.5,)")
+    }
+	implementation fileTree(dir: 'libs', include: ['*.jar'])
 	annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 

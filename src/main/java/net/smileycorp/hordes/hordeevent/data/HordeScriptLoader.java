@@ -1,0 +1,59 @@
+package net.smileycorp.hordes.hordeevent.data;
+
+import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.smileycorp.hordes.common.HordesLogger;
+import net.smileycorp.hordes.common.event.HordePlayerEvent;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class HordeScriptLoader extends SimpleJsonResourceReloadListener {
+
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+
+    public static HordeScriptLoader INSTANCE = new HordeScriptLoader();
+
+    private final Map<ResourceLocation, HordeScript> SCRIPTS = Maps.newHashMap();
+
+    public HordeScriptLoader() {
+        super(GSON, "horde_data/scripts");
+    }
+
+    @Override
+    protected void apply(Map<ResourceLocation, JsonElement> map, ResourceManager manager, ProfilerFiller profiller) {
+        SCRIPTS.clear();
+        for (Map.Entry<ResourceLocation, JsonElement> entry : map.entrySet()) {
+            try {
+                SCRIPTS.put(entry.getKey(), HordeScript.deserialize(entry.getKey(), entry.getValue()));
+                HordesLogger.logInfo("loaded horde script " + entry.getKey());
+            } catch (Exception e) {
+                HordesLogger.logError("Failed to parse script " + entry.getKey(), e);
+            }
+        }
+    }
+
+    public Collection<HordeScript> getScripts() {
+        return SCRIPTS.values();
+    }
+
+    public Collection<HordeScript> getScripts(HordePlayerEvent event) {
+        return getScripts().stream().filter(script -> script.getType() == event.getClass()).collect(Collectors.toList());
+    }
+    
+    public void applyScripts(HordePlayerEvent event) {
+        getScripts().stream().filter(script -> script.getType() == event.getClass()
+                && script.shouldApply(event.getEntityWorld(), event.getEntity(), event.getPlayer(), event.getRandom())).forEach(script -> {
+            script.apply(event);
+            HordesLogger.logInfo("Applying script " + script.getName() + " for event " + event);
+        });
+    }
+    
+}
