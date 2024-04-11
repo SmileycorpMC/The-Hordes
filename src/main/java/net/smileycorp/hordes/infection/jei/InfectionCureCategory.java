@@ -23,11 +23,10 @@ public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapp
 	private final IDrawable icon;
 
 	public static final ResourceLocation BACKGROUND_TEXTURE = Constants.loc("textures/gui/jei/cure_list.png");
-	public static final ResourceLocation ICON_TEXTURE = Constants.loc("textures/mob_effect/infected.png");
 
 	public InfectionCureCategory(IGuiHelper guiHelper) {
 		background = guiHelper.createDrawable(BACKGROUND_TEXTURE, 0, 0, 167, 113);
-		icon = guiHelper.createDrawable(ICON_TEXTURE, 0, 0, 18, 18);
+		icon = guiHelper.createDrawable(BACKGROUND_TEXTURE, 0, 113, 18, 18);
 	}
 
 	@Override

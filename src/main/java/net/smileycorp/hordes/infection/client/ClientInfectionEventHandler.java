@@ -73,7 +73,7 @@ public class ClientInfectionEventHandler {
 			components.add(Component.translatable("tooltip.hordes.cure"));
 		if (ClientConfigHandler.immunityTooltip.get() && immunityItems.containsKey(item))
 			PotionUtils.addPotionTooltip(Lists.newArrayList(new MobEffectInstance(HordesInfection.IMMUNITY.get(),
-					immunityItems.get(item))), components, 1);
+					immunityItems.get(item) * 20)), components, 1);
 		if (ClientConfigHandler.wearableProtectionTooltip.get() && wearableProtection.containsKey(item)) {
 			int value = wearableProtection.get(item);
 			if (value == 0) return;

@@ -26,7 +26,7 @@
 	"entity.hordes.ZombieWitch.name":"Zombie Witch",
 
 	"effect.hordes.infected":"Infection",
-	"effect.hordes.immunity":"Immunity",
+	"effect.hordes.immunity":"Infection Immunity",
 	"death.attack.infection":"%1$s succumbed to infection.",
 	"death.attack.infection.zombified":"%1$s was zombified.",
 
