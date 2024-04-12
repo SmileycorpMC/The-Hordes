@@ -1,4 +1,5 @@
-{	
+{
+	
 	"message.hordes.EventStart": "Поблизости слышится вой бродячей орды",
 	"message.hordes.EventEnd": "В воздухе тихо, бродячая орда остановилась",
 	"message.hordes.TrySleep": "Чувство надвигающегося ужаса мешает вам заснуть",
@@ -24,10 +25,13 @@
 	"entity.hordes.ZombieIllusioner.name": "Иллюзионист-зомби",
 	"entity.hordes.ZombieWitch.name": "Ведьма-зомби",
 
-	"effect.hordes.infected": "Зомби-нфекция",
+	"effect.hordes.infected": "Зомби-инфекция",
 	"effect.hordes.immunity": "Иммунитет",
 	"death.attack.infection": "%1$s умер от инфекции.",
 	"death.attack.infection.zombified": "%1$s был зомбифицирован.",
+
+	"tooltip.hordes.cure": "Лечит инфекцию",
+	"tooltip.hordes.wearableProtection": "Защита %1$s от инфекции",
 
 	"jei.category.hordes.InfectionCures": "Лечение инфекции"
 }
