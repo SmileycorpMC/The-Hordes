@@ -5,8 +5,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.smileycorp.atlas.api.data.DataType;
-import net.smileycorp.hordes.common.data.UnaryOperation;
 import net.smileycorp.hordes.common.HordesLogger;
+import net.smileycorp.hordes.common.data.UnaryOperation;
 
 import java.util.Random;
 

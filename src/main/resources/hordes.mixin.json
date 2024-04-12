@@ -25,6 +25,7 @@
 		"MixinPiglinBrute",
 		"MixinPillager",
 		"MixinRavager",
+		"MixinServerPlayer",
 		"MixinVex",
 		"MixinVindicator",
 		"MixinWitch",

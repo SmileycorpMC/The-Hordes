@@ -86,7 +86,8 @@ public class HordeEventHandler {
 		}
 		int day = horde.getCurrentDay(player);
 		int time = Math.round(level.getDayTime() % HordeEventConfig.dayLength.get());
-		if (time >= HordeEventConfig.hordeStartTime.get() && day >= horde.getNextDay() && (day > 0 || HordeEventConfig.spawnFirstDay.get())) {
+		if (time >= HordeEventConfig.hordeStartTime.get() && time <= HordeEventConfig.hordeStartTime.get() + HordeEventConfig.hordeStartBuffer.get()
+				&& day >= horde.getNextDay() && (day > 0 || HordeEventConfig.spawnFirstDay.get())) {
 			horde.tryStartEvent(player, -1, false);
 		}
 

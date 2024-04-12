@@ -8,7 +8,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.Level;
-import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.mixinutils.ChatName;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 import net.smileycorp.hordes.hordeevent.capability.HordeSavedData;
