@@ -27,6 +27,8 @@
 
 	"effect.hordes.infected": "Зомби-инфекция",
 	"effect.hordes.immunity": "Иммунитет",
+	"effect.hordes.infected.description": "Убивает игрока, превращая его в зомби по истечении времени действия",
+	"effect.hordes.immunity.description": "Дает +45% защиты от зомби-инфекции",
 	"death.attack.infection": "%1$s умер от инфекции.",
 	"death.attack.infection.zombified": "%1$s был зомбифицирован.",
 
