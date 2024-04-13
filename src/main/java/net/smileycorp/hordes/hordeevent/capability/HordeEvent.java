@@ -56,7 +56,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 	boolean sentDay;
 
 	HordeEvent(HordeSavedData data){
-		nextDay = HordeEventConfig.hordeEventByPlayerTime.get() ? HordeEventConfig.spawnFirstDay.get() ? 0 :HordeEventConfig.hordeSpawnDays.get()
+		nextDay = HordeEventConfig.hordeEventByPlayerTime.get() ? HordeEventConfig.spawnFirstDay.get() ? 0 : HordeEventConfig.hordeSpawnDays.get()
 				: data.getNextDay();
 		rand = data.getRandom();
 	}

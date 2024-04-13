@@ -22,6 +22,7 @@ public class HordeEventConfig {
     public static ForgeConfigSpec.ConfigValue<Double> hordeMultiplayerScaling;
     public static ForgeConfigSpec.ConfigValue<Boolean> pauseEventServer;
     public static ForgeConfigSpec.ConfigValue<Boolean> hordeEventByPlayerTime;
+    public static ForgeConfigSpec.ConfigValue<Integer> hordeStartBuffer;
     
     static void build(ForgeConfigSpec.Builder builder) {
         builder.push("Horde Event");
@@ -43,6 +44,7 @@ public class HordeEventConfig {
         hordeMultiplayerScaling = builder.comment("How much should the size of each horde scale down by when multiple players are near each other?").define("hordeMultiplayerScaling", 0.8);
         pauseEventServer = builder.comment("Do the daylight cycle (and active horde events get paused while there are no players online.).").define("pauseEventServer", true);
         hordeEventByPlayerTime = builder.comment("Are horde events tracked by player play time instead of world time.").define("hordeEventByPlayerTime", true);
+        hordeStartBuffer = builder.comment("How many ticks after a hordes scheduled time can it start?").define("hordeStartBuffer", 1200);
         builder.pop();
     }
     
