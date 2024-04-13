@@ -27,6 +27,8 @@
 
 	"effect.hordes.infected":"Infection",
 	"effect.hordes.immunity":"Infection Immunity",
+	"effect.hordes.infected.description":"Kills the player, turning him into a zombie after the expiration time",
+	"effect.hordes.immunity.description":"Gives +45% protection against zombie infection",
 	"death.attack.infection":"%1$s succumbed to infection.",
 	"death.attack.infection.zombified":"%1$s was zombified.",
 
