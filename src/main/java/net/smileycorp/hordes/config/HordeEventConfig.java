@@ -23,6 +23,7 @@ public class HordeEventConfig {
     public static ForgeConfigSpec.ConfigValue<Boolean> pauseEventServer;
     public static ForgeConfigSpec.ConfigValue<Boolean> hordeEventByPlayerTime;
     public static ForgeConfigSpec.ConfigValue<Integer> hordeStartBuffer;
+    public static ForgeConfigSpec.ConfigValue<Integer> hordeSpawnChecks;
     
     static void build(ForgeConfigSpec.Builder builder) {
         builder.push("Horde Event");
@@ -45,6 +46,7 @@ public class HordeEventConfig {
         pauseEventServer = builder.comment("Do the daylight cycle (and active horde events get paused while there are no players online.).").define("pauseEventServer", true);
         hordeEventByPlayerTime = builder.comment("Are horde events tracked by player play time instead of world time.").define("hordeEventByPlayerTime", true);
         hordeStartBuffer = builder.comment("How many ticks after a hordes scheduled time can it start?").define("hordeStartBuffer", 1200);
+        hordeSpawnChecks = builder.comment("How many attempts should horde events make to avoid spawning mobs in light areas or outside their spawn type.").define("hordeSpawnChecks", 25);
         builder.pop();
     }
     

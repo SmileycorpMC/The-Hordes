@@ -1,6 +1,7 @@
 package net.smileycorp.hordes.hordeevent.data;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -13,6 +14,7 @@ import net.smileycorp.hordes.common.event.HordePlayerEvent;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 public class HordeScriptLoader extends SimpleJsonResourceReloadListener {
@@ -20,8 +22,8 @@ public class HordeScriptLoader extends SimpleJsonResourceReloadListener {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     public static HordeScriptLoader INSTANCE = new HordeScriptLoader();
-
-    private final Map<ResourceLocation, HordeScript> SCRIPTS = Maps.newHashMap();
+    
+    private final TreeSet<HordeScript> SCRIPTS = Sets.newTreeSet(HordeScript::sort);
 
     public HordeScriptLoader() {
         super(GSON, "horde_data/scripts");
@@ -32,16 +34,16 @@ public class HordeScriptLoader extends SimpleJsonResourceReloadListener {
         SCRIPTS.clear();
         for (Map.Entry<ResourceLocation, JsonElement> entry : map.entrySet()) {
             try {
-                SCRIPTS.put(entry.getKey(), HordeScript.deserialize(entry.getKey(), entry.getValue()));
-                HordesLogger.logInfo("loaded horde script " + entry.getKey());
+                SCRIPTS.add(HordeScript.deserialize(entry.getKey(), entry.getValue()));
             } catch (Exception e) {
                 HordesLogger.logError("Failed to parse script " + entry.getKey(), e);
             }
         }
+        SCRIPTS.forEach(script -> HordesLogger.logInfo("loaded horde script " + script.getName()));
     }
 
     public Collection<HordeScript> getScripts() {
-        return SCRIPTS.values();
+        return SCRIPTS;
     }
 
     public Collection<HordeScript> getScripts(HordePlayerEvent event) {

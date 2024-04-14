@@ -127,7 +127,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 			basedir = DirectionUtils.getRandomDirectionVecXZ(rand);
 			basepos = DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, 75, 7, 0);
 			if (!spawnData.getSpawnType().canSpawn(level, basepos)) basepos = player.blockPosition();
-			if (i++ >= 20) {
+			if (i++ >= HordeEventConfig.hordeSpawnChecks.get()) {
 				logInfo("Unable to find unlit pos for horde " + this + " ignoring light level");
 				basedir = DirectionUtils.getRandomDirectionVecXZ(rand);
 				basepos = DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, 75);
