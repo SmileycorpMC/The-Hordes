@@ -6,7 +6,7 @@ import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.contents.LiteralContents;
-import net.smileycorp.hordes.common.hordeevent.capability.HordeSavedData;
+import net.smileycorp.hordes.hordeevent.capability.HordeSavedData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,8 +15,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class HordesLogger {
@@ -34,14 +32,18 @@ public class HordesLogger {
         }
     }
 
+    public static void logSilently(Object message) {
+        writeToFile(message);
+    }
+
     public static void logInfo(Object message) {
         writeToFile(message);
         logger.info(message);
     }
 
     public static void logError(Object message, Exception e) {
-        writeToFile(e);
-        writeToFile(message);
+        writeToFile(message + " " + e);
+        for (StackTraceElement traceElement : e.getStackTrace()) writeToFile(traceElement);
         logger.error(message, e);
         e.printStackTrace();
         has_errors = true;
@@ -57,7 +59,6 @@ public class HordesLogger {
     }
 
     private static boolean writeToFile(List<String> out) {
-        if (out.size() > 0) out.set(0, Timestamp.valueOf(LocalDateTime.now()) + ": " + out.get(0));
         try {
             Files.write(log_file, out, StandardCharsets.UTF_8, StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
             return true;

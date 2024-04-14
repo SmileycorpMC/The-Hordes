@@ -1,34 +1,50 @@
 package net.smileycorp.hordes.common.event;
 
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.smileycorp.hordes.common.CommonConfigHandler;
-import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
+import net.minecraftforge.eventbus.api.Event;
+import net.smileycorp.hordes.config.HordeEventConfig;
+import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 
-public class HordePlayerEvent extends PlayerEvent {
+import java.util.Random;
+
+public class HordePlayerEvent extends Event {
 
 	protected final Level level;
-	protected final IHordeEvent horde;
-
+	protected final HordeEvent horde;
 	protected final int day;
-
-	public HordePlayerEvent(Player player, IHordeEvent horde) {
-		super(player);
+	private final ServerPlayer player;
+	
+	public HordePlayerEvent(ServerPlayer player, HordeEvent horde) {
 		level = player.level;
 		this.horde = horde;
-		day = (int) Math.floor(level.getDayTime()/CommonConfigHandler.dayLength.get());
+		day = (int) Math.floor(level.getDayTime() / HordeEventConfig.dayLength.get());
+		this.player = player;
 	}
 
 	public Level getEntityWorld() {
 		return level;
 	}
 
-	public IHordeEvent getHorde() {
+	public HordeEvent getHorde() {
 		return horde;
 	}
 
 	public int getDay() {
 		return day;
 	}
+	
+	public Random getRandom() {
+		return horde.getRandom();
+	}
+	
+	public ServerPlayer getPlayer() {
+		return player;
+	}
+	
+	public LivingEntity getEntity() {
+		return player;
+	}
+	
 }

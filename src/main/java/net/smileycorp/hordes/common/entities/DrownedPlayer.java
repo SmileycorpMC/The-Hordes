@@ -3,13 +3,14 @@ package net.smileycorp.hordes.common.entities;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.LiteralContents;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -22,15 +23,14 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.server.ServerLifecycleHooks;
-import net.smileycorp.hordes.common.CommonConfigHandler;
-import net.smileycorp.hordes.common.infection.HordesInfection;
+import net.smileycorp.hordes.config.ZombiePlayersConfig;
 
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
 
-public class DrownedPlayer extends Drowned implements IZombiePlayer {
+public class DrownedPlayer extends Drowned implements PlayerZombie<DrownedPlayer> {
 
 	protected static final EntityDataAccessor<Optional<UUID>> PLAYER = SynchedEntityData.defineId(DrownedPlayer.class, EntityDataSerializers.OPTIONAL_UUID);
 	protected static final EntityDataAccessor<Boolean> SHOW_CAPE = SynchedEntityData.defineId(DrownedPlayer.class, EntityDataSerializers.BOOLEAN);
@@ -49,7 +49,7 @@ public class DrownedPlayer extends Drowned implements IZombiePlayer {
 	}
 
 	public DrownedPlayer(Level level) {
-		this(HordesInfection.DROWNED_PLAYER.get() ,level);
+		this(HordesEntities.DROWNED_PLAYER.get() ,level);
 	}
 
 	public DrownedPlayer(Player player) {
@@ -100,7 +100,7 @@ public class DrownedPlayer extends Drowned implements IZombiePlayer {
 	}
 
 	@Override
-	public void setInventory(Collection<ItemEntity> list) {
+	public void storeDrops(Collection<ItemEntity> list) {
 		playerItems.clear();
 		for (ItemEntity item : list) {
 			ItemStack stack = item.getItem();
@@ -131,12 +131,12 @@ public class DrownedPlayer extends Drowned implements IZombiePlayer {
 
 	@Override
 	public boolean isSunSensitive() {
-		return CommonConfigHandler.zombiePlayersBurn.get();
+		return ZombiePlayersConfig.zombiePlayersBurn.get();
 	}
 
 	@Override
 	public boolean fireImmune() {
-		return CommonConfigHandler.zombiePlayersFireImmune.get();
+		return ZombiePlayersConfig.zombiePlayersFireImmune.get();
 	}
 
 	@Override
@@ -163,14 +163,14 @@ public class DrownedPlayer extends Drowned implements IZombiePlayer {
 	@Override
 	public MutableComponent getDisplayName() {
 		MutableComponent textcomponentstring = PlayerTeam.formatNameForTeam(getTeam(),
-				MutableComponent.create(new TranslatableContents("entity.hordes.ZombiePlayer.chat", null, new Object[]{getCustomName()})));
+				Component.translatable("entity.hordes.DrownedPlayer.chat",  getCustomName()));
 		textcomponentstring.getStyle().withHoverEvent(this.createHoverEvent());
 		textcomponentstring.getStyle().withInsertion(this.getEncodeId());
 		return textcomponentstring;
 	}
 
 	@Override
-	public void copyFrom(IZombiePlayer entity) {
+	public void copyFrom(PlayerZombie entity) {
 		Optional<UUID> optional = entity.getPlayerUUID();
 		if(optional.isPresent()) setPlayer(optional.get());
 		setInventory(entity.getInventory());
@@ -185,6 +185,11 @@ public class DrownedPlayer extends Drowned implements IZombiePlayer {
 	public void tick() {
 		super.tick();
 		moveCloak(this);
+	}
+
+	@Override
+	public void checkDespawn() {
+		if (level.getDifficulty() == Difficulty.PEACEFUL) super.checkDespawn();
 	}
 
 	@Override

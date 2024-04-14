@@ -1,8 +1,7 @@
 package net.smileycorp.hordes.common;
 
 import net.minecraft.resources.ResourceLocation;
-
-import java.util.Locale;
+import net.minecraft.sounds.SoundEvent;
 
 public class Constants {
 
@@ -12,11 +11,10 @@ public class Constants {
 	public static final String hordeEventStart = "message.hordes.EventStart";
 	public static final String hordeEventEnd = "message.hordes.EventEnd";
 	public static final String hordeTrySleep = "message.hordes.TrySleep";
-	public static final String deathMessage = "message.hordes.DeathMessage";
-	public static final String deathMessageFighting = "message.hordes.DeathMessageFighting";
-	public static final String deathMessageOther = "message.hordes.DeathMessageOther";
 
 	public static final ResourceLocation HORDE_SOUND = loc("horde_spawn");
+	public static final SoundEvent INFECT_SOUND = SoundEvent.m_262824_(loc("infect"));
+	public static final SoundEvent IMMUNE_SOUND = SoundEvent.m_262824_(loc("immune"));
 
 	public static String name(String name) {
 		return name(MODID, name);
@@ -27,7 +25,7 @@ public class Constants {
 	}
 
 	public static ResourceLocation loc(String name) {
-		return new ResourceLocation(MODID, name.toLowerCase(Locale.US));
+		return new ResourceLocation(MODID, name.toLowerCase());
 	}
 
 	public static String locStr(String string) {

@@ -1,21 +1,26 @@
 {
-	"commands.hordes.SpawnHordeWave.usage":"/spawnHordeWave <optional: player> <number of mobs to spawn> <optional: spawn table to use>",
+	"commands.hordes.SpawnHordeWave.usage":"/hordes spawnWave <number of mobs to spawn>",
 	"commands.hordes.SpawnHordeWave.success":"Succesfully summoned horde wave;",
 	"commands.hordes.SpawnHordeWave.invalidValue":"%1$s is not a valid argument for <number of mobs to spawn>",
 	"commands.hordes.SpawnHordeWave.wrongArgCount":"Wrong number of arguments supplied for /spawnHordeWave",
-	"commands.hordes.StartHorde.usage":"/startHordeEvent <optional: player> <length of event> <optional: spawn table to use>",
+	"commands.hordes.StartHorde.usage":"/hordes start <length of event>",
 	"commands.hordes.StartHorde.success":"Succesfully started horde event for %1$s ticks",
 	"commands.hordes.StartHorde.invalidValue":"%1$s is not a valid argument for <length of event>;",
 	"commands.hordes.StartHorde.wrongArgCount":"Wrong number of arguments supplied for /startHordeEvent",
-	"commands.hordes.StopHorde.usage":"/stopHordeEvent <optional: player>",
+	"commands.hordes.StopHorde.usage":"/hordes stop",
 	"commands.hordes.StopHorde.success":"Stopped active horde event",
-	"commands.hordes.HordeDebug.usage":"/debugHorde <optional: player>",
+	"commands.hordes.HordeDebug.usage":"/hordes debug",
 	"commands.hordes.HordeDebug.success":"Output horde log to %1$s",
 	"commands.hordes.HordeClean.usage":"/clearHordeData",
 	"commands.hordes.HordeClean.success":"Cleared all existing horde world data",
-	"commands.hordes.HordeReset.usage":"/resetHorde <optional: player>",
+	"commands.hordes.HordeReset.usage":"/hordes reset <optional: player>",
 	"commands.hordes.HordeReset.success":"Reset all horde data for player %1$s",
+	"commands.hordes.ListEntities.usage":"/hordes listEntities",
+	"commands.hordes.ListEntities.success":"Output a list of all entities to %1$s",
+	
+	"commands.hordes.SpawnZombie.usage":"/hordes spawnZombie <username> <pos> <type>",
+	
 	"message.hordes.DataError":"Errors exist in currently loaded data, please check the file %1$s for more information.",
-
+	
 	"jei.category.hordes.InfectionCures":"Infection Cures"
 }

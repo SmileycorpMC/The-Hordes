@@ -24,7 +24,7 @@ repositories {
     }
 }
 
-version = '1.19.4-1.2.3'
+version = '1.19.4-1.5.2'
 group = 'net.smileycorp.hordes' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'The-Hordes'
 
@@ -84,7 +84,7 @@ minecraft {
 }
 
 mixin {
-    add sourceSets.main, "hordes.mixin.refmap.json"
+    add sourceSets.main, "hordes.refmap.json"
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
@@ -97,6 +97,11 @@ dependencies {
     minecraft 'net.minecraftforge:forge:1.19.4-45.1.0'
 	implementation fg.deobf('curse.maven:jei-238222:4581325')
 	implementation fg.deobf('curse.maven:atlaslib-463826:4578087')
+    implementation fg.deobf('curse.maven:gamestages-268655:4447356')
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.5"))
+    implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.3.5")) {
+        jarJar.ranged(it, "[0.3.5,)")
+    }
 	annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
