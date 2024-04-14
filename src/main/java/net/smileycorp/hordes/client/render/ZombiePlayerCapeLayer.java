@@ -15,9 +15,9 @@ import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.smileycorp.atlas.api.client.PlayerTextureRenderer;
-import net.smileycorp.hordes.common.entities.IZombiePlayer;
+import net.smileycorp.hordes.common.entities.PlayerZombie;
 
-public class ZombiePlayerCapeLayer<T extends Zombie & IZombiePlayer> extends RenderLayer<T, ZombiePlayerModel<T>> {
+public class ZombiePlayerCapeLayer<T extends Zombie & PlayerZombie> extends RenderLayer<T, ZombiePlayerModel<T>> {
 
 	public ZombiePlayerCapeLayer(ZombiePlayerRenderer<T> renderer) {
 		super(renderer);

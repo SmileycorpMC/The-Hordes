@@ -15,9 +15,9 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.ItemStack;
 import net.smileycorp.atlas.api.client.PlayerTextureRenderer;
-import net.smileycorp.hordes.common.entities.IZombiePlayer;
+import net.smileycorp.hordes.common.entities.PlayerZombie;
 
-public class ZombiePlayerElytraLayer<T extends Zombie & IZombiePlayer> extends ElytraLayer<T, ZombiePlayerModel<T>> {
+public class ZombiePlayerElytraLayer<T extends Zombie & PlayerZombie> extends ElytraLayer<T, ZombiePlayerModel<T>> {
 
 	public ZombiePlayerElytraLayer(RenderLayerParent<T, ZombiePlayerModel<T>> renderer, EntityModelSet models) {
 		super(renderer, models);

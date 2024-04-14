@@ -12,11 +12,10 @@ import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.animal.Turtle;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.animal.horse.ZombieHorse;
-import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.smileycorp.hordes.common.CommonConfigHandler;
+import net.smileycorp.hordes.config.CommonConfigHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -24,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ZombieHorse.class)
-public abstract class MixinZombieHorse extends AbstractHorse implements Enemy {
+public abstract class MixinZombieHorse extends AbstractHorse {
 
 	protected MixinZombieHorse(Level level) {
 		super(null, level);
@@ -47,8 +46,7 @@ public abstract class MixinZombieHorse extends AbstractHorse implements Enemy {
 
 	@Inject(at=@At("TAIL"), method = "createAttributes()Lnet/minecraft/world/entity/ai/attributes/AttributeSupplier$Builder;", cancellable = true)
 	private static void createAttributes(CallbackInfoReturnable<AttributeSupplier.Builder> callback) {
-		if (CommonConfigHandler.aggressiveZombieHorses.get()) {
-			callback.setReturnValue(callback.getReturnValue()
+		if (CommonConfigHandler.aggressiveZombieHorses.get()) {callback.setReturnValue(callback.getReturnValue()
 					.add(Attributes.FOLLOW_RANGE, 35.0D).add(Attributes.ATTACK_DAMAGE, 3.0D));
 		}
 	}
