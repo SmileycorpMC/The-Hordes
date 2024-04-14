@@ -19,7 +19,7 @@ import java.util.Map.Entry;
 public class HordeSavedData extends SavedData {
 	
 	public static final String DATA = Constants.MODID + "_HordeEvent";
-	private final Random rand = new Random(new Random().nextLong());
+	private final Random rand = new Random();
 	private int next_day = 0;
 	protected Level level = null;
 	

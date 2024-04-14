@@ -2,6 +2,7 @@ package net.smileycorp.hordes.common.data.conditions;
 
 import com.google.gson.JsonElement;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.smileycorp.atlas.api.data.DataType;
@@ -21,7 +22,7 @@ public class PlayerDayCondition implements Condition {
 
 	@Override
 	public boolean apply(Level level, LivingEntity entity, ServerPlayer player, Random rand) {
-		return player.tickCount / (float) HordeEventConfig.dayLength.get() > day.get(level, entity, player, rand);
+		return player.getStats().getValue(Stats.CUSTOM.get(Stats.PLAY_TIME)) / (float) HordeEventConfig.dayLength.get() > day.get(level, entity, player, rand);
 	}
 
 	public static PlayerDayCondition deserialize(JsonElement json) {
