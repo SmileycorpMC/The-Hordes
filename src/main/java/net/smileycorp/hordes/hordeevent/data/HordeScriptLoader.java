@@ -1,6 +1,5 @@
 package net.smileycorp.hordes.hordeevent.data;
 
-import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -11,7 +10,9 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 public class HordeScriptLoader extends SimpleJsonResourceReloadListener {

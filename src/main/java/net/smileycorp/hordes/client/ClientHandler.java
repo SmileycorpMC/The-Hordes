@@ -81,7 +81,7 @@ public class ClientHandler {
 		if (optional.isPresent() && optional.orElseGet(null).isHordeNight(level)) {
 			float d = level.getSkyDarken((float)event.getPartialTick()) * 1.4f;
 			Color rgb = ClientConfigHandler.getHordeSkyColour();
-			event.setRed((1f - d) * (float)rgb.getRed()/255f + (d * event.getRed()));
+			event.setRed((1f - d) * (float)rgb.getRed()/255f + d * event.getRed());
 			event.setGreen((1f - d) * (float)rgb.getGreen()/255f + d * event.getGreen());
 			event.setBlue((1f - d) * (float)rgb.getBlue()/255f + d * event.getBlue());
 		}

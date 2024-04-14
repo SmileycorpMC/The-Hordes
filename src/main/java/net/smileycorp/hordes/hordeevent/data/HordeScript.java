@@ -19,7 +19,6 @@ import net.smileycorp.hordes.hordeevent.data.functions.HordeFunction;
 import net.smileycorp.hordes.hordeevent.data.functions.MultipleFunction;
 
 import java.util.List;
-import java.util.Optional;
 
 public class HordeScript<T extends HordePlayerEvent> {
 
@@ -96,22 +95,12 @@ public class HordeScript<T extends HordePlayerEvent> {
 		for (;; ia++, ib++) {
 			char ca = charAt(a, ia);
 			char cb = charAt(b, ib);
-			if (!Character.isDigit(ca) && !Character.isDigit(cb)) {
-				return bias;
-			} else if (!Character.isDigit(ca)) {
-				return -1;
-			} else if (!Character.isDigit(cb)) {
-				return 1;
-			} else if (ca < cb) {
-				if (bias == 0) {
-					bias = -1;
-				}
-			} else if (ca > cb) {
-				if (bias == 0)
-					bias = 1;
-			} else if (ca == 0 && cb == 0) {
-				return bias;
-			}
+			if (!Character.isDigit(ca) && !Character.isDigit(cb)) return bias;
+			else if (!Character.isDigit(ca)) return -1;
+			else if (!Character.isDigit(cb)) return 1;
+			else if (ca < cb) if (bias == 0) bias = -1;
+			else if (ca > cb) if (bias == 0) bias = 1;
+			else if (ca == 0 && cb == 0) return bias;
 		}
 	}
 	
