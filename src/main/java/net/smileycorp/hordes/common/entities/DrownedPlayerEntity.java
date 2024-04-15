@@ -1,14 +1,8 @@
 package net.smileycorp.hordes.common.entities;
 
-import java.util.Collection;
-import java.util.Optional;
-import java.util.UUID;
-
 import com.mojang.authlib.GameProfile;
-
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.monster.DrownedEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -25,19 +19,22 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
-import net.smileycorp.hordes.common.CommonConfigHandler;
-import net.smileycorp.hordes.common.infection.HordesInfection;
+import net.smileycorp.hordes.config.ZombiePlayersConfig;
+
+import java.util.Collection;
+import java.util.Optional;
+import java.util.UUID;
 
 
-public class DrownedPlayerEntity extends DrownedEntity implements IZombiePlayer {
+public class DrownedPlayerEntity extends DrownedEntity implements PlayerZombie<DrownedPlayerEntity> {
 
-	protected static final DataParameter<Optional<UUID>> PLAYER_UUID = EntityDataManager.defineId(DrownedPlayerEntity.class, DataSerializers.OPTIONAL_UUID);
+	protected static final DataParameter<Optional<UUID>> PLAYER = EntityDataManager.defineId(DrownedPlayerEntity.class, DataSerializers.OPTIONAL_UUID);
 	protected static final DataParameter<Boolean> SHOW_CAPE = EntityDataManager.defineId(DrownedPlayerEntity.class, DataSerializers.BOOLEAN);
 
-	protected NonNullList<ItemStack> playerItems = NonNullList.<ItemStack>create();
-	protected UUID uuid;
+	protected NonNullList<ItemStack> playerItems = NonNullList.create();
 
 	public double xCloakO;
 	public double yCloakO;
@@ -46,12 +43,12 @@ public class DrownedPlayerEntity extends DrownedEntity implements IZombiePlayer 
 	public double yCloak;
 	public double zCloak;
 
-	public DrownedPlayerEntity(EntityType<? extends DrownedPlayerEntity> type, World world) {
-		super(type, world);
+	public DrownedPlayerEntity(EntityType<? extends DrownedPlayerEntity> type, World level) {
+		super(type, level);
 	}
 
-	public DrownedPlayerEntity(World world) {
-		this(HordesInfection.DROWNED_PLAYER.get() ,world);
+	public DrownedPlayerEntity(World level) {
+		this(HordesEntities.DROWNED_PLAYER.get() ,level);
 	}
 
 	public DrownedPlayerEntity(PlayerEntity player) {
@@ -62,50 +59,47 @@ public class DrownedPlayerEntity extends DrownedEntity implements IZombiePlayer 
 	@Override
 	protected void defineSynchedData(){
 		super.defineSynchedData();
-		entityData.define(PLAYER_UUID, Optional.of(UUID.fromString("1512ce82-00e5-441a-9774-f46d9b7badfb")));
+		entityData.define(PLAYER, Optional.empty());
 		entityData.define(SHOW_CAPE, true);
 	}
 
 	@Override
 	public void setPlayer(PlayerEntity player) {
 		if (player == null) return;
-		for (EquipmentSlotType slot : EquipmentSlotType.values()) {
-			ItemStack stack = slot.getType() == EquipmentSlotType.Group.ARMOR ? player.inventory.armor.get(slot.getIndex()) :
-				slot == EquipmentSlotType.MAINHAND ? player.getMainHandItem() : player.getOffhandItem();
-			setItemSlot(slot, stack);
-		}
+		for (EquipmentSlotType slot : EquipmentSlotType.values()) setItemSlot(slot, player.getItemBySlot(slot));
 		setPlayer(player.getGameProfile());
 	}
 
 	@Override
 	public void setPlayer(String username) {
-		setPlayer(ServerLifecycleHooks.getCurrentServer().getProfileCache().get(username));
+		GameProfile profile = ServerLifecycleHooks.getCurrentServer().getProfileCache().get(username);
+		if (profile != null) setPlayer(profile);
 	}
 
 	@Override
 	public void setPlayer(UUID uuid) {
-		setPlayer(ServerLifecycleHooks.getCurrentServer().getProfileCache().get(uuid));
+		GameProfile profile = ServerLifecycleHooks.getCurrentServer().getProfileCache().get(uuid);
+		if (profile != null) setPlayer(profile);
 	}
 
 	@Override
 	public void setPlayer(GameProfile profile) {
 		if (profile == null) return;
-		this.uuid=profile.getId();
-		this.setCustomName(new StringTextComponent(profile.getName()));
-		entityData.set(PLAYER_UUID, Optional.of(uuid));
+		if (profile.getName() == null) setCustomName(new StringTextComponent(profile.getName()));
+		entityData.set(PLAYER, Optional.of(profile.getId()));
 	}
 
 	@Override
-	public UUID getPlayerUUID() {
-		return entityData.get(PLAYER_UUID).get();
+	public Optional<UUID> getPlayerUUID() {
+		return entityData.get(PLAYER);
 	}
 
 	@Override
-	public void setInventory(Collection<ItemEntity> list) {
+	public void storeDrops(Collection<ItemEntity> list) {
 		playerItems.clear();
 		for (ItemEntity item : list) {
 			ItemStack stack = item.getItem();
-			item.remove();;
+			item.remove(false);
 			if (stack != null) playerItems.add(stack.copy());
 		}
 	}
@@ -132,19 +126,20 @@ public class DrownedPlayerEntity extends DrownedEntity implements IZombiePlayer 
 
 	@Override
 	public boolean isSunSensitive() {
-		return CommonConfigHandler.zombiePlayersBurn.get();
+		return ZombiePlayersConfig.zombiePlayersBurn.get();
 	}
 
 	@Override
 	public boolean fireImmune() {
-		return CommonConfigHandler.zombiePlayersFireImmune.get();
+		return ZombiePlayersConfig.zombiePlayersFireImmune.get();
 	}
 
 	@Override
 	public void addAdditionalSaveData(CompoundNBT compound) {
 		super.addAdditionalSaveData(compound);
-		if (uuid != null) {
-			compound.putString("player", uuid.toString());
+		Optional<UUID> optional = entityData.get(PLAYER);
+		if (optional.isPresent()) {
+			compound.putUUID("player", optional.get());
 		}
 		ItemStackHelper.saveAllItems(compound, playerItems);
 	}
@@ -153,13 +148,13 @@ public class DrownedPlayerEntity extends DrownedEntity implements IZombiePlayer 
 	public void readAdditionalSaveData(CompoundNBT compound) {
 		super.readAdditionalSaveData(compound);
 		if (compound.contains("player")) {
-			uuid = UUID.fromString(compound.getString("player"));
+			entityData.set(PLAYER, Optional.of(compound.getUUID("player")));
 		}
 		NonNullList<ItemStack> read = NonNullList.<ItemStack>withSize(compound.getList("Items", 10).size(), ItemStack.EMPTY);
 		ItemStackHelper.loadAllItems(compound, read);
 		playerItems = read;
 	}
-
+	
 	@Override
 	public ITextComponent getDisplayName() {
 		TranslationTextComponent textcomponentstring = new TranslationTextComponent(ScorePlayerTeam.formatNameForTeam(getTeam(),
@@ -168,13 +163,13 @@ public class DrownedPlayerEntity extends DrownedEntity implements IZombiePlayer 
 		textcomponentstring.getStyle().withInsertion(this.getEncodeId());
 		return textcomponentstring;
 	}
-
+	
 	@Override
-	public void copyFrom(IZombiePlayer entity) {
-		setPlayer(entity.getPlayerUUID());
+	public void copyFrom(PlayerZombie entity) {
+		setPlayer((UUID)entity.getPlayerUUID().get());
 		setInventory(entity.getInventory());
 		for (EquipmentSlotType slot : EquipmentSlotType.values()) {
-			ItemStack stack = ((MobEntity) entity).getItemBySlot(slot);
+			ItemStack stack = entity.asEntity().getItemBySlot(slot);
 			setItemSlot(slot, stack);
 		}
 		entityData.set(SHOW_CAPE, entity.displayCape());
@@ -184,6 +179,11 @@ public class DrownedPlayerEntity extends DrownedEntity implements IZombiePlayer 
 	public void tick() {
 		super.tick();
 		moveCloak(this);
+	}
+
+	@Override
+	public void checkDespawn() {
+		if (level.getDifficulty() == Difficulty.PEACEFUL) super.checkDespawn();
 	}
 
 	@Override

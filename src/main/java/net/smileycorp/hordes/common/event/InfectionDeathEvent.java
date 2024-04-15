@@ -12,7 +12,7 @@ public class InfectionDeathEvent extends LivingEvent {
 
 	public InfectionDeathEvent(LivingEntity entity, DamageSource source) {
 		super(entity);
-		this.source=source;
+		this.source = source;
 	}
 
 	public DamageSource getSource() {

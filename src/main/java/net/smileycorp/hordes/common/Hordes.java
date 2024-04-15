@@ -1,101 +1,91 @@
 package net.smileycorp.hordes.common;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.packs.FolderPackResources;
+import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
+import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.repository.PackSource;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.smileycorp.hordes.client.ClientConfigHandler;
-import net.smileycorp.hordes.common.capability.IZombifyPlayer;
-import net.smileycorp.hordes.common.capability.ZombifyPlayer;
-import net.smileycorp.hordes.common.hordeevent.HordeEventHandler;
-import net.smileycorp.hordes.common.hordeevent.HordeEventRegister;
-import net.smileycorp.hordes.common.hordeevent.capability.IHordeEvent;
-import net.smileycorp.hordes.common.hordeevent.capability.IHordeSpawn;
-import net.smileycorp.hordes.common.hordeevent.capability.IHordeSpawn.HordeSpawn;
-import net.smileycorp.hordes.common.hordeevent.network.HordeEventPacketHandler;
-import net.smileycorp.hordes.common.infection.HordesInfection;
-import net.smileycorp.hordes.common.infection.InfectionEventHandler;
-import net.smileycorp.hordes.common.infection.InfectionRegister;
-import net.smileycorp.hordes.common.infection.network.InfectionPacketHandler;
+import net.minecraftforge.fml.loading.FMLPaths;
+import net.smileycorp.hordes.client.ClientHandler;
+import net.smileycorp.hordes.common.data.DataGenerator;
+import net.smileycorp.hordes.common.data.DataRegistry;
+import net.smileycorp.hordes.common.entities.HordesEntities;
+import net.smileycorp.hordes.config.ClientConfigHandler;
+import net.smileycorp.hordes.config.CommonConfigHandler;
+import net.smileycorp.hordes.config.HordeEventConfig;
+import net.smileycorp.hordes.config.InfectionConfig;
+import net.smileycorp.hordes.hordeevent.HordeEventHandler;
+import net.smileycorp.hordes.hordeevent.network.HordeEventPacketHandler;
+import net.smileycorp.hordes.infection.HordesInfection;
+import net.smileycorp.hordes.infection.InfectionEventHandler;
+import net.smileycorp.hordes.infection.network.InfectionPacketHandler;
 
-@Mod(value = ModDefinitions.MODID)
-@Mod.EventBusSubscriber(modid = ModDefinitions.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+import java.nio.file.Path;
+
+@Mod(value = Constants.MODID)
+@Mod.EventBusSubscriber(modid = Constants.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class Hordes {
 
-	private static Logger logger = LogManager.getLogger(ModDefinitions.NAME);
-
-	@CapabilityInject(IHordeEvent.class)
-	public final static Capability<IHordeEvent> HORDE_EVENT = null;
-
-	@CapabilityInject(IHordeSpawn.class)
-	public final static Capability<IHordeSpawn> HORDESPAWN = null;
-
-	@CapabilityInject(IZombifyPlayer.class)
-	public final static Capability<IZombifyPlayer> ZOMBIFY_PLAYER = null;
-
 	public Hordes() {
+		HordesLogger.clearLog();
+		//register configs
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CommonConfigHandler.config);
 		ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfigHandler.config);
+		//generate data files
+		if (DataGenerator.shouldGenerateFiles()) {
+			DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> DataGenerator::generateAssets);
+			DataGenerator.generateData();
+		} else {
+			HordesLogger.logInfo("Config files are up to date, skipping data/asset generation");
+		}
 	}
-
+	
+	@SubscribeEvent
+	public static void addPacks(AddPackFindersEvent event) {
+		Path path = FMLPaths.CONFIGDIR.get().resolve("hordes");
+		event.addRepositorySource((consumer, constructor) -> consumer.accept(constructor.create(path.toString(), new TextComponent("Hordes Config"), true,
+				()-> new FolderPackResources(path.toFile()), new PackMetadataSection(new TextComponent("Hordes Config"), 8),
+				Pack.Position.TOP, PackSource.BUILT_IN, false))
+		);
+	}
+	
 	@SubscribeEvent
 	public static void constructMod(FMLConstructModEvent event) {
-		//Horde Event
-		if (CommonConfigHandler.enableHordeEvent.get()) {
-			HordeEventPacketHandler.initPackets();
-			MinecraftForge.EVENT_BUS.register(new HordeEventHandler());
-		} else {
-			MinecraftForge.EVENT_BUS.unregister(HordeEventHandler.class);
-		}
-		//Mob Infection
-		if (CommonConfigHandler.enableMobInfection.get()) {
-			InfectionPacketHandler.initPackets();
-			MinecraftForge.EVENT_BUS.register(new InfectionEventHandler());
-		} else {
-			MinecraftForge.EVENT_BUS.unregister(InfectionEventHandler.class);
-		}
 		MinecraftForge.EVENT_BUS.register(new MiscEventHandler());
 		HordesInfection.EFFECTS.register(FMLJavaModLoadingContext.get().getModEventBus());
-		HordesInfection.ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
+		HordesEntities.ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
 	}
-
+	
 	@SubscribeEvent
 	public static void commonSetup(FMLCommonSetupEvent event) {
-		CapabilityManager.INSTANCE.register(IZombifyPlayer.class, new IZombifyPlayer.Storage(), ZombifyPlayer::new);
-		CapabilityManager.INSTANCE.register(IHordeSpawn.class, new IHordeSpawn.Storage(), HordeSpawn::new);
-		CapabilityManager.INSTANCE.register(IHordeEvent.class, new IHordeEvent.Storage(), IHordeEvent::createEvent);
-	}
-
-	@SubscribeEvent
-	public static void loadComplete(FMLLoadCompleteEvent event) {
+		DataRegistry.init();
 		//Horde Event
-		if (CommonConfigHandler.enableHordeEvent.get()) {
-			HordeEventRegister.readConfig();
+		if (HordeEventConfig.enableHordeEvent.get()) {
+			HordeEventPacketHandler.initPackets();
+			MinecraftForge.EVENT_BUS.register(new HordeEventHandler());
 		}
 		//Mob Infection
-		if (CommonConfigHandler.enableMobInfection.get()) {
-			InfectionRegister.readConfig();
+		if (InfectionConfig.enableMobInfection.get()) {
+			InfectionPacketHandler.initPackets();
+			MinecraftForge.EVENT_BUS.register(new InfectionEventHandler());
 		}
 	}
-
-	public static void logInfo(Object message) {
-		logger.info(message);
+	
+	@SubscribeEvent
+	public static void loadClient(FMLClientSetupEvent event) {
+		MinecraftForge.EVENT_BUS.register(new ClientHandler());
 	}
-
-	public static void logError(Object message, Exception e) {
-		logger.error(message);
-		e.printStackTrace();
-	}
-
+	
 }

@@ -1,14 +1,39 @@
 {
 	"required": true,
 	"package": "net.smileycorp.hordes.mixin",
-	"compatibilityLevel": "JAVA_8",
+	"compatibilityLevel": "JAVA_17",
 	"refmap": "hordes.refmap.json",
+	"client": [
+		"MixinLevelRenderer",
+		"MixinLivingEntityRenderer",
+		"MixinVillagerProfessionLayer"
+	],
+	"server": [
+		"MixinServerLevel"
+	],
 	"mixins": [
-		"MixinMobEntity",
-		"MixinZombieEntity",
-		"MixinZombieVillagerEntity",
-		"MixinZombieHorseEntity",
-		"MixinAbstractHorseEntity"
+		"MixinAbstractHorse",
+		"MixinAbstractPiglin",
+		"MixinEntity",
+		"MixinEvoker",
+		"MixinHoglin",
+		"MixinLivingEntity",
+		"MixinMob",
+		"MixinMobEffectInstance",
+		"MixinPiglin",
+		"MixinPiglinAi",
+		"MixinPiglinBrute",
+		"MixinPillager",
+		"MixinRavager",
+		"MixinServerPlayer",
+		"MixinVex",
+		"MixinVindicator",
+		"MixinWitch",
+		"MixinZoglin",
+		"MixinZombie",
+		"MixinZombieHorse",
+		"MixinZombieVillager",
+		"MixinZombifiedPiglin"
 	],
 	"minVersion": "0.8"
 }

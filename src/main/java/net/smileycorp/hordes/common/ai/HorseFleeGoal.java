@@ -1,12 +1,12 @@
 package net.smileycorp.hordes.common.ai;
 
 import net.minecraft.entity.MobEntity;
-import net.smileycorp.hordes.common.infection.InfectionRegister;
+import net.smileycorp.hordes.infection.HordesInfection;
 
 public class HorseFleeGoal extends FleeEntityGoal {
 
 	public HorseFleeGoal(MobEntity entity) {
-		super(entity, 2D, 15, InfectionRegister::canCauseInfection);
+		super(entity, 2D, 15, HordesInfection::canCauseInfection);
 	}
 
 	@Override

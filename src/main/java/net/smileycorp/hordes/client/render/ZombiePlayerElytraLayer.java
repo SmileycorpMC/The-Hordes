@@ -2,7 +2,6 @@ package net.smileycorp.hordes.client.render;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-
 import net.minecraft.client.network.play.NetworkPlayerInfo;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
@@ -14,9 +13,9 @@ import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.smileycorp.hordes.common.entities.IZombiePlayer;
+import net.smileycorp.hordes.common.entities.PlayerZombie;
 
-public class ZombiePlayerElytraLayer<T extends ZombieEntity & IZombiePlayer> extends ElytraLayer<T, ZombiePlayerModel<T>> {
+public class ZombiePlayerElytraLayer<T extends ZombieEntity & PlayerZombie> extends ElytraLayer<T, ZombiePlayerModel<T>> {
 
 	public ZombiePlayerElytraLayer(IEntityRenderer<T, ZombiePlayerModel<T>> renderer) {
 		super(renderer);
@@ -32,7 +31,6 @@ public class ZombiePlayerElytraLayer<T extends ZombieEntity & IZombiePlayer> ext
 				if (playerInfo.getElytraLocation() != null) playerInfo.getElytraLocation();
 				else if (entity.displayCape() && playerInfo.getCapeLocation() != null) resourcelocation = playerInfo.getCapeLocation();
 			}
-
 			matrixStack.pushPose();
 			matrixStack.translate(0.0D, 0.0D, 0.125D);
 			getParentModel().copyPropertiesTo(elytraModel);
