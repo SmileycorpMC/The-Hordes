@@ -22,7 +22,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.network.NetworkDirection;
-import net.smileycorp.atlas.api.IOngoingEvent;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.network.SimpleStringMessage;
 import net.smileycorp.atlas.api.recipe.WeightedOutputs;
 import net.smileycorp.atlas.api.util.DirectionUtils;
@@ -43,7 +43,7 @@ import net.smileycorp.hordes.hordeevent.network.UpdateClientHordeMessage;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class HordeEvent implements IOngoingEvent<ServerPlayer> {
+public class HordeEvent {
 	
 	private static UUID FOLLOW_RANGE_MODIFIER = UUID.fromString("51cfe045-4248-409e-be37-556d67de4b97");
 	private final Random rand;
@@ -52,7 +52,8 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 	private int day = 0;
 	private int nextDay = -1;
 	private HordeSpawnData spawnData = null;
-	boolean sentDay;
+	int sentDay = 0;
+	private String username;
 	
 	HordeEvent(HordeSavedData data){
 		nextDay = HordeEventConfig.hordeEventByPlayerTime.get() ? HordeEventConfig.spawnFirstDay.get() ? 0 :HordeEventConfig.hordeSpawnDays.get()
@@ -70,14 +71,16 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 			spawnData = new HordeSpawnData(this);
 			spawnData.setTable(HordeTableLoader.INSTANCE.getTable(new ResourceLocation(nbt.getString("loadedTable"))));
 		}
+		if (nbt.contains("username")) username = nbt.getString("username");
 	}
 	
-	@Override
-	public CompoundTag writeToNBT(CompoundTag nbt) {
+	public CompoundTag writeToNBT(CompoundTag nbt, UUID uuid) {
 		nbt.putInt("timer", timer);
 		nbt.putInt("nextDay", nextDay);
 		nbt.putInt("day", day);
 		if (spawnData != null) nbt.put("spawnData", spawnData.save());
+		ServerPlayer player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(uuid);
+		nbt.putString("username", player == null ? username == null ? uuid.toString() : username : player.getName().getString());
 		return nbt;
 	}
 	
@@ -228,7 +231,10 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 	public boolean isHordeDay(ServerPlayer player) {
 		ServerLevel level = player.getLevel();
 		if (level.dimension() != Level.OVERWORLD) return false;
-		return isActive(player) || getCurrentDay(player) >= nextDay;
+		int day = (int) Math.floor((HordeEventConfig.hordeEventByPlayerTime.get() ? player.getStats().getValue(Stats.CUSTOM.get(Stats.PLAY_TIME))
+				+ HordeEventConfig.hordeStartTime.get() + HordeEventConfig.hordeStartBuffer.get()
+				: player.level.getDayTime()) / HordeEventConfig.dayLength.get());
+		return isActive(player) || day >= nextDay;
 	}
 	
 	public boolean isActive(ServerPlayer player) {
@@ -236,6 +242,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 	}
 	
 	public void setPlayer(ServerPlayer player) {
+		setNextDay(player);
 		cleanSpawns();
 		entitiesSpawned.forEach(entity -> fixGoals(player, entity));
 	}
@@ -283,8 +290,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 			if (isCommand) day = getCurrentDay(player);
 			else day = nextDay;
 		}
-		if (!isCommand) nextDay = HordeEventConfig.hordeEventByPlayerTime.get() ? nextDay + HordeEventConfig.hordeSpawnDays.get()
-				: HordeSavedData.getData(level).getNextDay();
+		if (!isCommand) setNextDay(player);
 	}
 	
 	public void setSpawntable(HordeSpawnTable table) {
@@ -316,8 +322,9 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 		entitiesSpawned.clear();
 		HordeEndEvent endEvent = new HordeEndEvent(player, this, isCommand, spawnData.getEndMessage());
 		postEvent(endEvent);
-		HordeEventPacketHandler.sendTo(new UpdateClientHordeMessage(nextDay, 0),
+		HordeEventPacketHandler.sendTo(new UpdateClientHordeMessage(false),
 				player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+		sentDay = getCurrentDay(player);
 		timer = 0;
 		spawnData = null;
 		sendMessage(player, endEvent.getMessage());
@@ -353,22 +360,33 @@ public class HordeEvent implements IOngoingEvent<ServerPlayer> {
 		MinecraftForge.EVENT_BUS.post(event);
 	}
 	
-	public void reset(ServerLevel level) {
+	public void reset(ServerPlayer player) {
 		entitiesSpawned.clear();
-		HordeSavedData data = HordeSavedData.getData(level);
-		nextDay = data.getNextDay();
+		setNextDay(player);
 		spawnData = null;
 		timer = 0;
 	}
 	
-	public boolean hasSynced() {
-		return sentDay;
+	private void setNextDay(ServerPlayer player) {
+		if (!HordeEventConfig.hordeEventByPlayerTime.get()) {
+			nextDay = HordeSavedData.getData(player.getLevel()).getNextDay();
+			return;
+		}
+		int expectedDay = HordeEventConfig.hordeSpawnDays.get() * ((getCurrentDay(player) / HordeEventConfig.hordeSpawnDays.get()) + 1);
+		if (Math.abs(nextDay - expectedDay) > HordeEventConfig.hordeSpawnDays.get() + HordeEventConfig.hordeSpawnVariation.get()) {
+			if (HordeEventConfig.hordeSpawnVariation.get() > 0) expectedDay += rand.nextInt(HordeEventConfig.hordeSpawnVariation.get());
+			nextDay = expectedDay;
+		}
 	}
 	
-	public void sync(ServerPlayer player) {
-		HordeEventPacketHandler.sendTo(new UpdateClientHordeMessage(isActive(player) ? day : nextDay, HordeEventConfig.dayLength.get()),
+	public boolean hasSynced(int day) {
+		return sentDay >= day;
+	}
+	
+	public void sync(ServerPlayer player, int day) {
+		HordeEventPacketHandler.sendTo(new UpdateClientHordeMessage(isHordeDay(player)),
 				player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
-		sentDay = true;
+		sentDay = day;
 	}
 	
 	public int getDay() {

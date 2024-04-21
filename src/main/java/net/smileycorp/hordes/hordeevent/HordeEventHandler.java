@@ -20,6 +20,7 @@ import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -79,18 +80,27 @@ public class HordeEventHandler {
 		if (HordeEventConfig.pauseEventServer.get() && level.players().isEmpty()) return;
 		HordeEvent horde = HordeSavedData.getData(level).getEvent(player);
 		if (horde == null) return;
-		if (!horde.hasSynced()) horde.sync(player);
+		int time = Math.round(level.getDayTime() % HordeEventConfig.dayLength.get());
+		int day = horde.getCurrentDay(player);
+		if (!horde.hasSynced(day)) horde.sync(player, day);
 		if (horde.isActive(player)) {
 			horde.update(player);
 			return;
 		}
-		int day = horde.getCurrentDay(player);
-		int time = Math.round(level.getDayTime() % HordeEventConfig.dayLength.get());
 		if (time >= HordeEventConfig.hordeStartTime.get() && time <= HordeEventConfig.hordeStartTime.get() + HordeEventConfig.hordeStartBuffer.get()
 				&& day >= horde.getNextDay() && (day > 0 || HordeEventConfig.spawnFirstDay.get())) {
 			horde.tryStartEvent(player, -1, false);
 		}
 
+	}
+	
+	@SubscribeEvent
+	public void logIn(PlayerEvent.PlayerLoggedInEvent event) {
+		if (event.getPlayer() instanceof ServerPlayer) {
+			ServerPlayer player = (ServerPlayer) event.getPlayer();
+			HordeEvent horde = HordeSavedData.getData(player.getLevel()).getEvent(player);
+			if (horde != null) horde.setPlayer(player);
+		}
 	}
 
 	//prevent despawning of entities in an active horde

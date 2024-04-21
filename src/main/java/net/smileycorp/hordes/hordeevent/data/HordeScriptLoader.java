@@ -1,6 +1,5 @@
 package net.smileycorp.hordes.hordeevent.data;
 
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

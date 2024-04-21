@@ -48,9 +48,7 @@ public class HordeSavedData extends SavedData {
 		for (Entry<UUID, HordeEvent> entry : this.events.entrySet()) {
 			UUID uuid = entry.getKey();
 			CompoundTag tag = new CompoundTag();
-			ServerPlayer player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(uuid);
-			if (player != null) tag.putString("username", player.getName().getString());
-			events.put(uuid.toString(), entry.getValue().writeToNBT(tag));
+			events.put(uuid.toString(), entry.getValue().writeToNBT(tag, uuid));
 		}
 		nbt.put("events", events);
 		return nbt;
