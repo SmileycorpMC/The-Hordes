@@ -9,6 +9,7 @@
 		"minecraft:zombified_piglin",
 		"minecraft:zoglin",
 		"hordes:zombie_player",
-		"hordes:drowned_player"
+		"hordes:drowned_player",
+		"hordes:husk_player"
 	]
 }

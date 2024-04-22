@@ -36,7 +36,7 @@ public class CommandResetHordeEvent {
 		for (ServerPlayer player : players) {
 			HordeEvent horde = HordeSavedData.getData(source.getLevel()).getEvent(player);
 			if (horde != null) {
-				horde.reset(ctx.getSource().getLevel());
+				horde.reset(player);
 				source.getEntity().sendSystemMessage(TextUtils.translatableComponent("commands.hordes.HordeReset.success", null, player.getName()));
 				return 1;
 			}

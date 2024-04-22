@@ -97,11 +97,11 @@ public class ClientHandler {
 			level.playSound(player, pos, SoundEvent.createVariableRangeEvent(sound), SoundSource.HOSTILE, 0.5f, pitch);
 		}
 	}
-
-	public static void setHordeDay(int day, int day_length) {
+	
+	public static void setHordeDay(boolean hordeDay, int dayLength) {
 		LocalPlayer player = Minecraft.getInstance().player;
 		LazyOptional<HordeEventClient> optional = player.getCapability(HordesCapabilities.HORDE_EVENT_CLIENT);
-		if (optional.isPresent()) optional.orElseGet(null).setNextDay(day, day_length);
+		if (optional.isPresent()) optional.orElseGet(null).setHordeDay(hordeDay, dayLength);
 	}
 
 	public static void displayMessage(String text) {

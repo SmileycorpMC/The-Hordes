@@ -9,25 +9,25 @@ import net.smileycorp.hordes.common.capability.HordesCapabilities;
 
 public interface HordeEventClient {
 
-    void setNextDay(int day, int day_length);
-
     boolean isHordeNight(Level level);
+    
+    void setHordeDay(boolean hordeDay, int day_length);
 
     class Impl implements HordeEventClient {
-
-        private int day, day_length;
+    
+        private int day_length;
+        private boolean horde_day;
 
         @Override
-        public void setNextDay(int day, int day_length) {
+        public void setHordeDay(boolean hordeDay, int day_length) {
             if (day_length > 0) this.day_length = day_length;
-            this.day = day;
+            this.horde_day = hordeDay;
         }
 
         @Override
         public boolean isHordeNight(Level level) {
-            if (day_length == 0) return false;
-            if (level.getDayTime() % day_length < 0.5 * day_length) return false;
-            return level.getDayTime() > day * day_length;
+            if (day_length == 0 |! horde_day) return false;
+            return (level.getDayTime() % day_length >= 0.5 * day_length);
         }
 
     }
