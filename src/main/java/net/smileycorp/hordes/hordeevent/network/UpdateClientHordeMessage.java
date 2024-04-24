@@ -7,7 +7,6 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 import net.smileycorp.atlas.api.network.SimpleAbstractMessage;
 import net.smileycorp.hordes.client.ClientHandler;
-import net.smileycorp.hordes.config.CommonConfigHandler;
 import net.smileycorp.hordes.config.HordeEventConfig;
 
 public class UpdateClientHordeMessage extends SimpleAbstractMessage {

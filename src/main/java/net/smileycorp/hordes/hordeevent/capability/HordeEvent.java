@@ -242,7 +242,6 @@ public class HordeEvent {
 	}
 	
 	public void setPlayer(ServerPlayer player) {
-		setNextDay(player);
 		cleanSpawns();
 		entitiesSpawned.forEach(entity -> fixGoals(player, entity));
 	}
@@ -373,7 +372,7 @@ public class HordeEvent {
 			return;
 		}
 		int expectedDay = HordeEventConfig.hordeSpawnDays.get() * ((getCurrentDay(player) / HordeEventConfig.hordeSpawnDays.get()) + 1);
-		if (Math.abs(nextDay - expectedDay) > HordeEventConfig.hordeSpawnDays.get() + HordeEventConfig.hordeSpawnVariation.get()) {
+		if (nextDay <= getCurrentDay(player) || Math.abs(nextDay - expectedDay) > HordeEventConfig.hordeSpawnDays.get() + HordeEventConfig.hordeSpawnVariation.get()) {
 			if (HordeEventConfig.hordeSpawnVariation.get() > 0) expectedDay += rand.nextInt(HordeEventConfig.hordeSpawnVariation.get());
 			nextDay = expectedDay;
 		}
