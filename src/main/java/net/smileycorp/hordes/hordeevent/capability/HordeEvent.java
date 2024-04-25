@@ -432,3 +432,59 @@ public class HordeEvent {
 	}
 	
 }
+package net.smileycorp.hordes.hordeevent.capability;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.stats.Stats;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.WrappedGoal;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.server.ServerLifecycleHooks;
+import net.smileycorp.atlas.api.network.GenericStringMessage;
+import net.smileycorp.atlas.api.util.DirectionUtils;
+import net.smileycorp.atlas.api.util.WeightedOutputs;
+import net.smileycorp.hordes.common.HordesLogger;
+import net.smileycorp.hordes.common.ai.HordeTrackPlayerGoal;
+import net.smileycorp.hordes.common.capability.HordesCapabilities;
+import net.smileycorp.hordes.common.event.*;
+import net.smileycorp.hordes.config.HordeEventConfig;
+import net.smileycorp.hordes.hordeevent.HordeSpawnData;
+import net.smileycorp.hordes.hordeevent.HordeSpawnEntry;
+import net.smileycorp.hordes.hordeevent.HordeSpawnTable;
+import net.smileycorp.hordes.hordeevent.data.HordeScriptLoader;
+import net.smileycorp.hordes.hordeevent.data.HordeTableLoader;
+import net.smileycorp.hordes.hordeevent.network.HordeEventPacketHandler;
+import net.smileycorp.hordes.hordeevent.network.HordeSoundMessage;
+import net.smileycorp.hordes.hordeevent.network.UpdateClientHordeMessage;
+
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+public class HordeEvent {
+
+	private static UUID FOLLOW_RANGE_MODIFIER = UUID.fromString("51cfe045-4248-409e-be37-556d67de4b97");
+	private final RandomSource rand;
+	private Set<Mob> entitiesSpawned = new HashSet<>();
+	private int timer = 0;
+	private int day = 0;
+	private int nextDay = -1;
+	private HordeSpawnData spawnData = null;
+	int sentDay = 0;
