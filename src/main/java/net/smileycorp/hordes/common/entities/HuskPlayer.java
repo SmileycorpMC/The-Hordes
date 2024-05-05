@@ -197,12 +197,12 @@ public class HuskPlayer extends Husk implements PlayerZombie<HuskPlayer> {
 		super.tick();
 		moveCloak(this);
 	}
-
+	
 	@Override
 	public void checkDespawn() {
-		if (level().getDifficulty() == Difficulty.PEACEFUL) super.checkDespawn();
+		if (playerItems.isEmpty()) super.checkDespawn();
 	}
-
+	
 	@Override
 	public void setDisplayCape(boolean display) {
 		entityData.set(SHOW_CAPE, display);

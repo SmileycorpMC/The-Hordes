@@ -189,9 +189,9 @@ public class DrownedPlayer extends Drowned implements PlayerZombie<DrownedPlayer
 
 	@Override
 	public void checkDespawn() {
-		if (level().getDifficulty() == Difficulty.PEACEFUL) super.checkDespawn();
+		if (playerItems.isEmpty()) super.checkDespawn();
 	}
-
+	
 	@Override
 	public boolean displayCape() {
 		return entityData.get(SHOW_CAPE);

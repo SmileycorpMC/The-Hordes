@@ -206,7 +206,7 @@ public class ZombiePlayer extends Zombie implements PlayerZombie<ZombiePlayer> {
 
 	@Override
 	public void checkDespawn() {
-		if (level().getDifficulty() == Difficulty.PEACEFUL) super.checkDespawn();
+		if (playerItems.isEmpty()) super.checkDespawn();
 	}
 
 	@Override
