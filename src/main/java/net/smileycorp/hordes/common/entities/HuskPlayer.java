@@ -9,8 +9,8 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.Difficulty;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
@@ -121,14 +121,16 @@ public class HuskPlayer extends Husk implements PlayerZombie<HuskPlayer> {
 	public NonNullList<ItemStack> getInventory() {
 		return playerItems;
 	}
-
+	
 	@Override
 	protected void dropCustomDeathLoot(DamageSource source, int looting, boolean recentlyHitIn){
-		for (ItemStack stack : playerItems) {
-			if (!stack.isEmpty() && ! EnchantmentHelper.hasVanishingCurse(stack)) {
-				spawnAtLocation(stack, 0f);
-			}
-		}
+		for (ItemStack stack : playerItems) if (!stack.isEmpty() && ! EnchantmentHelper.hasVanishingCurse(stack)) spawnAtLocation(stack, 0f);
+	}
+	
+	@Override
+	public void remove(Entity.RemovalReason reason) {
+		if (reason == RemovalReason.DISCARDED) dropCustomDeathLoot(null, 0 , false);
+		super.remove(reason);
 	}
 
 	@Override
@@ -140,9 +142,7 @@ public class HuskPlayer extends Husk implements PlayerZombie<HuskPlayer> {
 			ForgeEventFactory.onLivingConvert(this, zombie);
 			if (zombie instanceof PlayerZombie) ((PlayerZombie) zombie).copyFrom(this);
 		}
-		if (!this.isSilent()) {
-			level().levelEvent(null, 1040, this.blockPosition(), 0);
-		}
+		if (!this.isSilent()) level().levelEvent(null, 1040, this.blockPosition(), 0);
 	}
 
 	@Override
@@ -154,18 +154,14 @@ public class HuskPlayer extends Husk implements PlayerZombie<HuskPlayer> {
 	public void addAdditionalSaveData(CompoundTag compound) {
 		super.addAdditionalSaveData(compound);
 		Optional<UUID> optional = entityData.get(PLAYER);
-		if (optional.isPresent()) {
-			compound.putUUID("player", optional.get());
-		}
+		if (optional.isPresent()) compound.putUUID("player", optional.get());
 		ContainerHelper.saveAllItems(compound, playerItems);
 	}
 
 	@Override
 	public void readAdditionalSaveData(CompoundTag compound) {
 		super.readAdditionalSaveData(compound);
-		if (compound.contains("player")) {
-			entityData.set(PLAYER, Optional.of(compound.getUUID("player")));
-		}
+		if (compound.contains("player")) entityData.set(PLAYER, Optional.of(compound.getUUID("player")));
 		NonNullList<ItemStack> read = NonNullList.withSize(compound.getList("Items", 10).size(), ItemStack.EMPTY);
 		ContainerHelper.loadAllItems(compound, read);
 		playerItems = read;
@@ -200,7 +196,7 @@ public class HuskPlayer extends Husk implements PlayerZombie<HuskPlayer> {
 	
 	@Override
 	public void checkDespawn() {
-		if (playerItems.isEmpty()) super.checkDespawn();
+		if (playerItems.isEmpty() |! ZombiePlayersConfig.zombiePlayersDespawnPeaceful.get()) super.checkDespawn();
 	}
 	
 	@Override
