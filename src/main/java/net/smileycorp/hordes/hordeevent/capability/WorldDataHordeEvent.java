@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.hordeevent;
+package net.smileycorp.hordes.hordeevent.capability;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.player.EntityPlayer;
@@ -7,16 +7,16 @@ import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.smileycorp.atlas.api.util.DataUtils;
-import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.capability.HordesCapabilities;
+import net.smileycorp.hordes.config.HordeEventConfig;
 
 import java.util.*;
 import java.util.Map.Entry;
 
 public class WorldDataHordeEvent extends WorldSavedData {
 
-	public static final String DATA = Constants.modid + "_HordeEvent";
+	public static final String DATA = Constants.MODID + "_HordeEvent";
 
 	//stores legacy event data until it's needed to be loaded by a player capability
 	private Map<String, NBTTagCompound> legacyEventData = new HashMap<String, NBTTagCompound>();
@@ -68,12 +68,12 @@ public class WorldDataHordeEvent extends WorldSavedData {
 
 	//legacy function -- use capabilities instead
 	@Deprecated
-	public Set<OngoingHordeEvent> getEvents() {
-		Set<OngoingHordeEvent> events = new HashSet<OngoingHordeEvent>();
+	public Set<HordeEvent> getEvents() {
+		Set<HordeEvent> events = new HashSet<HordeEvent>();
 		if (!world.isRemote) {
 			for (EntityPlayer player : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers()) {
-				if (player.hasCapability(Hordes.HORDE_EVENT, null)) {
-					events.add((OngoingHordeEvent) player.getCapability(Hordes.HORDE_EVENT, null));
+				if (player.hasCapability(HordesCapabilities.HORDE_EVENT, null)) {
+					events.add((HordeEvent) player.getCapability(HordesCapabilities.HORDE_EVENT, null));
 				}
 			}
 		}
@@ -82,22 +82,22 @@ public class WorldDataHordeEvent extends WorldSavedData {
 
 	//legacy function -- use capabilities instead
 	@Deprecated
-	public OngoingHordeEvent getEventForPlayer(EntityPlayer player) {
-		if (player.hasCapability(Hordes.HORDE_EVENT, null)) {
-			return (OngoingHordeEvent) player.getCapability(Hordes.HORDE_EVENT, null);
+	public HordeEvent getEventForPlayer(EntityPlayer player) {
+		if (player.hasCapability(HordesCapabilities.HORDE_EVENT, null)) {
+			return (HordeEvent) player.getCapability(HordesCapabilities.HORDE_EVENT, null);
 		}
 		return null;
 	}
 
 	//legacy function -- use capabilities instead
 	@Deprecated
-	public OngoingHordeEvent getEventForPlayer(GameProfile profile) {
+	public HordeEvent getEventForPlayer(GameProfile profile) {
 		return getEventForPlayer(profile.getId());
 	}
 
 	//legacy function -- use capabilities instead
 	@Deprecated
-	public  OngoingHordeEvent getEventForPlayer(String uuid) {
+	public HordeEvent getEventForPlayer(String uuid) {
 		if (DataUtils.isValidUUID(uuid)) {
 			return getEventForPlayer(UUID.fromString(uuid));
 		}
@@ -106,7 +106,7 @@ public class WorldDataHordeEvent extends WorldSavedData {
 
 	//legacy function -- use capabilities instead
 	@Deprecated
-	public OngoingHordeEvent getEventForPlayer(UUID uuid) {
+	public HordeEvent getEventForPlayer(UUID uuid) {
 		if (world != null) {
 			if (!world.isRemote) {
 				return getEventForPlayer(FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(uuid));
@@ -144,10 +144,10 @@ public class WorldDataHordeEvent extends WorldSavedData {
 	public static WorldDataHordeEvent getCleanData(World world) {
 		WorldDataHordeEvent data = new WorldDataHordeEvent();
 		data.world = world;
-		int day = Math.round(world.getWorldTime()/ConfigHandler.dayLength);
-		double multiplier = Math.ceil(day / ConfigHandler.hordeSpawnDays);
-		if (!(ConfigHandler.spawnFirstDay && day == 0)) multiplier += 1;
-		int nextDay = (int) Math.floor(((multiplier*ConfigHandler.hordeSpawnDays) + world.rand.nextInt(ConfigHandler.hordeSpawnVariation + 1)));
+		int day = Math.round(world.getWorldTime()/ HordeEventConfig.dayLength);
+		double multiplier = Math.ceil(day / HordeEventConfig.hordeSpawnDays);
+		if (!(HordeEventConfig.spawnFirstDay && day == 0)) multiplier += 1;
+		int nextDay = (int) Math.floor(((multiplier* HordeEventConfig.hordeSpawnDays) + world.rand.nextInt(HordeEventConfig.hordeSpawnVariation + 1)));
 		data.setNextDay(nextDay);
 		world.getMapStorage().setData(DATA, data);
 		data.save();
@@ -158,7 +158,7 @@ public class WorldDataHordeEvent extends WorldSavedData {
 		List<String> out = new ArrayList<String>();
 		out.add(toString());
 		out.add("Existing events: {");
-		for (OngoingHordeEvent event : getEvents()) {
+		for (HordeEvent event : getEvents()) {
 			out.add("	" +event.toString());
 			out.addAll(event.getEntityStrings());
 		}

@@ -14,7 +14,7 @@ import net.smileycorp.hordes.common.Constants;
 
 public class InfectionPacketHandler {
 
-	public static final SimpleNetworkWrapper NETWORK_INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(Constants.modid + "_infection");
+	public static final SimpleNetworkWrapper NETWORK_INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(Constants.MODID + "_infection");
 
 	public static void initPackets() {
 		NETWORK_INSTANCE.registerMessage(ClientCureMessageHandler.class, SimpleStringMessage.class, 0, Side.CLIENT);

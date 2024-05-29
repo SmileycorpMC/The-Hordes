@@ -3,7 +3,7 @@ package net.smileycorp.hordes.common.event;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.hordeevent.IOngoingHordeEvent;
+import net.smileycorp.hordes.hordeevent.capability.IOngoingHordeEvent;
 
 public class HordeEndEvent extends HordeEvent {
 

@@ -20,7 +20,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.smileycorp.hordes.common.ConfigHandler;
+import net.smileycorp.hordes.config.ZombiePlayersConfig;
 
 import java.util.List;
 import java.util.UUID;
@@ -96,17 +96,17 @@ public class EntityZombiePlayer extends EntityZombie {
 
 	@Override
 	public boolean isImmuneToFire() {
-		return ConfigHandler.zombiePlayersFireImmune ? true : super.isImmuneToFire();
+		return ZombiePlayersConfig.zombiePlayersFireImmune ? true : super.isImmuneToFire();
 	}
 
 	@Override
 	public boolean shouldBurnInDay() {
-		return ConfigHandler.zombiePlayersBurn;
+		return ZombiePlayersConfig.zombiePlayersBurn;
 	}
 
 	@Override
 	public boolean attackEntityFrom(DamageSource source, float amount) {
-		if (ConfigHandler.zombiePlayersOnlyHurtByPlayers &! (source.getTrueSource() instanceof EntityPlayer)) return false;
+		if (ZombiePlayersConfig.zombiePlayersOnlyHurtByPlayers &! (source.getTrueSource() instanceof EntityPlayer)) return false;
 		return super.attackEntityFrom(source, amount);
 	}
 

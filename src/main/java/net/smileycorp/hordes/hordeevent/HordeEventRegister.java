@@ -6,8 +6,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.GameData;
 import net.smileycorp.atlas.api.recipe.WeightedOutputs;
 import net.smileycorp.hordes.common.CommonUtils;
-import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.config.HordeEventConfig;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -21,13 +21,13 @@ public class HordeEventRegister {
 	@SuppressWarnings("unchecked")
 	public static void readConfig() {
 		Hordes.logInfo("Trying to read spawn table from config");
-		if (ConfigHandler.hordeSpawnList == null) {
+		if (HordeEventConfig.hordeSpawnList == null) {
 			Hordes.logError("Error reading config.", new NullPointerException("Spawn table has loaded as null"));
 		}
-		else if (ConfigHandler.hordeSpawnList.length<=0) {
+		else if (HordeEventConfig.hordeSpawnList.length<=0) {
 			Hordes.logError("Error reading config.", new Exception("Spawn table in config is empty"));
 		}
-		for (String name : ConfigHandler.hordeSpawnList) {
+		for (String name : HordeEventConfig.hordeSpawnList) {
 			try {
 				Class<?> clazz = null;
 				int weight=0;
@@ -43,10 +43,11 @@ public class HordeEventRegister {
 							String nbtstring = nameSplit[0].substring(nameSplit[0].indexOf("{"));
 							nameSplit[0] = nameSplit[0].substring(0, nameSplit[0].indexOf("{"));
 							nbt = CommonUtils.parseNBT(name, nbtstring);
+							EntityOcelot
 						}
 						ResourceLocation loc = new ResourceLocation(nameSplit[0]);
 						if (GameData.getEntityRegistry().containsKey(loc)) {
-							clazz = (Class<? extends EntityLiving>) GameData.getEntityRegistry().getValue(loc).getEntityClass();
+							clazz = GameData.getEntityRegistry().getValue(loc).getEntityClass();
 							try {
 								weight = Integer.valueOf(nameSplit[1]);
 							} catch (Exception e) {
@@ -77,7 +78,7 @@ public class HordeEventRegister {
 				if (EntityLiving.class.isAssignableFrom(clazz) && weight>0) {
 					HordeSpawnEntry entry = new HordeSpawnEntry((Class<? extends EntityLiving>) clazz, weight, minDay, maxDay);
 					if (nbt != null) {
-						entry.setTagCompound(nbt);
+						entry.setNBT(nbt);
 					}
 					spawnlist.add(entry);
 					Hordes.logInfo("Loaded entity " + name + " as " + clazz.getName() + " with weight " + weight + ", min day " + minDay + " and max day " + maxDay);

@@ -3,8 +3,8 @@ package net.smileycorp.hordes.common.event;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.smileycorp.hordes.common.ConfigHandler;
-import net.smileycorp.hordes.hordeevent.IOngoingHordeEvent;
+import net.smileycorp.hordes.config.HordeEventConfig;
+import net.smileycorp.hordes.hordeevent.capability.IOngoingHordeEvent;
 
 public class HordeEvent extends PlayerEvent {
 
@@ -17,7 +17,7 @@ public class HordeEvent extends PlayerEvent {
 		super(player);
 		world = player.world;
 		this.horde = horde;
-		day = (int) Math.floor(world.getWorldTime()/ConfigHandler.dayLength);
+		day = (int) Math.floor(world.getWorldTime()/ HordeEventConfig.dayLength);
 	}
 
 	public World getEntityWorld() {

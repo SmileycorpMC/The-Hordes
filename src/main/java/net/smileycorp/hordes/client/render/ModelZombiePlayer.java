@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.client;
+package net.smileycorp.hordes.client.render;
 
 import net.minecraft.client.model.ModelPlayer;
 import net.minecraft.client.model.ModelRenderer;

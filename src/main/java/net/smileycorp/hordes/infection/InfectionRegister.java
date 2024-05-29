@@ -17,8 +17,9 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.oredict.OreDictionary;
 import net.smileycorp.atlas.api.util.RecipeUtils;
 import net.smileycorp.hordes.common.CommonUtils;
-import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.capability.HordesCapabilities;
+import net.smileycorp.hordes.config.InfectionConfig;
 import net.smileycorp.hordes.infection.capability.IInfection;
 import net.smileycorp.hordes.integration.jei.JEIPluginInfection;
 
@@ -43,13 +44,13 @@ public class InfectionRegister {
 	@SuppressWarnings("unchecked")
 	private static void readInfectionEntities() {
 		try {
-			if (ConfigHandler.infectionEntities == null) {
+			if (InfectionConfig.infectionEntities == null) {
 				throw new Exception("Infection entity list has loaded as null");
 			}
-			else if (ConfigHandler.infectionEntities.length <= 0) {
+			else if (InfectionConfig.infectionEntities.length <= 0) {
 				throw new Exception("Infection entity list in config is empty");
 			}
-			for (String name : ConfigHandler.infectionEntities) {
+			for (String name : InfectionConfig.infectionEntities) {
 				String[] nameSplit = name.split(":");
 				if (nameSplit.length>=2) {
 					ResourceLocation loc = new ResourceLocation(nameSplit[0], nameSplit[1]);
@@ -71,13 +72,13 @@ public class InfectionRegister {
 
 	private static void readCureItems() {
 		try {
-			if (ConfigHandler.cureItemList == null) {
+			if (InfectionConfig.cureItemList == null) {
 				throw new Exception("Cure list has loaded as null");
 			}
-			else if (ConfigHandler.cureItemList.length<=0) {
+			else if (InfectionConfig.cureItemList.length<=0) {
 				throw new Exception("Cure list in config is empty");
 			}
-			cures = parseCureData(ConfigHandler.cureItemList);
+			cures = parseCureData(InfectionConfig.cureItemList);
 		} catch (Exception e) {
 			Hordes.logError("Failed to read config, " + e.getCause() + " " + e.getMessage(), e);
 		}
@@ -86,13 +87,13 @@ public class InfectionRegister {
 	@SuppressWarnings("unchecked")
 	private static void readEntityConversions() {
 		Hordes.logInfo("Trying to read conversion table from config");
-		if (ConfigHandler.infectionConversionList == null) {
+		if (InfectionConfig.infectionConversionList == null) {
 			Hordes.logError("Error reading config.", new NullPointerException("Conversion table has loaded as null"));
 		}
-		else if (ConfigHandler.infectionConversionList.length<=0) {
+		else if (InfectionConfig.infectionConversionList.length<=0) {
 			Hordes.logError("Error reading config.", new Exception("Conversion table in config is empty"));
 		}
-		for (String name : ConfigHandler.infectionConversionList) {
+		for (String name : InfectionConfig.infectionConversionList) {
 			try {
 				Class<?> clazz = null;
 				int infectChance = 0;
@@ -261,9 +262,9 @@ public class InfectionRegister {
 	}
 
 	public static int getInfectionTime(EntityLivingBase entity) {
-		int time = ConfigHandler.ticksForEffectStage;
-		IInfection cap = entity.getCapability(Hordes.INFECTION, null);
-		if (cap != null) time = (int)(time * Math.pow(ConfigHandler.effectStageTickReduction, cap.getInfectionCount()));
+		int time = InfectionConfig.ticksForEffectStage;
+		IInfection cap = entity.getCapability(HordesCapabilities.INFECTION, null);
+		if (cap != null) time = (int)(time * Math.pow(InfectionConfig.effectStageTickReduction, cap.getInfectionCount()));
 		return time;
 	}
 

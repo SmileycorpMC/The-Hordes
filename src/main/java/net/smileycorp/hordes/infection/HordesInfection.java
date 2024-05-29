@@ -11,7 +11,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.entities.EntityZombiePlayer;
 
-@EventBusSubscriber(modid=Constants.modid)
+@EventBusSubscriber(modid=Constants.MODID)
 public class HordesInfection {
 	
 	public static Potion INFECTED = new PotionInfected();

@@ -30,17 +30,17 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.smileycorp.atlas.api.SimpleStringMessage;
 import net.smileycorp.atlas.api.util.DirectionUtils;
-import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.ai.EntityAINearestAttackableConversion;
+import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.common.event.InfectionDeathEvent;
+import net.smileycorp.hordes.config.InfectionConfig;
 import net.smileycorp.hordes.infection.InfectionPacketHandler.InfectMessage;
 import net.smileycorp.hordes.infection.capability.IInfection;
 
 import java.util.Random;
 
-@EventBusSubscriber(modid=Constants.modid)
+@EventBusSubscriber(modid=Constants.MODID)
 public class InfectionEventHandler {
 
 	//attach required entity capabilities for event to function
@@ -57,7 +57,7 @@ public class InfectionEventHandler {
 		Entity entity = event.getEntity();
 		if (entity != null) {
 			if (!entity.world.isRemote) {
-				if (ConfigHandler.infectionEntitiesAggroConversions) {
+				if (InfectionConfig.infectionEntitiesAggroConversions) {
 					if (InfectionRegister.canCauseInfection(entity) && entity instanceof EntityCreature) {
 						((EntityLiving)entity).targetTasks.addTask(3, new EntityAINearestAttackableConversion((EntityCreature)entity, 10, true, true));
 					}
@@ -83,7 +83,7 @@ public class InfectionEventHandler {
 		if (entity.isPotionActive(HordesInfection.INFECTED)) {
 			if (InfectionRegister.isCure(stack)) {
 				entity.removePotionEffect(HordesInfection.INFECTED);
-				IInfection cap = entity.getCapability(Hordes.INFECTION, null);
+				IInfection cap = entity.getCapability(HordesCapabilities.INFECTION, null);
 				if (cap != null) cap.increaseInfection();
 			}
 		}
@@ -99,7 +99,7 @@ public class InfectionEventHandler {
 				if (entity.isPotionActive(HordesInfection.INFECTED)) {
 					if (InfectionRegister.isCure(stack)) {
 						entity.removePotionEffect(HordesInfection.INFECTED);
-						IInfection cap = entity.getCapability(Hordes.INFECTION, null);
+						IInfection cap = entity.getCapability(HordesCapabilities.INFECTION, null);
 						if (cap != null) cap.increaseInfection();
 						event.setCanceled(true);
 						event.setCancellationResult(EnumActionResult.FAIL);
@@ -117,15 +117,15 @@ public class InfectionEventHandler {
 		Random rand = world.rand;
 		if (!world.isRemote && InfectionRegister.canCauseInfection(attacker)) {
 			if (!entity.isPotionActive(HordesInfection.INFECTED)) {
-				if ((entity instanceof EntityPlayer && ConfigHandler.infectPlayers)) {
+				if ((entity instanceof EntityPlayer && InfectionConfig.infectPlayers)) {
 					int c = rand.nextInt(100);
-					if (c <= ConfigHandler.playerInfectChance) {
+					if (c <= InfectionConfig.playerInfectChance) {
 						entity.addPotionEffect(new PotionEffect(HordesInfection.INFECTED, InfectionRegister.getInfectionTime(entity), 0));
 						InfectionPacketHandler.NETWORK_INSTANCE.sendTo(new InfectMessage(), (EntityPlayerMP) entity);
 					}
-				} else if ((entity instanceof EntityVillager && ConfigHandler.infectVillagers)) {
+				} else if ((entity instanceof EntityVillager && InfectionConfig.infectVillagers)) {
 					int c = rand.nextInt(100);
-					if (c <= ConfigHandler.villagerInfectChance) {
+					if (c <= InfectionConfig.villagerInfectChance) {
 						entity.addPotionEffect(new PotionEffect(HordesInfection.INFECTED, InfectionRegister.getInfectionTime(entity), 0));
 					}
 				} else if (InfectionRegister.canBeInfected(entity)) {

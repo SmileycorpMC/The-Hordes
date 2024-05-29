@@ -4,7 +4,7 @@ import net.minecraft.entity.IRangedAttackMob;
 import net.minecraft.entity.monster.AbstractSkeleton;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.world.World;
-import net.smileycorp.hordes.common.ConfigHandler;
+import net.smileycorp.hordes.config.CommonConfigHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -19,7 +19,7 @@ public abstract class MixinAbstractSkeleton extends EntityMob implements IRanged
 
 	@Inject(at=@At("HEAD"), method = "onLivingUpdate()V", cancellable = true)
 	public void onLivingUpdate(CallbackInfo callback) {
-		if (!ConfigHandler.skeletonsBurn) {
+		if (!CommonConfigHandler.skeletonsBurn) {
 			super.onLivingUpdate();
 			callback.cancel();
 		}

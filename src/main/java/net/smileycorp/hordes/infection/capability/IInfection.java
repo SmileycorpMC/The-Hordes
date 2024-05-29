@@ -6,7 +6,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.Capability.IStorage;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.capability.HordesCapabilities;
 
 public interface IInfection {
 
@@ -59,12 +59,12 @@ public interface IInfection {
 
 		@Override
 		public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-			return capability == Hordes.INFECTION;
+			return capability == HordesCapabilities.INFECTION;
 		}
 
 		@Override
 		public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-			return capability == Hordes.INFECTION ? Hordes.INFECTION.cast(instance) : null;
+			return capability == HordesCapabilities.INFECTION ? HordesCapabilities.INFECTION.cast(instance) : null;
 		}
 
 	}

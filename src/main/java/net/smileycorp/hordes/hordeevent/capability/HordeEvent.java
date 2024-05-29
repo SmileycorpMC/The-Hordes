@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.hordeevent;
+package net.smileycorp.hordes.hordeevent.capability;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
@@ -19,10 +19,15 @@ import net.smileycorp.atlas.api.SimpleStringMessage;
 import net.smileycorp.atlas.api.entity.ai.EntityAIFindNearestTargetPredicate;
 import net.smileycorp.atlas.api.recipe.WeightedOutputs;
 import net.smileycorp.atlas.api.util.DirectionUtils;
-import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.Hordes;
 import net.smileycorp.hordes.common.ai.EntityAIHordeTrackPlayer;
+import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.common.event.*;
+import net.smileycorp.hordes.config.HordeEventConfig;
+import net.smileycorp.hordes.hordeevent.HordeEventPacketHandler;
+import net.smileycorp.hordes.hordeevent.HordeEventRegister;
+import net.smileycorp.hordes.hordeevent.HordeSoundMessage;
+import net.smileycorp.hordes.hordeevent.HordeSpawnEntry;
 import net.smileycorp.hordes.integration.mobspropertiesrandomness.MPRIntegration;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -31,7 +36,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class OngoingHordeEvent implements IOngoingHordeEvent {
+public class HordeEvent implements IOngoingHordeEvent {
 
 	private Set<EntityLiving> entitiesSpawned = new HashSet<>();
 	private int timer = 0;
@@ -41,7 +46,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 	private EntityPlayer player;
 	private boolean hasChanged = false;
 
-	public OngoingHordeEvent(World world, EntityPlayer player) {
+	public HordeEvent(World world, EntityPlayer player) {
 		this.world=world;
 		this.player=player;
 		if (world!=null) {
@@ -53,7 +58,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 		}
 	}
 
-	public OngoingHordeEvent() {
+	public HordeEvent() {
 		world = null;
 	}
 
@@ -97,12 +102,12 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 	public void update(World world) {
 		if (!world.isRemote && player!=null) {
 			if (player.world.provider.getDimension()==0) {
-				if ((timer % ConfigHandler.hordeSpawnInterval) == 0) {
-					int amount = (int)(ConfigHandler.hordeSpawnAmount * (1+(day/ConfigHandler.hordeSpawnDays) * (ConfigHandler.hordeSpawnMultiplier-1)));
+				if ((timer % HordeEventConfig.hordeSpawnInterval) == 0) {
+					int amount = (int)(HordeEventConfig.hordeSpawnAmount * (1+(day/ HordeEventConfig.hordeSpawnDays) * (HordeEventConfig.hordeSpawnMultiplier-1)));
 					List<EntityPlayer>players = world.getEntities(EntityPlayer.class, p -> p != player);
 					for (EntityPlayer entity : players) {
 						if (player.getDistance(entity)<=25) {
-							amount = (int) Math.floor(amount * ConfigHandler.hordeMultiplayerScaling);
+							amount = (int) Math.floor(amount * HordeEventConfig.hordeMultiplayerScaling);
 						}
 					}
 					spawnWave(world, amount);
@@ -151,7 +156,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 			logInfo("Stopping wave spawn because count is " + count);
 		}
 		for (int n = 0; n<count; n++) {
-			if (entitiesSpawned.size() > ConfigHandler.hordeSpawnMax) {
+			if (entitiesSpawned.size() > HordeEventConfig.hordeSpawnMax) {
 				logInfo("Can't spawn wave because max cap has been reached");
 				return;
 			}
@@ -167,7 +172,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 					entity = spawnEntityEvent.entity;
 					pos = spawnEntityEvent.pos;
 					entity.onInitialSpawn(world.getDifficultyForLocation(pos), null);
-					entity.readFromNBT(entry.getTagCompound());
+					entity.readFromNBT(entry.getNBT());
 					entity.setPosition(pos.getX(), pos.getY(), pos.getZ());
 					if (!world.spawnEntity(entity)) Hordes.logError("Unable to spawn entity from " + clazz, new Exception());
 					else {
@@ -186,7 +191,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 	private void finalizeEntity(EntityLiving entity, World world2, EntityPlayer player2) {
 		entity.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(100.0D);
 		if (Loader.isModLoaded("mpr")) MPRIntegration.addFollowAttribute(entity);
-		entity.getCapability(Hordes.HORDESPAWN, null).setPlayerUUID(player.getUniqueID().toString());
+		entity.getCapability(HordesCapabilities.HORDESPAWN, null).setPlayerUUID(player.getUniqueID().toString());
 		entity.enablePersistence();
 		registerEntity(entity);
 		hasChanged = true;
@@ -206,8 +211,8 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 		for (EntityLiving entity : entitiesSpawned) {
 			if (entity != null) {
 				if (entity.isDead) {
-					if (entity.hasCapability(Hordes.HORDESPAWN, null)) {
-						IHordeSpawn cap = entity.getCapability(Hordes.HORDESPAWN, null);
+					if (entity.hasCapability(HordesCapabilities.HORDESPAWN, null)) {
+						HordeSpawn cap = entity.getCapability(HordesCapabilities.HORDESPAWN, null);
 						cap.setPlayerUUID("");
 						toRemove.add(entity);
 					}
@@ -223,7 +228,7 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 	public boolean isHordeDay(World world) {
 		if (world.isRemote || player==null) return false;
 		if (world!=this.world) return false;
-		return isActive(world) || Math.floor(world.getWorldTime()/ConfigHandler.dayLength)>=nextDay;
+		return isActive(world) || Math.floor(world.getWorldTime()/ HordeEventConfig.dayLength)>=nextDay;
 	}
 
 	@Override
@@ -271,14 +276,14 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 				HordeStartEvent startEvent = new HordeStartEvent(player, this, isCommand);
 				MinecraftForge.EVENT_BUS.post(startEvent);
 				if (startEvent.isCanceled()) return;
-				HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, HordeEventRegister.getSpawnTable((int) Math.floor(world.getWorldTime()/ConfigHandler.dayLength)), this);
+				HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, HordeEventRegister.getSpawnTable((int) Math.floor(world.getWorldTime()/ HordeEventConfig.dayLength)), this);
 				MinecraftForge.EVENT_BUS.post(buildTableEvent);
 				WeightedOutputs<HordeSpawnEntry> spawntable = buildTableEvent.spawntable;
 				if (!spawntable.isEmpty()) {
 					timer = duration;
 					hasChanged = true;
 					sendMessage(startEvent.getMessage());
-					if (isCommand) day = (int) Math.floor(world.getWorldTime()/ConfigHandler.dayLength);
+					if (isCommand) day = (int) Math.floor(world.getWorldTime()/ HordeEventConfig.dayLength);
 					else day = nextDay;
 				} else {
 					logInfo("Spawntable is empty, canceling event start.");
@@ -311,8 +316,8 @@ public class OngoingHordeEvent implements IOngoingHordeEvent {
 		sendMessage(endEvent.getMessage());
 		List<EntityLiving> toRemove = new ArrayList<>();
 		for (EntityLiving entity : entitiesSpawned) {
-			if (entity.hasCapability(Hordes.HORDESPAWN, null)) {
-				IHordeSpawn cap = entity.getCapability(Hordes.HORDESPAWN, null);
+			if (entity.hasCapability(HordesCapabilities.HORDESPAWN, null)) {
+				HordeSpawn cap = entity.getCapability(HordesCapabilities.HORDESPAWN, null);
 				cap.setPlayerUUID("");
 				toRemove.add(entity);
 			}

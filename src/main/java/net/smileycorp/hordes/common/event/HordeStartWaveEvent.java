@@ -3,13 +3,13 @@ package net.smileycorp.hordes.common.event;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;
-import net.smileycorp.hordes.common.Hordes;
-import net.smileycorp.hordes.hordeevent.IOngoingHordeEvent;
+import net.smileycorp.hordes.common.Constants;
+import net.smileycorp.hordes.hordeevent.capability.IOngoingHordeEvent;
 
 @Cancelable
 public class HordeStartWaveEvent extends HordeEvent {
 
-	protected ResourceLocation sound = Hordes.HORDE_SOUND;
+	protected ResourceLocation sound = Constants.HORDE_SOUND;
 	protected int count;
 
 	public HordeStartWaveEvent(EntityPlayer player, IOngoingHordeEvent horde, int count) {

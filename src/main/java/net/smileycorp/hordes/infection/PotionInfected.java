@@ -13,8 +13,8 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.Constants;
+import net.smileycorp.hordes.config.InfectionConfig;
 
 import java.util.List;
 import java.util.UUID;
@@ -49,7 +49,7 @@ public class PotionInfected extends Potion {
 
     @Override
 	public List<ItemStack> getCurativeItems() {
-    	return ConfigHandler.enableMobInfection ? InfectionRegister.getCureList() : super.getCurativeItems();
+    	return InfectionConfig.enableMobInfection ? InfectionRegister.getCureList() : super.getCurativeItems();
     }
     
     @Override
@@ -61,12 +61,12 @@ public class PotionInfected extends Potion {
     
     @Override
     public boolean isReady(int duration, int amplifier) {
-    	return ConfigHandler.infectHunger;
+    	return InfectionConfig.infectHunger;
     }
     
     @Override
 	public void applyAttributesModifiersToEntity(EntityLivingBase entity, AbstractAttributeMap map, int amplifier) {
-        if (amplifier > 0 && ConfigHandler.infectSlowness) {
+        if (amplifier > 0 && InfectionConfig.infectSlowness) {
         	IAttributeInstance attribute = map.getAttributeInstance(SharedMonsterAttributes.MOVEMENT_SPEED);
         	if (attribute != null) {
         		attribute.removeModifier(SPEED_MOD_UUID);

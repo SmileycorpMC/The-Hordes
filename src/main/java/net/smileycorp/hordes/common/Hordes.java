@@ -1,8 +1,5 @@
 package net.smileycorp.hordes.common;
 
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
@@ -11,37 +8,20 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.smileycorp.hordes.hordeevent.IHordeSpawn;
-import net.smileycorp.hordes.hordeevent.IOngoingHordeEvent;
-import net.smileycorp.hordes.infection.capability.IInfection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Mod(modid = Constants.modid, name=Constants.name, version = Constants.version, dependencies = Constants.dependencies)
+@Mod(modid = Constants.MODID, name=Constants.NAME, version = Constants.VERSION, dependencies = Constants.DEPENDENCIES)
 public class Hordes {
 
-	private static Logger logger = LogManager.getLogger(Constants.name);
-
-	public static final ResourceLocation HORDE_SOUND = Constants.loc("horde_spawn");
-
-	@Instance(Constants.modid)
+	private static Logger logger = LogManager.getLogger(Constants.NAME);
+    
+    @Instance(Constants.MODID)
 	public static Hordes INSTANCE;
 
-	@SidedProxy(clientSide = Constants.client, serverSide = Constants.server)
+	@SidedProxy(clientSide = Constants.CLIENT_PROXY, serverSide = Constants.SERVER_PROXY)
 	public static CommonProxy proxy;
-
-	@CapabilityInject(IOngoingHordeEvent.class)
-	public final static Capability<IOngoingHordeEvent> HORDE_EVENT = null;
-
-	@CapabilityInject(IHordeSpawn.class)
-	public final static Capability<IHordeSpawn> HORDESPAWN = null;
-
-	@CapabilityInject(IZombifyPlayer.class)
-	public final static Capability<IZombifyPlayer> ZOMBIFY_PLAYER = null;
-
-	@CapabilityInject(IInfection.class)
-	public final static Capability<IInfection> INFECTION = null;
-
+	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event){
 		proxy.preInit(event);

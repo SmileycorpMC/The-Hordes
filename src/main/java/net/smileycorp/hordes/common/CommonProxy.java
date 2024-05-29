@@ -7,8 +7,15 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.smileycorp.hordes.hordeevent.*;
-import net.smileycorp.hordes.hordeevent.IHordeSpawn.HordeSpawn;
+import net.smileycorp.hordes.config.CommonConfigHandler;
+import net.smileycorp.hordes.config.HordeEventConfig;
+import net.smileycorp.hordes.config.InfectionConfig;
+import net.smileycorp.hordes.hordeevent.HordeEventHandler;
+import net.smileycorp.hordes.hordeevent.HordeEventPacketHandler;
+import net.smileycorp.hordes.hordeevent.HordeEventRegister;
+import net.smileycorp.hordes.hordeevent.capability.HordeSpawn;
+import net.smileycorp.hordes.hordeevent.capability.IOngoingHordeEvent;
+import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 import net.smileycorp.hordes.hordeevent.command.CommandDebugHordeEvent;
 import net.smileycorp.hordes.hordeevent.command.CommandSpawnWave;
 import net.smileycorp.hordes.hordeevent.command.CommandStartHordeEvent;
@@ -21,15 +28,15 @@ import net.smileycorp.hordes.infection.capability.IInfection;
 public class CommonProxy {
 
 	public void preInit(FMLPreInitializationEvent event) {
-		ConfigHandler.config = new Configuration(event.getSuggestedConfigurationFile());
-		ConfigHandler.syncConfig();
+		CommonConfigHandler.config = new Configuration(event.getSuggestedConfigurationFile());
+		CommonConfigHandler.syncConfig();
 		MinecraftForge.EVENT_BUS.register(this);
 		CapabilityManager.INSTANCE.register(IZombifyPlayer.class, new IZombifyPlayer.Storage(), IZombifyPlayer.Implementation::new);
-		CapabilityManager.INSTANCE.register(IHordeSpawn.class, new IHordeSpawn.Storage(), HordeSpawn::new);
-		CapabilityManager.INSTANCE.register(IOngoingHordeEvent.class, new IOngoingHordeEvent.Storage(), OngoingHordeEvent::new);
+		CapabilityManager.INSTANCE.register(HordeSpawn.class, new HordeSpawn.Storage(), HordeSpawn.Impl::new);
+		CapabilityManager.INSTANCE.register(IOngoingHordeEvent.class, new IOngoingHordeEvent.Storage(), HordeEvent::new);
 		CapabilityManager.INSTANCE.register(IInfection.class, new IInfection.Storage(), IInfection.Implementation::new);
 		//Horde Event
-		if (ConfigHandler.enableHordeEvent) {
+		if (HordeEventConfig.enableHordeEvent) {
 			HordeEventPacketHandler.initPackets();
 			MinecraftForge.EVENT_BUS.register(new HordeEventHandler());
 		} else {
@@ -37,7 +44,7 @@ public class CommonProxy {
 		}
 
 		//Mob Infection
-		if (ConfigHandler.enableMobInfection) {
+		if (InfectionConfig.enableMobInfection) {
 			InfectionPacketHandler.initPackets();
 			MinecraftForge.EVENT_BUS.register(new InfectionEventHandler());
 		} else {
@@ -47,24 +54,17 @@ public class CommonProxy {
 		MinecraftForge.EVENT_BUS.register(new MiscEventHandler());
 	}
 
-	public void init(FMLInitializationEvent event) {
-
-	}
+	public void init(FMLInitializationEvent event) {}
 
 	public void postInit(FMLPostInitializationEvent event) {
 		//Horde Event
-		if (ConfigHandler.enableHordeEvent) {
-			HordeEventRegister.readConfig();
-		}
-
+		if (HordeEventConfig.enableHordeEvent) HordeEventRegister.readConfig();
 		//Mob Infection
-		if (ConfigHandler.enableMobInfection) {
-			InfectionRegister.readConfig();
-		}
+		if (InfectionConfig.enableMobInfection) InfectionRegister.readConfig();
 	}
 
 	public void serverStart(FMLServerStartingEvent event) {
-		if (ConfigHandler.enableHordeEvent) {
+		if (HordeEventConfig.enableHordeEvent) {
 			event.registerServerCommand(new CommandSpawnWave());
 			event.registerServerCommand(new CommandStartHordeEvent());
 			event.registerServerCommand(new CommandStopHordeEvent());

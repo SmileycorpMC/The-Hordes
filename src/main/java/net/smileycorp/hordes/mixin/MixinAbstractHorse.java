@@ -9,8 +9,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ContainerHorseChest;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.ai.EntityAIHorseFlee;
+import net.smileycorp.hordes.config.CommonConfigHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -30,7 +30,7 @@ public abstract class MixinAbstractHorse extends EntityAnimal {
 
 	@Inject(at=@At("TAIL"), method = "initEntityAI()V", cancellable = true)
 	protected void initEntityAI(CallbackInfo callback) {
-		if (ConfigHandler.aggressiveZombieHorses && ((EntityAnimal)this) instanceof EntityZombieHorse) {
+		if (CommonConfigHandler.aggressiveZombieHorses && ((EntityAnimal)this) instanceof EntityZombieHorse) {
 			tasks.addTask(0, new EntityAISwimming(this));
 			tasks.addTask(2, new EntityAIAttackMelee(this, 1.0D, false));
 			tasks.addTask(5, new EntityAIMoveTowardsRestriction(this, 1.0D));
@@ -45,7 +45,7 @@ public abstract class MixinAbstractHorse extends EntityAnimal {
 			tasks.taskEntries.removeIf(g->g.action instanceof EntityAIPanic);
 			tasks.taskEntries.removeIf(g->g.action instanceof EntityAIPanic);
 		}
-		if (getCreatureAttribute() != EnumCreatureAttribute.UNDEAD && ConfigHandler.zombiesScareHorses) {
+		if (getCreatureAttribute() != EnumCreatureAttribute.UNDEAD && CommonConfigHandler.zombiesScareHorses) {
 			tasks.addTask(1, new EntityAIHorseFlee(this));
 		}
 	}
@@ -53,16 +53,16 @@ public abstract class MixinAbstractHorse extends EntityAnimal {
 	@Inject(at=@At("HEAD"), method = "onLivingUpdate()V", cancellable = true)
 	public void onLivingUpdate(CallbackInfo callback) {
 		if ((EntityAnimal)this instanceof EntityZombieHorse) {
-			if (ConfigHandler.aggressiveZombieHorses) {
+			if (CommonConfigHandler.aggressiveZombieHorses) {
 				updateArmSwingProgress();
 				if (getBrightness() > 0.5F) idleTime += 2;
 			}
-			if (ConfigHandler.zombieHorsesBurn) {
+			if (CommonConfigHandler.zombieHorsesBurn) {
 				tryBurn();
 			}
 		}
 		else if ((EntityAnimal)this instanceof EntitySkeletonHorse) {
-			if (ConfigHandler.skeletonHorsesBurn) {
+			if (CommonConfigHandler.skeletonHorsesBurn) {
 				tryBurn();
 			}
 		}
@@ -92,7 +92,7 @@ public abstract class MixinAbstractHorse extends EntityAnimal {
 	@Inject(at=@At("HEAD"), method = "canEatGrass()Z", cancellable = true)
 	public void canEatGrass(CallbackInfoReturnable<Boolean> callback) {
 		if ((EntityAnimal)this instanceof EntityZombieHorse) {
-			if (ConfigHandler.aggressiveZombieHorses) {
+			if (CommonConfigHandler.aggressiveZombieHorses) {
 				callback.setReturnValue(false);
 				callback.cancel();
 			}

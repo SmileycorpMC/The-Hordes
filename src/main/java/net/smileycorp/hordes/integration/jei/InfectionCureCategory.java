@@ -36,7 +36,7 @@ public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapp
 
 	@Override
 	public String getModName() {
-		return Constants.modid;
+		return Constants.MODID;
 	}
 
 	@Override

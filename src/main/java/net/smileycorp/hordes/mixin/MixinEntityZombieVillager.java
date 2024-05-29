@@ -5,7 +5,7 @@ import net.minecraft.entity.monster.EntityZombieVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
-import net.smileycorp.hordes.common.ConfigHandler;
+import net.smileycorp.hordes.config.CommonConfigHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -20,7 +20,7 @@ public abstract class MixinEntityZombieVillager extends EntityZombie {
 
 	@Inject(at=@At("HEAD"), method = "processInteract(Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/EnumHand;)Z", cancellable = true)
 	public void processInteract(EntityPlayer player, EnumHand hand, CallbackInfoReturnable<Boolean> callback) {
-		if (!ConfigHandler.zombieVillagersCanBeCured) {
+		if (!CommonConfigHandler.zombieVillagersCanBeCured) {
 			callback.setReturnValue(super.processInteract(player, hand));
 			callback.cancel();
 		}

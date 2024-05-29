@@ -13,7 +13,7 @@ import net.smileycorp.hordes.common.Constants;
 
 public class HordeEventPacketHandler {
 
-	public static final SimpleNetworkWrapper NETWORK_INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(Constants.modid+"_hordeevent");
+	public static final SimpleNetworkWrapper NETWORK_INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(Constants.MODID +"_hordeevent");
 
 	public static void initPackets() {
 		NETWORK_INSTANCE.registerMessage(SoundMessageHandler.class, HordeSoundMessage.class, 0, Side.CLIENT);

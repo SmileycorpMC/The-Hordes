@@ -10,6 +10,7 @@ buildscript {
         classpath 'net.minecraftforge.gradle:ForgeGradle:3.+'
 		classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
 		classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
+        classpath 'io.github.llamalad7:mixinextras-common:0.3.5'
     }
 }
 
@@ -81,6 +82,8 @@ dependencies {
 	implementation "curse.maven:atlas-463826:3816069"
 	implementation "curse.maven:jei-238222:4393461"
 	implementation "curse.maven:mpr-285012:2823889"
+    implementation "curse.maven:gamestages-268655:2951840"
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.5"))
 
 }
 
@@ -110,6 +113,7 @@ shadowJar {
 	exclude 'LICENSE.txt'
 	dependencies {
 		include(dependency("org.spongepowered:mixin:0.8"))
+        include(dependency("io.github.llamalad7:mixinextras-forge:0.3.5"))
 	}
 }
 

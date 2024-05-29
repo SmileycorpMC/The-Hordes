@@ -6,7 +6,7 @@ import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.world.World;
-import net.smileycorp.hordes.common.ConfigHandler;
+import net.smileycorp.hordes.config.HordeEventConfig;
 
 public class EntityAIHordeTrackPlayer extends EntityAIBase {
     
@@ -18,7 +18,7 @@ public class EntityAIHordeTrackPlayer extends EntityAIBase {
     protected float waterCost;
     
     public EntityAIHordeTrackPlayer(EntityLiving entity, Entity target) {
-        timeToRecalcPath = entity.getRNG().nextInt(ConfigHandler.hordePathingInterval);
+        timeToRecalcPath = entity.getRNG().nextInt(HordeEventConfig.hordePathingInterval);
         this.entity = entity;
         world = entity.world;
         this.target = target;
@@ -50,7 +50,7 @@ public class EntityAIHordeTrackPlayer extends EntityAIBase {
     @Override
     public void updateTask() {
         if (timeToRecalcPath-- <= 0)  {
-            timeToRecalcPath = ConfigHandler.hordePathingInterval;
+            timeToRecalcPath = HordeEventConfig.hordePathingInterval;
             pather.tryMoveToXYZ(target.posX, target.posY, target.posZ, 1f);
         }
     }

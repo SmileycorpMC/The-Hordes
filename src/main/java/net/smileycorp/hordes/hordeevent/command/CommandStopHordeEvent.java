@@ -6,7 +6,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.capability.HordesCapabilities;
 
 public class CommandStopHordeEvent extends CommandBase {
 
@@ -17,7 +17,7 @@ public class CommandStopHordeEvent extends CommandBase {
 
 	@Override
 	public String getUsage(ICommandSender sender) {
-		return "commands."+Constants.modid+".StopHorde.usage";
+		return "commands."+Constants.MODID +".StopHorde.usage";
 	}
 
 	@Override
@@ -29,8 +29,8 @@ public class CommandStopHordeEvent extends CommandBase {
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		server.addScheduledTask(() -> {
 			EntityPlayer player = (EntityPlayer) sender.getCommandSenderEntity();
-			if (player.hasCapability(Hordes.HORDE_EVENT, null)) player.getCapability(Hordes.HORDE_EVENT, null).stopEvent(sender.getEntityWorld(), true);
+			if (player.hasCapability(HordesCapabilities.HORDE_EVENT, null)) player.getCapability(HordesCapabilities.HORDE_EVENT, null).stopEvent(sender.getEntityWorld(), true);
 		});
-		notifyCommandListener(sender, this, "commands."+Constants.modid+".StopHorde.success", new Object[] {});
+		notifyCommandListener(sender, this, "commands."+Constants.MODID +".StopHorde.success", new Object[] {});
 	}
 }

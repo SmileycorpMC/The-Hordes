@@ -9,7 +9,7 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.smileycorp.hordes.common.ConfigHandler;
+import net.smileycorp.hordes.config.ClientConfigHandler;
 import net.smileycorp.hordes.infection.HordesInfection;
 import org.lwjgl.opengl.GL11;
 
@@ -19,7 +19,7 @@ public class ClientInfectionEventHandler {
 
 	@SubscribeEvent
 	public void preRenderEntity(RenderLivingEvent.Pre<EntityLivingBase> event){
-		if (ConfigHandler.playerInfectionVisuals) {
+		if (ClientConfigHandler.playerInfectionVisuals) {
 			Minecraft mc = Minecraft.getMinecraft();
 			EntityPlayer player = mc.player;
 			if (player.isPotionActive(HordesInfection.INFECTED) && event.getEntity() != player) {
@@ -36,7 +36,7 @@ public class ClientInfectionEventHandler {
 
 	@SubscribeEvent
 	public void postRenderEntity(RenderLivingEvent.Post<EntityLivingBase> event){
-		if (ConfigHandler.playerInfectionVisuals) {
+		if (ClientConfigHandler.playerInfectionVisuals) {
 			Minecraft mc = Minecraft.getMinecraft();
 			EntityPlayer player = mc.player;
 			if (player.isPotionActive(HordesInfection.INFECTED) && event.getEntity() != player) {
@@ -50,7 +50,7 @@ public class ClientInfectionEventHandler {
 
 	@SubscribeEvent
 	public void renderOverlay(RenderGameOverlayEvent.Post event){
-		if (ConfigHandler.playerInfectionVisuals) {
+		if (ClientConfigHandler.playerInfectionVisuals) {
 			Minecraft mc = Minecraft.getMinecraft();
 			EntityPlayer player = mc.player;
 			if (player!= null && event.getType() == ElementType.VIGNETTE) {

@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.hordeevent;
+package net.smileycorp.hordes.hordeevent.capability;
 
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,7 +11,7 @@ import net.minecraftforge.common.capabilities.Capability.IStorage;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.smileycorp.atlas.api.IOngoingEvent;
-import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.capability.HordesCapabilities;
 
 public interface IOngoingHordeEvent extends IOngoingEvent {
 
@@ -59,7 +59,7 @@ public interface IOngoingHordeEvent extends IOngoingEvent {
 			try {
 				World world = player.world.isRemote ? player.world : FMLCommonHandler.instance().getMinecraftServerInstance().getWorld(0);
 				if (world == null) return;
-				instance = new OngoingHordeEvent(world, player);
+				instance = new HordeEvent(world, player);
 			} catch (Exception e) {
 				return;
 			}
@@ -67,22 +67,22 @@ public interface IOngoingHordeEvent extends IOngoingEvent {
 
 		@Override
 		public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-			return capability == Hordes.HORDE_EVENT && instance != null;
+			return capability == HordesCapabilities.HORDE_EVENT && instance != null;
 		}
 
 		@Override
 		public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-			return capability == Hordes.HORDE_EVENT && instance != null ? Hordes.HORDE_EVENT.cast(instance) : null;
+			return capability == HordesCapabilities.HORDE_EVENT && instance != null ? HordesCapabilities.HORDE_EVENT.cast(instance) : null;
 		}
 
 		@Override
 		public NBTBase serializeNBT() {
-			return instance == null ?  new NBTTagCompound() : Hordes.HORDE_EVENT.getStorage().writeNBT(Hordes.HORDE_EVENT, instance, null);
+			return instance == null ?  new NBTTagCompound() : HordesCapabilities.HORDE_EVENT.getStorage().writeNBT(HordesCapabilities.HORDE_EVENT, instance, null);
 		}
 
 		@Override
 		public void deserializeNBT(NBTBase nbt) {
-			if (instance != null) Hordes.HORDE_EVENT.getStorage().readNBT(Hordes.HORDE_EVENT, instance, null, nbt);
+			if (instance != null) HordesCapabilities.HORDE_EVENT.getStorage().readNBT(HordesCapabilities.HORDE_EVENT, instance, null, nbt);
 		}
 
 	}

@@ -9,21 +9,21 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
+import net.smileycorp.hordes.client.render.RenderZombiePlayer;
 import net.smileycorp.hordes.common.CommonProxy;
-import net.smileycorp.hordes.common.ConfigHandler;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.entities.EntityZombiePlayer;
+import net.smileycorp.hordes.config.InfectionConfig;
 
-@EventBusSubscriber(value = Side.CLIENT, modid = Constants.modid)
+@EventBusSubscriber(value = Side.CLIENT, modid = Constants.MODID)
 public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
 		super.preInit(event);
 		//Mob Infection
-		if (ConfigHandler.enableMobInfection) {
-			MinecraftForge.EVENT_BUS.register(new ClientInfectionEventHandler());
-		}
+		if (InfectionConfig.enableMobInfection) MinecraftForge.EVENT_BUS.register(new ClientInfectionEventHandler());
+		MinecraftForge.EVENT_BUS.register(new ClientHandler());
 	}
 	
 	@Override
@@ -38,6 +38,6 @@ public class ClientProxy extends CommonProxy {
 	
 	@SubscribeEvent
 	public static void registerModels(ModelRegistryEvent event) {
-		RenderingRegistry.registerEntityRenderingHandler(EntityZombiePlayer.class, m-> new RenderZombiePlayer(m));
+		RenderingRegistry.registerEntityRenderingHandler(EntityZombiePlayer.class, RenderZombiePlayer::new);
 	}
 }

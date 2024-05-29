@@ -5,7 +5,7 @@ import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.passive.AbstractHorse;
 import net.minecraft.entity.passive.EntityZombieHorse;
 import net.minecraft.world.World;
-import net.smileycorp.hordes.common.ConfigHandler;
+import net.smileycorp.hordes.config.CommonConfigHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -20,7 +20,7 @@ public abstract class MixinEntityZombieHorse extends AbstractHorse implements IM
 
 	@Inject(at=@At("TAIL"), method = "applyEntityAttributes()V", cancellable = true)
 	protected void applyEntityAttributes(CallbackInfo callback) {
-		if (ConfigHandler.aggressiveZombieHorses) {
+		if (CommonConfigHandler.aggressiveZombieHorses) {
 			getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(35.0D);
 			getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(3.0D);
 		}

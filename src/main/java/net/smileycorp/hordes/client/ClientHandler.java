@@ -2,6 +2,7 @@ package net.smileycorp.hordes.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiIngame;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
@@ -13,15 +14,34 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.*;
 import net.minecraft.world.World;
-import net.smileycorp.hordes.common.ConfigHandler;
+import net.minecraftforge.client.event.EntityViewRenderEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.smileycorp.hordes.common.capability.HordesCapabilities;
+import net.smileycorp.hordes.config.ClientConfigHandler;
+import net.smileycorp.hordes.hordeevent.capability.HordeEventClient;
 import net.smileycorp.hordes.infection.CureEntityMessage;
 
 import java.util.Random;
 
 public class ClientHandler {
+	
+	@SubscribeEvent
+	public void fogColour(EntityViewRenderEvent.FogColors event) {
+		if (!ClientConfigHandler.hordeEventTintsSky) return;
+		Minecraft mc = Minecraft.getMinecraft();
+		WorldClient world = mc.world;
+		HordeEventClient horde = mc.player.getCapability(HordesCapabilities.HORDE_EVENT_CLIENT, null);
+		if (horde != null && horde.isHordeNight(world)) {
+			float d = world.getSunBrightnessBody((float)event.getRenderPartialTicks()) * 1.4f;
+			int[] rgb = ClientConfigHandler.getHordeSkyColour();
+			event.setRed((1f - d) * (float)rgb[0]/255f + (d * event.getRed()));
+			event.setGreen((1f - d) * (float)rgb[1]/255f + d * event.getGreen());
+			event.setBlue((1f - d) * (float)rgb[2]/255f + d * event.getBlue());
+		}
+	}
 
 	public static void playHordeSound(Vec3d dir, ResourceLocation sound) {
-		if (ConfigHandler.hordeSpawnSound) {
+		if (ClientConfigHandler.hordeSpawnSound) {
 			Minecraft mc = Minecraft.getMinecraft();
 			World world = mc.world;
 			EntityPlayer player = mc.player;
@@ -39,14 +59,14 @@ public class ClientHandler {
 		GuiIngame gui = Minecraft.getMinecraft().ingameGUI;
 		ITextComponent message = new TextComponentTranslation(text);
 		message.setStyle(new Style().setBold(true).setColor(TextFormatting.DARK_RED));
-		if (ConfigHandler.eventNotifyMode == 1) {
+		if (ClientConfigHandler.eventNotifyMode == 1) {
 			gui.addChatMessage(ChatType.CHAT, message);
-		} else if (ConfigHandler.eventNotifyMode == 2) {
+		} else if (ClientConfigHandler.eventNotifyMode == 2) {
 			gui.overlayMessage=message.getFormattedText();
-			gui.overlayMessageTime=ConfigHandler.eventNotifyDuration;
+			gui.overlayMessageTime= ClientConfigHandler.eventNotifyDuration;
 			gui.animateOverlayMessageColor=false;
-		} else if (ConfigHandler.eventNotifyMode == 3) {
-			gui.displayTitle(null, null, 5, ConfigHandler.eventNotifyDuration, 5);
+		} else if (ClientConfigHandler.eventNotifyMode == 3) {
+			gui.displayTitle(null, null, 5, ClientConfigHandler.eventNotifyDuration, 5);
 			gui.displayTitle(" ", null, 0, 0, 0);
 			gui.displayTitle(null, message.getFormattedText(), 0, 0, 0);
 		}
@@ -54,7 +74,7 @@ public class ClientHandler {
 	}
 
 	public static void onInfect() {
-		if (ConfigHandler.playerInfectSound) {
+		if (ClientConfigHandler.playerInfectSound) {
 			Minecraft mc = Minecraft.getMinecraft();
 			World world = mc.world;
 			EntityPlayer player = mc.player;

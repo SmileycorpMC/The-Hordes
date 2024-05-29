@@ -10,7 +10,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
-import net.smileycorp.hordes.common.ConfigHandler;
+import net.smileycorp.hordes.config.CommonConfigHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -29,7 +29,7 @@ public abstract class MixinEntityLivingBase extends Entity {
 
 	@Inject(at=@At("HEAD"), method = "attackEntityAsMob(Lnet/minecraft/entity/Entity;)Z", cancellable = true)
 	public void attackEntityAsMob(Entity entityIn, CallbackInfoReturnable<Boolean> callback) {
-		if (((Entity)this) instanceof EntityZombieHorse && ConfigHandler.aggressiveZombieHorses) {
+		if (((Entity)this) instanceof EntityZombieHorse && CommonConfigHandler.aggressiveZombieHorses) {
 			float f = (float)this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
 			int i = 0;
 

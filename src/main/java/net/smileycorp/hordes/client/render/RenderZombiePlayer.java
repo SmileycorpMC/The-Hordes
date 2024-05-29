@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.client;
+package net.smileycorp.hordes.client.render;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.Minecraft;
@@ -20,18 +20,13 @@ public class RenderZombiePlayer extends RenderBiped<EntityZombiePlayer> {
 
     public RenderZombiePlayer(RenderManager rendermanager) {
         super(rendermanager, new ModelZombiePlayer(), 0.5F);
-        
-        LayerBipedArmor layerbipedarmor = new LayerBipedArmor(this)
-        
-        {
+        addLayer(new LayerBipedArmor(this) {
             @Override
-			protected void initArmor()
-            {
-                this.modelLeggings = new ModelZombie(0.5F, true);
-                this.modelArmor = new ModelZombie(1.0F, true);
+            protected void initArmor() {
+                modelLeggings = new ModelZombie(0.5F, true);
+                modelArmor = new ModelZombie(1.0F, true);
             }
-        };
-        this.addLayer(layerbipedarmor);
+        });
     }
 
     @Override

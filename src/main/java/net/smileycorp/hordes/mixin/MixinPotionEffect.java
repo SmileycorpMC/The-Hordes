@@ -4,7 +4,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
-import net.smileycorp.hordes.common.ConfigHandler;
+import net.smileycorp.hordes.config.InfectionConfig;
 import net.smileycorp.hordes.infection.HordesInfection;
 import net.smileycorp.hordes.infection.InfectionRegister;
 import org.spongepowered.asm.mixin.Mixin;
@@ -49,10 +49,10 @@ public class MixinPotionEffect {
 	private static void load(NBTTagCompound nbt, CallbackInfoReturnable<PotionEffect> callback) {
 		PotionEffect effect = callback.getReturnValue();
 		if (effect.getPotion() == HordesInfection.INFECTED) {
-			if (effect.duration > ConfigHandler.ticksForEffectStage) {
-				int d = effect.duration + ConfigHandler.ticksForEffectStage - 10000;
+			if (effect.duration > InfectionConfig.ticksForEffectStage) {
+				int d = effect.duration + InfectionConfig.ticksForEffectStage - 10000;
 				if (d > 0) effect.duration = d;
-				else effect.duration = ConfigHandler.ticksForEffectStage;
+				else effect.duration = InfectionConfig.ticksForEffectStage;
 			}
 		}
 	}
