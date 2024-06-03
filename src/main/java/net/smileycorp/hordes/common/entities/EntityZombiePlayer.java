@@ -29,9 +29,16 @@ import java.util.UUID;
 public class EntityZombiePlayer extends EntityZombie {
 
 	protected static final DataParameter<Optional<UUID>> PLAYER_UUID = EntityDataManager.createKey(EntityZombiePlayer.class, DataSerializers.OPTIONAL_UNIQUE_ID);
+	protected static final DataParameter<Boolean> SHOW_CAPE = EntityDataManager.createKey(EntityZombiePlayer.class, DataSerializers.BOOLEAN);
 
 	protected NonNullList<ItemStack> playerItems = NonNullList.<ItemStack>create();
-	protected UUID uuid;
+	
+	public double xCloakO;
+	public double yCloakO;
+	public double zCloakO;
+	public double xCloak;
+	public double yCloak;
+	public double zCloak;
 
 	public EntityZombiePlayer(World world) {
 		super(world);
@@ -47,6 +54,7 @@ public class EntityZombiePlayer extends EntityZombie {
 	protected void entityInit() {
 		super.entityInit();
 		dataManager.register(PLAYER_UUID, Optional.of(UUID.fromString("1512ce82-00e5-441a-9774-f46d9b7badfb")));
+		dataManager.register(SHOW_CAPE, true);
 	}
 
 	public void setPlayer(EntityPlayer player) {
@@ -67,7 +75,7 @@ public class EntityZombiePlayer extends EntityZombie {
 	}
 
 	public void setPlayer(GameProfile profile) {
-		uuid=profile.getId();
+		UUID uuid = profile.getId();
 		setCustomNameTag(profile.getName());
 		dataManager.set(PLAYER_UUID, Optional.of(uuid));
 	}
@@ -113,6 +121,7 @@ public class EntityZombiePlayer extends EntityZombie {
 	@Override
 	public void writeEntityToNBT(NBTTagCompound compound) {
 		super.writeEntityToNBT(compound);
+		UUID uuid = getPlayerUUID();
 		if (uuid != null) {
 			compound.setString("player", uuid.toString());
 		}
@@ -122,9 +131,7 @@ public class EntityZombiePlayer extends EntityZombie {
 	@Override
 	public void readEntityFromNBT(NBTTagCompound compound) {
 		super.readEntityFromNBT(compound);
-		if (compound.hasKey("player")) {
-			uuid = UUID.fromString(compound.getString("player"));
-		}
+		if (compound.hasKey("player")) setPlayer(UUID.fromString(compound.getString("player")));
 		NonNullList<ItemStack> read = NonNullList.<ItemStack>withSize(compound.getTagList("Items", 10).tagCount(), ItemStack.EMPTY);
 		ItemStackHelper.loadAllItems(compound, read);
 		playerItems = read;
@@ -137,5 +144,51 @@ public class EntityZombiePlayer extends EntityZombie {
 		textcomponentstring.getStyle().setInsertion(getCachedUniqueIdString());
 		return textcomponentstring;
 	}
-
+	
+	@Override
+	public void onUpdate() {
+		super.onUpdate();
+		xCloakO = xCloak;
+		yCloakO = yCloak;
+		zCloakO = zCloak;
+		double d0 = posX - xCloak;
+		double d1 = posY - yCloak;
+		double d2 = posZ - zCloak;
+		if (d0 > 10.0D) {
+			xCloak = posX;
+			xCloakO = xCloak;
+		}
+		if (d2 > 10.0D) {
+			zCloak = posZ;
+			zCloakO = zCloak;
+		}
+		if (d1 > 10.0D) {
+			yCloak = posY;
+			yCloakO = yCloak;
+		}
+		if (d0 < -10.0D) {
+			xCloak = posX;
+			xCloakO = xCloak;
+		}
+		if (d2 < -10.0D) {
+			zCloak = posZ;
+			zCloakO = zCloak;
+		}
+		if (d1 < -10.0D) {
+			yCloak = posY;
+			yCloakO = yCloak;
+		}
+		xCloak += (d0 * 0.25D);
+		yCloak += (d1 * 0.25D);
+		zCloak += (d2 * 0.25D);
+	}
+	
+	public void setDisplayCape(boolean display) {
+		dataManager.set(SHOW_CAPE, display);
+	}
+	
+	public boolean displayCape() {
+		return dataManager.get(SHOW_CAPE);
+	}
+	
 }

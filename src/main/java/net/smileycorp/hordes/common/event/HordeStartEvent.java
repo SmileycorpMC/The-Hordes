@@ -1,19 +1,19 @@
 package net.smileycorp.hordes.common.event;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;
 import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.hordeevent.capability.IOngoingHordeEvent;
+import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 
 @Cancelable
-public class HordeStartEvent extends HordeEvent {
-
+public class HordeStartEvent extends HordePlayerEvent {
+	
 	protected final BlockPos pos;
 	protected String message = Constants.hordeEventStart;
 	protected final boolean wasCommand;
 
-	public HordeStartEvent(EntityPlayer player, IOngoingHordeEvent horde, boolean wasCommand) {
+	public HordeStartEvent(EntityPlayerMP player, HordeEvent horde, boolean wasCommand) {
 		super(player, horde);
 		pos = player.getPosition();
 		this.wasCommand = wasCommand;
@@ -26,16 +26,6 @@ public class HordeStartEvent extends HordeEvent {
 	//Whether the event was started with a command
 	public boolean wasCommand() {
 		return wasCommand;
-	}
-
-	//get the translation key for the start message
-	public String getMessage() {
-		return message;
-	}
-
-	//set the translation key for the start message
-	public void setMessage(String message) {
-		this.message = message;
 	}
 
 }

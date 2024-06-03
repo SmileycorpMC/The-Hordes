@@ -1,11 +1,11 @@
 package net.smileycorp.hordes.config.data.hordeevent.functions.spawndata;
 
 import com.google.gson.JsonElement;
-import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
-import net.smileycorp.hordes.common.data.values.ValueGetter;
 import net.smileycorp.hordes.common.event.HordeBuildSpawnDataEvent;
-import net.smileycorp.hordes.hordeevent.data.functions.HordeFunction;
+import net.smileycorp.hordes.config.data.DataType;
+import net.smileycorp.hordes.config.data.hordeevent.functions.HordeFunction;
+import net.smileycorp.hordes.config.data.values.ValueGetter;
 
 public class SetEndMessageFunction implements HordeFunction<HordeBuildSpawnDataEvent> {
 

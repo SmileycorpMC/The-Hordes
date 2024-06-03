@@ -4,27 +4,20 @@ import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.datafixers.util.Pair;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.smileycorp.hordes.common.HordesLogger;
-import net.smileycorp.hordes.common.data.DataRegistry;
-import net.smileycorp.hordes.common.data.conditions.Condition;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
 import net.smileycorp.hordes.config.data.DataRegistry;
 import net.smileycorp.hordes.config.data.conditions.Condition;
 import net.smileycorp.hordes.config.data.hordeevent.functions.FunctionRegistry;
 import net.smileycorp.hordes.config.data.hordeevent.functions.HordeFunction;
 import net.smileycorp.hordes.config.data.hordeevent.functions.MultipleFunction;
-import net.smileycorp.hordes.hordeevent.data.functions.FunctionRegistry;
-import net.smileycorp.hordes.hordeevent.data.functions.HordeFunction;
-import net.smileycorp.hordes.hordeevent.data.functions.MultipleFunction;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class HordeScript<T extends HordePlayerEvent> {
@@ -53,7 +46,7 @@ public class HordeScript<T extends HordePlayerEvent> {
 		return name;
 	}
 
-	public boolean shouldApply(World level, EntityLiving entity, EntityPlayerMP player, Random rand) {
+	public boolean shouldApply(World level, EntityLivingBase entity, EntityPlayerMP player, Random rand) {
 		for (Condition condition : conditions)  if (!condition.apply(level, entity, player, rand)) return false;
 		return true;
 	}
@@ -114,13 +107,13 @@ public class HordeScript<T extends HordePlayerEvent> {
 	public static HordeScript deserialize(ResourceLocation key, JsonElement json) {
 		try {
 			if (json instanceof JsonArray) {
-				Pair<Class<HordePlayerEvent>, HordeFunction<HordePlayerEvent>> pair = MultipleFunction.deserialize(json.getAsJsonArray());
-				return new HordeScript(pair.getSecond(), pair.getFirst(), key);
+				Map.Entry<Class<HordePlayerEvent>, HordeFunction<HordePlayerEvent>> pair = MultipleFunction.deserialize(json.getAsJsonArray());
+				return new HordeScript(pair.getValue(), pair.getKey(), key);
 			}
 			JsonObject obj = json.getAsJsonObject();
-			Pair<Class<HordePlayerEvent>, HordeFunction<HordePlayerEvent>> pair = FunctionRegistry.readFunction(obj);
-			Class<? extends HordePlayerEvent> clazz = pair.getFirst();
-			HordeFunction<? extends HordePlayerEvent> function = pair.getSecond();
+			Map.Entry<Class<HordePlayerEvent>, HordeFunction<HordePlayerEvent>> pair = FunctionRegistry.readFunction(obj);
+			Class<? extends HordePlayerEvent> clazz = pair.getKey();
+			HordeFunction<? extends HordePlayerEvent> function = pair.getValue();
 			if (function == null || clazz == null) throw new Exception("invalid function: " + obj.get("function").getAsString());
 			List<Condition> conditions = Lists.newArrayList();
 			if (obj.has("conditions")) obj.get("conditions").getAsJsonArray().forEach(condition ->

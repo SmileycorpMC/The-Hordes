@@ -46,6 +46,10 @@ public class HordeSpawnEntry {
 	public EntityEntry getEntity() {
 		return type;
 	}
+	
+	public ResourceLocation getName() {
+		return name;
+	}
 
 	public NBTTagCompound getNBT() {
 		return nbt == null ? new NBTTagCompound() : nbt;

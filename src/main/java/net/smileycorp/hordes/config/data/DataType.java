@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.common.data;
+package net.smileycorp.hordes.config.data;
 
 import com.google.gson.JsonElement;
 import net.minecraft.nbt.NBTTagCompound;

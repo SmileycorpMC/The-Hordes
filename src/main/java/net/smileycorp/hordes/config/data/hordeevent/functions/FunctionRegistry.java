@@ -1,24 +1,22 @@
 package net.smileycorp.hordes.config.data.hordeevent.functions;
 
 import com.google.common.collect.Maps;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.datafixers.util.Pair;
 import net.minecraft.util.ResourceLocation;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.HordeBuildSpawnDataEvent;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
 import net.smileycorp.hordes.common.event.HordeSpawnEntityEvent;
-import net.smileycorp.hordes.hordeevent.data.functions.spawndata.*;
-import net.smileycorp.hordes.hordeevent.data.functions.spawnentity.*;
+import net.smileycorp.hordes.config.data.hordeevent.functions.spawndata.*;
+import net.smileycorp.hordes.config.data.hordeevent.functions.spawnentity.*;
 
+import java.util.AbstractMap;
 import java.util.Map;
-import java.util.function.Function;
 
 public class FunctionRegistry {
 
-    private static Map<ResourceLocation, Pair<Class<? extends HordePlayerEvent>, Function<JsonElement, HordeFunction<? extends HordePlayerEvent>>>> DESERIALIZERS = Maps.newHashMap();
+    private static Map<ResourceLocation, Map.Entry<Class<? extends HordePlayerEvent>, HordeFunction.Deserializer<? extends HordePlayerEvent>>> DESERIALIZERS = Maps.newHashMap();
 
     public static void registerFunctionSerializers() {
         //build spawndata functions
@@ -40,23 +38,22 @@ public class FunctionRegistry {
         registerFunctionDeserializer(Constants.loc("set_entity_loot_table"), HordeSpawnEntityEvent.class, SetEntityLootTableFunction::deserialize);
     }
 
-    public static <T extends HordePlayerEvent> Pair<Class<T>, HordeFunction<T>> readFunction(JsonObject json) {
-        if (!(json.has("function") && json.has("value"))) return Pair.of(null, null);
+    public static <T extends HordePlayerEvent> Map.Entry<Class<T>, HordeFunction<T>> readFunction(JsonObject json) {
+        if (!(json.has("function") && json.has("value"))) return new AbstractMap.SimpleEntry<>(null, null);
         if (json.get("function").getAsString().equals("hordes:multiple")) return MultipleFunction.deserialize(json.get("value").getAsJsonArray());
         try {
             ResourceLocation loc = new ResourceLocation(json.get("function").getAsString());
-            Pair<Class<? extends HordePlayerEvent>, Function<JsonElement, HordeFunction<? extends HordePlayerEvent>>> pair
-                    = DESERIALIZERS.get(loc);
+            Map.Entry<Class<? extends HordePlayerEvent>, HordeFunction.Deserializer<? extends HordePlayerEvent>> pair = DESERIALIZERS.get(loc);
             if (pair == null) throw new NullPointerException("function " + loc + " is not registered");
-            return Pair.of((Class<T>) pair.getFirst(), (HordeFunction<T>) pair.getSecond().apply(json.get("value")));
+            return new AbstractMap.SimpleEntry<>((Class<T>) pair.getKey(), (HordeFunction<T>) pair.getValue().apply(json.get("value")));
         } catch (Exception e) {
             HordesLogger.logError("Failed to read function " + json, e);
-            return Pair.of(null, null);
+            return new AbstractMap.SimpleEntry<>(null, null);
         }
     }
 
-    public static <T extends HordePlayerEvent> void registerFunctionDeserializer(ResourceLocation name, Class<T> clazz, Function<JsonElement, HordeFunction<T>> serializer) {
-        DESERIALIZERS.put(name, new Pair(clazz, serializer));
+    public static <T extends HordePlayerEvent> void registerFunctionDeserializer(ResourceLocation name, Class<T> clazz, HordeFunction.Deserializer<T> serializer) {
+        DESERIALIZERS.put(name, new AbstractMap.SimpleEntry<>(clazz, serializer));
     }
 
 }

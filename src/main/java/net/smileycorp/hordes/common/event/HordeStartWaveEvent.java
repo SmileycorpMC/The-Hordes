@@ -1,28 +1,17 @@
 package net.smileycorp.hordes.common.event;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;
-import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.hordeevent.capability.IOngoingHordeEvent;
+import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 
 @Cancelable
-public class HordeStartWaveEvent extends HordeEvent {
-
-	protected ResourceLocation sound = Constants.HORDE_SOUND;
+public class HordeStartWaveEvent extends HordePlayerEvent {
+	
 	protected int count;
 
-	public HordeStartWaveEvent(EntityPlayer player, IOngoingHordeEvent horde, int count) {
+	public HordeStartWaveEvent(EntityPlayerMP player, HordeEvent horde, int count) {
 		super(player, horde);
 		this.count = count;
-	}
-
-	public ResourceLocation getSound() {
-		return sound;
-	}
-
-	public void setSound(ResourceLocation sound) {
-		this.sound = sound;
 	}
 
 	//get the total number of mobs to spawn

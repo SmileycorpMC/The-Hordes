@@ -1,13 +1,13 @@
 package net.smileycorp.hordes.config.data.hordeevent.functions.spawnentity;
 
 import com.google.gson.JsonElement;
-import net.minecraft.nbt.CompoundNBT;
-import net.smileycorp.atlas.api.data.DataType;
+import net.minecraft.nbt.NBTTagCompound;
 import net.smileycorp.hordes.common.HordesLogger;
-import net.smileycorp.hordes.common.data.DataRegistry;
-import net.smileycorp.hordes.common.data.values.ValueGetter;
 import net.smileycorp.hordes.common.event.HordeSpawnEntityEvent;
-import net.smileycorp.hordes.hordeevent.data.functions.HordeFunction;
+import net.smileycorp.hordes.config.data.DataRegistry;
+import net.smileycorp.hordes.config.data.DataType;
+import net.smileycorp.hordes.config.data.hordeevent.functions.HordeFunction;
+import net.smileycorp.hordes.config.data.values.ValueGetter;
 
 public class SetEntityNBTFunction implements HordeFunction<HordeSpawnEntityEvent> {
     
@@ -21,8 +21,8 @@ public class SetEntityNBTFunction implements HordeFunction<HordeSpawnEntityEvent
     public void apply(HordeSpawnEntityEvent event) {
         String str = getter.get(event);
         try {
-            CompoundNBT nbt = DataRegistry.parseNBT(event.getEntity().toString(), str);
-            event.getEntity().readAdditionalSaveData(nbt);
+            NBTTagCompound nbt = DataRegistry.parseNBT(event.getEntity().toString(), str);
+            event.getEntity().readFromNBT(nbt);
         } catch (Exception e) {
             HordesLogger.logError("Failed loading nbt " + str + " for entity " + event.getEntity(), e);
         }

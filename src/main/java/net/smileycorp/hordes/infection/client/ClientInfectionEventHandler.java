@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.client;
+package net.smileycorp.hordes.infection.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;

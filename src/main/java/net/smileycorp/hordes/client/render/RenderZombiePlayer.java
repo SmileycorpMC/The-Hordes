@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.entity.layers.LayerBipedArmor;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.util.ResourceLocation;
 import net.smileycorp.hordes.common.entities.EntityZombiePlayer;
+import net.smileycorp.hordes.config.ClientConfigHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,9 @@ public class RenderZombiePlayer extends RenderBiped<EntityZombiePlayer> {
                 modelArmor = new ModelZombie(1.0F, true);
             }
         });
+        addLayer(new LayerZombiePlayerCape<>(this));
+        addLayer(new LayerZombiePlayerElytra<>(this));
+        addLayer(new LayerZombiePlayerOverlay(this));
     }
 
     @Override
@@ -46,7 +50,8 @@ public class RenderZombiePlayer extends RenderBiped<EntityZombiePlayer> {
 	@Override
     public void doRender(EntityZombiePlayer entity, double x, double y, double z, float entityYaw, float partialTicks) {
     	GlStateManager.pushMatrix();
-    	GlStateManager.color(0.4745f, 0.6117f, 0.3961f);
+        int[] colour = ClientConfigHandler.getZombiePlayerColour();
+    	GlStateManager.color((float)colour[0] * 0.0039215f, (float)colour[1] * 0.0039215f, (float)colour[2] * 0.0039215f);
     	super.doRender(entity, x, y, z, entityYaw, partialTicks);
         GlStateManager.popMatrix();
     }

@@ -1,6 +1,7 @@
 package net.smileycorp.hordes.client;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
@@ -16,6 +17,7 @@ import net.minecraft.util.text.*;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.config.ClientConfigHandler;
 import net.smileycorp.hordes.hordeevent.capability.HordeEventClient;
@@ -45,14 +47,16 @@ public class ClientHandler {
 			Minecraft mc = Minecraft.getMinecraft();
 			World world = mc.world;
 			EntityPlayer player = mc.player;
-			BlockPos pos = new BlockPos(player.posX + (5*dir.x), player.posY, player.posZ + (5*dir.z));
-			float pitch = 1+((world.rand.nextInt(6)-3)/10);
-			world.playSound(player, pos, new SoundEvent(sound), SoundCategory.HOSTILE, 0.3f, pitch);
+			BlockPos pos = new BlockPos(player.posX + (10 * dir.x), player.posY, player.posZ + (10 * dir.z));
+			float pitch = 1 + ((world.rand.nextInt(6) - 3) / 10);
+			world.playSound(player, pos, new SoundEvent(sound), SoundCategory.HOSTILE, 0.5f, pitch);
 		}
 	}
-
-	public static EntityPlayer getPlayer() {
-		return Minecraft.getMinecraft().player;
+	
+	public static void setHordeDay(int day, int day_length) {
+		EntityPlayerSP player = Minecraft.getMinecraft().player;
+		if (player.hasCapability(HordesCapabilities.HORDE_EVENT_CLIENT, null))
+			player.getCapability(HordesCapabilities.HORDE_EVENT_CLIENT, null).setNextDay(day, day_length);
 	}
 
 	public static void displayMessage(String text) {
@@ -72,13 +76,21 @@ public class ClientHandler {
 		}
 
 	}
-
-	public static void onInfect() {
-		if (ClientConfigHandler.playerInfectSound) {
+	
+	public static void onInfect(boolean prevented) {
+		if (ClientConfigHandler.playerInfectSound &! prevented) {
 			Minecraft mc = Minecraft.getMinecraft();
-			World world = mc.world;
-			EntityPlayer player = mc.player;
-			world.playSound(player, player.getPosition(), SoundEvents.ENTITY_ZOMBIE_VILLAGER_CONVERTED, SoundCategory.HOSTILE, 0.75f, world.rand.nextFloat());
+			WorldClient level = mc.world;
+			if (level == null) return;
+			EntityPlayerSP player = mc.player;
+			level.playSound(player, player.getPosition(), Constants.INFECT_SOUND, SoundCategory.PLAYERS, 0.75f, level.rand.nextFloat());
+		}
+		if (ClientConfigHandler.infectionProtectSound && prevented) {
+			Minecraft mc = Minecraft.getMinecraft();
+			WorldClient level = mc.world;
+			if (level == null) return;
+			EntityPlayerSP player = mc.player;
+			level.playSound(player, player.getPosition(), Constants.IMMUNE_SOUND, SoundCategory.PLAYERS, 0.75f, level.rand.nextFloat());
 		}
 	}
 

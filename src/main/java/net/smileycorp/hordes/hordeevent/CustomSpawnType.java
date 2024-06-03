@@ -1,27 +1,18 @@
 package net.smileycorp.hordes.hordeevent;
 
 import com.google.common.collect.Lists;
-import com.mojang.datafixers.util.Either;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
-import net.minecraft.nbt.StringNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeTagHandler;
-import net.minecraftforge.common.Tags;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.oredict.OreDictionary;
-import net.minecraftforge.oredict.ShapedOreRecipe;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.smileycorp.hordes.common.HordesLogger;
-import net.smileycorp.hordes.common.data.Either;
+import net.smileycorp.hordes.config.data.Either;
 
 import java.util.List;
 

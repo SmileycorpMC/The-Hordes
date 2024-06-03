@@ -6,351 +6,379 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
-import net.minecraft.entity.ai.EntityAITasks.EntityAITaskEntry;
+import net.minecraft.entity.ai.EntityAITasks;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.stats.StatList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.smileycorp.atlas.api.SimpleStringMessage;
-import net.smileycorp.atlas.api.entity.ai.EntityAIFindNearestTargetPredicate;
 import net.smileycorp.atlas.api.recipe.WeightedOutputs;
 import net.smileycorp.atlas.api.util.DirectionUtils;
-import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.ai.EntityAIHordeTrackPlayer;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.common.event.*;
 import net.smileycorp.hordes.config.HordeEventConfig;
-import net.smileycorp.hordes.hordeevent.HordeEventPacketHandler;
-import net.smileycorp.hordes.hordeevent.HordeEventRegister;
-import net.smileycorp.hordes.hordeevent.HordeSoundMessage;
+import net.smileycorp.hordes.config.data.hordeevent.HordeScriptLoader;
+import net.smileycorp.hordes.config.data.hordeevent.HordeTableLoader;
+import net.smileycorp.hordes.hordeevent.HordeSpawnData;
 import net.smileycorp.hordes.hordeevent.HordeSpawnEntry;
-import net.smileycorp.hordes.integration.mobspropertiesrandomness.MPRIntegration;
-import org.apache.commons.lang3.ArrayUtils;
+import net.smileycorp.hordes.hordeevent.HordeSpawnTable;
+import net.smileycorp.hordes.hordeevent.network.HordeEventPacketHandler;
+import net.smileycorp.hordes.hordeevent.network.HordeSoundMessage;
+import net.smileycorp.hordes.hordeevent.network.UpdateClientHordeMessage;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-public class HordeEvent implements IOngoingHordeEvent {
-
+public class HordeEvent {
+	
+	private static UUID FOLLOW_RANGE_MODIFIER = UUID.fromString("51cfe045-4248-409e-be37-556d67de4b97");
+	private final Random rand;
 	private Set<EntityLiving> entitiesSpawned = new HashSet<>();
 	private int timer = 0;
 	private int day = 0;
-	private int nextDay;
-	private final World world;
-	private EntityPlayer player;
-	private boolean hasChanged = false;
-
-	public HordeEvent(World world, EntityPlayer player) {
-		this.world=world;
-		this.player=player;
-		if (world!=null) {
-			WorldDataHordeEvent data = WorldDataHordeEvent.getData(world);
-			nextDay = data.getNextDay();
-			if (data.hasLegacyData(player.getUniqueID())) {
-				readFromNBT(data.getLegacyData(player.getUniqueID()));
-			}
-		}
+	private int nextDay = -1;
+	private HordeSpawnData spawnData = null;
+	boolean sentDay;
+	
+	HordeEvent(WorldDataHordes data){
+		nextDay = HordeEventConfig.hordeEventByPlayerTime ? HordeEventConfig.spawnFirstDay ? 0 : HordeEventConfig.hordeSpawnDays
+				: data.getNextDay();
+		rand = data.getRandom();
 	}
-
-	public HordeEvent() {
-		world = null;
-	}
-
-	@Override
+	
 	public void readFromNBT(NBTTagCompound nbt) {
 		entitiesSpawned.clear();
-		if (nbt.hasKey("timer")) {
-			timer = nbt.getInteger("timer");
-		}
-		if (nbt.hasKey("nextDay")) {
-			nextDay = nbt.getInteger("nextDay");
-		}
-		if (nbt.hasKey("day")) {
-			day = nbt.getInteger("day");
-		}
-		if (nbt.hasKey("entities")) {
-			if (world!=null) {
-				for (int id : nbt.getIntArray("entities")) {
-					Entity entity = world.getEntityByID(id);
-					if (entity instanceof EntityLiving) entitiesSpawned.add((EntityLiving) entity);
-				}
-			}
+		if (nbt.hasKey("timer")) timer = nbt.getInteger("timer");
+		if (nbt.hasKey("nextDay")) nextDay = nbt.getInteger("nextDay");
+		if (nbt.hasKey("day")) day = nbt.getInteger("day");
+		if (nbt.hasKey("spawnData")) spawnData = new HordeSpawnData(this, nbt.getCompoundTag("spawnData"));
+		if (nbt.hasKey("loadedTable")) {
+			spawnData = new HordeSpawnData(this);
+			spawnData.setTable(HordeTableLoader.INSTANCE.getTable(new ResourceLocation(nbt.getString("loadedTable"))));
 		}
 	}
-
-	@Override
+	
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
 		nbt.setInteger("timer", timer);
 		nbt.setInteger("nextDay", nextDay);
 		nbt.setInteger("day", day);
-		int[] entities = new int[]{};
-		for (EntityLiving entity : entitiesSpawned) {
-			if (entity!=null) if (entity.isAddedToWorld() &! entity.isDead) ArrayUtils.add(entities, entity.getEntityId());
-		}
-		nbt.setIntArray("entities", entities);
-		hasChanged = false;
+		if (spawnData != null) nbt.setTag("spawnData", spawnData.save());
 		return nbt;
 	}
-
-	@Override
-	public void update(World world) {
-		if (!world.isRemote && player!=null) {
-			if (player.world.provider.getDimension()==0) {
-				if ((timer % HordeEventConfig.hordeSpawnInterval) == 0) {
-					int amount = (int)(HordeEventConfig.hordeSpawnAmount * (1+(day/ HordeEventConfig.hordeSpawnDays) * (HordeEventConfig.hordeSpawnMultiplier-1)));
-					List<EntityPlayer>players = world.getEntities(EntityPlayer.class, p -> p != player);
-					for (EntityPlayer entity : players) {
-						if (player.getDistance(entity)<=25) {
-							amount = (int) Math.floor(amount * HordeEventConfig.hordeMultiplayerScaling);
-						}
-					}
-					spawnWave(world, amount);
-				}
-				timer--;
-				if (timer == 0) {
-					stopEvent(world, false);
-				}
-				hasChanged = true;
-			}
-		}
+	
+	public void update(EntityPlayerMP player) {
+		World world = player.world;
+		if (world.provider.getDimensionType().getId() != 0) return;
+		if (spawnData == null) return;
+		if (timer % spawnData.getSpawnInterval() == 0) spawnWave(player, getEntityLivingCount(player, world));
+		timer--;
+		if (timer == 0) stopEvent(player, false);
 	}
-
-	@Override
-	public void spawnWave(World world, int count) {
+	
+	private int getEntityLivingCount(EntityPlayerMP player, World level) {
+		int amount = spawnData.getSpawnAmount();
+		List<? extends EntityPlayer> players = level.playerEntities;
+		for (EntityPlayer other : players) if (shouldReduce(player, (EntityPlayerMP) other))
+			amount = (int) Math.floor(amount * HordeEventConfig.hordeMultiplayerScaling);
+		return amount;
+	}
+	
+	private boolean shouldReduce(EntityPlayerMP player, EntityPlayerMP other) {
+		if (other == player || player.getDistance(other) > 25) return false;
+		HordeEvent horde = WorldDataHordes.getData(other.getServerWorld()).getEvent(other);
+		return horde != null && horde.isActive(other);
+	}
+	
+	public void spawnWave(EntityPlayerMP player, int count) {
 		cleanSpawns();
+		if (spawnData == null) {
+			HordeBuildSpawnDataEvent buildTableEvent = new HordeBuildSpawnDataEvent(player, this);
+			postEvent(buildTableEvent);
+			spawnData = buildTableEvent.getSpawnData();
+		}
+		if (spawnData == null || spawnData.getTable() == null) {
+			logError("Cannot load wave spawn data, cancelling spawns.", new Exception());
+			return;
+		}
+		WorldServer world = player.getServerWorld();
 		HordeStartWaveEvent startEvent = new HordeStartWaveEvent(player, this, count);
-		MinecraftForge.EVENT_BUS.post(startEvent);
+		postEvent(startEvent);
 		if (startEvent.isCanceled()) return;
 		count = startEvent.getCount();
-		Vec3d basedir = DirectionUtils.getRandomDirectionVecXZ(world.rand);
+		Vec3d basedir = DirectionUtils.getRandomDirectionVecXZ(rand);
 		BlockPos basepos = DirectionUtils.getClosestLoadedPos(world, player.getPosition(), basedir, 75, 7, 0);
 		int i = 0;
 		while (basepos.equals(player.getPosition())) {
-			basedir = DirectionUtils.getRandomDirectionVecXZ(world.rand);
+			basedir = DirectionUtils.getRandomDirectionVecXZ(rand);
 			basepos = DirectionUtils.getClosestLoadedPos(world, player.getPosition(), basedir, 75, 7, 0);
-			i++;
-			if (i==20) {
-				logInfo("Unable to find unlight pos ");
+			if (!spawnData.getSpawnType().canSpawn(world, basepos)) basepos = player.getPosition();
+			if (i++ >= HordeEventConfig.hordeSpawnChecks) {
+				logInfo("Unable to find unlit pos for horde " + this + " ignoring light level");
+				basedir = DirectionUtils.getRandomDirectionVecXZ(rand);
 				basepos = DirectionUtils.getClosestLoadedPos(world, player.getPosition(), basedir, 75);
 				break;
 			}
 		}
-		HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, HordeEventRegister.getSpawnTable(day), this);
-		MinecraftForge.EVENT_BUS.post(buildTableEvent);
-		WeightedOutputs<HordeSpawnEntry> spawntable = buildTableEvent.spawntable;
+		WeightedOutputs<HordeSpawnEntry> spawntable = spawnData.getTable().getSpawnTable(day);
 		if (spawntable.isEmpty()) {
 			logInfo("Spawntable is empty, stopping wave spawn.");
 			return;
 		}
-		if (count > 0) {
-			if (player instanceof EntityPlayerMP) {
-				HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new HordeSoundMessage(basedir, startEvent.getSound()), (EntityPlayerMP) player);
-			}
-		} else {
+		if (count <= 0) {
 			logInfo("Stopping wave spawn because count is " + count);
+			return;
 		}
-		for (int n = 0; n<count; n++) {
+		HordeEventPacketHandler.sendTo(new HordeSoundMessage(basedir, spawnData.getSpawnSound()), player);
+		for (HordeSpawnEntry entry : spawntable.getResults(rand, count)) {
 			if (entitiesSpawned.size() > HordeEventConfig.hordeSpawnMax) {
 				logInfo("Can't spawn wave because max cap has been reached");
 				return;
 			}
-			Vec3d dir = DirectionUtils.getRandomDirectionVecXZ(world.rand);
-			BlockPos pos = DirectionUtils.getClosestLoadedPos(world, basepos, dir, world.rand.nextInt(10));
-			HordeSpawnEntry entry = spawntable.getResult(world.rand);
-			Class<? extends EntityLiving> clazz = entry.getEntity();
+			Vec3d pos = getSpawnPos(world, new Vec3d(basepos));
+			EntityEntry type = entry.getEntity();
 			try {
-				EntityLiving entity = clazz.getConstructor(World.class).newInstance(world);
-				HordeSpawnEntityEvent spawnEntityEvent = new HordeSpawnEntityEvent(player, entity, pos, this);
-				MinecraftForge.EVENT_BUS.post(spawnEntityEvent);
-				if (!spawnEntityEvent.isCanceled()) {
-					entity = spawnEntityEvent.entity;
-					pos = spawnEntityEvent.pos;
-					entity.onInitialSpawn(world.getDifficultyForLocation(pos), null);
-					entity.readFromNBT(entry.getNBT());
-					entity.setPosition(pos.getX(), pos.getY(), pos.getZ());
-					if (!world.spawnEntity(entity)) Hordes.logError("Unable to spawn entity from " + clazz, new Exception());
-					else {
-						finalizeEntity(entity, world, player);
-					}
-				} else {
-					logInfo("Entity spawn event has been cancelled, not spawning entity  of class " + clazz);
+				AtomicBoolean cancelled = new AtomicBoolean(false);
+				NBTTagCompound nbt = entry.getNBT();
+				nbt.setString("id", entry.getName().toString());
+				EntityLiving newEntity = loadEntity(world, player, (EntityLiving) AnvilChunkLoader.readWorldEntityPos(nbt, world, pos.x, pos.y, pos.z, false), pos, cancelled);
+				if (cancelled.get()) continue;
+				newEntity.readEntityFromNBT(entry.getNBT());
+				if (!(world.spawnEntity(newEntity))) {
+					logError("Unable to spawn entity from " + type, new Exception());
+					continue;
 				}
+				finalizeEntity(newEntity, player);
 			} catch (Exception e) {
 				e.printStackTrace();
-				Hordes.logError("Unable to spawn entity from " + clazz, e);
+				logError("Unable to spawn entity from " + type, e);
 			}
 		}
 	}
-
-	private void finalizeEntity(EntityLiving entity, World world2, EntityPlayer player2) {
-		entity.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(100.0D);
-		if (Loader.isModLoaded("mpr")) MPRIntegration.addFollowAttribute(entity);
-		entity.getCapability(HordesCapabilities.HORDESPAWN, null).setPlayerUUID(player.getUniqueID().toString());
-		entity.enablePersistence();
-		registerEntity(entity);
-		hasChanged = true;
-		entity.targetTasks.taskEntries.clear();
-		if (entity instanceof EntityCreature) {
-			entity.targetTasks.addTask(1, new EntityAIHurtByTarget((EntityCreature) entity, true));
-			entity.targetTasks.addTask(2, new EntityAINearestAttackableTarget<>((EntityCreature) entity, EntityPlayer.class, false));
-		} else {
-			entity.targetTasks.addTask(1, new EntityAIFindNearestTargetPredicate(entity, e -> e instanceof EntityPlayer));
+	
+	private Vec3d getSpawnPos(WorldServer level, Vec3d basepos) {
+		for (int j = 0; j < 5; j++) {
+			double x = basepos.x + rand.nextInt(10);
+			double z = basepos.z + rand.nextInt(10);
+			Vec3d pos = new Vec3d(x, level.getHeight((int)x, (int)z), z);
+			if (spawnData.getSpawnType().canSpawn(level, new BlockPos(pos))) return pos;
 		}
-		entity.tasks.addTask(6, new EntityAIHordeTrackPlayer(entity, player));
-		for (Entity passenger : entity.getPassengers()) if (passenger instanceof EntityLiving) finalizeEntity((EntityLiving) passenger, world, player);
+		return basepos;
 	}
-
+	
+	private EntityLiving loadEntity(WorldServer level, EntityPlayerMP player, EntityLiving entity, Vec3d pos, AtomicBoolean cancel) {
+		HordeSpawnEntityEvent spawnEntityEvent = new HordeSpawnEntityEvent(player, entity, pos, this);
+		postEvent(spawnEntityEvent);
+		if (!spawnEntityEvent.isCanceled()) {
+			entity = spawnEntityEvent.getEntity();
+			pos = spawnEntityEvent.getPos();
+			entity.onInitialSpawn(level.getDifficultyForLocation(new BlockPos(pos)), null);
+			entity.setPosition(pos.x, pos.y, pos.z);
+			return entity;
+		} else {
+			logInfo("Entity spawn event has been cancelled, not spawning entity  of class " + entity.getClass());
+			cancel.set(true);
+			return entity;
+		}
+	}
+	
+	private void finalizeEntity(EntityLiving entity, EntityPlayerMP player) {
+		entity.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).applyModifier(new AttributeModifier(FOLLOW_RANGE_MODIFIER,
+				"hordes:horde_range", 75, 0));
+		if (entity.hasCapability(HordesCapabilities.HORDESPAWN, null)) {
+			entity.getCapability(HordesCapabilities.HORDESPAWN, null).setPlayerUUID(player.getUniqueID().toString());
+			registerEntity(entity, player);
+		}
+		if (entity instanceof EntityCreature) entity.targetTasks.addTask(1, new EntityAIHurtByTarget((EntityCreature) entity, false));
+		entity.targetTasks.addTask(2, new EntityAINearestAttackableTarget<>((EntityCreature) entity, EntityPlayerMP.class, true));
+		for (Entity passenger : entity.getPassengers()) if (passenger instanceof EntityLiving) finalizeEntity((EntityLiving) passenger, player);
+	}
+	
 	private void cleanSpawns() {
 		List<EntityLiving> toRemove = new ArrayList<>();
 		for (EntityLiving entity : entitiesSpawned) {
-			if (entity != null) {
-				if (entity.isDead) {
-					if (entity.hasCapability(HordesCapabilities.HORDESPAWN, null)) {
-						HordeSpawn cap = entity.getCapability(HordesCapabilities.HORDESPAWN, null);
-						cap.setPlayerUUID("");
-						toRemove.add(entity);
-					}
-				}
-			} else {
+			if (entity.isEntityAlive()) continue;
+			if (entity.hasCapability(HordesCapabilities.HORDESPAWN, null)) {
+				entity.getCapability(HordesCapabilities.HORDESPAWN, null).setPlayerUUID("");
 				toRemove.add(entity);
 			}
 		}
 		entitiesSpawned.removeAll(toRemove);
 	}
-
-	@Override
-	public boolean isHordeDay(World world) {
-		if (world.isRemote || player==null) return false;
-		if (world!=this.world) return false;
-		return isActive(world) || Math.floor(world.getWorldTime()/ HordeEventConfig.dayLength)>=nextDay;
+	
+	public boolean isHordeDay(EntityPlayerMP player) {
+		WorldServer world = player.getServerWorld();
+		if (world.provider.getDimensionType().getId() != 0) return false;
+		return isActive(player) || getCurrentDay(player) >= nextDay;
 	}
-
-	@Override
-	public boolean isActive(World world) {
+	
+	public boolean isActive(EntityPlayerMP player) {
 		return timer > 0;
 	}
-
-	@Override
-	public boolean hasChanged() {
-		return hasChanged;
+	
+	public void setPlayer(EntityPlayerMP player) {
+		cleanSpawns();
+		entitiesSpawned.forEach(entity -> fixGoals(player, entity));
 	}
-
-	@Override
-	public EntityPlayer getPlayer() {
-		return player;
+	
+	private void fixGoals(EntityPlayerMP player, EntityLiving entity) {
+		entity.tasks.addTask(6, new EntityAIHordeTrackPlayer(entity, player, spawnData.getEntitySpeed()));
 	}
-
-	@Override
-	public void setPlayer(EntityPlayer player) {
-		this.player = player;
-		Set<EntityLiving> toRemove = new HashSet<>();
-		for (EntityLiving entity : entitiesSpawned) {
-			if (entity != null) {
-				EntityAIHordeTrackPlayer task = null;
-				for (EntityAITaskEntry entry : entity.tasks.taskEntries) {
-					if (entry.action instanceof EntityAIHordeTrackPlayer) {
-						task = (EntityAIHordeTrackPlayer) entry.action;
-						break;
-					}
-				}
-				if (task != null) {
-					entity.tasks.removeTask(task);
-					entity.tasks.addTask(6, new EntityAIHordeTrackPlayer(entity, player));
-				}
-			} else toRemove.add(entity);
+	
+	public void tryStartEvent(EntityPlayerMP player, int duration, boolean isCommand) {
+		cleanSpawns();
+		if (HordeEventConfig.hordesCommandOnly &! isCommand) return;
+		if (!isCommand) {
+			logInfo("Trying to start horde event on day " + getCurrentDay(player) + " with nextDay " + nextDay + " and time "
+					+ player.world.getWorldTime() % HordeEventConfig.dayLength);
 		}
-		entitiesSpawned.removeAll(toRemove);
-		hasChanged = true;
+		if (player == null) {
+			logError("player is null for " + this, new NullPointerException());
+			return;
+		}
+		WorldServer world = player.getServerWorld();
+		if (world.provider.getDimensionType().getId() != 0) return;
+		HordeStartEvent startEvent = new HordeStartEvent(player, this, isCommand);
+		postEvent(startEvent);
+		if (startEvent.isCanceled()) {
+			spawnData = null;
+			return;
+		}
+		if (spawnData == null) {
+			HordeBuildSpawnDataEvent event = new HordeBuildSpawnDataEvent(player, this);
+			postEvent(event);
+			spawnData = event.getSpawnData();
+		}
+		if (spawnData == null || spawnData.getTable() == null || spawnData.getTable().getSpawnTable(day).isEmpty()) {
+			spawnData = null;
+			logInfo("Spawntable is empty, canceling event start.");
+		}
+		else {
+			timer = duration <= 0 ? spawnData.getSpawnDuration() : duration;
+			sendMessage(player, spawnData.getStartMessage());
+			if (isCommand) day = getCurrentDay(player);
+			else day = nextDay;
+		}
+		if (!isCommand) nextDay = HordeEventConfig.hordeEventByPlayerTime ? nextDay + HordeEventConfig.hordeSpawnDays
+				: WorldDataHordes.getData(world).getNextDay();
 	}
-
-	@Override
-	public void tryStartEvent(int duration, boolean isCommand) {
-		if (player!=null) {
-			if (player.world.provider.getDimension()==0) {
-				HordeStartEvent startEvent = new HordeStartEvent(player, this, isCommand);
-				MinecraftForge.EVENT_BUS.post(startEvent);
-				if (startEvent.isCanceled()) return;
-				HordeBuildSpawntableEvent buildTableEvent = new HordeBuildSpawntableEvent(player, HordeEventRegister.getSpawnTable((int) Math.floor(world.getWorldTime()/ HordeEventConfig.dayLength)), this);
-				MinecraftForge.EVENT_BUS.post(buildTableEvent);
-				WeightedOutputs<HordeSpawnEntry> spawntable = buildTableEvent.spawntable;
-				if (!spawntable.isEmpty()) {
-					timer = duration;
-					hasChanged = true;
-					sendMessage(startEvent.getMessage());
-					if (isCommand) day = (int) Math.floor(world.getWorldTime()/ HordeEventConfig.dayLength);
-					else day = nextDay;
-				} else {
-					logInfo("Spawntable is empty, canceling event start.");
-				}
-				if (!isCommand) nextDay = WorldDataHordeEvent.getData(world).getNextDay();
-			}
-		} else Hordes.logError("player is null for " + toString(), new NullPointerException());
+	
+	public void setSpawntable(HordeSpawnTable table) {
+		if (table == null || table == HordeTableLoader.INSTANCE.getFallbackTable()) {
+			spawnData = null;
+			return;
+		}
+		if (spawnData == null) spawnData = new HordeSpawnData(this);
+		spawnData.setTable(table);
 	}
-
-	@Override
+	
+	public HordeSpawnTable getSpawntable() {
+		return spawnData == null ? null : spawnData.getTable();
+	}
+	
 	public void setNextDay(int day) {
-		nextDay=day;
+		nextDay = day;
 	}
-
-	@Override
+	
 	public int getNextDay() {
 		return nextDay;
 	}
-
-	private void sendMessage(String str) {
-		HordeEventPacketHandler.NETWORK_INSTANCE.sendTo(new SimpleStringMessage(str), (EntityPlayerMP) player);
+	
+	private void sendMessage(EntityPlayerMP player, String str) {
+		HordeEventPacketHandler.sendTo(new SimpleStringMessage(str), player);
 	}
-
-	@Override
-	public void stopEvent(World world, boolean isCommand) {
-		HordeEndEvent endEvent = new HordeEndEvent(player, this, isCommand);
-		MinecraftForge.EVENT_BUS.post(endEvent);
+	
+	public void stopEvent(EntityPlayerMP player, boolean isCommand) {
+		entitiesSpawned.clear();
+		HordeEndEvent endEvent = new HordeEndEvent(player, this, isCommand, spawnData.getEndMessage());
+		postEvent(endEvent);
+		HordeEventPacketHandler.sendTo(new UpdateClientHordeMessage(nextDay, 0), player);
 		timer = 0;
-		cleanSpawns();
-		sendMessage(endEvent.getMessage());
-		List<EntityLiving> toRemove = new ArrayList<>();
+		spawnData = null;
+		sendMessage(player, endEvent.getMessage());
 		for (EntityLiving entity : entitiesSpawned) {
-			if (entity.hasCapability(HordesCapabilities.HORDESPAWN, null)) {
-				HordeSpawn cap = entity.getCapability(HordesCapabilities.HORDESPAWN, null);
-				cap.setPlayerUUID("");
-				toRemove.add(entity);
+			for (EntityAITasks.EntityAITaskEntry entry : entity.tasks.taskEntries) {
+				if (!(entry.action instanceof EntityAIHordeTrackPlayer)) continue;
+				entity.tasks.removeTask(entry.action);
+				break;
 			}
+			if (!entity.hasCapability(HordesCapabilities.HORDESPAWN, null)) continue;
+			entity.getCapability(HordesCapabilities.HORDESPAWN, null).setPlayerUUID("");
+			entity.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).removeModifier(FOLLOW_RANGE_MODIFIER);
 		}
-		entitiesSpawned.removeAll(toRemove);
-		hasChanged = true;
 	}
-
-	@Override
+	
 	public void removeEntity(EntityLiving entity) {
 		entitiesSpawned.remove(entity);
 	}
-
-	@Override
-	public void registerEntity(EntityLiving entity) {
-		if (!entitiesSpawned.contains(entity) && entity != null) {
-			if (entity.isAddedToWorld() &! entity.isDead) entitiesSpawned.add(entity);
+	
+	public void registerEntity(EntityLiving entity, EntityPlayerMP player) {
+		if (!isActive(player) || spawnData == null) {
+			if (!entity.hasCapability(HordesCapabilities.HORDESPAWN, null)) return;
+			entity.getCapability(HordesCapabilities.HORDESPAWN, null).setPlayerUUID("");
+			return;
 		}
+		if (!entitiesSpawned.contains(entity)) entitiesSpawned.add(entity);
+		entity.tasks.addTask(6, new EntityAIHordeTrackPlayer(entity, player, spawnData.getEntitySpeed()));
 	}
-
-	@Override
-	public String toString() {
-		return "OngoingHordeEvent@" + Integer.toHexString(hashCode()) + "[player=" + (player == null ? "null" : player.getName()) + ", isActive=" + (timer > 0) +
-				", ticksLeft=" + timer +", entityCount="+ entitiesSpawned.size()+", nextDay="+nextDay + ", day="+day+"]";
+	
+	private void postEvent(HordePlayerEvent event) {
+		HordeScriptLoader.INSTANCE.applyScripts(event);
+		MinecraftForge.EVENT_BUS.post(event);
 	}
-
+	
+	public void reset(WorldServer level) {
+		entitiesSpawned.clear();
+		WorldDataHordes data = WorldDataHordes.getData(level);
+		nextDay = data.getNextDay();
+		spawnData = null;
+		timer = 0;
+	}
+	
+	public boolean hasSynced() {
+		return sentDay;
+	}
+	
+	public void sync(EntityPlayerMP player) {
+		HordeEventPacketHandler.sendTo(new UpdateClientHordeMessage(isActive(player) ? day : nextDay, HordeEventConfig.dayLength), player);
+		sentDay = true;
+	}
+	
+	public int getDay() {
+		return day;
+	}
+	
+	public int getCurrentDay(EntityPlayerMP player) {
+		return (int) Math.floor((HordeEventConfig.hordeEventByPlayerTime ? player.getStatFile().readStat(StatList.PLAY_ONE_MINUTE)
+				: player.world.getWorldTime()) / HordeEventConfig.dayLength);
+	}
+	
 	private void logInfo(Object message) {
-		Hordes.logInfo("["+this+"]" + message);
+		HordesLogger.logInfo("[" + this + "]" + message);
 	}
-
+	
+	private void logError(Object message, Exception e) {
+		HordesLogger.logError("["+this+"]" + message, e);
+	}
+	
+	public String toString(String player) {
+		return "OngoingHordeEvent@" + Integer.toHexString(hashCode()) + "[player = " + (player == null ? "null" : player) + ", isActive = " + (timer > 0) +
+				", ticksLeft=" + timer + ", entityCount=" + entitiesSpawned.size()+", nextDay=" + nextDay + ", day=" + day+"]";
+	}
+	
 	public List<String> getEntityStrings() {
 		List<String> result = new ArrayList<>();
-		result.add("	entities: {");
+		result.add("	entities: {" + (entitiesSpawned.isEmpty() ? "}" : ""));
 		List<EntityLiving> entitylist = new ArrayList<>(entitiesSpawned);
 		for (int i = 0; i < entitylist.size(); i += 10) {
 			List<EntityLiving> sublist = entitylist.subList(i, Math.min(i+9, entitylist.size()-1));
@@ -359,11 +387,16 @@ public class HordeEvent implements IOngoingHordeEvent {
 			for (EntityLiving entity : sublist) {
 				builder.append(entity.getClass().getSimpleName() + "@");
 				builder.append(Integer.toHexString(entity.hashCode()));
-				if (entitylist.indexOf(entity) < entitylist.size()-1) builder.append(", ");
+				if (entitylist.indexOf(entity) < entitylist.size() -1) builder.append(", ");
 			}
 			builder.append("}");
 			result.add(builder.toString());
 		}
 		return result;
 	}
+	
+	public Random getRandom() {
+		return rand;
+	}
+	
 }

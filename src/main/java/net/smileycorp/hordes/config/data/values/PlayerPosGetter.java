@@ -1,17 +1,13 @@
 package net.smileycorp.hordes.config.data.values;
 
 import com.google.gson.JsonObject;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.Direction;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
-import net.smileycorp.hordes.common.data.DataType;
+import net.smileycorp.hordes.config.data.DataType;
 
 import java.util.Random;
 
@@ -26,7 +22,7 @@ public class PlayerPosGetter<T extends Comparable<T>, Number> implements ValueGe
 	}
 	
 	@Override
-	public T get(World level, EntityLiving entity, EntityPlayerMP player, Random rand) {
+	public T get(World level, EntityLivingBase entity, EntityPlayerMP player, Random rand) {
 		if (!type.isNumber()) return null;
 		EnumFacing.Axis axis = EnumFacing.Axis.byName(value.get(level, entity, player, rand));
 		if (type == DataType.INT || type == DataType.LONG) {

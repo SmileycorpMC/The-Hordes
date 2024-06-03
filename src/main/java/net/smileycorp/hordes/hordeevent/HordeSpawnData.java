@@ -1,13 +1,11 @@
 package net.smileycorp.hordes.hordeevent;
 
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.config.HordeEventConfig;
 import net.smileycorp.hordes.config.data.hordeevent.HordeTableLoader;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
-import net.smileycorp.hordes.hordeevent.data.HordeTableLoader;
 
 public class HordeSpawnData {
     

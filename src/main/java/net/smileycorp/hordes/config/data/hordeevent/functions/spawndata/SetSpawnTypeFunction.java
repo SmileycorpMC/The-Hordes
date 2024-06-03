@@ -3,9 +3,9 @@ package net.smileycorp.hordes.config.data.hordeevent.functions.spawndata;
 import com.google.gson.JsonElement;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.HordeBuildSpawnDataEvent;
+import net.smileycorp.hordes.config.data.hordeevent.functions.HordeFunction;
 import net.smileycorp.hordes.hordeevent.HordeSpawnType;
 import net.smileycorp.hordes.hordeevent.HordeSpawnTypes;
-import net.smileycorp.hordes.hordeevent.data.functions.HordeFunction;
 
 public class SetSpawnTypeFunction implements HordeFunction<HordeBuildSpawnDataEvent> {
 

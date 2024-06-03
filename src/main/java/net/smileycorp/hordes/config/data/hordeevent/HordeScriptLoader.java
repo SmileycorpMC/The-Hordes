@@ -1,41 +1,43 @@
 package net.smileycorp.hordes.config.data.hordeevent;
 
 import com.google.common.collect.Sets;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import net.minecraft.client.resources.JsonReloadListener;
-import net.minecraft.profiler.IProfiler;
-import net.minecraft.resources.IResourceManager;
+import com.google.gson.JsonParser;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
 
+import java.io.File;
+import java.io.FileReader;
 import java.util.Collection;
-import java.util.Map;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 public class HordeScriptLoader {
 
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-
-    public static HordeScriptLoader INSTANCE = new HordeScriptLoader();
+    public static HordeScriptLoader INSTANCE;
     
     private final TreeSet<HordeScript> SCRIPTS = Sets.newTreeSet(HordeScript::sort);
-
-    public HordeScriptLoader() {
-        super(GSON, "horde_data/scripts");
+    private final File directory;
+    
+    public static void init(FMLPreInitializationEvent event) {
+        INSTANCE = new HordeScriptLoader(new File(event.getModConfigurationDirectory().getPath() + "/hordes/scripts"));
     }
 
-    @Override
-    protected void apply(Map<ResourceLocation, JsonElement> map, IResourceManager manager, IProfiler profiller) {
+    public HordeScriptLoader(File directory) {
+        this.directory = directory;
+    }
+
+    public void loadScripts() {
+        JsonParser parser = new JsonParser();
         SCRIPTS.clear();
-        for (Map.Entry<ResourceLocation, JsonElement> entry : map.entrySet()) {
+        for (File file : directory.listFiles((f, s) -> s.endsWith(".json"))) {
+            ResourceLocation name =  Constants.loc(file.getName().replace(".json", ""));
             try {
-                SCRIPTS.add(HordeScript.deserialize(entry.getKey(), entry.getValue()));
+                SCRIPTS.add(HordeScript.deserialize(name, parser.parse(new FileReader(file)).getAsJsonObject()));
             } catch (Exception e) {
-                HordesLogger.logError("Failed to parse script " + entry.getKey(), e);
+                HordesLogger.logError("Failed to parse script " + name, e);
             }
         }
         SCRIPTS.forEach(script -> HordesLogger.logInfo("loaded horde script " + script.getName()));

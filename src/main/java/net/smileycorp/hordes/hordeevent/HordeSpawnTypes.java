@@ -6,21 +6,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
-import net.minecraft.nbt.StringNBT;
-import net.minecraft.tags.FluidTags;
-import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.IFluidBlock;
 import net.smileycorp.hordes.common.HordesLogger;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class HordeSpawnTypes {
     

@@ -4,19 +4,20 @@ import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.datafixers.util.Pair;
-import net.smileycorp.hordes.common.data.DataRegistry;
-import net.smileycorp.hordes.common.data.conditions.Condition;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
+import net.smileycorp.hordes.config.data.DataRegistry;
+import net.smileycorp.hordes.config.data.conditions.Condition;
 
+import java.util.AbstractMap;
 import java.util.List;
+import java.util.Map;
 
 public class MultipleFunction<T extends HordePlayerEvent> implements HordeFunction<T> {
     
     private final Class<T> clazz;
-    private final List<Pair<List<Condition>, HordeFunction<T>>> functions;
+    private final List<Map.Entry<List<Condition>, HordeFunction<T>>> functions;
     
-    public MultipleFunction(Class<T> clazz, List<Pair<List<Condition>, HordeFunction<T>>> functions) {
+    public MultipleFunction(Class<T> clazz, List<Map.Entry<List<Condition>, HordeFunction<T>>> functions) {
         this.clazz = clazz;
         this.functions = functions;
     }
@@ -24,12 +25,12 @@ public class MultipleFunction<T extends HordePlayerEvent> implements HordeFuncti
     @Override
     public void apply(T event) {
         if (event.getClass() != clazz) return;
-       functions.forEach(pair -> tryApply(pair, event));
+        functions.forEach(pair -> tryApply(pair, event));
     }
     
-    private void tryApply(Pair<List<Condition>, HordeFunction<T>> pair, T event) {
-        for (Condition condition : pair.getFirst()) if (!condition.apply(event.getEntityWorld(), event.getEntity(), event.getPlayer(), event.getRandom())) return;
-        pair.getSecond().apply(event);
+    private void tryApply(Map.Entry<List<Condition>, HordeFunction<T>> pair, T event) {
+        for (Condition condition : pair.getKey()) if (!condition.apply(event.getEntityWorld(), event.getEntity(), event.getPlayer(), event.getRandom())) return;
+        pair.getValue().apply(event);
     }
     
     @Override
@@ -42,27 +43,27 @@ public class MultipleFunction<T extends HordePlayerEvent> implements HordeFuncti
         return super.toString() + "[" + builder + "]";
     }
     
-    public static <T extends HordePlayerEvent> Pair<Class<T>, HordeFunction<T>> deserialize(JsonArray json) {
+    public static <T extends HordePlayerEvent> Map.Entry<Class<T>, HordeFunction<T>> deserialize(JsonArray json) {
         Class<T> clazz = null;
-        List<Pair<List<Condition>, HordeFunction<T>>> functions = Lists.newArrayList();
+        List<Map.Entry<List<Condition>, HordeFunction<T>>> functions = Lists.newArrayList();
         for (JsonElement element : json) {
             JsonObject obj = element.getAsJsonObject();
-            Pair<Class<T>, HordeFunction<T>> pair = FunctionRegistry.readFunction(obj);
-            if (clazz == null && pair.getFirst() != null) {
+            Map.Entry<Class<T>, HordeFunction<T>> pair = FunctionRegistry.readFunction(obj);
+            if (clazz == null && pair.getKey() != null) {
                 List<Condition> conditions = Lists.newArrayList();
                 if (obj.has("conditions")) obj.get("conditions").getAsJsonArray().forEach(condition ->
                         conditions.add(DataRegistry.readCondition(condition.getAsJsonObject())));
-                clazz = pair.getFirst();
-                functions.add(Pair.of(conditions, pair.getSecond()));
+                clazz = pair.getKey();
+                functions.add(new AbstractMap.SimpleEntry<>(conditions, pair.getValue()));
             }
-            else if (clazz == pair.getFirst()) {
+            else if (clazz == pair.getKey()) {
                 List<Condition> conditions = Lists.newArrayList();
                 if (obj.has("conditions")) obj.get("conditions").getAsJsonArray().forEach(condition ->
                         conditions.add(DataRegistry.readCondition(condition.getAsJsonObject())));
-                functions.add(Pair.of(conditions, pair.getSecond()));
+                functions.add(new AbstractMap.SimpleEntry<>(conditions, pair.getValue()));
             }
         }
-        return Pair.of(clazz, new MultipleFunction(clazz, functions));
+        return new AbstractMap.SimpleEntry<>(clazz, new MultipleFunction(clazz, functions));
     }
     
 }

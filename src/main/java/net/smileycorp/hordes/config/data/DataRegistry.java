@@ -3,20 +3,16 @@ package net.smileycorp.hordes.config.data;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.JsonToNBT;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.common.Loader;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.HordesLogger;
-import net.smileycorp.hordes.common.data.BinaryOperation;
-import net.smileycorp.hordes.common.data.DataType;
-import net.smileycorp.hordes.common.data.LogicalOperation;
-import net.smileycorp.hordes.common.data.UnaryOperation;
-import net.smileycorp.hordes.common.data.conditions.*;
-import net.smileycorp.hordes.common.data.values.*;
 import net.smileycorp.hordes.config.HordeEventConfig;
-import net.smileycorp.hordes.hordeevent.data.functions.FunctionRegistry;
+import net.smileycorp.hordes.config.data.conditions.*;
+import net.smileycorp.hordes.config.data.hordeevent.functions.FunctionRegistry;
+import net.smileycorp.hordes.config.data.values.*;
 
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -30,7 +26,7 @@ public class DataRegistry {
 	public static void init() {
 		registerValueGetters();
 		registerConditionDeserializers();
-		if (HordeEventConfig.enableHordeEvent.get()) FunctionRegistry.registerFunctionSerializers();
+		if (HordeEventConfig.enableHordeEvent) FunctionRegistry.registerFunctionSerializers();
 	}
 
 	private static void registerValueGetters() {
@@ -59,7 +55,7 @@ public class DataRegistry {
 		registerConditionDeserializer(Constants.loc("game_difficulty"), GameDifficultyCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("advancement"), AdvancementCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("entity_type"), EntityTypeCondition::deserialize);
-		if (ModList.get().isLoaded("gamestages")) registerConditionDeserializer(new ResourceLocation("gamestages:gamestage"), GameStagesCondition::deserialize);
+		if (Loader.isModLoaded("gamestages")) registerConditionDeserializer(new ResourceLocation("gamestages:gamestage"), GameStagesCondition::deserialize);
 	}
 
 	public static ValueGetter readValue(DataType type, JsonObject json) {
@@ -98,10 +94,10 @@ public class DataRegistry {
 		CONDITION_DESERIALIZERS.put(name, serializer);
 	}
 
-    public static CompoundNBT parseNBT(String name, String nbtstring) {
-        CompoundNBT nbt = null;
+    public static NBTTagCompound parseNBT(String name, String nbtstring) {
+		NBTTagCompound nbt = null;
         try {
-            CompoundNBT parsed = JsonToNBT.parseTag(nbtstring);
+			NBTTagCompound parsed = JsonToNBT.getTagFromJson(nbtstring);
             if (parsed != null) nbt = parsed;
             else throw new NullPointerException("Parsed NBT is null.");
         } catch (Exception e) {

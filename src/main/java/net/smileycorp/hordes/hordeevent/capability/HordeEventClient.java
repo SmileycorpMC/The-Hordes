@@ -1,32 +1,35 @@
 package net.smileycorp.hordes.hordeevent.capability;
 
+import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 
+import javax.annotation.Nullable;
+
 public interface HordeEventClient {
+	
+	void setNextDay(int day, int day_length);
 	
 	boolean isHordeNight(World level);
 	
-	void setHordeDay(boolean hordeDay, int day_length);
-	
 	class Impl implements HordeEventClient {
 		
-		private int day_length;
-		private boolean horde_day;
+		private int day, day_length;
 		
 		@Override
-		public void setHordeDay(boolean hordeDay, int day_length) {
+		public void setNextDay(int day, int day_length) {
 			if (day_length > 0) this.day_length = day_length;
-			this.horde_day = hordeDay;
+			this.day = day;
 		}
 		
 		@Override
 		public boolean isHordeNight(World level) {
-			if (day_length == 0 |! horde_day) return false;
-			return (level.getWorldTime() % day_length >= 0.5 * day_length);
+			if (day_length == 0) return false;
+			if (level.getWorldTime() % day_length < 0.5 * day_length) return false;
+			return level.getWorldTime() > day * day_length;
 		}
 		
 	}
@@ -46,5 +49,17 @@ public interface HordeEventClient {
 		}
 
 	}
- 
+    
+    class Storage implements Capability.IStorage<HordeEventClient> {
+	
+		@Nullable
+		@Override
+		public NBTBase writeNBT(Capability<HordeEventClient> capability, HordeEventClient instance, EnumFacing side) {
+			return null;
+		}
+	
+		@Override
+		public void readNBT(Capability<HordeEventClient> capability, HordeEventClient instance, EnumFacing side, NBTBase nbt) {}
+		
+	}
 }

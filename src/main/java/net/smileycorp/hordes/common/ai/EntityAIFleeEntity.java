@@ -26,13 +26,13 @@ public class EntityAIFleeEntity extends EntityAIBase {
 
 	public EntityAIFleeEntity(EntityLiving entity, double speed, double range, Predicate<EntityLivingBase> predicate) {
 		super();
-		this.entity=entity;
+		this.entity = entity;
 		world = entity.world;
 		pather = entity.getNavigator();
 		this.predicate = predicate;
 		this.speed = speed;
 		this.range = range;
-		this.setMutexBits(1);
+		setMutexBits(3);
 	}
 
 	@Override
@@ -58,8 +58,8 @@ public class EntityAIFleeEntity extends EntityAIBase {
 
 	@Override
 	public void updateTask() {
-		if (--this.timeToRecalcPath <= 0)  {
-			this.timeToRecalcPath = 5;
+		if (--timeToRecalcPath <= 0)  {
+			timeToRecalcPath = 5;
 			BlockPos pos = findSafePos();
 			pather.tryMoveToXYZ(pos.getX(), pos.getY(), pos.getZ(), speed);
 		}
@@ -76,7 +76,8 @@ public class EntityAIFleeEntity extends EntityAIBase {
 	}
 
 	private List<EntityLivingBase> getEntities() {
-		return world.getEntitiesWithinAABB(EntityLivingBase.class, new AxisAlignedBB(entity.posX-range, entity.posY-range, entity.posZ-range, entity.posX+range, entity.posY+range, entity.posZ+range), predicate);
+		return world.getEntitiesWithinAABB(EntityLivingBase.class, new AxisAlignedBB(entity.posX - range, entity.posY - range, entity.posZ - range,
+				entity.posX + range, entity.posY + range, entity.posZ + range), predicate);
 	}
 
 }

@@ -5,25 +5,29 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.pathfinding.PathNodeType;
-import net.minecraft.world.World;
 import net.smileycorp.hordes.config.HordeEventConfig;
 
 public class EntityAIHordeTrackPlayer extends EntityAIBase {
     
     protected final EntityLiving entity;
     protected final Entity target;
-    protected final World world;
-    protected final PathNavigate pather;
+    protected final double speed;
+    protected PathNavigate pather;
     protected int timeToRecalcPath;
     protected float waterCost;
     
-    public EntityAIHordeTrackPlayer(EntityLiving entity, Entity target) {
+    public EntityAIHordeTrackPlayer(EntityLiving entity, Entity target, double speed) {
         timeToRecalcPath = entity.getRNG().nextInt(HordeEventConfig.hordePathingInterval);
         this.entity = entity;
-        world = entity.world;
         this.target = target;
+        this.speed = speed;
         pather = entity.getNavigator();
-        setMutexBits(1);
+        setMutexBits(3);
+    }
+    
+    @Override
+    public boolean shouldExecute() {
+        return target != null && target.isEntityAlive() && entity.getAttackTarget() == null;
     }
     
     @Override
@@ -32,13 +36,8 @@ public class EntityAIHordeTrackPlayer extends EntityAIBase {
     }
     
     @Override
-    public boolean shouldExecute() {
-        return target != null && target.isEntityAlive();
-    }
-    
-    @Override
     public boolean shouldContinueExecuting() {
-        return shouldExecute();
+        return true;
     }
     
     @Override
@@ -49,10 +48,12 @@ public class EntityAIHordeTrackPlayer extends EntityAIBase {
     
     @Override
     public void updateTask() {
-        if (timeToRecalcPath-- <= 0)  {
+        if (timeToRecalcPath-- <= 0) {
             timeToRecalcPath = HordeEventConfig.hordePathingInterval;
-            pather.tryMoveToXYZ(target.posX, target.posY, target.posZ, 1f);
+            pather = entity.getNavigator();
+            pather.tryMoveToEntityLiving(target, speed);
         }
+        
     }
     
 }

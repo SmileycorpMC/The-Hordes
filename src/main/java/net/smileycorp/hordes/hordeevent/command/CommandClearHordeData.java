@@ -6,7 +6,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.hordeevent.capability.WorldDataHordeEvent;
+import net.smileycorp.hordes.hordeevent.capability.WorldDataHordes;
 
 public class CommandClearHordeData extends CommandBase {
 
@@ -29,7 +29,7 @@ public class CommandClearHordeData extends CommandBase {
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		World world = sender.getEntityWorld();
 		server.addScheduledTask(() -> {
-			WorldDataHordeEvent.getCleanData(world);
+			WorldDataHordes.getCleanData(world);
 		});
 		notifyCommandListener(sender, this, "commands."+Constants.MODID +".HordeClean.success", new Object[]{});
     }

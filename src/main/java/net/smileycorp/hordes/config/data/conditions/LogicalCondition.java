@@ -2,16 +2,12 @@ package net.smileycorp.hordes.config.data.conditions;
 
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.world.World;
-import net.smileycorp.atlas.api.data.LogicalOperation;
 import net.smileycorp.hordes.common.HordesLogger;
-import net.smileycorp.hordes.common.data.DataRegistry;
-import net.smileycorp.hordes.common.data.LogicalOperation;
 import net.smileycorp.hordes.config.data.DataRegistry;
+import net.smileycorp.hordes.config.data.LogicalOperation;
 
 import java.util.List;
 import java.util.Random;
@@ -27,7 +23,7 @@ public class LogicalCondition implements Condition {
 	}
 
 	@Override
-	public boolean apply(World level, EntityLiving entity, EntityPlayerMP player, Random rand) {
+	public boolean apply(World level, EntityLivingBase entity, EntityPlayerMP player, Random rand) {
 		boolean result = false;
 		for (Condition condition : conditions) result = operation.apply(result, condition.apply(level, entity, player, rand));
 		return result;

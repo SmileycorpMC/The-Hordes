@@ -1,20 +1,20 @@
 package net.smileycorp.hordes.common.event;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.BlockPos;
-import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.hordeevent.capability.IOngoingHordeEvent;
+import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 
-public class HordeEndEvent extends HordeEvent {
+public class HordeEndEvent extends HordePlayerEvent {
 
 	protected final BlockPos pos;
-	protected String message = Constants.hordeEventEnd;
+	protected String message;
 	protected final boolean wasCommand;
 
-	public HordeEndEvent(EntityPlayer player, IOngoingHordeEvent horde, boolean wasCommand) {
+	public HordeEndEvent(EntityPlayerMP player, HordeEvent horde, boolean wasCommand, String message) {
 		super(player, horde);
 		pos = player.getPosition();
 		this.wasCommand = wasCommand;
+		this.message = message;
 	}
 
 	public BlockPos getPlayerPos() {
@@ -35,4 +35,5 @@ public class HordeEndEvent extends HordeEvent {
 	public void setMessage(String message) {
 		this.message = message;
 	}
+	
 }
