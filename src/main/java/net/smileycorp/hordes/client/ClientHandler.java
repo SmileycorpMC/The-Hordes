@@ -21,7 +21,7 @@ import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.config.ClientConfigHandler;
 import net.smileycorp.hordes.hordeevent.capability.HordeEventClient;
-import net.smileycorp.hordes.infection.CureEntityMessage;
+import net.smileycorp.hordes.infection.network.CureEntityMessage;
 
 import java.util.Random;
 

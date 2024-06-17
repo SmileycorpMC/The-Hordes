@@ -9,6 +9,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.smileycorp.atlas.api.recipe.WeightedOutputs;
+import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.config.data.DataRegistry;
 
@@ -25,9 +26,9 @@ public class HordeSpawnTable {
     private boolean tested;
 
    protected HordeSpawnTable(ResourceLocation name, List<HordeSpawnEntry> spawns) {
-    this.name = name;
-    this.spawns = spawns;
-    }
+        this.name = name;
+        this.spawns = spawns;
+   }
 
     public ResourceLocation getName() {
        return name;
@@ -132,7 +133,7 @@ public class HordeSpawnTable {
                     HordeSpawnEntry entry = new HordeSpawnEntry(type, weight, minDay, maxDay, minSpawns, maxSpawns);
                     if (nbt != null) entry.setNBT(nbt);
                 }
-                HordesLogger.logInfo("Loaded entity " + entity + " as " + type.toString() + " with weight " + weight + ", min day " + minDay + " and max day " + maxDay);
+                HordesLogger.logInfo("Loaded entity " + entity + " as " + type.getEntityClass().toString() + " with weight " + weight + ", min day " + minDay + " and max day " + maxDay);
                 HordeSpawnEntry entry = new HordeSpawnEntry(type, weight, minDay, maxDay, minSpawns, maxSpawns);
                 if (nbt != null) entry.setNBT(nbt);
                 spawns.add(entry);
@@ -141,6 +142,30 @@ public class HordeSpawnTable {
             }
         }
        return new HordeSpawnTable(name, spawns);
+    }
+    
+    public static class Builder {
+       
+        protected final List<HordeSpawnEntry> spawns = Lists.newArrayList();
+        protected final ResourceLocation name;
+    
+        public Builder(String name) {
+            this(Constants.loc(name));
+        }
+        
+        public Builder(ResourceLocation name) {
+            this.name = name;
+        }
+    
+        public Builder addEntry(HordeSpawnEntry entry) {
+            spawns.add(entry);
+            return this;
+        }
+        
+       public HordeSpawnTable build() {
+            return new HordeSpawnTable(name, spawns);
+       }
+       
     }
 
 }

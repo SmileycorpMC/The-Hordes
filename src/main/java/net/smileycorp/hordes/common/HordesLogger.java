@@ -1,13 +1,12 @@
 package net.smileycorp.hordes.common;
 
 import com.google.common.collect.Lists;
-import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
-import net.smileycorp.hordes.hordeevent.capability.HordeSavedData;
+import net.smileycorp.hordes.hordeevent.capability.WorldDataHordes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -50,7 +49,7 @@ public class HordesLogger {
         has_errors = true;
     }
     
-    public static boolean logSaveData(HordeSavedData data) {
+    public static boolean logSaveData(WorldDataHordes data) {
         writeToFile("Horde world data: ");
         return writeToFile(data.getDebugText());
     }
@@ -76,9 +75,9 @@ public class HordesLogger {
     
     public static ITextComponent getFiletext() {
         String file = log_file.toAbsolutePath().toString();
-        IFormattableTextComponent text = new StringTextComponent(file);
-        text.setStyle(Style.EMPTY.withUnderlined(true).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file))
-                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new StringTextComponent(file))));
+        TextComponentString text = new TextComponentString(file);
+        text.setStyle(new Style().setUnderlined(true).setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file))
+                .setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(file))));
         return text;
     }
     

@@ -35,7 +35,7 @@ public class HordeScriptLoader {
         for (File file : directory.listFiles((f, s) -> s.endsWith(".json"))) {
             ResourceLocation name =  Constants.loc(file.getName().replace(".json", ""));
             try {
-                SCRIPTS.add(HordeScript.deserialize(name, parser.parse(new FileReader(file)).getAsJsonObject()));
+                SCRIPTS.add(HordeScript.deserialize(name, parser.parse(new FileReader(file))));
             } catch (Exception e) {
                 HordesLogger.logError("Failed to parse script " + name, e);
             }

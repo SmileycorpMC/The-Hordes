@@ -12,6 +12,7 @@ import net.minecraftforge.event.entity.player.PlayerDropsEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
+import net.smileycorp.hordes.common.capability.ZombifyPlayer;
 import net.smileycorp.hordes.common.entities.EntityZombiePlayer;
 import net.smileycorp.hordes.config.InfectionConfig;
 import net.smileycorp.hordes.config.ZombiePlayersConfig;
@@ -46,7 +47,7 @@ public class MiscEventHandler {
 			if (!world.isRemote) {
 				if ((player.isPotionActive(HordesInfection.INFECTED) && InfectionConfig.enableMobInfection && InfectionConfig.infectionSpawnsZombiePlayers) || ZombiePlayersConfig.zombieGraves) {
 					if (player.hasCapability(HordesCapabilities.ZOMBIFY_PLAYER, null)) {
-						IZombifyPlayer cap = player.getCapability(HordesCapabilities.ZOMBIFY_PLAYER, null);
+						ZombifyPlayer cap = player.getCapability(HordesCapabilities.ZOMBIFY_PLAYER, null);
 						EntityZombiePlayer zombie = cap.getZombie();
 						if (zombie!=null) {
 							List<EntityItem> drops = event.getDrops();
@@ -67,7 +68,7 @@ public class MiscEventHandler {
 	public void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
 		Entity entity = event.getObject();
 		if (!entity.hasCapability(HordesCapabilities.HORDESPAWN, null) && entity instanceof EntityPlayer &!(entity instanceof FakePlayer)) {
-			event.addCapability(Constants.loc("Infection"), new IZombifyPlayer.Provider((EntityPlayer) entity));
+			event.addCapability(Constants.loc("Infection"), new ZombifyPlayer.Provider((EntityPlayer) entity));
 		}
 	}
 }

@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.integration.jei;
+package net.smileycorp.hordes.infection.jei;
 
 import mezz.jei.api.IGuiHelper;
 import mezz.jei.api.gui.IDrawable;
@@ -10,7 +10,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.translation.I18n;
 import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.infection.PotionInfected;
 
 import java.util.List;
 
@@ -26,7 +25,7 @@ public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapp
 	
 	public InfectionCureCategory(IGuiHelper guiHelper) {
 		this.background = guiHelper.createDrawable(TEXTURE, 0, 0, 167, 113);
-		this.icon = guiHelper.createDrawable(PotionInfected.TEXTURE, 1, 200, 16, 16);
+		this.icon = guiHelper.createDrawable(Constants.loc("textures/mob_effect/infected.png"), 1, 200, 16, 16);
 	}
 	
 	@Override

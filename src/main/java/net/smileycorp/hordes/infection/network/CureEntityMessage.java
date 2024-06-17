@@ -1,9 +1,13 @@
-package net.smileycorp.hordes.infection;
+package net.smileycorp.hordes.infection.network;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
+import net.smileycorp.hordes.client.ClientHandler;
 
 public class CureEntityMessage implements IMessage {
 
@@ -28,4 +32,10 @@ public class CureEntityMessage implements IMessage {
 	public Entity getEntity(World world) {
 		return world.getEntityByID(entity);
 	}
+	
+	public IMessage process(MessageContext ctx) {
+		if (ctx.side == Side.CLIENT) Minecraft.getMinecraft().addScheduledTask(() -> ClientHandler.processCureEntityMessage(this));
+		return null;
+	}
+	
 }

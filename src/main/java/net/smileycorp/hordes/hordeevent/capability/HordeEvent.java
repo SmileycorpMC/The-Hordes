@@ -19,6 +19,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.smileycorp.atlas.api.SimpleStringMessage;
 import net.smileycorp.atlas.api.recipe.WeightedOutputs;
@@ -36,6 +37,7 @@ import net.smileycorp.hordes.hordeevent.HordeSpawnTable;
 import net.smileycorp.hordes.hordeevent.network.HordeEventPacketHandler;
 import net.smileycorp.hordes.hordeevent.network.HordeSoundMessage;
 import net.smileycorp.hordes.hordeevent.network.UpdateClientHordeMessage;
+import net.smileycorp.hordes.integration.mobspropertiesrandomness.MPRIntegration;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -195,6 +197,7 @@ public class HordeEvent {
 	private void finalizeEntity(EntityLiving entity, EntityPlayerMP player) {
 		entity.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).applyModifier(new AttributeModifier(FOLLOW_RANGE_MODIFIER,
 				"hordes:horde_range", 75, 0));
+		if (Loader.isModLoaded("mpr")) MPRIntegration.addFollowAttribute(entity);
 		if (entity.hasCapability(HordesCapabilities.HORDESPAWN, null)) {
 			entity.getCapability(HordesCapabilities.HORDESPAWN, null).setPlayerUUID(player.getUniqueID().toString());
 			registerEntity(entity, player);

@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.integration.jei;
+package net.smileycorp.hordes.infection.jei;
 
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.ingredients.VanillaTypes;

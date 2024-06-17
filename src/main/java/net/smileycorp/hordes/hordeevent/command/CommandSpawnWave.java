@@ -5,10 +5,11 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.NumberInvalidException;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.common.capability.HordesCapabilities;
+import net.smileycorp.hordes.hordeevent.capability.WorldDataHordes;
 
 public class CommandSpawnWave extends CommandBase {
 
@@ -37,7 +38,8 @@ public class CommandSpawnWave extends CommandBase {
 			if (sender.getCommandSenderEntity() instanceof EntityPlayer) {
 				server.addScheduledTask(() -> {
 					EntityPlayer player = (EntityPlayer) sender.getCommandSenderEntity();
-					if (player.hasCapability(HordesCapabilities.HORDE_EVENT, null)) player.getCapability(HordesCapabilities.HORDE_EVENT, null).spawnWave(player.world, count);
+					WorldDataHordes data = WorldDataHordes.getData(sender.getEntityWorld());
+					data.getEvent((EntityPlayerMP) player).spawnWave((EntityPlayerMP) player, count);
 				});
 			}
 			notifyCommandListener(sender, this, "commands."+Constants.MODID +".SpawnHordeWave.success", new Object[0]);

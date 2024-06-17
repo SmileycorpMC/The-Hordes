@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.common;
+package net.smileycorp.hordes.common.capability;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTBase;
@@ -6,31 +6,32 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.Capability.IStorage;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.common.entities.EntityZombiePlayer;
 
-public interface IZombifyPlayer {
+public interface ZombifyPlayer {
 
-	public EntityZombiePlayer createZombie();
+	EntityZombiePlayer createZombie();
 	
-	public EntityZombiePlayer getZombie();
+	EntityZombiePlayer getZombie();
 	
-	public void clearZombie();
+	void clearZombie();
+	
+	boolean wasZombified();
 
-	public static class Storage implements IStorage<IZombifyPlayer> {
+	class Storage implements IStorage<ZombifyPlayer> {
 
 		@Override
-		public NBTBase writeNBT(Capability<IZombifyPlayer> capability, IZombifyPlayer instance, EnumFacing side) {
+		public NBTBase writeNBT(Capability<ZombifyPlayer> capability, ZombifyPlayer instance, EnumFacing side) {
 			return null;
 		}
 	
 		@Override
-		public void readNBT(Capability<IZombifyPlayer> capability, IZombifyPlayer instance, EnumFacing side, NBTBase nbt) {}
+		public void readNBT(Capability<ZombifyPlayer> capability, ZombifyPlayer instance, EnumFacing side, NBTBase nbt) {}
 		
 		
 	}
 	
-	public static class Implementation implements IZombifyPlayer {
+	class Implementation implements ZombifyPlayer {
 		
 		private final EntityPlayer player;
 		private EntityZombiePlayer zombie = null;
@@ -58,14 +59,19 @@ public interface IZombifyPlayer {
 
 		@Override
 		public void clearZombie() {
-			zombie=null;
+			zombie = null;
+		}
+		
+		@Override
+		public boolean wasZombified() {
+			return zombie != null;
 		}
 
 	}
 	
 	public static class Provider implements ICapabilityProvider {
 		
-		protected final IZombifyPlayer instance;
+		protected final ZombifyPlayer instance;
 
 		public Provider(EntityPlayer player) {
 			instance = new Implementation(player);

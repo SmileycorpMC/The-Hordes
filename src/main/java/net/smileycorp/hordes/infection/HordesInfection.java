@@ -15,6 +15,7 @@ import net.smileycorp.hordes.common.entities.EntityZombiePlayer;
 public class HordesInfection {
 	
 	public static Potion INFECTED = new PotionInfected();
+	public static Potion IMMUNITY = new PotionHordes("Immunity",  false, 0x00923A89);
 	public static DamageSource INFECTION_DAMAGE = new DamageSourceInfection();
 	
 	@SubscribeEvent

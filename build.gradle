@@ -10,7 +10,6 @@ buildscript {
         classpath 'net.minecraftforge.gradle:ForgeGradle:3.+'
 		classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
 		classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
-        classpath 'io.github.llamalad7:mixinextras-common:0.3.5'
     }
 }
 
@@ -27,7 +26,7 @@ apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'java'
 
-version = "1.12.2-1.1.7"
+version = "1.12.2-1.5.3"
 group = "net.smileycorp.hordes"
 archivesBaseName = "The-Hordes"
 
@@ -83,7 +82,6 @@ dependencies {
 	implementation "curse.maven:jei-238222:4393461"
 	implementation "curse.maven:mpr-285012:2823889"
     implementation "curse.maven:gamestages-268655:2951840"
-    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.5"))
 
 }
 
@@ -113,7 +111,6 @@ shadowJar {
 	exclude 'LICENSE.txt'
 	dependencies {
 		include(dependency("org.spongepowered:mixin:0.8"))
-        include(dependency("io.github.llamalad7:mixinextras-forge:0.3.5"))
 	}
 }
 

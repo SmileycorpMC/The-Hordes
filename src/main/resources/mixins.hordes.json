@@ -5,6 +5,7 @@
   "mixins": [
 	"MixinAbstractHorse",
 	"MixinAbstractSkeleton",
+    "MixinEntity",
 	"MixinEntityAnimal",
     "MixinEntityLiving",
 	"MixinEntityLivingBase",
@@ -13,6 +14,8 @@
 	"MixinEntityZombieVillager",
 	"MixinPotionEffect"
   ],
-  "client": [],
+  "client": [
+    "MixinRenderGlobal"
+  ],
   "server": []
 }

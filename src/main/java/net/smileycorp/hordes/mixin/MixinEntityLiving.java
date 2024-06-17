@@ -6,12 +6,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
-import net.smileycorp.hordes.common.capability.HordesCapabilities;
-import net.smileycorp.hordes.infection.CureEntityMessage;
+import net.smileycorp.hordes.config.data.infection.InfectionDataLoader;
 import net.smileycorp.hordes.infection.HordesInfection;
-import net.smileycorp.hordes.infection.InfectionPacketHandler;
-import net.smileycorp.hordes.infection.InfectionRegister;
-import net.smileycorp.hordes.infection.capability.IInfection;
+import net.smileycorp.hordes.infection.network.CureEntityMessage;
+import net.smileycorp.hordes.infection.network.InfectionPacketHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -27,27 +25,17 @@ public abstract class MixinEntityLiving extends EntityLivingBase {
 	@Inject(at=@At("HEAD"), method = "processInitialInteract(Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/EnumHand;)Z", cancellable = true)
 	public void processInteract(EntityPlayer player, EnumHand hand, CallbackInfoReturnable<Boolean> callback) {
 		ItemStack stack = player.getHeldItem(hand);
-		if (isPotionActive(HordesInfection.INFECTED)) {
-			if (InfectionRegister.isCure(stack)) {
-				removePotionEffect(HordesInfection.INFECTED);
-				IInfection cap = getCapability(HordesCapabilities.INFECTION, null);
-				if (cap != null) cap.increaseInfection();
-				if (!player.world.isRemote) InfectionPacketHandler.NETWORK_INSTANCE.sendToAllTracking(new CureEntityMessage(this), this);
-				if (!player.capabilities.isCreativeMode) {
-					ItemStack container = stack.getItem().getContainerItem(stack);
-					if (stack.isItemStackDamageable()) {
-						stack.damageItem(1, player);
-					} else {
-						stack.shrink(1);
-					}
-					if (stack.isEmpty() && !container.isEmpty()) {
-						player.setHeldItem(hand, container);
-					}
-				}
-				callback.setReturnValue(true);
-				callback.cancel();
-			}
+		if (!isPotionActive(HordesInfection.INFECTED)) return;
+		if (!InfectionDataLoader.INSTANCE.isCure(stack)) return;
+		removePotionEffect(HordesInfection.INFECTED);
+		if (!player.world.isRemote) InfectionPacketHandler.send(this, new CureEntityMessage(this));
+		if (!player.isCreative()) {
+			ItemStack container = stack.getItem().getContainerItem(stack);
+			if (stack.isItemStackDamageable())stack.damageItem(1, player);
+			else stack.shrink(1);
+			if (stack.isEmpty() && !container.isEmpty()) player.setHeldItem(hand, container);
 		}
+		callback.setReturnValue(world.isRemote);
 	}
 
 }

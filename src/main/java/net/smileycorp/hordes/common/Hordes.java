@@ -8,13 +8,9 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @Mod(modid = Constants.MODID, name=Constants.NAME, version = Constants.VERSION, dependencies = Constants.DEPENDENCIES)
 public class Hordes {
-
-	private static Logger logger = LogManager.getLogger(Constants.NAME);
     
     @Instance(Constants.MODID)
 	public static Hordes INSTANCE;
@@ -40,15 +36,6 @@ public class Hordes {
 	@EventHandler
 	public void serverStart(FMLServerStartingEvent event){
 		proxy.serverStart(event);
-	}
-
-	public static void logInfo(Object message) {
-		logger.info(message);
-	}
-
-	public static void logError(Object message, Exception e) {
-		logger.error(message);
-		e.printStackTrace();
 	}
 
 }

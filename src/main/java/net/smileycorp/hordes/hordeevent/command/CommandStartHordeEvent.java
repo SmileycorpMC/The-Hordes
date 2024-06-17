@@ -5,10 +5,11 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.NumberInvalidException;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.common.capability.HordesCapabilities;
+import net.smileycorp.hordes.hordeevent.capability.WorldDataHordes;
 
 public class CommandStartHordeEvent extends CommandBase {
 
@@ -36,7 +37,8 @@ public class CommandStartHordeEvent extends CommandBase {
 			int duration = parseInt(args[0], 0);
 			server.addScheduledTask(() -> {
 				EntityPlayer player = (EntityPlayer) sender.getCommandSenderEntity();
-				if (player.hasCapability(HordesCapabilities.HORDE_EVENT, null)) player.getCapability(HordesCapabilities.HORDE_EVENT, null).tryStartEvent(duration, true);
+				WorldDataHordes data = WorldDataHordes.getData(sender.getEntityWorld());
+				data.getEvent((EntityPlayerMP) player).tryStartEvent((EntityPlayerMP) player, duration, true);
 			});
 			notifyCommandListener(sender, this, "commands."+Constants.MODID +".StartHorde.success", new Object[] {new TextComponentTranslation(args[0])});
 		}

@@ -8,15 +8,15 @@ import net.minecraftforge.common.capabilities.Capability.IStorage;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 
-public interface IInfection {
+public interface Infection {
 
-	public int getInfectionCount();
+	int getInfectionCount();
 
-	public void increaseInfection();
+	void increaseInfection();
 
-	public void setInfectionCount(int count);
+	void setInfectionCount(int count);
 
-	public static class Implementation implements IInfection {
+	class Impl implements Infection {
 
 		protected int count = 0;
 
@@ -38,24 +38,24 @@ public interface IInfection {
 
 	}
 
-	public static class Storage implements IStorage<IInfection> {
+	class Storage implements IStorage<Infection> {
 
 		@Override
-		public NBTBase writeNBT(Capability<IInfection> capability, IInfection instance, EnumFacing side) {
+		public NBTBase writeNBT(Capability<Infection> capability, Infection instance, EnumFacing side) {
 			return new NBTTagInt(instance.getInfectionCount());
 		}
 
 		@Override
-		public void readNBT(Capability<IInfection> capability, IInfection instance, EnumFacing side, NBTBase nbt) {
+		public void readNBT(Capability<Infection> capability, Infection instance, EnumFacing side, NBTBase nbt) {
 			if (nbt instanceof NBTTagInt) instance.setInfectionCount(((NBTTagInt) nbt).getInt());
 		}
 
 
 	}
 
-	public static class Provider implements ICapabilityProvider {
+	class Provider implements ICapabilityProvider {
 
-		protected final IInfection instance = new Implementation();
+		protected final Infection instance = new Impl();
 
 		@Override
 		public boolean hasCapability(Capability<?> capability, EnumFacing facing) {

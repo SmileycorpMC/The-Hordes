@@ -55,8 +55,9 @@ public class HordeSpawnEntry {
 		return nbt == null ? new NBTTagCompound() : nbt;
 	}
 
-	public void setNBT(NBTTagCompound nbt) {
+	public HordeSpawnEntry setNBT(NBTTagCompound nbt) {
 		this.nbt = nbt;
+		return this;
 	}
 	
 	@Override

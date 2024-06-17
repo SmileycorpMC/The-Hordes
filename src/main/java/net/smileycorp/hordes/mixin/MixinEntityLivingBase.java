@@ -31,26 +31,19 @@ public abstract class MixinEntityLivingBase extends Entity {
 	public void attackEntityAsMob(Entity entityIn, CallbackInfoReturnable<Boolean> callback) {
 		if (((Entity)this) instanceof EntityZombieHorse && CommonConfigHandler.aggressiveZombieHorses) {
 			float f = (float)this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
-			int i = 0;
-
 			boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage((EntityLivingBase)(Entity)this), f);
 			if (flag) {
-				if (entityIn instanceof EntityPlayer)
-				{
+				if (entityIn instanceof EntityPlayer) {
 					EntityPlayer entityplayer = (EntityPlayer)entityIn;
 					ItemStack itemstack1 = entityplayer.isHandActive() ? entityplayer.getActiveItemStack() : ItemStack.EMPTY;
-					if (!itemstack1.isEmpty() && itemstack1.getItem().isShield(itemstack1, entityplayer))
-					{
-
-						if (this.rand.nextFloat() < 0.25F )
-						{
+					if (!itemstack1.isEmpty() && itemstack1.getItem().isShield(itemstack1, entityplayer)) {
+						if (this.rand.nextFloat() < 0.25F ) {
 							entityplayer.getCooldownTracker().setCooldown(itemstack1.getItem(), 100);
 							this.world.setEntityState(entityplayer, (byte)30);
 						}
 					}
 				}
 			}
-			callback.cancel();
 			callback.setReturnValue(flag);
 		}
 	}

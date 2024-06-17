@@ -7,11 +7,15 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.smileycorp.hordes.common.capability.ZombifyPlayer;
 import net.smileycorp.hordes.config.CommonConfigHandler;
 import net.smileycorp.hordes.config.HordeEventConfig;
 import net.smileycorp.hordes.config.InfectionConfig;
+import net.smileycorp.hordes.config.data.DataGenerator;
+import net.smileycorp.hordes.config.data.DataRegistry;
 import net.smileycorp.hordes.config.data.hordeevent.HordeScriptLoader;
 import net.smileycorp.hordes.config.data.hordeevent.HordeTableLoader;
+import net.smileycorp.hordes.config.data.infection.InfectionDataLoader;
 import net.smileycorp.hordes.hordeevent.HordeEventHandler;
 import net.smileycorp.hordes.hordeevent.capability.HordeSpawn;
 import net.smileycorp.hordes.hordeevent.command.CommandDebugHordeEvent;
@@ -20,18 +24,20 @@ import net.smileycorp.hordes.hordeevent.command.CommandStartHordeEvent;
 import net.smileycorp.hordes.hordeevent.command.CommandStopHordeEvent;
 import net.smileycorp.hordes.hordeevent.network.HordeEventPacketHandler;
 import net.smileycorp.hordes.infection.InfectionEventHandler;
-import net.smileycorp.hordes.infection.InfectionPacketHandler;
-import net.smileycorp.hordes.infection.InfectionRegister;
-import net.smileycorp.hordes.infection.capability.IInfection;
+import net.smileycorp.hordes.infection.capability.Infection;
+import net.smileycorp.hordes.infection.network.InfectionPacketHandler;
 
 public class CommonProxy {
 
 	public void preInit(FMLPreInitializationEvent event) {
+		HordesLogger.clearLog();
 		CommonConfigHandler.syncConfig(new Configuration(event.getSuggestedConfigurationFile()));
+		DataGenerator.init(event);
+		DataRegistry.init();
 		MinecraftForge.EVENT_BUS.register(this);
-		CapabilityManager.INSTANCE.register(IZombifyPlayer.class, new IZombifyPlayer.Storage(), IZombifyPlayer.Implementation::new);
+		CapabilityManager.INSTANCE.register(ZombifyPlayer.class, new ZombifyPlayer.Storage(), ZombifyPlayer.Implementation::new);
 		CapabilityManager.INSTANCE.register(HordeSpawn.class, new HordeSpawn.Storage(), HordeSpawn.Impl::new);
-		CapabilityManager.INSTANCE.register(IInfection.class, new IInfection.Storage(), IInfection.Implementation::new);
+		CapabilityManager.INSTANCE.register(Infection.class, new Infection.Storage(), Infection.Impl::new);
 		//Horde Event
 		if (HordeEventConfig.enableHordeEvent) {
 			HordeEventPacketHandler.initPackets();
@@ -44,6 +50,7 @@ public class CommonProxy {
 
 		//Mob Infection
 		if (InfectionConfig.enableMobInfection) {
+			InfectionDataLoader.init(event);
 			InfectionPacketHandler.initPackets();
 			MinecraftForge.EVENT_BUS.register(new InfectionEventHandler());
 		} else {
@@ -61,7 +68,7 @@ public class CommonProxy {
 			HordeScriptLoader.INSTANCE.loadScripts();
 		}
 		//Mob Infection
-		if (InfectionConfig.enableMobInfection) InfectionRegister.readConfig();
+		if (InfectionConfig.enableMobInfection) InfectionDataLoader.INSTANCE.loadInfectionData();
 	}
 
 	public void serverStart(FMLServerStartingEvent event) {

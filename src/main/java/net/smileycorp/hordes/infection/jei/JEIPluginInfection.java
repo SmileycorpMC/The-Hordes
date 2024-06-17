@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.integration.jei;
+package net.smileycorp.hordes.infection.jei;
 
 import com.google.common.collect.Lists;
 import mezz.jei.api.*;
@@ -17,7 +17,6 @@ public class JEIPluginInfection implements IModPlugin {
 
 	public static IJeiHelpers jeiHelpers;
 	public static IIngredientRegistry ingredientRegistry = null;
-
 	private static InfectionCureCategory infectionCategory;
 	private static List<InfectionCureWrapper> recipes = new ArrayList<>();
 	private static RecipeRegistry recipeRegistry = null;
@@ -38,9 +37,7 @@ public class JEIPluginInfection implements IModPlugin {
 
 	@Override
 	public void onRuntimeAvailable(IJeiRuntime runtime) {
-		if (runtime.getRecipeRegistry() instanceof RecipeRegistry) {
-			recipeRegistry = (RecipeRegistry) runtime.getRecipeRegistry();
-		}
+		if (runtime.getRecipeRegistry() instanceof RecipeRegistry) recipeRegistry = (RecipeRegistry) runtime.getRecipeRegistry();
 	}
 
 	@SuppressWarnings("deprecation")

@@ -2,10 +2,13 @@ package net.smileycorp.hordes.config.data.hordeevent;
 
 import com.google.common.collect.Maps;
 import com.google.gson.JsonParser;
+import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.HordesLogger;
+import net.smileycorp.hordes.hordeevent.HordeSpawnEntry;
 import net.smileycorp.hordes.hordeevent.HordeSpawnTable;
 
 import java.io.File;
@@ -21,7 +24,7 @@ public class HordeTableLoader {
     private final File directory;
     
     public static void init(FMLPreInitializationEvent event) {
-        INSTANCE = new HordeTableLoader(new File(event.getModConfigurationDirectory().getPath() + "/hordes/scripts"));
+        INSTANCE = new HordeTableLoader(new File(event.getModConfigurationDirectory().getPath() + "/hordes/tables"));
     }
     
     public HordeTableLoader(File directory) {
@@ -31,10 +34,17 @@ public class HordeTableLoader {
     public void loadTables() {
         JsonParser parser = new JsonParser();
         SPAWN_TABLES.clear();
+        try {
+            SPAWN_TABLES.put(FALLBACK_TABLE, new HordeSpawnTable.Builder("fallback").addEntry(
+                    new HordeSpawnEntry(ForgeRegistries.ENTITIES.getValue(new ResourceLocation("zombie")))
+                            .setNBT(JsonToNBT.getTagFromJson("{ArmorItems:[{},{},{},{id:pumpkin,Count:1}]}"))).build());
+        } catch (Exception e) {
+            HordesLogger.logError("Failed generating fallback table", e);
+        }
         for (File file : directory.listFiles((f, s) -> s.endsWith(".json"))) {
             ResourceLocation name =  Constants.loc(file.getName().replace(".json", ""));
             try {
-                HordeSpawnTable table = HordeSpawnTable.deserialize(name, parser.parse(new FileReader(file)).getAsJsonObject());
+                HordeSpawnTable table = HordeSpawnTable.deserialize(name, parser.parse(new FileReader(file)));
                 if (table == null) throw new NullPointerException();
                 SPAWN_TABLES.put(name, table);
                 HordesLogger.logInfo("loaded horde table " + name);

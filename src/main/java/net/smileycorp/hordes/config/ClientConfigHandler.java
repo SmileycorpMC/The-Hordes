@@ -1,7 +1,7 @@
 package net.smileycorp.hordes.config;
 
 import net.minecraftforge.common.config.Configuration;
-import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.HordesLogger;
 
 public class ClientConfigHandler {
     
@@ -25,7 +25,7 @@ public class ClientConfigHandler {
     
     
     public static void syncConfig(Configuration config) {
-        Hordes.logInfo("Trying to load client config");
+        HordesLogger.logInfo("Trying to load client config");
         try{
             config.load();
             zombiePlayerColour = config.get("Horde Event", "zombiePlayerColour", new int[]{121, 156, 101}, "Colour tint for zombie players.", 0, 255).getIntList();

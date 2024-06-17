@@ -1,12 +1,15 @@
 package net.smileycorp.hordes.mixin;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.smileycorp.hordes.config.InfectionConfig;
 import net.smileycorp.hordes.infection.HordesInfection;
-import net.smileycorp.hordes.infection.InfectionRegister;
+import net.smileycorp.hordes.infection.PotionInfected;
+import net.smileycorp.hordes.infection.network.InfectMessage;
+import net.smileycorp.hordes.infection.network.InfectionPacketHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -27,19 +30,16 @@ public class MixinPotionEffect {
 
 	@Inject(at=@At("HEAD"), method = "onUpdate(Lnet/minecraft/entity/EntityLivingBase;)Z", cancellable = true)
 	public void onUpdate(EntityLivingBase entity, CallbackInfoReturnable<Boolean> callback) {
-		if (duration <= 1 && potion == HordesInfection.INFECTED) {
+		if (duration <= 1 && potion == HordesInfection.INFECTED && InfectionConfig.enableMobInfection) {
 			if (amplifier < 3) {
 				amplifier = amplifier + 1;
-				duration = InfectionRegister.getInfectionTime(entity);
+				duration = PotionInfected.getInfectionTime(entity);
+				if (entity instanceof EntityPlayerMP) InfectionPacketHandler.sendTo(new InfectMessage(false), (EntityPlayerMP) entity);
 				callback.setReturnValue(true);
-				callback.cancel();
-				return;
 			}
 			else {
 				entity.attackEntityFrom(HordesInfection.INFECTION_DAMAGE, Float.MAX_VALUE);
 				callback.setReturnValue(false);
-				callback.cancel();
-				return;
 			}
 		}
 	}

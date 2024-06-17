@@ -1,7 +1,7 @@
 package net.smileycorp.hordes.config;
 
 import net.minecraftforge.common.config.Configuration;
-import net.smileycorp.hordes.common.Hordes;
+import net.smileycorp.hordes.common.HordesLogger;
 
 public class CommonConfigHandler {
 	
@@ -16,7 +16,7 @@ public class CommonConfigHandler {
 	
 	//load config properties
 	public static void syncConfig(Configuration config) {
-		Hordes.logInfo("Trying to load config");
+		HordesLogger.logInfo("Trying to load config");
 		try{
 			config.load();
 			HordeEventConfig.syncConfig(config);

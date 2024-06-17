@@ -57,46 +57,29 @@ public abstract class MixinAbstractHorse extends EntityAnimal {
 				updateArmSwingProgress();
 				if (getBrightness() > 0.5F) idleTime += 2;
 			}
-			if (CommonConfigHandler.zombieHorsesBurn) {
-				tryBurn();
-			}
+			if (CommonConfigHandler.zombieHorsesBurn) tryBurn();
 		}
-		else if ((EntityAnimal)this instanceof EntitySkeletonHorse) {
-			if (CommonConfigHandler.skeletonHorsesBurn) {
-				tryBurn();
-			}
-		}
+		else if ((EntityAnimal)this instanceof EntitySkeletonHorse && CommonConfigHandler.skeletonHorsesBurn) tryBurn();
 	}
 
 	protected void tryBurn() {
-		boolean flag = world.isDaytime() && !world.isRemote;
-		if (flag && getPassengers().isEmpty()) {
+		boolean burn = world.isDaytime() && !world.isRemote;
+		if (burn && getPassengers().isEmpty()) {
 			ItemStack itemstack = horseChest.getStackInSlot(1);
 			if (!itemstack.isEmpty()) {
 				if (itemstack.isItemDamaged()) {
 					itemstack.setItemDamage(itemstack.getItemDamage() + rand.nextInt(2));
-					if (itemstack.getItemDamage() >= itemstack.getMaxDamage()) {
-						horseChest.decrStackSize(1, 1);
-					}
+					if (itemstack.getItemDamage() >= itemstack.getMaxDamage()) horseChest.decrStackSize(1, 1);
 				}
-
-				flag = false;
+				burn = false;
 			}
-
-			if (flag) {
-				this.setFire(8);
-			}
+			if (burn) setFire(8);
 		}
 	}
 
 	@Inject(at=@At("HEAD"), method = "canEatGrass()Z", cancellable = true)
 	public void canEatGrass(CallbackInfoReturnable<Boolean> callback) {
-		if ((EntityAnimal)this instanceof EntityZombieHorse) {
-			if (CommonConfigHandler.aggressiveZombieHorses) {
-				callback.setReturnValue(false);
-				callback.cancel();
-			}
-		}
+		if ((EntityAnimal)this instanceof EntityZombieHorse && CommonConfigHandler.aggressiveZombieHorses) callback.setReturnValue(false);
 	}
 
 }
