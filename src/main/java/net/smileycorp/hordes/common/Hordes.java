@@ -1,17 +1,33 @@
 package net.smileycorp.hordes.common;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.server.packs.repository.FolderRepositorySource;
+import net.minecraft.server.packs.repository.PackSource;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.monster.Drowned;
+import net.minecraft.world.entity.monster.Husk;
+import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.level.validation.DirectoryValidator;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLConstructModEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.fml.loading.FMLPaths;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.AddPackFindersEvent;
+import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.smileycorp.hordes.client.ClientHandler;
+import net.smileycorp.hordes.common.capability.HordesCapabilities;
+import net.smileycorp.hordes.common.capability.ZombifyPlayer;
 import net.smileycorp.hordes.common.data.DataGenerator;
 import net.smileycorp.hordes.common.data.DataRegistry;
 import net.smileycorp.hordes.common.entities.HordesEntities;
@@ -20,53 +36,79 @@ import net.smileycorp.hordes.config.CommonConfigHandler;
 import net.smileycorp.hordes.config.HordeEventConfig;
 import net.smileycorp.hordes.config.InfectionConfig;
 import net.smileycorp.hordes.hordeevent.HordeEventHandler;
+import net.smileycorp.hordes.hordeevent.capability.HordeSpawn;
 import net.smileycorp.hordes.hordeevent.network.HordeEventPacketHandler;
 import net.smileycorp.hordes.infection.HordesInfection;
 import net.smileycorp.hordes.infection.InfectionEventHandler;
+import net.smileycorp.hordes.infection.capability.Infection;
 import net.smileycorp.hordes.infection.network.InfectionPacketHandler;
 
+import java.nio.file.Path;
+
 @Mod(value = Constants.MODID)
-@Mod.EventBusSubscriber(modid = Constants.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class Hordes {
 
-	public Hordes() {
+	public Hordes(ModContainer container, IEventBus bus) {
 		HordesLogger.clearLog();
-		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CommonConfigHandler.config);
-		ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfigHandler.config);
+		container.registerConfig(ModConfig.Type.COMMON, CommonConfigHandler.config);
+		container.registerConfig(ModConfig.Type.CLIENT, ClientConfigHandler.config);
+		HordesInfection.EFFECTS.register(bus);
+		HordesEntities.ENTITIES.register(bus);
 		//generate data files
 		if (DataGenerator.shouldGenerateFiles()) {
-			DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> DataGenerator::generateAssets);
+			if (FMLEnvironment.dist == Dist.CLIENT) DataGenerator.generateAssets();
 			DataGenerator.generateData();
 		} else {
 			HordesLogger.logInfo("Config files are up to date, skipping data/asset generation");
 		}
+		bus.register(this);
+		bus.addListener(HordeEventPacketHandler::initPackets);
+		bus.addListener(InfectionPacketHandler::initPackets);
 	}
 
 	@SubscribeEvent
-	public static void constructMod(FMLConstructModEvent event) {
-		MinecraftForge.EVENT_BUS.register(new MiscEventHandler());
-		HordesInfection.EFFECTS.register(FMLJavaModLoadingContext.get().getModEventBus());
-		HordesEntities.ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
+	public void constructMod(FMLConstructModEvent event) {
+		NeoForge.EVENT_BUS.register(new MiscEventHandler());
 	}
 
 	@SubscribeEvent
-	public static void commonSetup(FMLCommonSetupEvent event) {
+	public void commonSetup(FMLCommonSetupEvent event) {
 		DataRegistry.init();
 		//Horde Event
-		if (HordeEventConfig.enableHordeEvent.get()) {
-			HordeEventPacketHandler.initPackets();
-			MinecraftForge.EVENT_BUS.register(new HordeEventHandler());
-		}
+		if (HordeEventConfig.enableHordeEvent.get()) NeoForge.EVENT_BUS.register(new HordeEventHandler());
 		//Mob Infection
-		if (InfectionConfig.enableMobInfection.get()) {
-			InfectionPacketHandler.initPackets();
-			MinecraftForge.EVENT_BUS.register(new InfectionEventHandler());
-		}
+		if (InfectionConfig.enableMobInfection.get()) NeoForge.EVENT_BUS.register(new InfectionEventHandler());
 	}
 
 	@SubscribeEvent
-	public static void loadClient(FMLClientSetupEvent event) {
-		MinecraftForge.EVENT_BUS.register(new ClientHandler());
+	public void loadClient(FMLClientSetupEvent event) {
+		NeoForge.EVENT_BUS.register(new ClientHandler());
+	}
+	
+	//attach zombie player provider to players
+	@SubscribeEvent
+	public void attachCapabilities(RegisterCapabilitiesEvent event) {
+		event.registerEntity(HordesCapabilities.ZOMBIFY_PLAYER, EntityType.PLAYER, (entity, ctx) -> new ZombifyPlayer.Impl(entity));
+		for (EntityType type : BuiltInRegistries.ENTITY_TYPE) {
+			if (Mob.class.isAssignableFrom(type.getBaseClass()))
+				event.registerEntity(HordesCapabilities.HORDESPAWN, type, (entity, ctx) -> new HordeSpawn.Impl());
+			if (LivingEntity.class.isAssignableFrom(type.getBaseClass()))
+				event.registerEntity(HordesCapabilities.INFECTION, type, (entity, ctx) -> new Infection.Impl());
+		}
+	}
+	
+	//register attributes for zombie players
+	@SubscribeEvent
+	public void registerAttributes(EntityAttributeCreationEvent event) {
+		event.put(HordesEntities.ZOMBIE_PLAYER.get(), Zombie.createAttributes().build());
+		event.put(HordesEntities.DROWNED_PLAYER.get(), Drowned.createAttributes().build());
+		event.put(HordesEntities.HUSK_PLAYER.get(), Husk.createAttributes().build());
+	}
+	
+	@SubscribeEvent
+	public void addPackFinders(AddPackFindersEvent event) {
+		event.addRepositorySource(new FolderRepositorySource(FMLPaths.CONFIGDIR.get().resolve("hordes"),
+				event.getPackType(), PackSource.BUILT_IN, new DirectoryValidator(Path::isAbsolute)));
 	}
 
 }

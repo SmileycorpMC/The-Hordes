@@ -4,7 +4,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.network.NetworkDirection;
 import net.smileycorp.hordes.config.InfectionConfig;
 import net.smileycorp.hordes.infection.HordesInfection;
 import net.smileycorp.hordes.infection.InfectedEffect;
@@ -34,8 +33,7 @@ public class MixinMobEffectInstance {
 			if (amplifier < 3) {
 				amplifier = amplifier + 1;
 				duration = InfectedEffect.getInfectionTime(entity);
-				if (entity instanceof ServerPlayer) InfectionPacketHandler.sendTo(new InfectMessage(false),
-						((ServerPlayer) entity).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+				if (entity instanceof ServerPlayer) InfectionPacketHandler.sendTo(new InfectMessage(false), (ServerPlayer) entity);
 				callback.setReturnValue(true);
 			}
 			else {

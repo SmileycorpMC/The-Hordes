@@ -1,15 +1,15 @@
 package net.smileycorp.hordes.infection.network;
 
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.PacketListener;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkEvent;
-import net.smileycorp.atlas.api.network.AbstractMessage;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.smileycorp.atlas.api.network.NetworkMessage;
 import net.smileycorp.hordes.client.ClientHandler;
+import net.smileycorp.hordes.common.Constants;
 
-public class InfectMessage extends AbstractMessage {
-
+public class InfectMessage implements NetworkMessage {
+	
+	public static CustomPacketPayload.Type<InfectMessage> TYPE = new CustomPacketPayload.Type(Constants.loc("infect"));
 
 	private boolean prevented;
 
@@ -30,12 +30,13 @@ public class InfectMessage extends AbstractMessage {
 	}
 
 	@Override
-	public void handle(PacketListener handler) {}
-
-	@Override
-	public void process(NetworkEvent.Context ctx) {
-		ctx.enqueueWork(() -> DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> ClientHandler.onInfect(prevented)));
-		ctx.setPacketHandled(true);
+	public void process(IPayloadContext ctx) {
+		if (ctx.connection().getDirection().isClientbound()) ctx.enqueueWork(() -> ClientHandler.onInfect(prevented));
 	}
-
+	
+	@Override
+	public Type<? extends CustomPacketPayload> type() {
+		return TYPE;
+	}
+	
 }

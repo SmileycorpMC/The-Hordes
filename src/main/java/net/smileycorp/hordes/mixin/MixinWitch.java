@@ -3,14 +3,17 @@ package net.smileycorp.hordes.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.core.Holder;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MobType;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableWitchTargetGoal;
 import net.minecraft.world.entity.monster.RangedAttackMob;
 import net.minecraft.world.entity.monster.Witch;
 import net.minecraft.world.entity.raid.Raider;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.Potions;
@@ -30,18 +33,19 @@ public abstract class MixinWitch extends Raider implements RangedAttackMob {
         super(p_37839_, p_37840_);
     }
     
-    @WrapOperation(method = "performRangedAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/alchemy/PotionUtils;setPotion(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/alchemy/Potion;)Lnet/minecraft/world/item/ItemStack;"))
-    public ItemStack performRangedAttack$setPotion(ItemStack stack, Potion potion, Operation<ItemStack> original, @Local(ordinal = 0) LivingEntity entity) {
-        if (CommonConfigHandler.illagersHuntZombies.get() && (potion == Potions.HARMING || potion == Potions.POISON) && entity.getMobType() == MobType.UNDEAD && HordesInfection.canCauseInfection(entity))
-            return original.call(stack, entity.hasEffect(MobEffects.REGENERATION) && entity.getHealth() >= 8.0F ? Potions.REGENERATION : Potions.HEALING);
-        return original.call(stack, potion);
+    @WrapOperation(method = "performRangedAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/alchemy/PotionContents;createItemStack(Lnet/minecraft/world/item/Item;Lnet/minecraft/core/Holder;)Lnet/minecraft/world/item/ItemStack;"))
+    public ItemStack performRangedAttack$setPotion(Item item, Holder<Potion> potion, Operation<ItemStack> original, @Local(ordinal = 0) LivingEntity entity) {
+        if (CommonConfigHandler.illagersHuntZombies.get() && (potion == Potions.HARMING || potion == Potions.POISON) && entity.getType().is(EntityTypeTags.UNDEAD)
+                && HordesInfection.canCauseInfection(entity))
+            return original.call(item, entity.hasEffect(MobEffects.REGENERATION) && entity.getHealth() >= 8.0F ? Potions.REGENERATION : Potions.HEALING);
+        return original.call(item, potion);
     }
     
     @WrapOperation(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;distanceToSqr(Lnet/minecraft/world/entity/Entity;)D"))
-    public double aiStep$distanceToSqr(Witch witch, Operation<Double> original, @Local(ordinal = 0) LivingEntity entity) {
-        double distance = original.call(witch);
-        if (CommonConfigHandler.illagersHuntZombies.get() && entity.getMobType() == MobType.UNDEAD)
-            return HordesInfection.canCauseInfection(entity) && distance < 100 ? 122 : 0;
+    public double aiStep$distanceToSqr(LivingEntity instance, Entity entity, Operation<Double> original) {
+        double distance = original.call(instance, entity);
+        if (CommonConfigHandler.illagersHuntZombies.get() && entity.getType().is(EntityTypeTags.UNDEAD))
+            return HordesInfection.canCauseInfection(instance) && distance < 100 ? 122 : 0;
         return distance;
     }
     

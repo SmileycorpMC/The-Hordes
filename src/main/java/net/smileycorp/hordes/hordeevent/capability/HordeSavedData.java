@@ -2,6 +2,7 @@ package net.smileycorp.hordes.hordeevent.capability;
 
 import com.google.common.collect.Maps;
 import com.mojang.authlib.GameProfile;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -9,7 +10,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.hordes.config.HordeEventConfig;
 
@@ -42,7 +43,7 @@ public class HordeSavedData extends SavedData {
 	}
 
 	@Override
-	public CompoundTag save(CompoundTag nbt) {
+	public CompoundTag save(CompoundTag nbt, HolderLookup.Provider registries) {
 		nbt.putInt("next_day", next_day);
 		CompoundTag events = new CompoundTag();
 		for (Entry<UUID, HordeEvent> entry : this.events.entrySet()) {
@@ -108,7 +109,8 @@ public class HordeSavedData extends SavedData {
 	}
 
 	public static HordeSavedData getData(ServerLevel level) {
-		HordeSavedData data = level.getChunkSource().getDataStorage().computeIfAbsent((nbt) -> getDataFromNBT(level, nbt), () -> getCleanData(level), DATA);
+		HordeSavedData data = level.getChunkSource().getDataStorage().computeIfAbsent(new Factory<>(() -> getCleanData(level),
+				(nbt, provider) -> getDataFromNBT(level, nbt)), DATA);
 		if (data == null) data = getCleanData(level);
 		level.getChunkSource().getDataStorage().set(DATA, data);
 		return data;

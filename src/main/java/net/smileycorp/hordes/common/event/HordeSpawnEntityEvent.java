@@ -3,11 +3,10 @@ package net.smileycorp.hordes.common.event;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.eventbus.api.Cancelable;
+import net.neoforged.bus.api.ICancellableEvent;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 
-@Cancelable
-public class HordeSpawnEntityEvent extends HordePlayerEvent {
+public class HordeSpawnEntityEvent extends HordePlayerEvent implements ICancellableEvent {
 	
 	protected Mob entity;
 	protected Vec3 pos;

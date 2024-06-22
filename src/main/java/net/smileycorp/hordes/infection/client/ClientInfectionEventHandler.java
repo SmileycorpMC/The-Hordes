@@ -15,13 +15,13 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.alchemy.PotionUtils;
-import net.minecraftforge.client.event.CustomizeGuiOverlayEvent;
-import net.minecraftforge.client.event.RenderLivingEvent;
-import net.minecraftforge.client.event.RenderTooltipEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.CustomizeGuiOverlayEvent;
+import net.neoforged.neoforge.client.event.RenderLivingEvent;
+import net.neoforged.neoforge.client.event.RenderTooltipEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.smileycorp.hordes.config.ClientConfigHandler;
 import net.smileycorp.hordes.infection.HordesInfection;
 
@@ -73,8 +73,8 @@ public class ClientInfectionEventHandler {
 		if (ClientConfigHandler.cureTooltip.get() && stack.is(HordesInfection.INFECTION_CURES_TAG))
 			components.add(Component.translatable("tooltip.hordes.cure"));
 		if (ClientConfigHandler.immunityTooltip.get() && immunityItems.containsKey(item))
-			PotionUtils.addPotionTooltip(Lists.newArrayList(new MobEffectInstance(HordesInfection.IMMUNITY.get(),
-					immunityItems.get(item) * 20)), components, 1);
+			PotionContents.addPotionTooltip(Lists.newArrayList(new MobEffectInstance(HordesInfection.IMMUNITY.get(),
+					immunityItems.get(item) * 20)), components::add, 1, Minecraft.getInstance().level.tickRateManager().tickrate());
 		if (ClientConfigHandler.wearableProtectionTooltip.get() && wearableProtection.containsKey(item)) {
 			int value = wearableProtection.get(item);
 			if (value == 0) return;

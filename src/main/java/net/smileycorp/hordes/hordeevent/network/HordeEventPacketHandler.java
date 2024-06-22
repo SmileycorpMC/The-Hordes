@@ -1,45 +1,40 @@
 package net.smileycorp.hordes.hordeevent.network;
 
-import net.minecraft.network.Connection;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkEvent.Context;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.simple.SimpleChannel;
-import net.smileycorp.atlas.api.network.AbstractMessage;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.smileycorp.atlas.api.network.GenericStringMessage;
 import net.smileycorp.atlas.api.network.NetworkUtils;
-import net.smileycorp.hordes.client.ClientHandler;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.config.HordeEventConfig;
-
-import java.util.function.Supplier;
+import net.smileycorp.hordes.hordeevent.client.HordeEventClient;
 
 public class HordeEventPacketHandler {
-
-	private static SimpleChannel NETWORK_INSTANCE;
 	
-	public static void sendTo(AbstractMessage message, Connection manager, NetworkDirection direction) {
+	public static final CustomPacketPayload.Type<GenericStringMessage> NOTIFICATION = new CustomPacketPayload.Type(Constants.loc("notification"));
+	
+	public static void sendTo(CustomPacketPayload message, ServerPlayer player) {
 		if (!HordeEventConfig.enableHordeEvent.get()) return;
-		NETWORK_INSTANCE.sendTo(message, manager, direction);
+		PacketDistributor.sendToPlayer(player, message);
 	}
 	
-	public static void send(PacketDistributor.PacketTarget target, AbstractMessage message) {
+	public static void send(CustomPacketPayload message) {
 		if (!HordeEventConfig.enableHordeEvent.get()) return;
-		NETWORK_INSTANCE.send(target, message);
+		PacketDistributor.sendToServer(message);
 	}
 
-	public static void initPackets() {
-		NETWORK_INSTANCE = NetworkUtils.createChannel(Constants.loc("HordeEvent"));
-		NetworkUtils.registerMessage(NETWORK_INSTANCE,0, HordeSoundMessage.class);
-		NetworkUtils.registerMessage(NETWORK_INSTANCE,1, GenericStringMessage.class, HordeEventPacketHandler::processNotificationMessage);
-		NetworkUtils.registerMessage(NETWORK_INSTANCE,2, UpdateClientHordeMessage.class);
+	public static void initPackets(RegisterPayloadHandlersEvent event) {
+		PayloadRegistrar channel = event.registrar("1");
+		NetworkUtils.register(channel,HordeSoundMessage.TYPE, HordeSoundMessage.class);
+		NetworkUtils.register(channel, NOTIFICATION, GenericStringMessage.class, HordeEventPacketHandler::processNotificationMessage);
+		NetworkUtils.register(channel, UpdateClientHordeMessage.TYPE, UpdateClientHordeMessage.class);
 	}
 
-	public static void processNotificationMessage(GenericStringMessage message, Supplier<Context> ctx) {
-		ctx.get().enqueueWork(() -> DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> ClientHandler.displayMessage(message.getText())));
-		ctx.get().setPacketHandled(true);
+	public static void processNotificationMessage(GenericStringMessage message, IPayloadContext ctx) {
+		if (ctx.connection().getDirection().isClientbound()) ctx.enqueueWork(() -> HordeEventClient.INSTANCE.displayMessage(message.getText()));
 	}
 
 }

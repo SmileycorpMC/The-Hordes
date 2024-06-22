@@ -1,9 +1,9 @@
 package net.smileycorp.hordes.hordeevent;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public class HordeSpawnEntry {
 
@@ -23,7 +23,7 @@ public class HordeSpawnEntry {
 	}
 
 	HordeSpawnEntry(EntityType<?> type, int weight, int minDay, int maxDay, int minSpawns, int maxSpawns) {
-		this.name = ForgeRegistries.ENTITY_TYPES.getKey(type);
+		this.name = BuiltInRegistries.ENTITY_TYPE.getKey(type);
 		this.type = type;
 		this.weight = weight;
 		this.minDay = minDay;

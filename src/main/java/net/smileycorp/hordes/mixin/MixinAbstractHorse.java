@@ -1,7 +1,7 @@
 package net.smileycorp.hordes.mixin;
 
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.entity.MobType;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.animal.horse.SkeletonHorse;
@@ -50,13 +50,13 @@ public abstract class MixinAbstractHorse extends Animal {
 				}
 				burn = false;
 			}
-			if (burn) setSecondsOnFire(8);
+			if (burn) igniteForSeconds(8);
 		}
 	}
 
 	@Inject(at=@At("HEAD"), method = "registerGoals", cancellable = true)
 	public void registerGoals(CallbackInfo callback) {
-		if (getMobType() != MobType.UNDEAD && CommonConfigHandler.zombiesScareHorses.get()) goalSelector.addGoal(1, new HorseFleeGoal(this));
+		if (getType().is(EntityTypeTags.UNDEAD) && CommonConfigHandler.zombiesScareHorses.get()) goalSelector.addGoal(1, new HorseFleeGoal(this));
 	}
 
 	@Inject(at=@At("HEAD"), method = "canEatGrass", cancellable = true)

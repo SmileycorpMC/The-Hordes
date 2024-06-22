@@ -27,9 +27,9 @@ public class HordeSpawnData {
     
     public HordeSpawnData(HordeEvent horde, CompoundTag tag) {
         this(horde);
-        if (tag.contains("table")) table = HordeTableLoader.INSTANCE.getTable(new ResourceLocation(tag.getString("table")));
+        if (tag.contains("table")) table = HordeTableLoader.INSTANCE.getTable(ResourceLocation.tryParse(tag.getString("table")));
         if (tag.contains("spawnType")) spawnType = HordeSpawnTypes.fromNBT(tag.get("spawnType"));
-        if (tag.contains("spawnSound")) spawnSound = new ResourceLocation(tag.getString("spawnSound"));
+        if (tag.contains("spawnSound")) spawnSound = ResourceLocation.tryParse(tag.getString("spawnSound"));
         if (tag.contains("startMessage")) startMessage = tag.getString("startMessage");
         if (tag.contains("endMessage")) endMessage = tag.getString("endMessage");
         if (tag.contains("spawnDuration")) spawnDuration = tag.getInt("spawnDuration");

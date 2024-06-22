@@ -2,8 +2,7 @@ package net.smileycorp.hordes.config;
 
 import com.google.common.collect.Lists;
 import net.minecraft.network.chat.TextColor;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
+import net.neoforged.neoforge.common.ModConfigSpec;
 import net.smileycorp.hordes.common.HordesLogger;
 
 import java.awt.*;
@@ -11,9 +10,8 @@ import java.util.List;
 
 
 public class ClientConfigHandler {
-
-	public static final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
-	public static final ForgeConfigSpec config;
+	
+	public static final ModConfigSpec config;
 
 	private static TextColor hordeMessageColour = null;
 	private static Color zombiePlayerColour = null;
@@ -23,29 +21,30 @@ public class ClientConfigHandler {
 	private static Color hordeEventMoonColour = null;
 
 	//horde event
-	public static ConfigValue<Integer> eventNotifyMode;
-	public static ConfigValue<Integer> eventNotifyDuration;
-	public static ConfigValue<Boolean> hordeSpawnSound;
-	private static ConfigValue<List<? extends Integer>> configHordeMessageColour;
-	public static ConfigValue<Boolean> hordeEventTintsSky;
-	public static ConfigValue<List<? extends Integer>> configHordeEventSkyColour;
-	public static ConfigValue<List<? extends Integer>> configHordeEventMoonColour;
+	public static ModConfigSpec.ConfigValue<Integer> eventNotifyMode;
+	public static ModConfigSpec.ConfigValue<Integer> eventNotifyDuration;
+	public static ModConfigSpec.ConfigValue<Boolean> hordeSpawnSound;
+	private static ModConfigSpec.ConfigValue<List<? extends Integer>> configHordeMessageColour;
+	public static ModConfigSpec.ConfigValue<Boolean> hordeEventTintsSky;
+	public static ModConfigSpec.ConfigValue<List<? extends Integer>> configHordeEventSkyColour;
+	public static ModConfigSpec.ConfigValue<List<? extends Integer>> configHordeEventMoonColour;
 
 
 	//infection
-	public static ConfigValue<Boolean> playerInfectionVisuals;
-	public static ConfigValue<Boolean> playerInfectSound;
-	public static ConfigValue<Boolean> infectionProtectSound;
-	public static ConfigValue<Boolean> cureTooltip;
-	public static ConfigValue<Boolean> immunityTooltip;
-	public static ConfigValue<Boolean> wearableProtectionTooltip;
-	private static ConfigValue<List<? extends Integer>> configZombiePlayerColour;
-	private static ConfigValue<List<? extends Integer>> configDrownedPlayerColour;
-	private static ConfigValue<List<? extends Integer>> configHuskPlayerColour;
+	public static ModConfigSpec.ConfigValue<Boolean> playerInfectionVisuals;
+	public static ModConfigSpec.ConfigValue<Boolean> playerInfectSound;
+	public static ModConfigSpec.ConfigValue<Boolean> infectionProtectSound;
+	public static ModConfigSpec.ConfigValue<Boolean> cureTooltip;
+	public static ModConfigSpec.ConfigValue<Boolean> immunityTooltip;
+	public static ModConfigSpec.ConfigValue<Boolean> wearableProtectionTooltip;
+	private static ModConfigSpec.ConfigValue<List<? extends Integer>> configZombiePlayerColour;
+	private static ModConfigSpec.ConfigValue<List<? extends Integer>> configDrownedPlayerColour;
+	private static ModConfigSpec.ConfigValue<List<? extends Integer>> configHuskPlayerColour;
 
 	//load config properties
 	static {
 		HordesLogger.logInfo("Trying to load client config");
+		ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
 		//horde event
 		builder.push("Horde Event");
 		eventNotifyMode = builder.comment("How do players get notified of a horde event. 0: Off, 1: Chat, 2:Action Bar, 3:Title").define("eventNotifyMode", 2);

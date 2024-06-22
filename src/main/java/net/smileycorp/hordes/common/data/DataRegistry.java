@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.fml.ModList;
+import net.neoforged.fml.ModList;
 import net.smileycorp.atlas.api.data.BinaryOperation;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.atlas.api.data.LogicalOperation;
@@ -59,13 +59,13 @@ public class DataRegistry {
 		registerConditionDeserializer(Constants.loc("game_difficulty"), GameDifficultyCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("advancement"), AdvancementCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("entity_type"), EntityTypeCondition::deserialize);
-		if (ModList.get().isLoaded("gamestages")) registerConditionDeserializer(new ResourceLocation("gamestages:gamestage"), GameStagesCondition::deserialize);
+		if (ModList.get().isLoaded("gamestages")) registerConditionDeserializer(ResourceLocation.tryParse("gamestages:gamestage"), GameStagesCondition::deserialize);
 	}
 
 	public static ValueGetter readValue(DataType type, JsonObject json) {
 		if (json.has("name") && json.has("value")) {
 			try {
-				ResourceLocation loc = new ResourceLocation(json.get("name").getAsString());
+				ResourceLocation loc = ResourceLocation.tryParse(json.get("name").getAsString());
 				BiFunction<JsonObject, DataType, ValueGetter> getter = VALUE_GETTERS.get(loc);
 				if (getter == null) throw new NullPointerException("value getter " + loc + " is not registered");
 				return getter.apply(json, type);

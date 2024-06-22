@@ -4,7 +4,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
-import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.level.pathfinder.PathType;
 import net.smileycorp.hordes.config.HordeEventConfig;
 
 import java.util.EnumSet;
@@ -32,7 +32,7 @@ public class HordeTrackPlayerGoal extends Goal {
     }
 
     public void start() {
-        waterCost = entity.getPathfindingMalus(BlockPathTypes.WATER);
+        waterCost = entity.getPathfindingMalus(PathType.WATER);
     }
 
     public boolean canContinueToUse() {
@@ -41,7 +41,7 @@ public class HordeTrackPlayerGoal extends Goal {
 
     public void stop() {
         pather.stop();
-        entity.setPathfindingMalus(BlockPathTypes.WATER, waterCost);
+        entity.setPathfindingMalus(PathType.WATER, waterCost);
     }
 
     public void tick() {

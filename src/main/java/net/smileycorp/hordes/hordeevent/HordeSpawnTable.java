@@ -3,13 +3,13 @@ package net.smileycorp.hordes.hordeevent;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.util.WeightedOutputs;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.data.DataRegistry;
@@ -95,7 +95,7 @@ public class HordeSpawnTable {
                 if (element.isJsonObject()) {
                     JsonObject obj = element.getAsJsonObject();
                     entity = obj.get("entity").getAsString();
-                    type = ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(entity));
+                    type = BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.tryParse(entity));
                     if (obj.has("weight")) weight = obj.get("weight").getAsInt();
                     if (obj.has("first_day")) minDay = obj.get("first_day").getAsInt();
                     if (obj.has("last_day")) maxDay = obj.get("last_day").getAsInt();
@@ -114,9 +114,9 @@ public class HordeSpawnTable {
                                 nbt = DataRegistry.parseNBT(data, nbtstring);
                             }
                             entity = dataSplit[0];
-                            ResourceLocation loc = new ResourceLocation(dataSplit[0]);
-                            if (ForgeRegistries.ENTITY_TYPES.containsKey(loc)) {
-                                type = ForgeRegistries.ENTITY_TYPES.getValue(loc);
+                            ResourceLocation loc = ResourceLocation.tryParse(dataSplit[0]);
+                            if (BuiltInRegistries.ENTITY_TYPE.containsKey(loc)) {
+                                type = BuiltInRegistries.ENTITY_TYPE.get(loc);
                                 try {
                                     weight = Integer.valueOf(dataSplit[1]);
                                 } catch (Exception e) {

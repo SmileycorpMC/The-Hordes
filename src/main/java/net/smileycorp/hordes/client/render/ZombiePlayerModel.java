@@ -38,7 +38,7 @@ public class ZombiePlayerModel<T extends Zombie & PlayerZombie> extends PlayerMo
 	public void prepareMobModel(T entity, float f1, float f2, float f3) {
 		if (!fixedArms) {
 			Optional<UUID> optional = entity.getPlayerUUID();
-			if (optional.isPresent()) if (DefaultPlayerSkin.getSkinModelName(optional.get()).equals("slim")) slim = true;
+			if (optional.isPresent()) if (DefaultPlayerSkin.get(optional.get()).equals("slim")) slim = true;
 			fixedArms = true;
 		}
 		if (isDrowned) {

@@ -1,0 +1,36 @@
+modLoader="javafml" #mandatory
+loaderVersion="${loader_version_range}"
+license="GNU LESSER GENERAL PUBLIC LICENSE Version 2.1"
+
+[[mods]]
+	modId="hordes"
+	version="${mod_version}"
+	displayName="The Hordes"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/the-hordes"
+updateJSONURL="https://raw.githubusercontent.com/SmileycorpMC/The-Hordes/1.20/update.json"
+	credits="bstylia14, Ski_Z, ForgeLabs, TqLxQuanZ, mpustovoi"
+	authors="Smileycorp" #optional
+	description=""
+	
+[[dependencies.hordes]]
+    modId="minecraft"
+    type="required"
+    versionRange="${minecraft_version}"
+    side="BOTH"
+[[dependencies.hordes]]
+    modId="neoforge"
+    type="required"
+    versionRange="${neo_version}"
+    side="BOTH"
+	
+[[dependencies.hordes]]
+    modId="atlaslib"
+    type="required"
+    versionRange="1.21.0-1.1.14"
+    side="BOTH"
+
+[[accessTransformers]]
+	file="META-INF/accesstransformer.cfg"
+	
+[[mixin]]
+	file="hordes.mixin.json"

@@ -44,7 +44,7 @@ public class FunctionRegistry {
         if (!(json.has("function") && json.has("value"))) return Pair.of(null, null);
         if (json.get("function").getAsString().equals("hordes:multiple")) return MultipleFunction.deserialize(json.get("value").getAsJsonArray());
         try {
-            ResourceLocation loc = new ResourceLocation(json.get("function").getAsString());
+            ResourceLocation loc = ResourceLocation.tryParse(json.get("function").getAsString());
             Pair<Class<? extends HordePlayerEvent>, Function<JsonElement, HordeFunction<? extends HordePlayerEvent>>> pair
                     = DESERIALIZERS.get(loc);
             if (pair == null) throw new NullPointerException("function " + loc + " is not registered");

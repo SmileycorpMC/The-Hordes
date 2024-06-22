@@ -20,8 +20,8 @@ public class AdvancementCondition implements Condition {
 
 	@Override
 	public boolean apply(Level level, LivingEntity entity, ServerPlayer player, RandomSource rand) {
-		ResourceLocation advancement = new ResourceLocation(getter.get(level, entity, player, rand));
-		return player.getAdvancements().getOrStartProgress(player.getServer().getAdvancements().getAdvancement(advancement)).isDone();
+		ResourceLocation advancement = ResourceLocation.tryParse(getter.get(level, entity, player, rand));
+		return player.getAdvancements().getOrStartProgress(player.getServer().getAdvancements().get(advancement)).isDone();
 	}
 
 	public static AdvancementCondition deserialize(JsonElement json) {

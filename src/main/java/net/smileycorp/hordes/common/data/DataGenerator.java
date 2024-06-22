@@ -2,9 +2,9 @@ package net.smileycorp.hordes.common.data;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.minecraftforge.fml.loading.FMLLoader;
-import net.minecraftforge.fml.loading.FMLPaths;
-import net.minecraftforge.fml.loading.moddiscovery.ModFile;
+import net.neoforged.fml.loading.FMLLoader;
+import net.neoforged.fml.loading.FMLPaths;
+import net.neoforged.fml.loading.moddiscovery.ModFile;
 import net.smileycorp.hordes.common.HordesLogger;
 import org.apache.commons.io.FileUtils;
 

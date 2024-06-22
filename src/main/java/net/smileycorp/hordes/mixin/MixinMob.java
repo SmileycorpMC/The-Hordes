@@ -17,10 +17,9 @@ import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.util.DataUtils;
+import net.smileycorp.atlas.api.util.Func;
 import net.smileycorp.hordes.common.ai.FleeEntityGoal;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.config.CommonConfigHandler;
@@ -44,7 +43,7 @@ public abstract class MixinMob extends LivingEntity {
 
 	@Shadow
 	public GoalSelector goalSelector;
-
+	
 	public MixinMob(Level level) {
 		super(null, level);
 	}
@@ -53,22 +52,15 @@ public abstract class MixinMob extends LivingEntity {
 	@Inject(at=@At("HEAD"), method = "checkAndHandleImportantInteractions", cancellable = true)
 	public void checkAndHandleImportantInteractions(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> callback) {
 		ItemStack stack = player.getItemInHand(hand);
-		if (!hasEffect(HordesInfection.INFECTED.get())) return;
+		if (!hasEffect(HordesInfection.INFECTED)) return;
 		if (!HordesInfection.isCure(stack)) return;
-		removeEffect(HordesInfection.INFECTED.get());
-		if (!player.level().isClientSide) InfectionPacketHandler.send(
-				PacketDistributor.TRACKING_CHUNK.with(() -> player.level().getChunkAt(getOnPos())),
-				new CureEntityMessage(this));
+		removeEffect(HordesInfection.INFECTED);
+		if (!player.level().isClientSide) InfectionPacketHandler.sendTracking(new CureEntityMessage(this), this);
 		if (!player.isCreative()) {
 			ItemStack container = stack.getItem().getCraftingRemainingItem(stack);
-			if (stack.isDamageableItem() && player instanceof ServerPlayer) {
-				stack.hurt(1, player.level().random, (ServerPlayer) player);
-			} else {
-				stack.shrink(1);
-			}
-			if (stack.isEmpty() && !container.isEmpty()) {
-				player.setItemInHand(hand, container);
-			}
+			if (stack.isDamageableItem() && player instanceof ServerPlayer) stack.hurtAndBreak(1, player.level().random, (ServerPlayer) player, Func::Void);
+			else stack.shrink(1);
+			if (stack.isEmpty() && !container.isEmpty()) player.setItemInHand(hand, container);
 		}
 		callback.setReturnValue(InteractionResult.sidedSuccess(player.level().isClientSide));
 	}
@@ -91,20 +83,20 @@ public abstract class MixinMob extends LivingEntity {
 		Entity entity = original.call(instance, level);
 		if (!(entity instanceof Mob)) return entity;
 		Mob converted = (Mob) entity;
-		LazyOptional<HordeSpawn> beforeOptional = getCapability(HordesCapabilities.HORDESPAWN);
-		LazyOptional<HordeSpawn> afterOptional = converted.getCapability(HordesCapabilities.HORDESPAWN);
-		if (!(beforeOptional.isPresent() || afterOptional.isPresent())) return converted;
-		if (!beforeOptional.orElseGet(null).isHordeSpawned()) return converted;
-		String uuid = beforeOptional.orElseGet(null).getPlayerUUID();
+		HordeSpawn before = getCapability(HordesCapabilities.HORDESPAWN);
+		HordeSpawn after = converted.getCapability(HordesCapabilities.HORDESPAWN);
+		if (before == null || after == null) return converted;
+		if (!before.isHordeSpawned()) return converted;
+		String uuid = before.getPlayerUUID();
 		if (!DataUtils.isValidUUID(uuid)) return converted;
-		afterOptional.orElseGet(null).setPlayerUUID(uuid);
-		beforeOptional.orElseGet(null).setPlayerUUID("");
+		after.setPlayerUUID(uuid);
+		before.setPlayerUUID("");
 		HordeEvent horde = HordeSavedData.getData((ServerLevel) level()).getEvent(UUID.fromString(uuid));
 		if (horde != null) {
 			ServerPlayer player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(UUID.fromString(uuid));
 			horde.registerEntity(converted, player);
 			horde.removeEntity((Mob) (LivingEntity) this);
-			converted.targetSelector.getRunningGoals().forEach(WrappedGoal::stop);
+			converted.targetSelector.getAvailableGoals().forEach(WrappedGoal::stop);
 			if (converted instanceof PathfinderMob) converted.targetSelector.addGoal(1, new HurtByTargetGoal((PathfinderMob) converted));
 			converted.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(converted, Player.class, true));
 		}
@@ -115,10 +107,10 @@ public abstract class MixinMob extends LivingEntity {
 	@Inject(at=@At("TAIL"), method = "convertTo", cancellable = true)
 	public void convertTo(EntityType<?> type, boolean keepEquipment, CallbackInfoReturnable<Mob> callback) {
 		Mob converted = callback.getReturnValue();
-		LazyOptional<HordeSpawn> optional = converted.getCapability(HordesCapabilities.HORDESPAWN);
-		if (!optional.isPresent()) return;
-		if (!optional.orElseGet(null).isHordeSpawned()) return;
-		String uuid = optional.orElseGet(null).getPlayerUUID();
+		HordeSpawn cap = converted.getCapability(HordesCapabilities.HORDESPAWN);
+		if (cap == null) return;
+		if (!cap.isHordeSpawned()) return;
+		String uuid = cap.getPlayerUUID();
 		if (DataUtils.isValidUUID(uuid)) {
 			ServerPlayer player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(UUID.fromString(uuid));
 			if (player == null) return;
@@ -136,7 +128,7 @@ public abstract class MixinMob extends LivingEntity {
 	}
 
 	@Inject(at = @At("HEAD"), method = "canBeLeashed")
-	public void canBeLeashed(Player player, CallbackInfoReturnable<Boolean> callback) {
+	public void canBeLeashed(CallbackInfoReturnable<Boolean> callback) {
 		if (((LivingEntity)this) instanceof ZombieHorse && CommonConfigHandler.aggressiveZombieHorses.get()) callback.setReturnValue(false);
 	}
 }

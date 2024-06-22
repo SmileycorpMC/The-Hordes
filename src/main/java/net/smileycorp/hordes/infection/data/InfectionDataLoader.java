@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.Connection;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -17,9 +18,7 @@ import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.common.NeoForge;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.InfectEntityEvent;
 import net.smileycorp.hordes.config.InfectionConfig;
@@ -51,7 +50,7 @@ public class InfectionDataLoader extends SimpleJsonResourceReloadListener {
         conversionTable.clear();
         HordesLogger.logInfo("Loading conversion tables");
         for (String id : manager.getNamespaces()) {
-            ResourceLocation loc = new ResourceLocation(id, "infection_conversions");
+            ResourceLocation loc = ResourceLocation.tryBuild(id, "infection_conversions");
             JsonElement json = map.get(loc);
             if (json == null) continue;
             try {
@@ -71,7 +70,7 @@ public class InfectionDataLoader extends SimpleJsonResourceReloadListener {
         immunityItems.clear();
         HordesLogger.logInfo("Loading immunity item list");
         for (String id : manager.getNamespaces()) {
-            ResourceLocation loc = new ResourceLocation(id, "immunity_items");
+            ResourceLocation loc = ResourceLocation.tryBuild(id, "immunity_items");
             JsonElement json = map.get(loc);
             if (json == null) continue;
             try {
@@ -79,8 +78,8 @@ public class InfectionDataLoader extends SimpleJsonResourceReloadListener {
                 for (JsonElement element : json.getAsJsonArray()) {
                     try {
                         JsonObject obj = element.getAsJsonObject();
-                        ResourceLocation name = new ResourceLocation(obj.get("item").getAsString());
-                        Item item = ForgeRegistries.ITEMS.getValue(name);
+                        ResourceLocation name = ResourceLocation.tryParse(obj.get("item").getAsString());
+                        Item item = BuiltInRegistries.ITEM.get(name);
                         int duration = obj.get("duration").getAsInt();
                         immunityItems.put(item, duration);
                         HordesLogger.logInfo("Loaded immunity item " + name + " with duration " + duration);
@@ -95,7 +94,7 @@ public class InfectionDataLoader extends SimpleJsonResourceReloadListener {
         wearablesProtection.clear();
         HordesLogger.logInfo("Loading wearables protection list");
         for (String id : manager.getNamespaces()) {
-            ResourceLocation loc = new ResourceLocation(id, "immune_wearables");
+            ResourceLocation loc = ResourceLocation.tryBuild(id, "immune_wearables");
             JsonElement json = map.get(loc);
             if (json == null) continue;
             try {
@@ -103,8 +102,8 @@ public class InfectionDataLoader extends SimpleJsonResourceReloadListener {
                 for (JsonElement element : json.getAsJsonArray()) {
                     try {
                         JsonObject obj = element.getAsJsonObject();
-                        ResourceLocation name = new ResourceLocation(obj.get("item").getAsString());
-                        Item item = ForgeRegistries.ITEMS.getValue(name);
+                        ResourceLocation name = ResourceLocation.tryParse(obj.get("item").getAsString());
+                        Item item = BuiltInRegistries.ITEM.get(name);
                         float modifier = obj.get("multiplier").getAsFloat();
                         wearablesProtection.put(item, modifier);
                         HordesLogger.logInfo("Loaded wearable protection " + name + " with modifier " + modifier);
@@ -119,7 +118,7 @@ public class InfectionDataLoader extends SimpleJsonResourceReloadListener {
     }
 
     public void tryToInfect(LivingEntity entity, LivingEntity attacker, DamageSource source, float amount) {
-        if (MinecraftForge.EVENT_BUS.post(new InfectEntityEvent(entity, attacker, source, amount))) return;
+        if (NeoForge.EVENT_BUS.post(new InfectEntityEvent(entity, attacker, source, amount)).isCanceled()) return;
         if ((entity instanceof Player && InfectionConfig.infectPlayers.get()))
             if (entity.getRandom().nextFloat() <= getModifiedInfectChance(entity, (float)(double)InfectionConfig.playerInfectChance.get()))
                 InfectedEffect.apply(entity);

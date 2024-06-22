@@ -32,7 +32,7 @@ public abstract class MixinLivingEntity extends Entity implements CustomTexture 
 
     @Override
     public ResourceLocation getTexture() {
-        return new ResourceLocation(entityData.get(TEXTURE));
+        return ResourceLocation.tryParse(entityData.get(TEXTURE));
     }
 
     @Override
@@ -41,8 +41,8 @@ public abstract class MixinLivingEntity extends Entity implements CustomTexture 
     }
 
     @Inject(at=@At("HEAD"), method = "defineSynchedData")
-    public void defineSynchedData(CallbackInfo callback){
-        entityData.define(TEXTURE, "");
+    public void defineSynchedData(SynchedEntityData.Builder builder, CallbackInfo callback){
+        builder.define(TEXTURE, "");
     }
 
     @Inject(at=@At("HEAD"), method = "addAdditionalSaveData")
@@ -55,7 +55,7 @@ public abstract class MixinLivingEntity extends Entity implements CustomTexture 
     public void readAdditionalSaveData(CompoundTag tag, CallbackInfo callback) {
         if (tag.contains("texture")) {
             String texture = tag.getString("texture");
-            if (ResourceLocation.isValidResourceLocation(texture)) entityData.set(TEXTURE, texture);
+            if (ResourceLocation.tryParse(texture) != null) entityData.set(TEXTURE, texture);
         }
         if (tag.contains("chat_name")) ((ChatName)this).setChatName(tag.getString("chat_name"));
     }

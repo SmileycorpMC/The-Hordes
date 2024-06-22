@@ -44,7 +44,7 @@ public abstract class MixinPiglinAi {
 
 	@Inject(at=@At("HEAD"), method = "admireGoldItem", cancellable = true)
 	private static void admireGoldItem(LivingEntity entity, CallbackInfo callback) {
-		if (entity.hasEffect(HordesInfection.INFECTED.get()) && entity.getOffhandItem().is(HordesInfection.INFECTION_CURES_TAG)) entity.startUsingItem(InteractionHand.OFF_HAND);
+		if (entity.hasEffect(HordesInfection.INFECTED) && entity.getOffhandItem().is(HordesInfection.INFECTION_CURES_TAG)) entity.startUsingItem(InteractionHand.OFF_HAND);
 	}
 
 }

@@ -4,7 +4,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.common.util.LazyOptional;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.common.capability.ZombifyPlayer;
 import net.smileycorp.hordes.infection.HordesInfection;
@@ -20,8 +19,8 @@ public class MixinDamageSource {
     public void getLocalizedDeathMessage(LivingEntity entity, CallbackInfoReturnable<Component> callback) {
         if (!(entity instanceof Player && this.equals(HordesInfection.getInfectionDamage(entity)))) return;
         String msg = "death.attack.infection";
-        LazyOptional<ZombifyPlayer> optional = entity.getCapability(HordesCapabilities.ZOMBIFY_PLAYER);
-        if (optional.isPresent() && optional.orElseGet(null).wasZombified()) msg += ".zombified";
+        ZombifyPlayer cap = entity.getCapability(HordesCapabilities.ZOMBIFY_PLAYER);
+        if (cap != null && cap.wasZombified()) msg += ".zombified";
         callback.setReturnValue(Component.translatable(msg, entity.getDisplayName()));
     }
 

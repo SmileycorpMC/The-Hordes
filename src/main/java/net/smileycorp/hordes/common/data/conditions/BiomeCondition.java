@@ -46,8 +46,8 @@ public class BiomeCondition implements Condition {
 	}
 	
 	private static Either<TagKey<Biome>, ResourceLocation> either(String string) {
-		return string.contains("#") ? Either.left(TagKey.create(Registries.BIOME, new ResourceLocation(string.replace("#", ""))))
-				: Either.right(new ResourceLocation(string));
+		return string.contains("#") ? Either.left(TagKey.create(Registries.BIOME, ResourceLocation.tryParse(string.replace("#", ""))))
+				: Either.right(ResourceLocation.tryParse(string));
 	}
 	
 }

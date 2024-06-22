@@ -1,17 +1,16 @@
 package net.smileycorp.hordes.common.capability;
 
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.smileycorp.hordes.hordeevent.capability.HordeEventClient;
+import net.neoforged.neoforge.capabilities.EntityCapability;
+import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.hordeevent.capability.HordeSpawn;
 import net.smileycorp.hordes.infection.capability.Infection;
 
 public class HordesCapabilities {
-
-    public final static Capability<HordeEventClient> HORDE_EVENT_CLIENT = CapabilityManager.get(new CapabilityToken<>() {});
-    public final static Capability<HordeSpawn> HORDESPAWN = CapabilityManager.get(new CapabilityToken<>() {});
-    public final static Capability<ZombifyPlayer> ZOMBIFY_PLAYER = CapabilityManager.get(new CapabilityToken<>() {});
-    public final static Capability<Infection> INFECTION = CapabilityManager.get(new CapabilityToken<>() {});
+    
+    public final static EntityCapability<ZombifyPlayer, Void> ZOMBIFY_PLAYER = EntityCapability.createVoid(Constants.loc("zombify_player"), ZombifyPlayer.class);
+    
+    public final static EntityCapability<HordeSpawn, Void> HORDESPAWN = EntityCapability.createVoid(Constants.loc("horde_spawn"), HordeSpawn.class);
+   
+    public final static EntityCapability<Infection, Void> INFECTION = EntityCapability.createVoid(Constants.loc("infection"), Infection.class);
 
 }

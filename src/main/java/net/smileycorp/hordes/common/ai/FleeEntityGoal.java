@@ -7,10 +7,10 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap.Types;
-import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.smileycorp.atlas.api.util.DirectionUtils;
+import net.smileycorp.atlas.api.util.VecMath;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -51,7 +51,7 @@ public class FleeEntityGoal extends Goal  {
 
 	@Override
 	public void start() {
-		waterCost = entity.getPathfindingMalus(BlockPathTypes.WATER);
+		waterCost = entity.getPathfindingMalus(PathType.WATER);
 	}
 
 	@Override
@@ -62,7 +62,7 @@ public class FleeEntityGoal extends Goal  {
 	@Override
 	public void stop() {
 		pather.stop();
-		entity.setPathfindingMalus(BlockPathTypes.WATER, waterCost);
+		entity.setPathfindingMalus(PathType.WATER, waterCost);
 	}
 
 	@Override
@@ -77,7 +77,7 @@ public class FleeEntityGoal extends Goal  {
 		Vec3 pos = entity.position();
 		Vec3 resultDir = new Vec3(0, 0, 0);
 		for (LivingEntity entity : getEntities()) {
-			Vec3 dir = DirectionUtils.getDirectionVecXZ(this.entity, entity);
+			Vec3 dir = VecMath.directionXZ(this.entity, entity);
 			resultDir = new Vec3((dir.x + resultDir.x) * 0.5, (dir.y + resultDir.y) * 0.5, (dir.z + resultDir.z) * 0.5);
 		}
 		return Stream.of(level.getHeightmapPos(Types.WORLD_SURFACE, BlockPos.containing(pos.add(resultDir.reverse().multiply(5, 0, 5)))));

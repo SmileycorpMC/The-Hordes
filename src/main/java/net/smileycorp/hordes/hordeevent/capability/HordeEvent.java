@@ -1,5 +1,6 @@
 package net.smileycorp.hordes.hordeevent.capability;
 
+import com.google.common.collect.Sets;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -20,13 +21,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.network.GenericStringMessage;
-import net.smileycorp.atlas.api.util.DirectionUtils;
+import net.smileycorp.atlas.api.util.VecMath;
 import net.smileycorp.atlas.api.util.WeightedOutputs;
+import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.ai.HordeTrackPlayerGoal;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
@@ -41,14 +41,17 @@ import net.smileycorp.hordes.hordeevent.network.HordeEventPacketHandler;
 import net.smileycorp.hordes.hordeevent.network.HordeSoundMessage;
 import net.smileycorp.hordes.hordeevent.network.UpdateClientHordeMessage;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class HordeEvent {
 
-	private static UUID FOLLOW_RANGE_MODIFIER = UUID.fromString("51cfe045-4248-409e-be37-556d67de4b97");
+	private static ResourceLocation FOLLOW_RANGE_MODIFIER = Constants.loc("horde_range");
 	private final RandomSource rand;
-	private Set<Mob> entitiesSpawned = new HashSet<>();
+	private Set<Mob> entitiesSpawned = Sets.newHashSet();
 	private int timer = 0;
 	private int day = 0;
 	private int nextDay = -1;
@@ -70,7 +73,7 @@ public class HordeEvent {
 		if (nbt.contains("spawnData")) spawnData = new HordeSpawnData(this, nbt.getCompound("spawnData"));
 		if (nbt.contains("loadedTable")) {
 			spawnData = new HordeSpawnData(this);
-			spawnData.setTable(HordeTableLoader.INSTANCE.getTable(new ResourceLocation(nbt.getString("loadedTable"))));
+			spawnData.setTable(HordeTableLoader.INSTANCE.getTable(ResourceLocation.tryParse(nbt.getString("loadedTable"))));
 		}
 	}
 	
@@ -123,17 +126,17 @@ public class HordeEvent {
 		postEvent(startEvent);
 		if (startEvent.isCanceled()) return;
 		count = startEvent.getCount();
-		Vec3 basedir = DirectionUtils.getRandomDirectionVecXZ(rand);
-		BlockPos basepos = DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, 75, 7, 0);
+		Vec3 basedir = VecMath.randomXZVec(rand);
+		BlockPos basepos = VecMath.closestLoadedPos(level, player.blockPosition(), basedir, 75, 7, 0);
 		int i = 0;
 		while (basepos.equals(player.blockPosition())) {
-			basedir = DirectionUtils.getRandomDirectionVecXZ(rand);
-			basepos = DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, 75, 7, 0);
+			basedir = VecMath.randomXZVec(rand);
+			basepos = VecMath.closestLoadedPos(level, player.blockPosition(), basedir, 75, 7, 0);
 			if (!spawnData.getSpawnType().canSpawn(level, basepos)) basepos = player.blockPosition();
 			if (i++ >= HordeEventConfig.hordeSpawnChecks.get()) {
 				logInfo("Unable to find unlit pos for horde " + this + " ignoring light level");
-				basedir = DirectionUtils.getRandomDirectionVecXZ(rand);
-				basepos = DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, 75);
+				basedir = VecMath.randomXZVec(rand);
+				basepos = VecMath.closestLoadedPos(level, player.blockPosition(), basedir, 75);
 				break;
 			}
 		}
@@ -146,8 +149,7 @@ public class HordeEvent {
 			logInfo("Stopping wave spawn because count is " + count);
 			return;
 		}
-		HordeEventPacketHandler.sendTo(new HordeSoundMessage(basedir, spawnData.getSpawnSound()),
-					player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+		HordeEventPacketHandler.sendTo(new HordeSoundMessage(basedir, spawnData.getSpawnSound()), player);
 		for (HordeSpawnEntry entry : spawntable.getResults(rand, count)) {
 			if (entitiesSpawned.size() > HordeEventConfig.hordeSpawnMax.get()) {
 				logInfo("Can't spawn wave because max cap has been reached");
@@ -190,7 +192,7 @@ public class HordeEvent {
 		if (!spawnEntityEvent.isCanceled()) {
 			entity = spawnEntityEvent.getEntity();
 			pos = spawnEntityEvent.getPos();
-			entity.finalizeSpawn(level, level.getCurrentDifficultyAt(BlockPos.containing(pos)), null, null, null);
+			entity.finalizeSpawn(level, level.getCurrentDifficultyAt(BlockPos.containing(pos)), null, null);
 			entity.setPos(pos.x(), pos.y(), pos.z());
 			return entity;
 		} else {
@@ -202,13 +204,13 @@ public class HordeEvent {
 
 	private void finalizeEntity(Mob entity, ServerPlayer player) {
 		entity.getAttribute(Attributes.FOLLOW_RANGE).addPermanentModifier(new AttributeModifier(FOLLOW_RANGE_MODIFIER,
-				"hordes:horde_range", 75, AttributeModifier.Operation.ADDITION));
-		LazyOptional<HordeSpawn> optional = entity.getCapability(HordesCapabilities.HORDESPAWN);
-		if (optional.isPresent()) {
-			optional.orElseGet(null).setPlayerUUID(player.getUUID().toString());
+				75, AttributeModifier.Operation.ADD_VALUE));
+		HordeSpawn cap = entity.getCapability(HordesCapabilities.HORDESPAWN);
+		if (cap != null) {
+			cap.setPlayerUUID(player.getUUID().toString());
 			registerEntity(entity, player);
 		}
-		entity.targetSelector.getRunningGoals().forEach(WrappedGoal::stop);
+		entity.targetSelector.getAvailableGoals().forEach(WrappedGoal::stop);
 		if (entity instanceof PathfinderMob) entity.targetSelector.addGoal(1, new HurtByTargetGoal((PathfinderMob) entity));
 		entity.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(entity, ServerPlayer.class, true));
 		for (Entity passenger : entity.getPassengers()) if (passenger instanceof Mob) finalizeEntity((Mob) passenger, player);
@@ -218,9 +220,8 @@ public class HordeEvent {
 		List<Mob> toRemove = new ArrayList<>();
 		for (Mob entity : entitiesSpawned) {
 			if (entity.isAlive() |! entity.isRemoved()) continue;
-			LazyOptional<HordeSpawn> optional = entity.getCapability(HordesCapabilities.HORDESPAWN, null);
-			if (optional.isPresent()) {
-				HordeSpawn cap = optional.orElseGet(null);
+			HordeSpawn cap = entity.getCapability(HordesCapabilities.HORDESPAWN, null);
+			if (cap != null) {
 				cap.setPlayerUUID("");
 				toRemove.add(entity);
 			}
@@ -245,7 +246,7 @@ public class HordeEvent {
 	}
 
 	private void fixGoals(ServerPlayer player, Mob entity) {
-		for (WrappedGoal entry : entity.goalSelector.getRunningGoals().toArray(WrappedGoal[]::new)) {
+		for (WrappedGoal entry : entity.goalSelector.getAvailableGoals().toArray(WrappedGoal[]::new)) {
 			if (!(entry.getGoal() instanceof HordeTrackPlayerGoal)) continue;
 			entity.goalSelector.removeGoal(entry.getGoal());
 			entity.goalSelector.addGoal(6, new HordeTrackPlayerGoal(entity, player, spawnData.getEntitySpeed()));
@@ -312,28 +313,27 @@ public class HordeEvent {
 	}
 
 	private void sendMessage(ServerPlayer player, String str) {
-		HordeEventPacketHandler.sendTo(new GenericStringMessage(str), player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+		HordeEventPacketHandler.sendTo(new GenericStringMessage(str, HordeEventPacketHandler.NOTIFICATION), player);
 	}
 
 	public void stopEvent(ServerPlayer player, boolean isCommand) {
 		entitiesSpawned.clear();
 		HordeEndEvent endEvent = new HordeEndEvent(player, this, isCommand, spawnData.getEndMessage());
 		postEvent(endEvent);
-		HordeEventPacketHandler.sendTo(new UpdateClientHordeMessage(false),
-				player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+		HordeEventPacketHandler.sendTo(new UpdateClientHordeMessage(false), player);
 		sentDay = getCurrentDay(player);
 		timer = 0;
 		spawnData = null;
 		sendMessage(player, endEvent.getMessage());
 		for (Mob entity : entitiesSpawned) {
-			for (WrappedGoal entry : entity.goalSelector.getRunningGoals().toArray(WrappedGoal[]::new)) {
+			for (WrappedGoal entry : entity.goalSelector.getAvailableGoals().toArray(WrappedGoal[]::new)) {
 				if (!(entry.getGoal() instanceof HordeTrackPlayerGoal)) continue;
 				entity.goalSelector.removeGoal(entry.getGoal());
 				break;
 			}
-			LazyOptional<HordeSpawn> cap = entity.getCapability(HordesCapabilities.HORDESPAWN);
-			if (!cap.isPresent()) continue;
-			cap.orElseGet(null).setPlayerUUID("");
+			HordeSpawn cap = entity.getCapability(HordesCapabilities.HORDESPAWN);
+			if (cap != null) continue;
+			cap.setPlayerUUID("");
 			entity.getAttribute(Attributes.FOLLOW_RANGE).removeModifier(FOLLOW_RANGE_MODIFIER);
 		}
 	}
@@ -344,8 +344,8 @@ public class HordeEvent {
 
 	public void registerEntity(Mob entity, ServerPlayer player) {
 		if (!isActive(player) || spawnData == null) {
-			LazyOptional<HordeSpawn> optional = entity.getCapability(HordesCapabilities.HORDESPAWN);
-			if (optional.isPresent()) optional.orElseGet(null).setPlayerUUID("");
+			HordeSpawn cap = entity.getCapability(HordesCapabilities.HORDESPAWN);
+			if (cap != null) cap.setPlayerUUID("");
 			return;
 		}
 		if (!entitiesSpawned.contains(entity)) entitiesSpawned.add(entity);
@@ -354,7 +354,7 @@ public class HordeEvent {
 
 	private void postEvent(HordePlayerEvent event) {
 		HordeScriptLoader.INSTANCE.applyScripts(event);
-		MinecraftForge.EVENT_BUS.post(event);
+		NeoForge.EVENT_BUS.post(event);
 	}
 	
 	public void reset(ServerPlayer player) {
@@ -381,8 +381,7 @@ public class HordeEvent {
 	}
 	
 	public void sync(ServerPlayer player, int day) {
-		HordeEventPacketHandler.sendTo(new UpdateClientHordeMessage(isHordeDay(player)),
-				player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+		HordeEventPacketHandler.sendTo(new UpdateClientHordeMessage(isHordeDay(player)), player);
 		sentDay = day;
 	}
 	

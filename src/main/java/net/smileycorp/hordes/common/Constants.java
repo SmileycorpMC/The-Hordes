@@ -25,7 +25,7 @@ public class Constants {
 	}
 
 	public static ResourceLocation loc(String name) {
-		return new ResourceLocation(MODID, name.toLowerCase());
+		return ResourceLocation.tryBuild(MODID, name.toLowerCase());
 	}
 
 	public static String locStr(String string) {

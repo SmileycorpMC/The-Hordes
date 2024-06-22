@@ -34,7 +34,7 @@ public abstract class MixinPiglin extends AbstractPiglin {
 	@Inject(at=@At("TAIL"), method = "customServerAiStep", cancellable = true)
 	public void customServerAiStep(CallbackInfo callback) {
 		if (!(InfectionConfig.enableMobInfection.get() && CommonConfigHandler.piglinsCureThemself.get())) return;
-		if (!hasEffect(HordesInfection.INFECTED.get())) return;
+		if (!hasEffect(HordesInfection.INFECTED)) return;
 		if (!getBrain().checkMemory(MemoryModuleType.ATTACK_TARGET, MemoryStatus.VALUE_ABSENT)) return;
 		if (!getItemBySlot(EquipmentSlot.OFFHAND).isEmpty()) return;
 		for (int i = 0; i < inventory.getContainerSize(); i++) {

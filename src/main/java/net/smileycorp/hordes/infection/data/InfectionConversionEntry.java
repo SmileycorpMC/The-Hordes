@@ -1,6 +1,7 @@
 package net.smileycorp.hordes.infection.data;
 
 import com.google.gson.JsonObject;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.AgeableMob;
@@ -8,9 +9,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.monster.Zombie;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.living.LivingConversionEvent;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.living.LivingConversionEvent;
 import net.smileycorp.atlas.api.util.Func;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.data.DataRegistry;
@@ -33,13 +33,13 @@ public class InfectionConversionEntry {
 
 	public LivingEntity convertEntity(Mob entity) {
 		LivingConversionEvent.Pre preEvent = new LivingConversionEvent.Pre(entity, result, Func::Void);
-		MinecraftForge.EVENT_BUS.post(preEvent);
+		NeoForge.EVENT_BUS.post(preEvent);
 		LivingEntity zombie = entity.convertTo(result, true);
 		if (zombie instanceof AgeableMob) ((AgeableMob) zombie).setAge(entity.isBaby() ? -1000000 : 0);
 		if (zombie instanceof Zombie) ((Zombie) zombie).setBaby(entity.isBaby());
 		if (nbt != null) zombie.readAdditionalSaveData(nbt);
 		LivingConversionEvent.Post postEvent = new LivingConversionEvent.Post(entity, zombie);
-		MinecraftForge.EVENT_BUS.post(postEvent);
+		NeoForge.EVENT_BUS.post(postEvent);
 		return zombie;
 	}
 
@@ -52,8 +52,8 @@ public class InfectionConversionEntry {
 	}
 	
 	public static InfectionConversionEntry deserialize(JsonObject json) throws Exception {
-		EntityType<?> entity = ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(json.get("entity").getAsString()));
-		EntityType<?> converts_to = ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(json.get("converts_to").getAsString()));
+		EntityType<?> entity = BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.tryParse(json.get("entity").getAsString()));
+		EntityType<?> converts_to = BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.tryParse(json.get("converts_to").getAsString()));
 		float chance = json.get("chance").getAsFloat();
 		CompoundTag nbt = json.has("nbt") ? DataRegistry.parseNBT(entity.toShortString(), json.get("nbt").getAsString()) : null;
 		return new InfectionConversionEntry((EntityType<? extends Mob>)entity, (EntityType<? extends Mob>)converts_to, chance, nbt);

@@ -1,15 +1,16 @@
 package net.smileycorp.hordes.hordeevent.network;
 
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.PacketListener;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkEvent;
-import net.smileycorp.atlas.api.network.AbstractMessage;
-import net.smileycorp.hordes.client.ClientHandler;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.smileycorp.atlas.api.network.NetworkMessage;
+import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.config.HordeEventConfig;
+import net.smileycorp.hordes.hordeevent.client.HordeEventClient;
 
-public class UpdateClientHordeMessage extends AbstractMessage {
+public class UpdateClientHordeMessage implements NetworkMessage {
+    
+    public static Type<UpdateClientHordeMessage> TYPE = new Type(Constants.loc("sync_horde_client"));
     
     private boolean horde_day;
     private int day_length;
@@ -34,12 +35,13 @@ public class UpdateClientHordeMessage extends AbstractMessage {
     }
 
     @Override
-    public void process(NetworkEvent.Context ctx) {
-        ctx.enqueueWork(() -> DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> ClientHandler.setHordeDay(horde_day, day_length)));
-        ctx.setPacketHandled(true);
+    public void process(IPayloadContext ctx) {
+       if (ctx.connection().getDirection().isClientbound()) ctx.enqueueWork(() -> HordeEventClient.INSTANCE.setHordeDay(horde_day, day_length));
     }
-
+    
     @Override
-    public void handle(PacketListener p_131342_) {}
-
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
+    
 }
