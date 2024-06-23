@@ -37,10 +37,12 @@ import net.smileycorp.hordes.config.HordeEventConfig;
 import net.smileycorp.hordes.config.InfectionConfig;
 import net.smileycorp.hordes.hordeevent.HordeEventHandler;
 import net.smileycorp.hordes.hordeevent.capability.HordeSpawn;
+import net.smileycorp.hordes.hordeevent.client.HordeClientHandler;
 import net.smileycorp.hordes.hordeevent.network.HordeEventPacketHandler;
 import net.smileycorp.hordes.infection.HordesInfection;
 import net.smileycorp.hordes.infection.InfectionEventHandler;
 import net.smileycorp.hordes.infection.capability.Infection;
+import net.smileycorp.hordes.infection.client.InfectionClientHandler;
 import net.smileycorp.hordes.infection.network.InfectionPacketHandler;
 
 import java.nio.file.Path;
@@ -64,6 +66,10 @@ public class Hordes {
 		bus.register(this);
 		bus.addListener(HordeEventPacketHandler::initPackets);
 		bus.addListener(InfectionPacketHandler::initPackets);
+		if (FMLEnvironment.dist == Dist.CLIENT) {
+			bus.register(new ClientHandler());
+			bus.addListener(InfectionClientHandler.INSTANCE::registerOverlays);
+		}
 	}
 
 	@SubscribeEvent
@@ -82,7 +88,9 @@ public class Hordes {
 
 	@SubscribeEvent
 	public void loadClient(FMLClientSetupEvent event) {
-		NeoForge.EVENT_BUS.register(new ClientHandler());
+		NeoForge.EVENT_BUS.addListener(ClientHandler::renderNameplate);
+		NeoForge.EVENT_BUS.register(HordeClientHandler.INSTANCE);
+		NeoForge.EVENT_BUS.register(InfectionClientHandler.INSTANCE);
 	}
 	
 	//attach zombie player provider to players

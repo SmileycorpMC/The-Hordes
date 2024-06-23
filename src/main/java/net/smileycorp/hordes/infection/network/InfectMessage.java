@@ -4,8 +4,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.smileycorp.atlas.api.network.NetworkMessage;
-import net.smileycorp.hordes.client.ClientHandler;
 import net.smileycorp.hordes.common.Constants;
+import net.smileycorp.hordes.infection.client.InfectionClientHandler;
 
 public class InfectMessage implements NetworkMessage {
 	
@@ -31,7 +31,7 @@ public class InfectMessage implements NetworkMessage {
 
 	@Override
 	public void process(IPayloadContext ctx) {
-		if (ctx.connection().getDirection().isClientbound()) ctx.enqueueWork(() -> ClientHandler.onInfect(prevented));
+		if (ctx.connection().getDirection().isClientbound()) ctx.enqueueWork(() -> InfectionClientHandler.INSTANCE.onInfect(prevented));
 	}
 	
 	@Override

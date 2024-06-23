@@ -44,7 +44,7 @@ public class HordeEventHandler {
 
 	//update the next day in the horde level data
 	@SubscribeEvent
-	public void serverTick(ServerTickEvent event) {
+	public void serverTick(ServerTickEvent.Pre event) {
 		if (HordeEventConfig.hordesCommandOnly.get()) return;
 		MinecraftServer server = event.getServer();
 		ServerLevel level = server.overworld();
@@ -58,7 +58,7 @@ public class HordeEventHandler {
 
 	//spawn the horde at the correct time
 	@SubscribeEvent
-	public void playerTick(PlayerTickEvent event) {
+	public void playerTick(PlayerTickEvent.Pre event) {
 		if (!(event.getEntity() instanceof ServerPlayer) || event.getEntity() instanceof FakePlayer) return;
 		ServerPlayer player = (ServerPlayer) event.getEntity();
 		ServerLevel level = ServerLifecycleHooks.getCurrentServer().overworld();
@@ -99,7 +99,7 @@ public class HordeEventHandler {
 
 	//sync entity capabilities when added to level
 	@SubscribeEvent(priority = EventPriority.LOWEST)
-	public void update(EntityTickEvent event) {
+	public void update(EntityTickEvent.Pre event) {
 		ServerPlayer player = HordeSpawn.getHordePlayer(event.getEntity());
 		if (player == null |! (event.getEntity() instanceof Mob)) return;
 		HordeSpawn cap = event.getEntity().getCapability(HordesCapabilities.HORDESPAWN);

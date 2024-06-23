@@ -19,9 +19,9 @@ import net.smileycorp.hordes.config.ClientConfigHandler;
 
 import java.awt.*;
 
-public class HordeEventClient {
+public class HordeClientHandler {
     
-    public static final HordeEventClient INSTANCE = new HordeEventClient();
+    public static final HordeClientHandler INSTANCE = new HordeClientHandler();
     
     private int day_length;
     private boolean horde_day;
@@ -40,7 +40,7 @@ public class HordeEventClient {
         }
     }
     
-    public static void playHordeSound(Vec3 vec3, ResourceLocation sound) {
+    public void playHordeSound(Vec3 vec3, ResourceLocation sound) {
         if (ClientConfigHandler.hordeSpawnSound.get()) {
             Minecraft mc = Minecraft.getInstance();
             Level level = mc.level;

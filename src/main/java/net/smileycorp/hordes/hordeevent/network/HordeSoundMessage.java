@@ -7,7 +7,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.smileycorp.atlas.api.network.NetworkMessage;
 import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.hordeevent.client.HordeEventClient;
+import net.smileycorp.hordes.hordeevent.client.HordeClientHandler;
 
 public class HordeSoundMessage implements NetworkMessage {
 	
@@ -42,7 +42,7 @@ public class HordeSoundMessage implements NetworkMessage {
 	
 	@Override
 	public void process(IPayloadContext ctx) {
-		if (ctx.connection().getDirection().isClientbound()) ctx.enqueueWork(() -> HordeEventClient.playHordeSound(direction, sound));
+		if (ctx.connection().getDirection().isClientbound()) ctx.enqueueWork(() -> HordeClientHandler.INSTANCE.playHordeSound(direction, sound));
 	}
 	
 	@Override

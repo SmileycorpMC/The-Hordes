@@ -6,7 +6,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.smileycorp.atlas.api.network.NetworkMessage;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.config.HordeEventConfig;
-import net.smileycorp.hordes.hordeevent.client.HordeEventClient;
+import net.smileycorp.hordes.hordeevent.client.HordeClientHandler;
 
 public class UpdateClientHordeMessage implements NetworkMessage {
     
@@ -36,7 +36,7 @@ public class UpdateClientHordeMessage implements NetworkMessage {
 
     @Override
     public void process(IPayloadContext ctx) {
-       if (ctx.connection().getDirection().isClientbound()) ctx.enqueueWork(() -> HordeEventClient.INSTANCE.setHordeDay(horde_day, day_length));
+       if (ctx.connection().getDirection().isClientbound()) ctx.enqueueWork(() -> HordeClientHandler.INSTANCE.setHordeDay(horde_day, day_length));
     }
     
     @Override

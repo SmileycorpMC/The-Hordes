@@ -10,7 +10,7 @@ import net.smileycorp.atlas.api.network.GenericStringMessage;
 import net.smileycorp.atlas.api.network.NetworkUtils;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.config.HordeEventConfig;
-import net.smileycorp.hordes.hordeevent.client.HordeEventClient;
+import net.smileycorp.hordes.hordeevent.client.HordeClientHandler;
 
 public class HordeEventPacketHandler {
 	
@@ -34,7 +34,7 @@ public class HordeEventPacketHandler {
 	}
 
 	public static void processNotificationMessage(GenericStringMessage message, IPayloadContext ctx) {
-		if (ctx.connection().getDirection().isClientbound()) ctx.enqueueWork(() -> HordeEventClient.INSTANCE.displayMessage(message.getText()));
+		if (ctx.connection().getDirection().isClientbound()) ctx.enqueueWork(() -> HordeClientHandler.INSTANCE.displayMessage(message.getText()));
 	}
 
 }

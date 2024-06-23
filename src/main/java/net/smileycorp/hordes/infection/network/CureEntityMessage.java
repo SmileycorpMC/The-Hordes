@@ -6,8 +6,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.smileycorp.atlas.api.network.NetworkMessage;
-import net.smileycorp.hordes.client.ClientHandler;
 import net.smileycorp.hordes.common.Constants;
+import net.smileycorp.hordes.infection.client.InfectionClientHandler;
 
 public class CureEntityMessage implements NetworkMessage {
 	
@@ -37,7 +37,7 @@ public class CureEntityMessage implements NetworkMessage {
 
 	@Override
 	public void process(IPayloadContext ctx) {
-		if (ctx.connection().getDirection().isClientbound()) ctx.enqueueWork(() -> ClientHandler.processCureEntity(this));
+		if (ctx.connection().getDirection().isClientbound()) ctx.enqueueWork(() -> InfectionClientHandler.INSTANCE.processCureEntity(this));
 	}
 	
 	@Override

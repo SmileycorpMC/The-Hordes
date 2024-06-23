@@ -9,45 +9,47 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.CustomizeGuiOverlayEvent;
+import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RenderLivingEvent;
 import net.neoforged.neoforge.client.event.RenderTooltipEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.config.ClientConfigHandler;
 import net.smileycorp.hordes.infection.HordesInfection;
+import net.smileycorp.hordes.infection.network.CureEntityMessage;
 
 import java.awt.*;
 import java.util.List;
 import java.util.Map;
 
-public class ClientInfectionEventHandler {
+public class InfectionClientHandler {
 	
-	private static Map<Item, Integer> immunityItems = Maps.newHashMap();
-	private static Map<Item, Integer> wearableProtection = Maps.newHashMap();
+	public static final InfectionClientHandler INSTANCE = new InfectionClientHandler();
 	
-	@SubscribeEvent
-	public void renderOverlay(CustomizeGuiOverlayEvent event){
+	private Map<Item, Integer> immunityItems = Maps.newHashMap();
+	private Map<Item, Integer> wearableProtection = Maps.newHashMap();
+	
+	public void registerOverlays(RegisterGuiLayersEvent event) {
 		if (!ClientConfigHandler.playerInfectionVisuals.get()) return;
-		Minecraft mc = Minecraft.getInstance();
-		LocalPlayer player = mc.player;
-		if (player == null) return;
-		if (!player.hasEffect(HordesInfection.INFECTED)) return;
-		int a = player.getEffect(HordesInfection.INFECTED).getAmplifier();
-		if (a == 0) return;
-		Color colour = new Color(0.4745f, 0.6117f, 0.3961f, 0.01f * a);
-		Window window = mc.getWindow();
-		event.getGuiGraphics().fill(0, 0, window.getWidth(), window.getHeight(), colour.getRGB());
+		event.registerBelowAll(Constants.loc("infection"), new InfectionLayer());
 	}
-
+	
 	@SubscribeEvent
 	public void preRenderEntity(RenderLivingEvent.Pre event){
 		LivingEntity entity = event.getEntity();
@@ -91,12 +93,37 @@ public class ClientInfectionEventHandler {
 		wearableProtection.clear();
 	}
 	
-	public static void readImmunityItems(List<Map.Entry<Item, Integer>> data) {
+	public void onInfect(boolean prevented) {
+		if (ClientConfigHandler.playerInfectSound.get() &! prevented) {
+			Minecraft mc = Minecraft.getInstance();
+			Level level = mc.level;
+			LocalPlayer player = mc.player;
+			level.playSound(player, player.blockPosition(), Constants.INFECT_SOUND, SoundSource.PLAYERS, 0.75f, level.random.nextFloat());
+		}
+		if (ClientConfigHandler.infectionProtectSound.get() && prevented) {
+			Minecraft mc = Minecraft.getInstance();
+			Level level = mc.level;
+			LocalPlayer player = mc.player;
+			level.playSound(player, player.blockPosition(), Constants.IMMUNE_SOUND, SoundSource.PLAYERS, 0.75f, level.random.nextFloat());
+		}
+	}
+	
+	public void processCureEntity(CureEntityMessage message) {
+		Minecraft mc = Minecraft.getInstance();
+		Level level = mc.level;
+		Entity entity = message.getEntity(level);
+		level.playLocalSound(entity.getX(), entity.getY(), entity.getZ(), SoundEvents.EXPERIENCE_ORB_PICKUP, entity.getSoundSource(), 1f, 1f, true);
+		RandomSource rand = level.random;
+		for (int i = 0; i < 10; ++i) level.addParticle(ParticleTypes.HAPPY_VILLAGER, entity.getX() + (rand.nextDouble() - 0.5D) * entity.getBbWidth() * 1.5,
+				entity.getY() + rand.nextDouble() * entity.getBbHeight(), entity.getZ() + (rand.nextDouble() - 0.5D) * entity.getBbWidth() * 1.5, 0.0D, 0.3D, 0.0D);
+	}
+	
+	public void readImmunityItems(List<Map.Entry<Item, Integer>> data) {
 		immunityItems.clear();
 		data.forEach(e -> immunityItems.put(e.getKey(), e.getValue()));
 	}
 	
-	public static void readWearableProtection(List<Pair<Item, Integer>> data) {
+	public void readWearableProtection(List<Pair<Item, Integer>> data) {
 		wearableProtection.clear();
 		data.forEach(e -> wearableProtection.put(e.getFirst(), e.getSecond()));
 	}

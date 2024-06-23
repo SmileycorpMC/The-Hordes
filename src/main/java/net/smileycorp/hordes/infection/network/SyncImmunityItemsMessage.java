@@ -9,7 +9,7 @@ import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.smileycorp.atlas.api.network.NetworkMessage;
 import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.infection.client.ClientInfectionEventHandler;
+import net.smileycorp.hordes.infection.client.InfectionClientHandler;
 
 import java.util.AbstractMap;
 import java.util.List;
@@ -45,7 +45,7 @@ public class SyncImmunityItemsMessage implements NetworkMessage {
 
 	@Override
 	public void process(IPayloadContext ctx) {
-		if (ctx.connection().getDirection().isClientbound()) ctx.enqueueWork(() -> ClientInfectionEventHandler.readImmunityItems(data));
+		if (ctx.connection().getDirection().isClientbound()) ctx.enqueueWork(() -> InfectionClientHandler.INSTANCE.readImmunityItems(data));
 	}
 	
 	@Override

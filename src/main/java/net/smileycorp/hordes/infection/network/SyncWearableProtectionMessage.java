@@ -11,7 +11,7 @@ import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.smileycorp.atlas.api.network.NetworkMessage;
 import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.infection.client.ClientInfectionEventHandler;
+import net.smileycorp.hordes.infection.client.InfectionClientHandler;
 
 import java.util.List;
 import java.util.Map;
@@ -46,7 +46,7 @@ public class SyncWearableProtectionMessage implements NetworkMessage {
 
 	@Override
 	public void process(IPayloadContext ctx) {
-		if (ctx.connection().getDirection().isClientbound()) ctx.enqueueWork(() -> ClientInfectionEventHandler.readWearableProtection(data));
+		if (ctx.connection().getDirection().isClientbound()) ctx.enqueueWork(() -> InfectionClientHandler.INSTANCE.readWearableProtection(data));
 	}
 	
 	@Override
