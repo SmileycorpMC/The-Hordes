@@ -22,6 +22,8 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 // In build.gradle:
 // This block is where your mappings version is also specified
+// In build.gradle:
+// This block is where your mappings version is also specified
 minecraft {
     accessTransformers {
         file('src/main/resources/META-INF/accesstransformer.cfg')
@@ -100,10 +102,6 @@ dependencies {
 	implementation 'curse.maven:atlaslib-463826:5449009'
     implementation 'curse.maven:jei-238222:5447427'
     implementation 'curse.maven:gamestages-268655:4648424'
-    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.5"))
-    implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.3.5")) {
-        jarJar.ranged(it, "[0.3.5,)")
-    }
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

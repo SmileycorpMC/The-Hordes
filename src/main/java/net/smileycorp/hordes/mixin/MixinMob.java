@@ -58,7 +58,8 @@ public abstract class MixinMob extends LivingEntity {
 		if (!player.level().isClientSide) InfectionPacketHandler.sendTracking(new CureEntityMessage(this), this);
 		if (!player.isCreative()) {
 			ItemStack container = stack.getItem().getCraftingRemainingItem(stack);
-			if (stack.isDamageableItem() && player instanceof ServerPlayer) stack.hurtAndBreak(1, player.level().random, (ServerPlayer) player, Func::Void);
+			if (stack.isDamageableItem() && player instanceof ServerPlayer)
+				stack.hurtAndBreak(1, ((ServerPlayer) player).serverLevel(), (ServerPlayer) player, Func::Void);
 			else stack.shrink(1);
 			if (stack.isEmpty() && !container.isEmpty()) player.setItemInHand(hand, container);
 		}

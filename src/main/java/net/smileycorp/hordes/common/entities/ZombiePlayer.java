@@ -147,7 +147,7 @@ public class ZombiePlayer extends Zombie implements PlayerZombie<ZombiePlayer> {
 		Zombie zombie = convertTo(type, true);
 		if (zombie != null) {
 			zombie.handleAttributes(zombie.level().getCurrentDifficultyAt(zombie.blockPosition()).getSpecialMultiplier());
-			zombie.setCanBreakDoors(zombie.supportsBreakDoorGoal() && this.canBreakDoors());
+			zombie.setCanBreakDoors(zombie.supportsBreakDoorGoal() && canBreakDoors());
 			EventHooks.onLivingConvert(this, zombie);
 			if (zombie instanceof PlayerZombie) ((PlayerZombie) zombie).copyFrom(this);
 		}

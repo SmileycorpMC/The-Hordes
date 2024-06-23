@@ -59,7 +59,7 @@ public class InfectionEventHandler {
 	@SubscribeEvent
 	public void logIn(PlayerEvent.PlayerLoggedInEvent event) {
 		if (event.getEntity() instanceof ServerPlayer)
-			InfectionDataLoader.INSTANCE.syncData(((ServerPlayer)event.getEntity()).connection.connection);
+			InfectionDataLoader.INSTANCE.syncData((ServerPlayer)event.getEntity());
 	}
 
 	@SubscribeEvent

@@ -39,7 +39,7 @@ public class ZombiePlayerOverlayLayer<T extends Zombie & PlayerZombie> extends R
         VertexConsumer vertexconsumer = buffers.getBuffer(rendertype);
         poseStack.pushPose();
         poseStack.scale(1.01f, 1.01f, 1.01f);
-        model.renderToBuffer(poseStack, vertexconsumer, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+        model.renderToBuffer(poseStack, vertexconsumer, packedLight, OverlayTexture.NO_OVERLAY, -1);
         poseStack.popPose();
     }
     

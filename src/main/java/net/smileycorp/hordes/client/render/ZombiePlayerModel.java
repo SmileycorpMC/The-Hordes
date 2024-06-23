@@ -7,6 +7,7 @@ import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.resources.DefaultPlayerSkin;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
@@ -83,8 +84,8 @@ public class ZombiePlayerModel<T extends Zombie & PlayerZombie> extends PlayerMo
 	}
 
 	@Override
-	public void renderToBuffer(PoseStack poseStack, VertexConsumer consumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-		super.renderToBuffer(poseStack, consumer, packedLight, packedOverlay, colour.getRed()/255f, colour.getGreen()/255f, colour.getBlue()/255f, 1);
+	public void renderToBuffer(PoseStack poseStack, VertexConsumer consumer, int packedLight, int packedOverlay, int c) {
+		super.renderToBuffer(poseStack, consumer, packedLight, packedOverlay, FastColor.ARGB32.colorFromFloat(1, colour.getRed()/255f, colour.getGreen()/255f, colour.getBlue()/255f));
 	}
 
 }

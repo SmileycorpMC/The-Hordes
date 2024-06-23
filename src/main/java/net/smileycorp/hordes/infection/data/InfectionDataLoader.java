@@ -6,8 +6,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.Connection;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -144,7 +144,7 @@ public class InfectionDataLoader extends SimpleJsonResourceReloadListener {
 
     public boolean applyImmunity(LivingEntity entity, Item item) {
         if (immunityItems.containsKey(item)) {
-            entity.addEffect(new MobEffectInstance(HordesInfection.IMMUNITY.get(), immunityItems.get(item) * 20));
+            entity.addEffect(new MobEffectInstance(HordesInfection.IMMUNITY, immunityItems.get(item) * 20));
             return true;
         }
         return false;
@@ -162,9 +162,9 @@ public class InfectionDataLoader extends SimpleJsonResourceReloadListener {
         return wearablesProtection.containsKey(item) ? wearablesProtection.get(item) : 1;
     }
     
-    public void syncData(Connection connection) {
-        InfectionPacketHandler.sendTo(new SyncImmunityItemsMessage(immunityItems), connection, NetworkDirection.PLAY_TO_CLIENT);
-        InfectionPacketHandler.sendTo(new SyncWearableProtectionMessage(wearablesProtection), connection, NetworkDirection.PLAY_TO_CLIENT);
+    public void syncData(ServerPlayer player) {
+        InfectionPacketHandler.sendTo(new SyncImmunityItemsMessage(immunityItems), player);
+        InfectionPacketHandler.sendTo(new SyncWearableProtectionMessage(wearablesProtection), player);
     }
 
 }

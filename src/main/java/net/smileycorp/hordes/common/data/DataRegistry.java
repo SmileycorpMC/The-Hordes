@@ -79,7 +79,7 @@ public class DataRegistry {
 	public static Condition readCondition(JsonObject json) {
 		if (json.has("name") && json.has("value")) {
 			try {
-				ResourceLocation loc = new ResourceLocation(json.get("name").getAsString());
+				ResourceLocation loc = ResourceLocation.tryParse(json.get("name").getAsString());
 				Function<JsonElement, Condition> deserializer = CONDITION_DESERIALIZERS.get(loc);
 				if (deserializer == null) throw new NullPointerException("condition " + loc + " is not registered");
 				return deserializer.apply(json.get("value"));

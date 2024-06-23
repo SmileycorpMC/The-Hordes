@@ -40,8 +40,8 @@ public class ClientInfectionEventHandler {
 		Minecraft mc = Minecraft.getInstance();
 		LocalPlayer player = mc.player;
 		if (player == null) return;
-		if (!player.hasEffect(HordesInfection.INFECTED.get())) return;
-		int a = player.getEffect(HordesInfection.INFECTED.get()).getAmplifier();
+		if (!player.hasEffect(HordesInfection.INFECTED)) return;
+		int a = player.getEffect(HordesInfection.INFECTED).getAmplifier();
 		if (a == 0) return;
 		Color colour = new Color(0.4745f, 0.6117f, 0.3961f, 0.01f * a);
 		Window window = mc.getWindow();
@@ -52,8 +52,8 @@ public class ClientInfectionEventHandler {
 	public void preRenderEntity(RenderLivingEvent.Pre event){
 		LivingEntity entity = event.getEntity();
 		Player player = Minecraft.getInstance().player;
-		if (ClientConfigHandler.playerInfectionVisuals.get() && player != null && player.hasEffect(HordesInfection.INFECTED.get()) && entity != player) {
-			int a = player.getEffect(HordesInfection.INFECTED.get()).getAmplifier();
+		if (ClientConfigHandler.playerInfectionVisuals.get() && player != null && player.hasEffect(HordesInfection.INFECTED) && entity != player) {
+			int a = player.getEffect(HordesInfection.INFECTED).getAmplifier();
 			if (a > 2) RenderSystem.setShaderColor(1, 0, 0, 1);
 			else if (a == 2) RenderSystem.setShaderColor(1, 0.4f, 0.4f, 1);
 		}
@@ -73,7 +73,7 @@ public class ClientInfectionEventHandler {
 		if (ClientConfigHandler.cureTooltip.get() && stack.is(HordesInfection.INFECTION_CURES_TAG))
 			components.add(Component.translatable("tooltip.hordes.cure"));
 		if (ClientConfigHandler.immunityTooltip.get() && immunityItems.containsKey(item))
-			PotionContents.addPotionTooltip(Lists.newArrayList(new MobEffectInstance(HordesInfection.IMMUNITY.get(),
+			PotionContents.addPotionTooltip(Lists.newArrayList(new MobEffectInstance(HordesInfection.IMMUNITY,
 					immunityItems.get(item) * 20)), components::add, 1, Minecraft.getInstance().level.tickRateManager().tickrate());
 		if (ClientConfigHandler.wearableProtectionTooltip.get() && wearableProtection.containsKey(item)) {
 			int value = wearableProtection.get(item);
