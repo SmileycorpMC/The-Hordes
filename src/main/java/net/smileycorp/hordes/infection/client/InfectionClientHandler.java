@@ -2,7 +2,6 @@ package net.smileycorp.hordes.infection.client;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
@@ -24,7 +23,6 @@ import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.client.event.CustomizeGuiOverlayEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RenderLivingEvent;
 import net.neoforged.neoforge.client.event.RenderTooltipEvent;
@@ -34,7 +32,6 @@ import net.smileycorp.hordes.config.ClientConfigHandler;
 import net.smileycorp.hordes.infection.HordesInfection;
 import net.smileycorp.hordes.infection.network.CureEntityMessage;
 
-import java.awt.*;
 import java.util.List;
 import java.util.Map;
 

@@ -1,7 +1,11 @@
 package net.smileycorp.hordes.common;
 
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.server.packs.repository.FolderRepositorySource;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.packs.PackLocationInfo;
+import net.minecraft.server.packs.PackSelectionConfig;
+import net.minecraft.server.packs.PathPackResources;
+import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -9,7 +13,6 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.monster.Drowned;
 import net.minecraft.world.entity.monster.Husk;
 import net.minecraft.world.entity.monster.Zombie;
-import net.minecraft.world.level.validation.DirectoryValidator;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -46,6 +49,7 @@ import net.smileycorp.hordes.infection.client.InfectionClientHandler;
 import net.smileycorp.hordes.infection.network.InfectionPacketHandler;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 @Mod(value = Constants.MODID)
 public class Hordes {
@@ -115,8 +119,10 @@ public class Hordes {
 	
 	@SubscribeEvent
 	public void addPackFinders(AddPackFindersEvent event) {
-		event.addRepositorySource(new FolderRepositorySource(FMLPaths.CONFIGDIR.get().resolve("hordes"),
-				event.getPackType(), PackSource.BUILT_IN, new DirectoryValidator(Path::isAbsolute)));
+		Path path = FMLPaths.CONFIGDIR.get().resolve("hordes");
+		event.addRepositorySource(consumer -> consumer.accept(Pack.readMetaAndCreate(
+				new PackLocationInfo(path.toString(), Component.literal("Hordes Config"), PackSource.BUILT_IN, Optional.empty()),
+				new PathPackResources.PathResourcesSupplier(path), event.getPackType(), new PackSelectionConfig(true, Pack.Position.TOP, false))));
 	}
 
 }

@@ -91,7 +91,6 @@ public class HordeEventHandler {
 	@SubscribeEvent
 	public void tryDespawn(MobDespawnEvent event) {
 		ServerPlayer player = HordeSpawn.getHordePlayer(event.getEntity());
-		player.checkDespawn();
 		if (player == null) return;
 		HordeEvent horde = HordeSavedData.getData((ServerLevel) player.level()).getEvent(player);
 		if (horde != null && horde.isActive(player)) event.setResult(MobDespawnEvent.Result.DENY);
@@ -117,7 +116,7 @@ public class HordeEventHandler {
 	@SubscribeEvent
 	public void trySleep(CanPlayerSleepEvent event) {
 		if (HordeEventConfig.canSleepDuringHorde.get() || !(event.getEntity() instanceof ServerPlayer)) return;
-		ServerPlayer player = (ServerPlayer) event.getEntity();
+		ServerPlayer player = event.getEntity();
 		ServerLevel level = player.serverLevel();
 		HordeEvent horde = HordeSavedData.getData((ServerLevel) player.level()).getEvent(player);
 		if (horde == null) return;
