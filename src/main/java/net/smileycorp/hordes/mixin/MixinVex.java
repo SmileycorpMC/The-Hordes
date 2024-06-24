@@ -7,7 +7,7 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Vex;
 import net.minecraft.world.level.Level;
 import net.smileycorp.hordes.config.CommonConfigHandler;
-import net.smileycorp.hordes.infection.HordesInfection;
+import net.smileycorp.hordes.infection.data.InfectionData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -23,7 +23,7 @@ public abstract class MixinVex extends Monster {
     @Inject(at=@At("HEAD"), method = "registerGoals", cancellable = true)
     public void registerGoals(CallbackInfo callback) {
         if (CommonConfigHandler.illagersHuntZombies.get())
-            targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 10, true, false, HordesInfection::canCauseInfection));
+            targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 10, true, false, InfectionData.INSTANCE::canCauseInfection));
     }
     
 }

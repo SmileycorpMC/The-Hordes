@@ -58,8 +58,9 @@ public class Hordes {
 		HordesLogger.clearLog();
 		container.registerConfig(ModConfig.Type.COMMON, CommonConfigHandler.config);
 		container.registerConfig(ModConfig.Type.CLIENT, ClientConfigHandler.config);
-		HordesInfection.EFFECTS.register(bus);
 		HordesEntities.ENTITIES.register(bus);
+		HordesInfection.ATTRIBUTES.register(bus);
+		HordesInfection.EFFECTS.register(bus);
 		//generate data files
 		if (DataGenerator.shouldGenerateFiles()) {
 			if (FMLEnvironment.dist == Dist.CLIENT) DataGenerator.generateAssets();
@@ -70,6 +71,7 @@ public class Hordes {
 		bus.register(this);
 		bus.addListener(HordeEventPacketHandler::initPackets);
 		bus.addListener(InfectionPacketHandler::initPackets);
+		bus.addListener(InfectionEventHandler::addEntityAttributes);
 		if (FMLEnvironment.dist == Dist.CLIENT) {
 			bus.register(new ClientHandler());
 			bus.addListener(InfectionClientHandler.INSTANCE::registerOverlays);
@@ -102,10 +104,8 @@ public class Hordes {
 	public void attachCapabilities(RegisterCapabilitiesEvent event) {
 		event.registerEntity(HordesCapabilities.ZOMBIFY_PLAYER, EntityType.PLAYER, (entity, ctx) -> new ZombifyPlayer.Impl(entity));
 		for (EntityType type : BuiltInRegistries.ENTITY_TYPE) {
-			if (Mob.class.isAssignableFrom(type.getBaseClass()))
-				event.registerEntity(HordesCapabilities.HORDESPAWN, type, (entity, ctx) -> new HordeSpawn.Impl());
-			if (LivingEntity.class.isAssignableFrom(type.getBaseClass()))
-				event.registerEntity(HordesCapabilities.INFECTION, type, (entity, ctx) -> new Infection.Impl());
+			event.registerEntity(HordesCapabilities.HORDESPAWN, type, (entity, ctx) -> entity instanceof Mob ? new HordeSpawn.Impl() : null);
+			event.registerEntity(HordesCapabilities.INFECTION, type, (entity, ctx) -> entity instanceof LivingEntity ? new Infection.Impl() : null);
 		}
 	}
 	

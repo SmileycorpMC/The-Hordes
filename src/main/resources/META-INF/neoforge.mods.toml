@@ -32,5 +32,5 @@ updateJSONURL="https://raw.githubusercontent.com/SmileycorpMC/The-Hordes/1.20/up
 [[accessTransformers]]
 	file="META-INF/accesstransformer.cfg"
 	
-[[mixin]]
-	file="hordes.mixin.json"
+[[mixins]]
+	config="hordes.mixin.json"

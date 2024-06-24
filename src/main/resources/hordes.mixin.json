@@ -2,8 +2,8 @@
 	"required": true,
 	"package": "net.smileycorp.hordes.mixin",
 	"compatibilityLevel": "JAVA_17",
-	"refmap": "hordes.refmap.json",
     "client": [
+      "MixinItemStack",
       "MixinLevelRenderer",
       "MixinLivingEntityRenderer",
       "MixinVillagerProfessionLayer"
@@ -28,6 +28,7 @@
       "MixinRavager",
       "MixinServerPlayer",
       "MixinVex",
+      "MixinVillager",
       "MixinVindicator",
       "MixinWitch",
       "MixinZoglin",

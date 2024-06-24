@@ -11,6 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.smileycorp.hordes.config.CommonConfigHandler;
 import net.smileycorp.hordes.infection.HordesInfection;
+import net.smileycorp.hordes.infection.data.InfectionData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -29,7 +30,7 @@ public abstract class MixinPiglinAi {
 
 	@Inject(at=@At("HEAD"), method = "isZombified", cancellable = true)
 	private static void isZombified(EntityType<?> type, CallbackInfoReturnable<Boolean> callback) {
-		if (CommonConfigHandler.piglinsHuntZombies.get() && type.is(HordesInfection.INFECTION_ENTITIES_TAG)) callback.setReturnValue(true);
+		if (CommonConfigHandler.piglinsHuntZombies.get() && InfectionData.INSTANCE.canCauseInfection(type)) callback.setReturnValue(true);
 	}
 
 	@Inject(at=@At("TAIL"), method = "findNearestValidAttackTarget", cancellable = true)

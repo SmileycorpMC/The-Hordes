@@ -27,6 +27,7 @@ import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 import net.smileycorp.hordes.hordeevent.capability.HordeSavedData;
 import net.smileycorp.hordes.hordeevent.capability.HordeSpawn;
 import net.smileycorp.hordes.infection.HordesInfection;
+import net.smileycorp.hordes.infection.data.InfectionData;
 import net.smileycorp.hordes.infection.network.CureEntityMessage;
 import net.smileycorp.hordes.infection.network.InfectionPacketHandler;
 import org.spongepowered.asm.mixin.Mixin;
@@ -125,7 +126,7 @@ public abstract class MixinMob extends LivingEntity {
 	@Inject(at=@At("HEAD"), method = "registerGoals", cancellable = true)
 	public void registerGoals(CallbackInfo callback) {
 		if (CommonConfigHandler.piglinsHuntZombies.get() && ((LivingEntity)this) instanceof Piglin)
-			goalSelector.addGoal(1, new FleeEntityGoal((Mob)(LivingEntity)this, 1.5, 5, HordesInfection::canCauseInfection));
+			goalSelector.addGoal(1, new FleeEntityGoal((Mob)(LivingEntity)this, 1.5, 5, InfectionData.INSTANCE::canCauseInfection));
 	}
 
 	@Inject(at = @At("HEAD"), method = "canBeLeashed")
