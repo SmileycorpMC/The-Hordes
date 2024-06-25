@@ -55,9 +55,9 @@ public class ZombiePlayerModel<T extends Zombie & PlayerZombie> extends PlayerMo
 	}
 
 	@Override
-	public void setupAnim(T entity, float p_225597_2_, float p_225597_3_, float p_225597_4_, float p_225597_5_, float p_225597_6_) {
-		super.setupAnim(entity, p_225597_2_, p_225597_3_, p_225597_4_, p_225597_5_, p_225597_6_);
-		AnimationUtils.animateZombieArms(leftArm, rightArm, entity.isAggressive(), attackTime, p_225597_4_);
+	public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float age, float headYaw, float headPitch) {
+		super.setupAnim(entity, limbSwing, limbSwingAmount, age, headYaw, headPitch);
+		AnimationUtils.animateZombieArms(leftArm, rightArm, entity.isAggressive(), attackTime, age);
 		if (isDrowned) {
 			if (leftArmPose == HumanoidModel.ArmPose.THROW_SPEAR) {
 				leftArm.xRot = leftArm.xRot * 0.5F - (float)Math.PI;
@@ -68,12 +68,12 @@ public class ZombiePlayerModel<T extends Zombie & PlayerZombie> extends PlayerMo
 				rightArm.yRot = 0.0F;
 			}
 			if (swimAmount > 0.0F) {
-				rightArm.xRot = rotlerpRad(swimAmount, rightArm.xRot, -2.5132742F) + swimAmount * 0.35F * Mth.sin(0.1F * p_225597_4_);
-				leftArm.xRot = rotlerpRad(swimAmount, leftArm.xRot, -2.5132742F) - swimAmount * 0.35F * Mth.sin(0.1F * p_225597_4_);
+				rightArm.xRot = rotlerpRad(swimAmount, rightArm.xRot, -2.5132742F) + swimAmount * 0.35F * Mth.sin(0.1F * age);
+				leftArm.xRot = rotlerpRad(swimAmount, leftArm.xRot, -2.5132742F) - swimAmount * 0.35F * Mth.sin(0.1F * age);
 				rightArm.zRot = rotlerpRad(swimAmount, rightArm.zRot, -0.15F);
 				leftArm.zRot = rotlerpRad(swimAmount, leftArm.zRot, 0.15F);
-				leftLeg.xRot -= swimAmount * 0.55F * Mth.sin(0.1F * p_225597_4_);
-				rightLeg.xRot += swimAmount * 0.55F * Mth.sin(0.1F * p_225597_4_);
+				leftLeg.xRot -= swimAmount * 0.55F * Mth.sin(0.1F * age);
+				rightLeg.xRot += swimAmount * 0.55F * Mth.sin(0.1F * age);
 				head.xRot = 0.0F;
 			}
 		}

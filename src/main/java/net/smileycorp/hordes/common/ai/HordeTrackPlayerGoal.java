@@ -24,7 +24,7 @@ public class HordeTrackPlayerGoal extends Goal {
         this.target = target;
         this.speed = speed;
         pather = entity.getNavigation();
-        this.setFlags(EnumSet.of(Flag.LOOK, Flag.MOVE));
+        setFlags(EnumSet.of(Flag.LOOK, Flag.MOVE));
     }
 
     public boolean canUse() {
@@ -33,6 +33,7 @@ public class HordeTrackPlayerGoal extends Goal {
 
     public void start() {
         waterCost = entity.getPathfindingMalus(PathType.WATER);
+        entity.setPathfindingMalus(PathType.WATER, 0);
     }
 
     public boolean canContinueToUse() {
@@ -48,7 +49,7 @@ public class HordeTrackPlayerGoal extends Goal {
         if (timeToRecalcPath-- <= 0) {
             timeToRecalcPath = HordeEventConfig.hordePathingInterval.get();
             pather = entity.getNavigation();
-            pather.moveTo(pather.createPath(target.blockPosition(), 1), speed);
+            pather.moveTo(target, speed);
         }
 
     }

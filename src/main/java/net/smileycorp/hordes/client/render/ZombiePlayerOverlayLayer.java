@@ -31,7 +31,7 @@ public class ZombiePlayerOverlayLayer<T extends Zombie & PlayerZombie> extends R
     }
 
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource buffers, int packedLight, T entity, float p_117353_, float p_117354_, float p_117355_, float p_117356_, float p_117357_, float p_117358_) {
+    public void render(PoseStack poseStack, MultiBufferSource buffers, int packedLight, T entity,  float limbSwing, float limbSwingAmount, float pt, float age, float headYaw, float headPitch) {
         Optional<UUID> optional = entity.getPlayerUUID();
         ZombiePlayerModel<T> model = "slim".equals(PlayerTextureRenderer.getSkinType(optional)) ? slimModel : defaultModel;
         getParentModel().copyPropertiesTo(model);

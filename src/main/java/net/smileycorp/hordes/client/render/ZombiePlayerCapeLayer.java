@@ -24,43 +24,35 @@ public class ZombiePlayerCapeLayer<T extends Zombie & PlayerZombie> extends Rend
 	}
 
 	@Override
-	public void render(PoseStack poseStack, MultiBufferSource buffer, int size, T entity, float p_225628_5_, float p_225628_6_, float p_225628_7_, float p_225628_8_, float p_225628_9_, float p_225628_10_) {
-		if (entity.displayCape()) {
-			ItemStack itemstack = entity.getItemBySlot(EquipmentSlot.CHEST);
-			if (itemstack.getItem() != Items.ELYTRA) {
-				ResourceLocation loc = PlayerTextureRenderer.getTexture(entity.getPlayerUUID(), Type.CAPE);
-				if (loc != null) {
-					poseStack.pushPose();
-					poseStack.translate(0.0D, 0.0D, 0.125D);
-					double d0 = Mth.lerp(p_225628_7_, entity.getXCloakO(), entity.getXCloak()) - Mth.lerp((double)p_225628_7_, entity.xo, entity.getX());
-					double d1 = Mth.lerp(p_225628_7_, entity.getYCloakO(), entity.getYCloak()) - Mth.lerp((double)p_225628_7_, entity.yo, entity.getY());
-					double d2 = Mth.lerp(p_225628_7_, entity.getZCloakO(), entity.getZCloak()) - Mth.lerp((double)p_225628_7_, entity.zo, entity.getZ());
-					float f = entity.yBodyRotO + (entity.yBodyRot - entity.yBodyRotO);
-					double d3 = Mth.sin(f * ((float)Math.PI / 180F));
-					double d4 = -Mth.cos(f * ((float)Math.PI / 180F));
-					float f1 = (float)d1 * 10.0F;
-					f1 = Mth.clamp(f1, -6.0F, 32.0F);
-					float f2 = (float)(d0 * d3 + d2 * d4) * 100.0F;
-					f2 = Mth.clamp(f2, 0.0F, 150.0F);
-					float f3 = (float)(d0 * d4 - d2 * d3) * 100.0F;
-					f3 = Mth.clamp(f3, -20.0F, 20.0F);
-					if (f2 < 0.0F) {
-						f2 = 0.0F;
-					}
-
-					f1 = f1 + Mth.sin(Mth.lerp(p_225628_7_, entity.walkDistO, entity.walkDist) * 6.0F) * 32.0F * p_225628_7_;
-					if (entity.isCrouching()) {
-						f1 += 25.0F;
-					}
-					poseStack.mulPose(Axis.XP.rotationDegrees(6.0F + f2 / 2.0F + f1));
-					poseStack.mulPose(Axis.ZP.rotationDegrees(f3 / 2.0F));
-					poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - f3 / 2.0F));
-					VertexConsumer ivertexbuilder = buffer.getBuffer(RenderType.entitySolid(loc));
-					this.getParentModel().renderCloak(poseStack, ivertexbuilder, size, OverlayTexture.NO_OVERLAY);
-					poseStack.popPose();
-				}
-			}
-		}
+	public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight, T entity,  float limbSwing, float limbSwingAmount, float pt, float age, float headYaw, float headPitch) {
+		if (!entity.displayCape()) return;
+		ItemStack itemstack = entity.getItemBySlot(EquipmentSlot.CHEST);
+		if (itemstack.getItem() == Items.ELYTRA) return;
+		ResourceLocation loc = PlayerTextureRenderer.getTexture(entity.getPlayerUUID(), Type.CAPE);
+		if (loc == null) return;
+		poseStack.pushPose();
+		poseStack.translate(0.0D, 0.0D, 0.125D);
+		double d0 = Mth.lerp(pt, entity.getXCloakO(), entity.getXCloak()) - Mth.lerp(pt, entity.xo, entity.getX());
+		double d1 = Mth.lerp(pt, entity.getYCloakO(), entity.getYCloak()) - Mth.lerp(pt, entity.yo, entity.getY());
+		double d2 = Mth.lerp(pt, entity.getZCloakO(), entity.getZCloak()) - Mth.lerp(pt, entity.zo, entity.getZ());
+		float f = entity.yBodyRotO + (entity.yBodyRot - entity.yBodyRotO);
+		double d3 = Mth.sin(f * ((float)Math.PI / 180F));
+		double d4 = -Mth.cos(f * ((float)Math.PI / 180F));
+		float f1 = (float)d1 * 10.0F;
+		f1 = Mth.clamp(f1, -6.0F, 32.0F);
+		float f2 = (float)(d0 * d3 + d2 * d4) * 100.0F;
+		f2 = Mth.clamp(f2, 0.0F, 150.0F);
+		float f3 = (float)(d0 * d4 - d2 * d3) * 100.0F;
+		f3 = Mth.clamp(f3, -20.0F, 20.0F);
+		if (f2 < 0.0F) f2 = 0.0F;
+		f1 = f1 + Mth.sin(Mth.lerp(pt, entity.walkDistO, entity.walkDist) * 6.0F) * 32.0F * pt;
+		if (entity.isCrouching()) f1 += 25.0F;
+		poseStack.mulPose(Axis.XP.rotationDegrees(6.0F + f2 / 2.0F + f1));
+		poseStack.mulPose(Axis.ZP.rotationDegrees(f3 / 2.0F));
+		poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - f3 / 2.0F));
+		VertexConsumer consumer = buffer.getBuffer(RenderType.entitySolid(loc));
+		getParentModel().renderCloak(poseStack, consumer, packedLight, OverlayTexture.NO_OVERLAY);
+		poseStack.popPose();
 	}
 
 }

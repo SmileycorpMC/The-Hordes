@@ -8,10 +8,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
@@ -127,11 +124,11 @@ public class HordeEvent {
 		if (startEvent.isCanceled()) return;
 		count = startEvent.getCount();
 		Vec3 basedir = VecMath.randomXZVec(rand);
-		BlockPos basepos = VecMath.closestLoadedPos(level, player.blockPosition(), basedir, 75, 7, 0);
+		BlockPos basepos = VecMath.closestLoadedPos(level, player.blockPosition(), basedir, 50, 7, 0);
 		int i = 0;
 		while (basepos.equals(player.blockPosition())) {
 			basedir = VecMath.randomXZVec(rand);
-			basepos = VecMath.closestLoadedPos(level, player.blockPosition(), basedir, 75, 7, 0);
+			basepos = VecMath.closestLoadedPos(level, player.blockPosition(), basedir, 50, 7, 0);
 			if (!spawnData.getSpawnType().canSpawn(level, basepos)) basepos = player.blockPosition();
 			if (i++ >= HordeEventConfig.hordeSpawnChecks.get()) {
 				logInfo("Unable to find unlit pos for horde " + this + " ignoring light level");

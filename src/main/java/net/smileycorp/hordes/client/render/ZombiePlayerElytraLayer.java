@@ -26,20 +26,18 @@ public class ZombiePlayerElytraLayer<T extends Zombie & PlayerZombie> extends El
 	@Override
 	public void render(PoseStack poseStack, MultiBufferSource buffers, int packedLight, T entity,  float limbSwing, float limbSwingAmount, float pt, float age, float headYaw, float headPitch) {
 		ItemStack itemstack = entity.getItemBySlot(EquipmentSlot.CHEST);
-		if (shouldRender(itemstack, entity)) {
-			ResourceLocation loc = getElytraTexture(itemstack, entity);
-			if (entity.displayCape()) {
-				ResourceLocation texture = PlayerTextureRenderer.getTexture(entity.getPlayerUUID(), Type.ELYTRA);
-				if (texture != null) loc = texture;
-			}
-			poseStack.pushPose();
-			poseStack.translate(0.0D, 0.0D, 0.125D);
-			getParentModel().copyPropertiesTo(elytraModel);
-			elytraModel.setupAnim(entity, limbSwing, limbSwingAmount, age, headYaw, headPitch);
-			VertexConsumer vertexconsumer = ItemRenderer.getArmorFoilBuffer(buffers, RenderType.armorCutoutNoCull(loc), itemstack.hasFoil());
-			elytraModel.renderToBuffer(poseStack, vertexconsumer, packedLight, OverlayTexture.NO_OVERLAY);
-			poseStack.popPose();
-		}
+		if (!shouldRender(itemstack, entity)) return;
+		ResourceLocation loc = getElytraTexture(itemstack, entity);
+		if (!entity.displayCape()) return;
+		ResourceLocation texture = PlayerTextureRenderer.getTexture(entity.getPlayerUUID(), Type.ELYTRA);
+		if (texture != null) loc = texture;
+		poseStack.pushPose();
+		poseStack.translate(0.0D, 0.0D, 0.125D);
+		getParentModel().copyPropertiesTo(elytraModel);
+		elytraModel.setupAnim(entity, limbSwing, limbSwingAmount, age, headYaw, headPitch);
+		VertexConsumer vertexconsumer = ItemRenderer.getArmorFoilBuffer(buffers, RenderType.armorCutoutNoCull(loc), itemstack.hasFoil());
+		elytraModel.renderToBuffer(poseStack, vertexconsumer, packedLight, OverlayTexture.NO_OVERLAY);
+		poseStack.popPose();
 	}
 
 }

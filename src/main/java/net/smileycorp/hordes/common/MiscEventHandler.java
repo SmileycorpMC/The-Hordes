@@ -84,9 +84,8 @@ public class MiscEventHandler {
 		if (before instanceof AbstractHorse && after instanceof AbstractHorse) {
 			Container beforeInv = ((AbstractHorse) before).getInventory();
 			Container afterInv = ((AbstractHorse) after).getInventory();
-			for (int i = 0; i < Math.min(beforeInv.getContainerSize(), afterInv.getContainerSize()); i++) {
+			for (int i = 0; i < Math.min(beforeInv.getContainerSize(), afterInv.getContainerSize()); i++)
 				afterInv.setItem(i, beforeInv.getItem(i).copy());
-			}
 		}
 	}
 

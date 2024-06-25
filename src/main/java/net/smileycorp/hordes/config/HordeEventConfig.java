@@ -38,7 +38,7 @@ public class HordeEventConfig {
         hordeSpawnVariation = builder.comment("Amount of days a horde event can be randomly delayed by").define("hordeSpawnVariation", 0);
         hordeSpawnMax = builder.comment("Max cap for the number of entities that can exist from the horde at once.").define("hordeSpawnMax", 160);
         dayLength = builder.comment("Length of a day (use only if you have another day that changes the length of the day/night cycle) Default is 24000").define("dayLength", 24000);
-        hordePathingInterval = builder.comment("How many ticks does the horde pathing ai take before recalculating? (Increase this if you are having server slowdown during horde events.)").define("hordePathingInterval", 15);
+        hordePathingInterval = builder.comment("How many ticks does the horde pathing ai take before recalculating? (Increase this if you are having server slowdown during horde events.)").define("hordePathingInterval", 25);
         hordeEntitySpeed = builder.comment("How fast do horde mobs move towards their tracked player?").define("hordeEntitySpeed", 1d);
         spawnFirstDay = builder.comment("Set to true to enable the horde spawning on the first day. (Game day 0)").define("spawnFirstDay", false);
         canSleepDuringHorde = builder.comment("Set to false to disable the use of beds during a horde event.").define("canSleepDuringHorde", false);
