@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.common.data.conditions;
+package net.smileycorp.hordes.hordeevent.data.conditions;
 
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
@@ -6,13 +6,10 @@ import com.mojang.datafixers.util.Either;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.smileycorp.hordes.common.HordesLogger;
+import net.smileycorp.hordes.common.event.HordePlayerEvent;
 
 import java.util.List;
 
@@ -25,8 +22,8 @@ public class BiomeCondition implements Condition {
 	}
 
 	@Override
-	public boolean apply(Level level, LivingEntity entity, ServerPlayer player, RandomSource rand) {
-		Holder<Biome> biome = level.getBiomeManager().getBiome(player.blockPosition());
+	public boolean apply(HordePlayerEvent event) {
+		Holder<Biome> biome = event.getLevel().getBiomeManager().getBiome(event.getEntity().blockPosition());
 		for (Either<TagKey<Biome>, ResourceLocation> either : biomes) if (either.map(biome::is, biome::is)) return true;
 		return false;
 	}

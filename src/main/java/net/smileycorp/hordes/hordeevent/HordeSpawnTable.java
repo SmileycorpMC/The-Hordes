@@ -12,7 +12,7 @@ import net.minecraft.world.entity.Mob;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.util.WeightedOutputs;
 import net.smileycorp.hordes.common.HordesLogger;
-import net.smileycorp.hordes.common.data.DataRegistry;
+import net.smileycorp.hordes.hordeevent.data.DataRegistry;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;

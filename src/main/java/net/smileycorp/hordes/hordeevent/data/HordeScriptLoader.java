@@ -49,8 +49,7 @@ public class HordeScriptLoader extends SimpleJsonResourceReloadListener {
     }
     
     public void applyScripts(HordePlayerEvent event) {
-        getScripts().stream().filter(script -> script.getType() == event.getClass()
-                && script.shouldApply(event.getEntityWorld(), event.getEntity(), event.getPlayer(), event.getRandom())).forEach(script -> {
+        getScripts().stream().filter(script -> script.getType() == event.getClass() && script.shouldApply(event)).forEach(script -> {
             script.apply(event);
             HordesLogger.logInfo("Applying script " + script.getName() + " for event " + event);
         });

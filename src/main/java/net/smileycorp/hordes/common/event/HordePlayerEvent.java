@@ -22,7 +22,7 @@ public class HordePlayerEvent extends Event {
 		this.player = player;
 	}
 
-	public Level getEntityWorld() {
+	public Level getLevel() {
 		return level;
 	}
 

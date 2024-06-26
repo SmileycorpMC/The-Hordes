@@ -12,8 +12,8 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.living.LivingConversionEvent;
 import net.smileycorp.atlas.api.util.Func;
 import net.smileycorp.hordes.common.HordesLogger;
-import net.smileycorp.hordes.common.data.DataRegistry;
 import net.smileycorp.hordes.common.mixinutils.VillageMerchant;
+import net.smileycorp.hordes.hordeevent.data.DataRegistry;
 
 public class InfectionConversionEntry {
 

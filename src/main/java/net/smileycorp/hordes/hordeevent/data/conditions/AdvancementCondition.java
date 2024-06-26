@@ -1,14 +1,11 @@
-package net.smileycorp.hordes.common.data.conditions;
+package net.smileycorp.hordes.hordeevent.data.conditions;
 
 import com.google.gson.JsonElement;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.Level;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
-import net.smileycorp.hordes.common.data.values.ValueGetter;
+import net.smileycorp.hordes.common.event.HordePlayerEvent;
+import net.smileycorp.hordes.hordeevent.data.values.ValueGetter;
 
 public class AdvancementCondition implements Condition {
 
@@ -19,9 +16,9 @@ public class AdvancementCondition implements Condition {
 	}
 
 	@Override
-	public boolean apply(Level level, LivingEntity entity, ServerPlayer player, RandomSource rand) {
-		ResourceLocation advancement = ResourceLocation.tryParse(getter.get(level, entity, player, rand));
-		return player.getAdvancements().getOrStartProgress(player.getServer().getAdvancements().get(advancement)).isDone();
+	public boolean apply(HordePlayerEvent event) {
+		ResourceLocation advancement = ResourceLocation.tryParse(getter.get(event));
+		return event.getPlayer().getAdvancements().getOrStartProgress(event.getPlayer().getServer().getAdvancements().get(advancement)).isDone();
 	}
 
 	public static AdvancementCondition deserialize(JsonElement json) {

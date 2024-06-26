@@ -1,13 +1,10 @@
-package net.smileycorp.hordes.common.data.conditions;
+package net.smileycorp.hordes.hordeevent.data.conditions;
 
 import com.google.gson.JsonElement;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.Level;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
-import net.smileycorp.hordes.common.data.values.ValueGetter;
+import net.smileycorp.hordes.common.event.HordePlayerEvent;
+import net.smileycorp.hordes.hordeevent.data.values.ValueGetter;
 
 public class RandomCondition implements Condition {
 
@@ -18,8 +15,8 @@ public class RandomCondition implements Condition {
 	}
 
 	@Override
-	public boolean apply(Level level, LivingEntity entity, ServerPlayer player, RandomSource rand) {
-		return rand.nextFloat() <= chance.get(level, entity, player, rand);
+	public boolean apply(HordePlayerEvent event) {
+		return event.getRandom().nextFloat() <= chance.get(event);
 	}
 
 	public static RandomCondition deserialize(JsonElement json) {

@@ -6,15 +6,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.Level;
 import net.smileycorp.hordes.common.HordesLogger;
-import net.smileycorp.hordes.common.data.DataRegistry;
-import net.smileycorp.hordes.common.data.conditions.Condition;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
-import net.smileycorp.hordes.hordeevent.data.functions.FunctionRegistry;
+import net.smileycorp.hordes.hordeevent.data.conditions.Condition;
 import net.smileycorp.hordes.hordeevent.data.functions.HordeFunction;
 import net.smileycorp.hordes.hordeevent.data.functions.MultipleFunction;
 
@@ -46,8 +40,8 @@ public class HordeScript<T extends HordePlayerEvent> {
 		return name;
 	}
 
-	public boolean shouldApply(Level level, LivingEntity entity, ServerPlayer player, RandomSource rand) {
-		for (Condition condition : conditions)  if (!condition.apply(level, entity, player, rand)) return false;
+	public boolean shouldApply(HordePlayerEvent event) {
+		for (Condition condition : conditions)  if (!condition.apply(event)) return false;
 		return true;
 	}
 	
@@ -111,7 +105,7 @@ public class HordeScript<T extends HordePlayerEvent> {
 				return new HordeScript(pair.getSecond(), pair.getFirst(), key);
 			}
 			JsonObject obj = json.getAsJsonObject();
-			Pair<Class<HordePlayerEvent>, HordeFunction<HordePlayerEvent>> pair = FunctionRegistry.readFunction(obj);
+			Pair<Class<HordePlayerEvent>, HordeFunction<HordePlayerEvent>> pair = DataRegistry.readFunction(obj);
 			Class<? extends HordePlayerEvent> clazz = pair.getFirst();
 			HordeFunction<? extends HordePlayerEvent> function = pair.getSecond();
 			if (function == null || clazz == null) throw new Exception("invalid function: " + obj.get("function").getAsString());

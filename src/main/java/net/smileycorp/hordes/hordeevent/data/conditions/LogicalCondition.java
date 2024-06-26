@@ -1,14 +1,11 @@
-package net.smileycorp.hordes.common.data.conditions;
+package net.smileycorp.hordes.hordeevent.data.conditions;
 
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.Level;
 import net.smileycorp.atlas.api.data.LogicalOperation;
 import net.smileycorp.hordes.common.HordesLogger;
-import net.smileycorp.hordes.common.data.DataRegistry;
+import net.smileycorp.hordes.common.event.HordePlayerEvent;
+import net.smileycorp.hordes.hordeevent.data.DataRegistry;
 
 import java.util.List;
 
@@ -23,9 +20,9 @@ public class LogicalCondition implements Condition {
 	}
 
 	@Override
-	public boolean apply(Level level, LivingEntity entity, ServerPlayer player, RandomSource rand) {
+	public boolean apply(HordePlayerEvent event) {
 		boolean result = false;
-		for (Condition condition : conditions) result = operation.apply(result, condition.apply(level, entity, player, rand));
+		for (Condition condition : conditions) result = operation.apply(result, condition.apply(event));
 		return result;
 	}
 

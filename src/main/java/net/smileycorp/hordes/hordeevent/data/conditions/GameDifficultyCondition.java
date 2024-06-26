@@ -1,14 +1,11 @@
-package net.smileycorp.hordes.common.data.conditions;
+package net.smileycorp.hordes.hordeevent.data.conditions;
 
 import com.google.gson.JsonElement;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.Level;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
-import net.smileycorp.hordes.common.data.values.ValueGetter;
+import net.smileycorp.hordes.common.event.HordePlayerEvent;
+import net.smileycorp.hordes.hordeevent.data.values.ValueGetter;
 
 public class GameDifficultyCondition implements Condition {
 
@@ -19,9 +16,9 @@ public class GameDifficultyCondition implements Condition {
 	}
 
 	@Override
-	public boolean apply(Level level, LivingEntity entity, ServerPlayer player, RandomSource rand) {
-		Comparable value = difficulty.get(level, entity, player, rand);
-		return level.getDifficulty() == (value instanceof String ? Difficulty.byName((String) value) : Difficulty.byId((Integer) value));
+	public boolean apply(HordePlayerEvent event) {
+		Comparable value = difficulty.get(event);
+		return event.getLevel().getDifficulty() == (value instanceof String ? Difficulty.byName((String) value) : Difficulty.byId((Integer) value));
 	}
 
 	public static GameDifficultyCondition deserialize(JsonElement json) {

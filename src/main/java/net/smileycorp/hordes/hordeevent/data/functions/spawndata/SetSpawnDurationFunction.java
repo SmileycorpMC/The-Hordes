@@ -3,9 +3,9 @@ package net.smileycorp.hordes.hordeevent.data.functions.spawndata;
 import com.google.gson.JsonElement;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
-import net.smileycorp.hordes.common.data.values.ValueGetter;
 import net.smileycorp.hordes.common.event.HordeBuildSpawnDataEvent;
 import net.smileycorp.hordes.hordeevent.data.functions.HordeFunction;
+import net.smileycorp.hordes.hordeevent.data.values.ValueGetter;
 
 public class SetSpawnDurationFunction implements HordeFunction<HordeBuildSpawnDataEvent> {
 

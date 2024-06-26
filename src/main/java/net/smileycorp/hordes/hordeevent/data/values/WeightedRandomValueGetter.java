@@ -1,15 +1,12 @@
-package net.smileycorp.hordes.common.data.values;
+package net.smileycorp.hordes.hordeevent.data.values;
 
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.Level;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.atlas.api.util.WeightedOutputs;
 import net.smileycorp.hordes.common.HordesLogger;
+import net.smileycorp.hordes.common.event.HordePlayerEvent;
 
 import java.util.Map;
 
@@ -22,8 +19,8 @@ public class WeightedRandomValueGetter<T extends Comparable<T>> implements Value
     }
     
     @Override
-    public T get(Level level, LivingEntity entity, ServerPlayer player, RandomSource rand) {
-        return outputs.getResult(rand).get(level, entity, player, rand);
+    public T get(HordePlayerEvent event) {
+        return outputs.getResult(event.getRandom()).get(event);
     }
     
     public static <T extends Number & Comparable<T>> WeightedRandomValueGetter deserialize(JsonObject json, DataType<T> type) {

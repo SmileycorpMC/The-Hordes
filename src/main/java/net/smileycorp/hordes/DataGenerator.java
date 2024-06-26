@@ -1,4 +1,4 @@
-package net.smileycorp.hordes.common.data;
+package net.smileycorp.hordes;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;

@@ -1,14 +1,11 @@
-package net.smileycorp.hordes.common.data.values;
+package net.smileycorp.hordes.hordeevent.data.values;
 
 import com.google.gson.JsonObject;
 import net.minecraft.advancements.critereon.NbtPredicate;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.Level;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
+import net.smileycorp.hordes.common.event.HordePlayerEvent;
 
 public class PlayerNBTGetter<T extends Comparable<T>> extends NBTGetter<T> {
 
@@ -17,8 +14,8 @@ public class PlayerNBTGetter<T extends Comparable<T>> extends NBTGetter<T> {
 	}
 
 	@Override
-	protected CompoundTag getNBT(Level level, LivingEntity entity, ServerPlayer player, RandomSource rand) {
-		return NbtPredicate.getEntityTagToCompare(player);
+	protected CompoundTag getNBT(HordePlayerEvent event) {
+		return NbtPredicate.getEntityTagToCompare(event.getPlayer());
 	}
 	
 	public static <T extends Comparable<T>> ValueGetter deserialize(JsonObject object, DataType<T> type) {

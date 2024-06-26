@@ -5,9 +5,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
-import net.smileycorp.hordes.common.data.DataRegistry;
-import net.smileycorp.hordes.common.data.conditions.Condition;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
+import net.smileycorp.hordes.hordeevent.data.DataRegistry;
+import net.smileycorp.hordes.hordeevent.data.conditions.Condition;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ public class MultipleFunction<T extends HordePlayerEvent> implements HordeFuncti
     }
     
     private void tryApply(Pair<List<Condition>, HordeFunction<T>> pair, T event) {
-        for (Condition condition : pair.getFirst()) if (!condition.apply(event.getEntityWorld(), event.getEntity(), event.getPlayer(), event.getRandom())) return;
+        for (Condition condition : pair.getFirst()) if (!condition.apply(event)) return;
         pair.getSecond().apply(event);
     }
     
@@ -47,7 +47,7 @@ public class MultipleFunction<T extends HordePlayerEvent> implements HordeFuncti
         List<Pair<List<Condition>, HordeFunction<T>>> functions = Lists.newArrayList();
         for (JsonElement element : json) {
             JsonObject obj = element.getAsJsonObject();
-            Pair<Class<T>, HordeFunction<T>> pair = FunctionRegistry.readFunction(obj);
+            Pair<Class<T>, HordeFunction<T>> pair = DataRegistry.readFunction(obj);
             if (clazz == null && pair.getFirst() != null) {
                 List<Condition> conditions = Lists.newArrayList();
                 if (obj.has("conditions")) obj.get("conditions").getAsJsonArray().forEach(condition ->
