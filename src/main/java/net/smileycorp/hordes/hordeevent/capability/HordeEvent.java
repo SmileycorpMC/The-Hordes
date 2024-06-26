@@ -300,8 +300,12 @@ public class HordeEvent {
 		spawnData.setTable(table);
 	}
 
-	public HordeSpawnTable getSpawntable() {
+	public HordeSpawnTable getSpawnTable() {
 		return spawnData == null ? null : spawnData.getTable();
+	}
+	
+	public HordeSpawnData getSpawnData() {
+		return spawnData;
 	}
 
 	public void setNextDay(int day) {

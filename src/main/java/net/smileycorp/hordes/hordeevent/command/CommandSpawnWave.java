@@ -44,7 +44,7 @@ public class CommandSpawnWave {
 		for (ServerPlayer player : players) {
 			HordeEvent horde = HordeSavedData.getData(ctx.getSource().getLevel()).getEvent(player);
 			try {
-				HordeSpawnTable current = horde.getSpawntable();
+				HordeSpawnTable current = horde.getSpawnTable();
 				horde.setSpawntable(HordeTableLoader.INSTANCE.getTable(table));
 				horde.spawnWave(player, count);
 				horde.setSpawntable(current);

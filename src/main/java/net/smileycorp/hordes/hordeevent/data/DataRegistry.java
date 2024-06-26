@@ -52,6 +52,7 @@ public class DataRegistry {
 		registerValueGetter(Constants.loc("entity_nbt"), EntityNBTGetter::deserialize);
 		registerValueGetter(Constants.loc("entity_pos"), EntityPosGetter::deserialize);
 		registerValueGetter(Constants.loc("day"), EventDayGetter::deserialize);
+		registerValueGetter(Constants.loc("spawn_table"), SpawnTableGetter::deserialize);
 	}
 
 	public static void registerConditionDeserializers() {

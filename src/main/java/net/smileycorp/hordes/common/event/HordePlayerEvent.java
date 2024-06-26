@@ -6,6 +6,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.Event;
 import net.smileycorp.hordes.config.HordeEventConfig;
+import net.smileycorp.hordes.hordeevent.HordeSpawnData;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 
 public class HordePlayerEvent extends Event {
@@ -45,5 +46,9 @@ public class HordePlayerEvent extends Event {
 	public LivingEntity getEntity() {
 		return player;
 	}
+    
+    public HordeSpawnData getSpawnData() {
+		return horde.getSpawnData();
+    }
 	
 }
