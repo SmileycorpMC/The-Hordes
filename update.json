@@ -1,10 +1,11 @@
 {
     "homepage": "https://www.curseforge.com/minecraft/mc-mods/the-hordes",
     "1.21": {
-        "1.6.0": "first release for 1.21"
+        "1.6.0": "first release for 1.21",
+		"1.6.1": "add hordes:spawn_table and hordes:day values, rework hordes:day to include the functionality of hordes:player_day, update to neo version 21.0.42"
     },
     "promos": {
-        "1.21-latest": "1.6.0",
-        "1.21-recommended": "1.6.0"
+        "1.21-latest": "1.6.1",
+        "1.21-recommended": "1.6.1"
     }
 }
