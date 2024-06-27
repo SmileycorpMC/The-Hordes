@@ -91,15 +91,15 @@ public class InfectionEventHandler {
 		event.setCancellationResult(InteractionResult.FAIL);
 	}
 
-	@SubscribeEvent
-	public void onDamage(LivingDamageEvent event) {
+	@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
+	public void onDamage(LivingDamageEvent.Post event) {
 		LivingEntity entity = event.getEntity();
 		Entity attacker = event.getSource().getDirectEntity();
 		Level level = entity.level();
 		if (level.isClientSide) return;
 		if (!InfectionData.INSTANCE.canCauseInfection(attacker) || entity.hasEffect(HordesInfection.INFECTED)) return;
 		if (InfectionData.INSTANCE.canBeInfected(entity))
-			InfectionData.INSTANCE.tryToInfect(entity, (LivingEntity) attacker, event.getSource(), event.getAmount());
+			InfectionData.INSTANCE.tryToInfect(entity, (LivingEntity) attacker, event.getSource(), event.getNewDamage());
 	}
 
 	@SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
@@ -123,10 +123,9 @@ public class InfectionEventHandler {
 	public void onInfectDeath(InfectionDeathEvent event) {
 		LivingEntity entity = event.getEntity();
 		if (entity instanceof Player) return;
-		if (InfectionData.INSTANCE.canBeInfected(entity))  {
-			if (InfectionData.INSTANCE.convertEntity((Mob) entity)) return;
-			event.setCanceled(true);
-		}
+		if (!InfectionData.INSTANCE.canBeInfected(entity)) return;
+		if (InfectionData.INSTANCE.convertEntity((Mob) entity)) return;
+		event.setCanceled(true);
 	}
 
 	@SubscribeEvent
@@ -151,12 +150,11 @@ public class InfectionEventHandler {
 	@SubscribeEvent
 	public void addItemAttributes(ItemAttributeModifierEvent event) {
 		ItemStack stack = event.getItemStack();
-		if (event.getSlotType() != getSlot(stack) |! event.getSlotType().isArmor()) return;
+		EquipmentSlot slot = getSlot(stack);
 		float value = InfectionData.INSTANCE.getProtectionMultiplier(stack);
-		if (value != 0) {
-			event.addModifier(HordesInfection.INFECTION_RESISTANCE, new AttributeModifier(Constants.loc(event.getSlotType().getName()), value,
-					AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
-		}
+		if (value == 0) return;
+		event.addModifier(HordesInfection.INFECTION_RESISTANCE, new AttributeModifier(Constants.loc(slot.getName()), value,
+				AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL), EquipmentSlotGroup.bySlot(slot));
 	}
 	
 	public static EquipmentSlot getSlot(ItemStack stack) {
