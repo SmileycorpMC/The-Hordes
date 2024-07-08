@@ -35,7 +35,7 @@ public class CommonProxy {
 		DataGenerator.init(event);
 		DataRegistry.init();
 		MinecraftForge.EVENT_BUS.register(this);
-		CapabilityManager.INSTANCE.register(ZombifyPlayer.class, new ZombifyPlayer.Storage(), ZombifyPlayer.Implementation::new);
+		CapabilityManager.INSTANCE.register(ZombifyPlayer.class, new ZombifyPlayer.Storage(), ZombifyPlayer.Impl::new);
 		CapabilityManager.INSTANCE.register(HordeSpawn.class, new HordeSpawn.Storage(), HordeSpawn.Impl::new);
 		CapabilityManager.INSTANCE.register(Infection.class, new Infection.Storage(), Infection.Impl::new);
 		//Horde Event

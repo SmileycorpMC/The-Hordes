@@ -1,5 +1,6 @@
 package net.smileycorp.hordes.hordeevent.capability;
 
+import com.google.common.collect.Lists;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
@@ -7,7 +8,6 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.ai.EntityAITasks;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -19,7 +19,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.smileycorp.atlas.api.SimpleStringMessage;
 import net.smileycorp.atlas.api.recipe.WeightedOutputs;
@@ -37,7 +36,6 @@ import net.smileycorp.hordes.hordeevent.HordeSpawnTable;
 import net.smileycorp.hordes.hordeevent.network.HordeEventPacketHandler;
 import net.smileycorp.hordes.hordeevent.network.HordeSoundMessage;
 import net.smileycorp.hordes.hordeevent.network.UpdateClientHordeMessage;
-import net.smileycorp.hordes.integration.mobspropertiesrandomness.MPRIntegration;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -195,20 +193,20 @@ public class HordeEvent {
 	}
 	
 	private void finalizeEntity(EntityLiving entity, EntityPlayerMP player) {
-		entity.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).applyModifier(new AttributeModifier(FOLLOW_RANGE_MODIFIER,
-				"hordes:horde_range", 75, 0));
-		if (Loader.isModLoaded("mpr")) MPRIntegration.addFollowAttribute(entity);
 		if (entity.hasCapability(HordesCapabilities.HORDESPAWN, null)) {
 			entity.getCapability(HordesCapabilities.HORDESPAWN, null).setPlayerUUID(player.getUniqueID().toString());
 			registerEntity(entity, player);
 		}
-		if (entity instanceof EntityCreature) entity.targetTasks.addTask(1, new EntityAIHurtByTarget((EntityCreature) entity, false));
-		entity.targetTasks.addTask(2, new EntityAINearestAttackableTarget<>((EntityCreature) entity, EntityPlayerMP.class, true));
+		if (entity instanceof EntityCreature) {
+			entity.targetTasks.addTask(1, new EntityAIHurtByTarget((EntityCreature) entity, false));
+			entity.targetTasks.addTask(2, new EntityAINearestAttackableTarget<>((EntityCreature) entity, EntityPlayerMP.class, true));
+		}
+		entity.tasks.addTask(6, new EntityAIHordeTrackPlayer(entity, player, spawnData.getEntitySpeed()));
 		for (Entity passenger : entity.getPassengers()) if (passenger instanceof EntityLiving) finalizeEntity((EntityLiving) passenger, player);
 	}
 	
 	private void cleanSpawns() {
-		List<EntityLiving> toRemove = new ArrayList<>();
+		List<EntityLiving> toRemove = Lists.newArrayList();
 		for (EntityLiving entity : entitiesSpawned) {
 			if (entity.isEntityAlive()) continue;
 			if (entity.hasCapability(HordesCapabilities.HORDESPAWN, null)) {

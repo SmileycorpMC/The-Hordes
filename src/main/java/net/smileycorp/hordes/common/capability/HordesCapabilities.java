@@ -10,10 +10,13 @@ public class HordesCapabilities {
     
     @CapabilityInject(HordeEventClient.class)
     public final static Capability<HordeEventClient> HORDE_EVENT_CLIENT = null;
+    
     @CapabilityInject(HordeSpawn.class)
     public final static Capability<HordeSpawn> HORDESPAWN = null;
+    
     @CapabilityInject(ZombifyPlayer.class)
     public final static Capability<ZombifyPlayer> ZOMBIFY_PLAYER = null;
+    
     @CapabilityInject(Infection.class)
     public final static Capability<Infection> INFECTION = null;
     

@@ -62,7 +62,7 @@ public class HordeSpawnEntry {
 	
 	@Override
 	public String toString() {
-		String str = "HordeSpawnEntry[type=" + type + ",weight=" + weight + ",minDay=" + minDay + ",maxDay=" + maxDay + "]";
+		String str = "HordeSpawnEntry[type=" + type.getEntityClass() + ",weight=" + weight + ",minDay=" + minDay + ",maxDay=" + maxDay + "]";
 		return nbt == null ? str : str + "{" + nbt + "}";
 	}
 

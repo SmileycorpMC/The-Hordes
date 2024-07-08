@@ -31,16 +31,16 @@ public interface ZombifyPlayer {
 		
 	}
 	
-	class Implementation implements ZombifyPlayer {
+	class Impl implements ZombifyPlayer {
 		
 		private final EntityPlayer player;
 		private EntityZombiePlayer zombie = null;
 		
-		public Implementation() {
+		public Impl() {
 			player = null;
 		}
 		
-		public Implementation(EntityPlayer player) {
+		public Impl(EntityPlayer player) {
 			this.player=player;
 		}
 
@@ -74,7 +74,7 @@ public interface ZombifyPlayer {
 		protected final ZombifyPlayer instance;
 
 		public Provider(EntityPlayer player) {
-			instance = new Implementation(player);
+			instance = new Impl(player);
 		}
 
 		@Override

@@ -43,7 +43,7 @@ public class EntityAIHordeTrackPlayer extends EntityAIBase {
     @Override
     public void resetTask() {
         pather.clearPath();
-        entity.setPathPriority(PathNodeType.WATER, waterCost);
+        //entity.setPathPriority(PathNodeType.WATER, waterCost);
     }
     
     @Override

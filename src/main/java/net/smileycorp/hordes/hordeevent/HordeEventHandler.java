@@ -35,12 +35,10 @@ public class HordeEventHandler {
 	@SubscribeEvent
 	public void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
 		Entity entity = event.getObject();
-		if (entity instanceof EntityLiving) {
+		if (entity instanceof EntityLiving &! entity.hasCapability(HordesCapabilities.HORDESPAWN, null))
 			event.addCapability(Constants.loc("HordeSpawn"), new HordeSpawn.Provider());
-		}
-		if (entity instanceof EntityPlayer && entity.world.isRemote) {
+		if (entity instanceof EntityPlayer && entity.world.isRemote &! entity.hasCapability(HordesCapabilities.HORDE_EVENT_CLIENT, null))
 			event.addCapability(Constants.loc("HordeEventClient"), new HordeEventClient.Provider());
-		}
 	}
 	
 	//update the next day in the horde world data
@@ -102,7 +100,7 @@ public class HordeEventHandler {
 			entity.targetTasks.addTask(1, new EntityAIHurtByTarget((EntityCreature) entity, false));
 			entity.targetTasks.addTask(2, new EntityAINearestAttackableTarget<>((EntityCreature) entity, EntityPlayer.class, true));
 		}
-		HordeEvent horde = WorldDataHordes.getData((WorldServer) player.world).getEvent(player);
+		HordeEvent horde = WorldDataHordes.getData(player.world).getEvent(player);
 		if (horde != null) if (horde.isActive(player)) horde.registerEntity(entity, player);
 		cap.setSynced();
 	}

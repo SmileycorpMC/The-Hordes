@@ -24,8 +24,8 @@ public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapp
 	public static final ResourceLocation TEXTURE = Constants.loc("textures/gui/jei/cure_list.png");
 	
 	public InfectionCureCategory(IGuiHelper guiHelper) {
-		this.background = guiHelper.createDrawable(TEXTURE, 0, 0, 167, 113);
-		this.icon = guiHelper.createDrawable(Constants.loc("textures/mob_effect/infected.png"), 1, 200, 16, 16);
+		background = guiHelper.createDrawable(TEXTURE, 0, 0, 167, 113);
+		icon = guiHelper.createDrawable(Constants.loc("textures/mob_effect/infected.png"), 1, 1, 16, 16, 18, 18);
 	}
 	
 	@Override
@@ -56,16 +56,9 @@ public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapp
 	@Override
 	public void setRecipe(IRecipeLayout recipeLayout, InfectionCureWrapper recipeWrapper, IIngredients ingredients) {
 		IGuiItemStackGroup items = recipeLayout.getItemStacks();
-		for (int i = 0; i <6; i++) {
-			for (int j = 0; j <9; j++) {
-				items.init((i*9)+j, false, j*18+3, i*18+3);
-			}
-		}
+		for (int i = 0; i <6; i++) for (int j = 0; j <9; j++) items.init((i * 9) + j, false, j * 18 + 3, i * 18 + 3);
 		List<List<ItemStack>> stacks = ingredients.getInputs(ItemStack.class);
-		for (int i = 0; i < stacks.size(); i++) {
-			items.set(i, stacks.get(i));
-		}
-		
+		for (int i = 0; i < stacks.size(); i++) items.set(i, stacks.get(i));
 	}
 
 }

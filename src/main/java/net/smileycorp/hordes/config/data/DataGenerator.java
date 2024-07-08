@@ -57,12 +57,13 @@ public class DataGenerator {
             HordesLogger.logInfo("Hordes data does not exist, generating new files.");
             return false;
         }
-        try {
+        try (FileSystem mod = FileSystems.newFileSystem(DataGenerator.class.getProtectionDomain().getCodeSource().getLocation().toURI(),
+                Collections.emptyMap())) {
             JsonParser parser = new JsonParser();
             JsonObject config_json = parser.parse(new FileReader(config_file)).getAsJsonObject();
             if (config_json.get("data_version").getAsInt() < 0) return true;
             JsonObject mod_json = parser.parse(new BufferedReader(
-                    new InputStreamReader(DataGenerator.class.getResourceAsStream("config_defaults/hordes-info.json")))).getAsJsonObject();
+                    new InputStreamReader(Files.newInputStream(mod.getPath("config_defaults/hordes-info.json"))))).getAsJsonObject();
             boolean flag = config_json.get("data_version").getAsInt() >= mod_json.get("data_version").getAsInt();
             if (!flag) HordesLogger.logInfo("Hordes data is not up to date, or set to pack author mode, generating new files.");;
             return flag;

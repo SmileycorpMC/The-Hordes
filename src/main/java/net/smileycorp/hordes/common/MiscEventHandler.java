@@ -67,7 +67,7 @@ public class MiscEventHandler {
 	@SubscribeEvent
 	public void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
 		Entity entity = event.getObject();
-		if (!entity.hasCapability(HordesCapabilities.HORDESPAWN, null) && entity instanceof EntityPlayer &!(entity instanceof FakePlayer)) {
+		if (!entity.hasCapability(HordesCapabilities.ZOMBIFY_PLAYER, null) && entity instanceof EntityPlayer &!(entity instanceof FakePlayer)) {
 			event.addCapability(Constants.loc("Infection"), new ZombifyPlayer.Provider((EntityPlayer) entity));
 		}
 	}

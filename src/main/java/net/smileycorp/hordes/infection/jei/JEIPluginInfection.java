@@ -18,7 +18,7 @@ public class JEIPluginInfection implements IModPlugin {
 	public static IJeiHelpers jeiHelpers;
 	public static IIngredientRegistry ingredientRegistry = null;
 	private static InfectionCureCategory infectionCategory;
-	private static List<InfectionCureWrapper> recipes = new ArrayList<>();
+	private static List<InfectionCureWrapper> recipes = Lists.newArrayList();
 	private static RecipeRegistry recipeRegistry = null;
 
 	@Override

@@ -35,7 +35,7 @@ public class ClientConfigHandler {
             hordeSpawnSound = config.get("Horde Event", "hordeSpawnSound", true, "Play a sound when a horde wave spawns?").getBoolean();
             hordeEventTintsSky = config.get("Horde Event", "hordeEventTintsSky", true, "Whether the sky and moon should be tinted on a horde night").getBoolean();
             hordeEventSkyColour = config.get("Horde Event", "hordeEventSkyColour", new int[]{102, 0, 0}, "Colour of the sky during horde events", 0, 255).getIntList();
-            hordeEventMoonColour = config.get("Horde Event", "hordeEventMoonColour", new int[]{121, 156, 101}, "Colour of the moon during horde events", 0, 255).getIntList();
+            hordeEventMoonColour = config.get("Horde Event", "hordeEventMoonColour", new int[]{193, 57, 15}, "Colour of the moon during horde events", 0, 255).getIntList();
             //infection
             playerInfectionVisuals = config.get("Infection", "playerInfectionVisuals", true, "Tint the player's screen and display other visual effects if they are infected.").getBoolean();
             playerInfectSound = config.get("Infection", "playerInfectSound", true, "Play a sound when the player becomes infected.").getBoolean();
@@ -56,7 +56,7 @@ public class ClientConfigHandler {
     
     
     public static int[] getHordeMoonColour() {
-        if (hordeEventMoonColour.length < 3) hordeEventMoonColour = new int[]{121, 156, 101};
+        if (hordeEventMoonColour.length < 3) hordeEventMoonColour = new int[]{193, 57, 15};
         return hordeEventMoonColour;
     }
     

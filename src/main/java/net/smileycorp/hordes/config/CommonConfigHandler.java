@@ -22,12 +22,12 @@ public class CommonConfigHandler {
 			HordeEventConfig.syncConfig(config);
 			InfectionConfig.syncConfig(config);
 			ZombiePlayersConfig.syncConfig(config);
-			zombiesBurn = config.get("Misc", "zombiesBurn", true, "Whether zombies burn in sunlight.").getBoolean();
-			skeletonsBurn = config.get("Misc", "skeletonsBurn", true, "Whether skeletons burn in sunlight.").getBoolean();
+			zombiesBurn = config.get("Misc", "zombiesBurn", false, "Whether zombies burn in sunlight.").getBoolean();
+			skeletonsBurn = config.get("Misc", "skeletonsBurn", false, "Whether skeletons burn in sunlight.").getBoolean();
 			zombieVillagersCanBeCured = config.get("Misc", "zombieVillagersCanBeCured", false, "Whether zombie villagers have vanilla curing mechanics or not").getBoolean();
 			aggressiveZombieHorses = config.get("Misc", "aggressiveZombieHorses", true, "Whether zombie horses are aggressive or not.").getBoolean();
-			zombieHorsesBurn = config.get("Misc", "zombieHorsesBurn", true, "Whether zombie horses burn in sunlight").getBoolean();
-			skeletonHorsesBurn = config.get("Misc", "skeletonHorsesBurn", true, "Whether skeleton horses burn in sunlight").getBoolean();
+			zombieHorsesBurn = config.get("Misc", "zombieHorsesBurn", false, "Whether zombie horses burn in sunlight").getBoolean();
+			skeletonHorsesBurn = config.get("Misc", "skeletonHorsesBurn", false, "Whether skeleton horses burn in sunlight").getBoolean();
 			zombiesScareHorses = config.get("Misc", "zombiesScareHorses", true, "Whether zombies scare horses").getBoolean();
 		} catch(Exception e) {
 		} finally {
