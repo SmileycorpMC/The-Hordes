@@ -16,7 +16,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.PotionUtils;
-import net.minecraftforge.client.event.CustomizeGuiOverlayEvent;
+import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -35,7 +35,7 @@ public class ClientInfectionEventHandler {
 	private static Map<Item, Integer> wearableProtection = Maps.newHashMap();
 	
 	@SubscribeEvent
-	public void renderOverlay(CustomizeGuiOverlayEvent event){
+	public void renderOverlay(RenderGuiOverlayEvent.Pre event) {
 		if (!ClientConfigHandler.playerInfectionVisuals.get()) return;
 		Minecraft mc = Minecraft.getInstance();
 		LocalPlayer player = mc.player;
@@ -43,7 +43,7 @@ public class ClientInfectionEventHandler {
 		if (!player.hasEffect(HordesInfection.INFECTED.get())) return;
 		int a = player.getEffect(HordesInfection.INFECTED.get()).getAmplifier();
 		if (a == 0) return;
-		Color colour = new Color(0.4745f, 0.6117f, 0.3961f, 0.01f * a);
+		Color colour = new Color(0.4745f, 0.6117f, 0.3961f, 0.005f * a);
 		Window window = mc.getWindow();
 		event.getGuiGraphics().fill(0, 0, window.getWidth(), window.getHeight(), colour.getRGB());
 	}
