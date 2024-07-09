@@ -11,6 +11,7 @@ public class ZombiePlayersConfig {
     public static ForgeConfigSpec.ConfigValue<Boolean> zombiePlayersBurn;
     public static ForgeConfigSpec.ConfigValue<Boolean> zombiePlayersOnlyHurtByPlayers;
     public static ForgeConfigSpec.ConfigValue<Boolean> zombiePlayersStoreItems;
+    public static ForgeConfigSpec.ConfigValue<Boolean> zombiePlayersDespawnPeaceful;
     
     static void build(ForgeConfigSpec.Builder builder) {
         builder.push("Zombie Players");
@@ -21,6 +22,7 @@ public class ZombiePlayersConfig {
         zombiePlayersBurn = builder.comment("Whether zombie players and drowned players burn in sunlight.").define("zombiePlayersBurn", false);
         zombiePlayersOnlyHurtByPlayers = builder.comment("Whether zombie players, drowned players and husk players are immune to all damage from non player sources.").define("zombiePlayersOnlyHurtByPlayers", false);
         zombiePlayersStoreItems = builder.comment("Whether zombie players, drowned players and husk players store items dropped by the player that spawned them.").define("zombiePlayersStoreItems", true);
+        zombiePlayersDespawnPeaceful = builder.comment("Do zombie players despawn in peaceful mode?").define("zombiePlayersDespawnPeaceful", false);
     }
     
 }

@@ -67,9 +67,7 @@ public class ClientHandler {
 	
 	@SubscribeEvent
 	public void renderNameplate(RenderNameplateEvent event) {
-		if (event.getEntity() instanceof PlayerZombie) {
-			event.setContent(event.getEntity().getCustomName());
-		}
+		if (event.getEntity() instanceof PlayerZombie) event.setContent(event.getEntity().getCustomName());
 	}
 	
 	@SubscribeEvent
@@ -81,7 +79,7 @@ public class ClientHandler {
 		if (optional.isPresent() && optional.orElseGet(null).isHordeNight(level)) {
 			float d = level.getSkyDarken((float)event.getPartialTicks()) * 1.4f;
 			Color rgb = ClientConfigHandler.getHordeSkyColour();
-			event.setRed((1f - d) * (float)rgb.getRed()/255f + (d * event.getRed()));
+			event.setRed((1f - d) * (float)rgb.getRed()/255f + d * event.getRed());
 			event.setGreen((1f - d) * (float)rgb.getGreen()/255f + d * event.getGreen());
 			event.setBlue((1f - d) * (float)rgb.getBlue()/255f + d * event.getBlue());
 		}
@@ -98,10 +96,10 @@ public class ClientHandler {
 		}
 	}
 	
-	public static void setHordeDay(boolean hordeDay, int dayLength) {
+	public static void setHordeDay(boolean hordeDay, int day_length) {
 		LocalPlayer player = Minecraft.getInstance().player;
 		LazyOptional<HordeEventClient> optional = player.getCapability(HordesCapabilities.HORDE_EVENT_CLIENT);
-		if (optional.isPresent()) optional.orElseGet(null).setHordeDay(hordeDay, dayLength);
+		if (optional.isPresent()) optional.orElseGet(null).setHordeDay(hordeDay, day_length);
 	}
 	
 	public static void displayMessage(String text) {

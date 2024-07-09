@@ -15,10 +15,11 @@
 	"1.2.1a": "fixed errors in default table, zombie horse speed and config crashes",
 	"1.2.2": "backport 1.20 pathfinding optimisations",
 	"1.2.3": "backport 1.20 checks to prevent horde spawning in water",
-	"1.5.0": "backport all 1.20 features"
+	"1.5.0": "backport all 1.20 features",
+	"1.5.4": "a lot of bug fixes, new translations"
   },
   "promos": {
-    "1.18.2-latest": "1.5.0",
-    "1.18.2-recommended": "1.5.0"
+    "1.18.2-latest": "1.5.4",
+    "1.18.2-recommended": "1.5.4"
   }
 }

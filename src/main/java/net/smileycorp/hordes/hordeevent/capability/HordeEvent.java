@@ -56,7 +56,7 @@ public class HordeEvent {
 	private String username;
 	
 	HordeEvent(HordeSavedData data){
-		nextDay = HordeEventConfig.hordeEventByPlayerTime.get() ? HordeEventConfig.spawnFirstDay.get() ? 0 :HordeEventConfig.hordeSpawnDays.get()
+		nextDay = HordeEventConfig.hordeEventByPlayerTime.get() ? HordeEventConfig.spawnFirstDay.get() ? 0 : HordeEventConfig.hordeSpawnDays.get()
 				: data.getNextDay();
 		rand = data.getRandom();
 	}
@@ -71,7 +71,6 @@ public class HordeEvent {
 			spawnData = new HordeSpawnData(this);
 			spawnData.setTable(HordeTableLoader.INSTANCE.getTable(new ResourceLocation(nbt.getString("loadedTable"))));
 		}
-		if (nbt.contains("username")) username = nbt.getString("username");
 	}
 	
 	public CompoundTag writeToNBT(CompoundTag nbt, UUID uuid) {
@@ -153,7 +152,7 @@ public class HordeEvent {
 				logInfo("Can't spawn wave because max cap has been reached");
 				return;
 			}
-			Vec3 pos = getSpawnPos(level, Vec3.atCenterOf(basepos));
+			Vec3 pos = getSpawnPos(level, new Vec3(basepos.getX() + 0.5, 0, basepos.getZ() + 0.5));
 			EntityType<?> type = entry.getEntity();
 			try {
 				AtomicBoolean cancelled = new AtomicBoolean(false);
@@ -231,10 +230,7 @@ public class HordeEvent {
 	public boolean isHordeDay(ServerPlayer player) {
 		ServerLevel level = player.getLevel();
 		if (level.dimension() != Level.OVERWORLD) return false;
-		int day = (int) Math.floor((HordeEventConfig.hordeEventByPlayerTime.get() ? player.getStats().getValue(Stats.CUSTOM.get(Stats.PLAY_TIME))
-				+ HordeEventConfig.hordeStartTime.get() + HordeEventConfig.hordeStartBuffer.get()
-				: player.level.getDayTime()) / HordeEventConfig.dayLength.get());
-		return isActive(player) || day >= nextDay;
+		return isActive(player) || getCurrentDay(player) >= nextDay;
 	}
 	
 	public boolean isActive(ServerPlayer player) {
@@ -242,6 +238,7 @@ public class HordeEvent {
 	}
 	
 	public void setPlayer(ServerPlayer player) {
+		setNextDay(player);
 		cleanSpawns();
 		entitiesSpawned.forEach(entity -> fixGoals(player, entity));
 	}
