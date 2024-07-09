@@ -5,10 +5,11 @@
 		"for modpack authors: setting the value to -1 will prevent the config folder regenerating when updating the mod",
 		"(keep an eye on base changes, in case they are needed for your pack when updating)"
 	],
-	"minecraft_version": "1.18.2",
-	"mod_version": "1.5.1",
-	"data_version": 5,
+	"minecraft_version": "1.19.4",
+	"mod_version": "1.5.4",
+	"data_version": 7,
 	"changes": [
-		"add russian translations for tooltips"
+		"husk players to infection entities tag",
+		"zn_ch translation"
 	]
 }
