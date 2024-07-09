@@ -7,6 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.smileycorp.atlas.api.util.TextUtils;
@@ -37,7 +38,7 @@ public class CommandResetHordeEvent {
 			HordeEvent horde = HordeSavedData.getData(source.getLevel()).getEvent(player);
 			if (horde != null) {
 				horde.reset(player);
-				source.getEntity().sendSystemMessage(TextUtils.translatableComponent("commands.hordes.HordeReset.success", null, player.getName()));
+				source.getEntity().sendSystemMessage(Component.translatable("commands.hordes.HordeReset.success", player.getName()));
 				return 1;
 			}
 		}

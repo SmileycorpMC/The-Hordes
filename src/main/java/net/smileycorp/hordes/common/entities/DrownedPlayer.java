@@ -3,6 +3,7 @@ package net.smileycorp.hordes.common.entities;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.LiteralContents;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -161,7 +162,7 @@ public class DrownedPlayer extends Drowned implements PlayerZombie<DrownedPlayer
 	@Override
 	public MutableComponent getDisplayName() {
 		MutableComponent textcomponentstring = PlayerTeam.formatNameForTeam(getTeam(),
-				TextUtils.translatableComponent("entity.hordes.DrownedPlayer.chat", "Drowned Player", getCustomName()));
+				Component.translatable("entity.hordes.DrownedPlayer.chat", getCustomName()));
 		textcomponentstring.getStyle().withHoverEvent(this.createHoverEvent());
 		textcomponentstring.getStyle().withInsertion(this.getEncodeId());
 		return textcomponentstring;

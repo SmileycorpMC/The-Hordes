@@ -1,5 +1,6 @@
 package net.smileycorp.hordes.hordeevent;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -141,7 +142,7 @@ public class HordeEventHandler {
 		if (horde == null) return;
 		if (level.isDay() |! (level.dimensionType().bedWorks() && (horde.isHordeDay(player) || horde.isActive(player)))) return;
 		event.setResult(BedSleepingProblem.OTHER_PROBLEM);
-		player.displayClientMessage(TextUtils.translatableComponent(Constants.hordeTrySleep, "Can't sleep now, a horde is approaching"), true);
+		player.displayClientMessage(Component.translatable(Constants.hordeTrySleep), true);
 	}
 
 }

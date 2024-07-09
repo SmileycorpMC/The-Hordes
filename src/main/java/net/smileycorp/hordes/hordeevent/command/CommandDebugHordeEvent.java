@@ -5,6 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
 import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.hordeevent.capability.HordeSavedData;
@@ -21,7 +22,7 @@ public class CommandDebugHordeEvent {
 		CommandSourceStack source = ctx.getSource();
 		HordeSavedData data = HordeSavedData.getData(source.getServer().overworld());
 		if (!HordesLogger.logSaveData(data)) return 0;
-		source.getEntity().sendSystemMessage(TextUtils.translatableComponent("commands.hordes.HordeDebug.success", null, HordesLogger.getFiletext()));
+		source.getEntity().sendSystemMessage(Component.translatable("commands.hordes.HordeDebug.success", HordesLogger.getFiletext()));
 		return 1;
 	}
 

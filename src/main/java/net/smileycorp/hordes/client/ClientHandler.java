@@ -6,6 +6,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
@@ -67,9 +68,7 @@ public class ClientHandler {
 	
 	@SubscribeEvent
 	public void renderNameplate(RenderNameTagEvent event) {
-		if (event.getEntity() instanceof PlayerZombie) {
-			event.setContent(event.getEntity().getCustomName());
-		}
+		if (event.getEntity() instanceof PlayerZombie) event.setContent(event.getEntity().getCustomName());
 	}
 
 	@SubscribeEvent
@@ -107,7 +106,7 @@ public class ClientHandler {
 	public static void displayMessage(String text) {
 		Minecraft mc = Minecraft.getInstance();
 		Gui gui = mc.gui;
-		MutableComponent message = TextUtils.translatableComponent(text, null);
+		MutableComponent message = Component.translatable(text);
 		message.setStyle(Style.EMPTY.withColor(ClientConfigHandler.getHordeMessageColour()));
 		if (ClientConfigHandler.eventNotifyMode.get() == 1) {
 			gui.getChat().addMessage(message);

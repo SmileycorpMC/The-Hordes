@@ -3,6 +3,7 @@ package net.smileycorp.hordes.common.entities;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.LiteralContents;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -170,7 +171,7 @@ public class HuskPlayer extends Husk implements PlayerZombie<HuskPlayer> {
 	@Override
 	public MutableComponent getDisplayName() {
 		MutableComponent textcomponentstring = PlayerTeam.formatNameForTeam(getTeam(),
-				TextUtils.translatableComponent("entity.hordes.HuskPlayer.chat", "Husk Player", getCustomName()));
+				Component.translatable("entity.hordes.HuskPlayer.chat", getCustomName()));
 		textcomponentstring.getStyle().withHoverEvent(createHoverEvent());
 		textcomponentstring.getStyle().withInsertion(getEncodeId());
 		return textcomponentstring;
