@@ -11,7 +11,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.common.Constants;
 
 import java.util.List;

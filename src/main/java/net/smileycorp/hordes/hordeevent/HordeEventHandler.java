@@ -27,7 +27,6 @@ import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.server.ServerLifecycleHooks;
-import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.config.CommonConfigHandler;

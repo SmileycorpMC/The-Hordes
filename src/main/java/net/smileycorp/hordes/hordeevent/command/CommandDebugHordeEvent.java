@@ -6,7 +6,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
-import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.hordeevent.capability.HordeSavedData;
 

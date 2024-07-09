@@ -24,7 +24,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.server.ServerLifecycleHooks;
-import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.config.ZombiePlayersConfig;
 
 import java.util.Collection;

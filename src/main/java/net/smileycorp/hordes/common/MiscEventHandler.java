@@ -23,7 +23,6 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.common.capability.ZombifyPlayer;
 import net.smileycorp.hordes.common.entities.HordesEntities;

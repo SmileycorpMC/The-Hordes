@@ -10,7 +10,6 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 import net.smileycorp.hordes.hordeevent.capability.HordeSavedData;
 
