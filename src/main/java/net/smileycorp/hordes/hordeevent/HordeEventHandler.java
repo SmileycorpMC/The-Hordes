@@ -10,6 +10,7 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.monster.ZombifiedPiglin;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Player.BedSleepingProblem;
 import net.minecraftforge.common.util.FakePlayer;
@@ -20,6 +21,7 @@ import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -27,6 +29,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
+import net.smileycorp.hordes.config.CommonConfigHandler;
 import net.smileycorp.hordes.config.HordeEventConfig;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 import net.smileycorp.hordes.hordeevent.capability.HordeEventClient;
@@ -79,19 +82,29 @@ public class HordeEventHandler {
 		if (HordeEventConfig.pauseEventServer.get() && level.players().isEmpty()) return;
 		HordeEvent horde = HordeSavedData.getData(level).getEvent(player);
 		if (horde == null) return;
-		if (!horde.hasSynced()) horde.sync(player);
+		int time = Math.round(level.getDayTime() % HordeEventConfig.dayLength.get());
+		int day = horde.getCurrentDay(player);
+		if (!horde.hasSynced(day)) horde.sync(player, day);
 		if (horde.isActive(player)) {
 			horde.update(player);
 			return;
 		}
-		int day = horde.getCurrentDay(player);
-		int time = Math.round(level.getDayTime() % HordeEventConfig.dayLength.get());
 		if (time >= HordeEventConfig.hordeStartTime.get() && time <= HordeEventConfig.hordeStartTime.get() + HordeEventConfig.hordeStartBuffer.get()
 				&& day >= horde.getNextDay() && (day > 0 || HordeEventConfig.spawnFirstDay.get())) {
 			horde.tryStartEvent(player, -1, false);
 		}
-		
 	}
+	
+	@SubscribeEvent
+	public void logIn(PlayerEvent.PlayerLoggedInEvent event) {
+		if (event.getEntity() instanceof ServerPlayer) {
+			ServerPlayer player = (ServerPlayer) event.getEntity();
+			HordeEvent horde = HordeSavedData.getData(player.getLevel()).getEvent(player);
+			if (horde != null) horde.setPlayer(player);
+		}
+	}
+	
+	
 	
 	//prevent despawning of entities in an active horde
 	@SubscribeEvent
@@ -112,7 +125,7 @@ public class HordeEventHandler {
 		Mob entity = (Mob) event.getEntity();
 		entity.targetSelector.getRunningGoals().forEach(WrappedGoal::stop);
 		if (entity instanceof PathfinderMob) entity.targetSelector.addGoal(1, new HurtByTargetGoal((PathfinderMob) entity));
-		entity.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(entity, Player.class, true));
+		if (!(entity instanceof ZombifiedPiglin && CommonConfigHandler.aggressiveZombiePiglins.get())) entity.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(entity, Player.class, true));
 		HordeEvent horde = HordeSavedData.getData((ServerLevel) player.level).getEvent(player);
 		if (horde != null) if (horde.isActive(player)) horde.registerEntity(entity, player);
 		cap.setSynced();
@@ -128,7 +141,7 @@ public class HordeEventHandler {
 		if (horde == null) return;
 		if (level.isDay() |! (level.dimensionType().bedWorks() && (horde.isHordeDay(player) || horde.isActive(player)))) return;
 		event.setResult(BedSleepingProblem.OTHER_PROBLEM);
-		player.displayClientMessage(Component.translatable(Constants.hordeTrySleep), true);
+		player.displayClientMessage(Component.translatable(Constants.hordeTrySleep, "Can't sleep now, a horde is approaching"), true);
 	}
 	
 }

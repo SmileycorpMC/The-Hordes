@@ -42,8 +42,9 @@ public class ClientInfectionEventHandler {
 		LocalPlayer player = mc.player;
 		if (player == null) return;
 		if (!player.hasEffect(HordesInfection.INFECTED.get())) return;
-		int level = player.getEffect(HordesInfection.INFECTED.get()).getAmplifier();
-		Color colour = new Color(0.4745f, 0.6117f, 0.3961f, 0.01f*level);
+		int a = player.getEffect(HordesInfection.INFECTED.get()).getAmplifier();
+		if (a == 0) return;
+		Color colour = new Color(0.4745f, 0.6117f, 0.3961f, 0.005f * a);
 		Window window = mc.getWindow();
 		Gui.fill(event.getPoseStack(), 0, 0, window.getWidth(), window.getHeight(), colour.getRGB());
 	}
