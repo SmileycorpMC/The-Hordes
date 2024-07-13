@@ -95,11 +95,14 @@ public class EntityZombiePlayer extends EntityZombie {
 
 	@Override
 	protected void dropEquipment(boolean recentlyHit, int looting) {
-		for (ItemStack stack : playerItems) {
-			if (!stack.isEmpty() && ! EnchantmentHelper.hasVanishingCurse(stack)) {
+		for (ItemStack stack : playerItems) if (!stack.isEmpty() && ! EnchantmentHelper.hasVanishingCurse(stack))
 				entityDropItem(stack, 0f);
-			}
-		}
+	}
+	
+	@Override
+	public void onRemovedFromWorld() {
+		dropEquipment(false, 0);
+		super.onRemovedFromWorld();
 	}
 
 	@Override
@@ -122,9 +125,7 @@ public class EntityZombiePlayer extends EntityZombie {
 	public void writeEntityToNBT(NBTTagCompound compound) {
 		super.writeEntityToNBT(compound);
 		UUID uuid = getPlayerUUID();
-		if (uuid != null) {
-			compound.setString("player", uuid.toString());
-		}
+		if (uuid != null) compound.setString("player", uuid.toString());
 		ItemStackHelper.saveAllItems(compound, playerItems);
 	}
 
@@ -139,6 +140,7 @@ public class EntityZombiePlayer extends EntityZombie {
 
 	@Override
 	public ITextComponent getDisplayName() {
+		despawnEntity();
 		TextComponentTranslation textcomponentstring = new TextComponentTranslation(ScorePlayerTeam.formatPlayerName(getTeam(), "entity.hordes.ZombiePlayer.chat"), ScorePlayerTeam.formatPlayerName(getTeam(), getName()));
 		textcomponentstring.getStyle().setHoverEvent(getHoverEvent());
 		textcomponentstring.getStyle().setInsertion(getCachedUniqueIdString());
@@ -181,6 +183,11 @@ public class EntityZombiePlayer extends EntityZombie {
 		xCloak += (d0 * 0.25D);
 		yCloak += (d1 * 0.25D);
 		zCloak += (d2 * 0.25D);
+	}
+	
+	@Override
+	protected boolean canDespawn() {
+		return playerItems.isEmpty() |! ZombiePlayersConfig.zombiePlayersDespawnPeaceful ? super.canDespawn() : false;
 	}
 	
 	public void setDisplayCape(boolean display) {

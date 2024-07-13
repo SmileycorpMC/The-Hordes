@@ -49,7 +49,7 @@ public class HordeEvent {
 	private int day = 0;
 	private int nextDay = -1;
 	private HordeSpawnData spawnData = null;
-	boolean sentDay;
+	int sentDay = 0;
 	
 	HordeEvent(WorldDataHordes data){
 		nextDay = HordeEventConfig.hordeEventByPlayerTime ? HordeEventConfig.spawnFirstDay ? 0 : HordeEventConfig.hordeSpawnDays
@@ -228,6 +228,7 @@ public class HordeEvent {
 	}
 	
 	public void setPlayer(EntityPlayerMP player) {
+		setNextDay(player);
 		cleanSpawns();
 		entitiesSpawned.forEach(entity -> fixGoals(player, entity));
 	}
@@ -270,8 +271,7 @@ public class HordeEvent {
 			if (isCommand) day = getCurrentDay(player);
 			else day = nextDay;
 		}
-		if (!isCommand) nextDay = HordeEventConfig.hordeEventByPlayerTime ? nextDay + HordeEventConfig.hordeSpawnDays
-				: WorldDataHordes.getData(world).getNextDay();
+		if (!isCommand) setNextDay(player);
 	}
 	
 	public void setSpawntable(HordeSpawnTable table) {
@@ -303,7 +303,8 @@ public class HordeEvent {
 		entitiesSpawned.clear();
 		HordeEndEvent endEvent = new HordeEndEvent(player, this, isCommand, spawnData.getEndMessage());
 		postEvent(endEvent);
-		HordeEventPacketHandler.sendTo(new UpdateClientHordeMessage(nextDay, 0), player);
+		HordeEventPacketHandler.sendTo(new UpdateClientHordeMessage(false), player);
+		sentDay = getCurrentDay(player);
 		timer = 0;
 		spawnData = null;
 		sendMessage(player, endEvent.getMessage());
@@ -338,21 +339,32 @@ public class HordeEvent {
 		MinecraftForge.EVENT_BUS.post(event);
 	}
 	
-	public void reset(WorldServer level) {
+	public void reset(EntityPlayerMP player) {
 		entitiesSpawned.clear();
-		WorldDataHordes data = WorldDataHordes.getData(level);
-		nextDay = data.getNextDay();
+		setNextDay(player);
 		spawnData = null;
 		timer = 0;
 	}
 	
-	public boolean hasSynced() {
-		return sentDay;
+	private void setNextDay(EntityPlayerMP player) {
+		if (!HordeEventConfig.hordeEventByPlayerTime) {
+			nextDay = WorldDataHordes.getData(player.getServerWorld()).getNextDay();
+			return;
+		}
+		int expectedDay = HordeEventConfig.hordeSpawnDays * ((getCurrentDay(player) / HordeEventConfig.hordeSpawnDays) + 1);
+		if (nextDay <= getCurrentDay(player) || Math.abs(nextDay - expectedDay) > HordeEventConfig.hordeSpawnDays + HordeEventConfig.hordeSpawnVariation) {
+			if (HordeEventConfig.hordeSpawnVariation > 0) expectedDay += rand.nextInt(HordeEventConfig.hordeSpawnVariation);
+			nextDay = expectedDay;
+		}
 	}
 	
-	public void sync(EntityPlayerMP player) {
-		HordeEventPacketHandler.sendTo(new UpdateClientHordeMessage(isActive(player) ? day : nextDay, HordeEventConfig.dayLength), player);
-		sentDay = true;
+	public boolean hasSynced(int day) {
+		return sentDay >= day;
+	}
+	
+	public void sync(EntityPlayerMP player, int day) {
+		HordeEventPacketHandler.sendTo(new UpdateClientHordeMessage(isHordeDay(player)), player);
+		sentDay = day;
 	}
 	
 	public int getDay() {

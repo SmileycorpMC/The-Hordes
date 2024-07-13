@@ -20,6 +20,7 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
@@ -64,20 +65,28 @@ public class HordeEventHandler {
 		if (HordeEventConfig.pauseEventServer && world.playerEntities.isEmpty()) return;
 		HordeEvent horde = WorldDataHordes.getData(world).getEvent(player);
 		if (horde == null) return;
-		if (!horde.hasSynced()) horde.sync(player);
+		int time = Math.round(world.getWorldTime() % HordeEventConfig.dayLength);
+		int day = horde.getCurrentDay(player);
+		if (!horde.hasSynced(day)) horde.sync(player, day);
 		if (horde.isActive(player)) {
 			horde.update(player);
 			return;
 		}
-		int day = horde.getCurrentDay(player);
-		int time = Math.round(world.getWorldTime() % HordeEventConfig.dayLength);
 		if (time >= HordeEventConfig.hordeStartTime && time <= HordeEventConfig.hordeStartTime + HordeEventConfig.hordeStartBuffer
 				&& day >= horde.getNextDay() && (day > 0 || HordeEventConfig.spawnFirstDay)) {
 			horde.tryStartEvent(player, -1, false);
 		}
-		
 	}
 	
+	@SubscribeEvent
+	public void logIn(PlayerEvent.PlayerLoggedInEvent event) {
+		if (event.player instanceof EntityPlayerMP) {
+			EntityPlayerMP player = (EntityPlayerMP) event.player;
+			HordeEvent horde = WorldDataHordes.getData(player.getServerWorld()).getEvent(player);
+			if (horde != null) horde.setPlayer(player);
+		}
+	}
+			
 	//prevent despawning of entities in an active horde
 	@SubscribeEvent
 	public void tryDespawn(LivingSpawnEvent.AllowDespawn event) {

@@ -53,10 +53,10 @@ public class ClientHandler {
 		}
 	}
 	
-	public static void setHordeDay(int day, int day_length) {
+	public static void setHordeDay(boolean horde_day, int day_length) {
 		EntityPlayerSP player = Minecraft.getMinecraft().player;
 		if (player.hasCapability(HordesCapabilities.HORDE_EVENT_CLIENT, null))
-			player.getCapability(HordesCapabilities.HORDE_EVENT_CLIENT, null).setNextDay(day, day_length);
+			player.getCapability(HordesCapabilities.HORDE_EVENT_CLIENT, null).setHordeDay(horde_day, day_length);
 	}
 
 	public static void displayMessage(String text) {
