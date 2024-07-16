@@ -117,16 +117,16 @@ public class HordeEvent {
 		if (startEvent.isCanceled()) return;
 		count = startEvent.getCount();
 		Vec3d basedir = DirectionUtils.getRandomDirectionVecXZ(rand);
-		BlockPos basepos = DirectionUtils.getClosestLoadedPos(world, player.getPosition(), basedir, 75, 7, 0);
+		BlockPos basepos = DirectionUtils.getClosestLoadedPos(world, player.getPosition(), basedir, 50, 7, 0);
 		int i = 0;
 		while (basepos.equals(player.getPosition())) {
 			basedir = DirectionUtils.getRandomDirectionVecXZ(rand);
-			basepos = DirectionUtils.getClosestLoadedPos(world, player.getPosition(), basedir, 75, 7, 0);
+			basepos = DirectionUtils.getClosestLoadedPos(world, player.getPosition(), basedir, 50, 7, 0);
 			if (!spawnData.getSpawnType().canSpawn(world, basepos)) basepos = player.getPosition();
 			if (i++ >= HordeEventConfig.hordeSpawnChecks) {
 				logInfo("Unable to find unlit pos for horde " + this + " ignoring light level");
 				basedir = DirectionUtils.getRandomDirectionVecXZ(rand);
-				basepos = DirectionUtils.getClosestLoadedPos(world, player.getPosition(), basedir, 75);
+				basepos = DirectionUtils.getClosestLoadedPos(world, player.getPosition(), basedir, 50);
 				break;
 			}
 		}
@@ -193,6 +193,7 @@ public class HordeEvent {
 	}
 	
 	private void finalizeEntity(EntityLiving entity, EntityPlayerMP player) {
+		entity.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(100.0D);
 		if (entity.hasCapability(HordesCapabilities.HORDESPAWN, null)) {
 			entity.getCapability(HordesCapabilities.HORDESPAWN, null).setPlayerUUID(player.getUniqueID().toString());
 			registerEntity(entity, player);
