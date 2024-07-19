@@ -124,16 +124,16 @@ public class HordeEvent {
 		if (startEvent.isCanceled()) return;
 		count = startEvent.getCount();
 		Vec3 basedir = DirectionUtils.getRandomDirectionVecXZ(rand);
-		BlockPos basepos = DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, 75, 7, 0);
+		BlockPos basepos = getBasePos(level, basedir, player, true);
 		int i = 0;
 		while (basepos.equals(player.blockPosition())) {
 			basedir = DirectionUtils.getRandomDirectionVecXZ(rand);
-			basepos = DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, 75, 7, 0);
+			basepos = getBasePos(level, basedir, player, true);
 			if (!spawnData.getSpawnType().canSpawn(level, basepos)) basepos = player.blockPosition();
 			if (i++ >= HordeEventConfig.hordeSpawnChecks.get()) {
 				logInfo("Unable to find unlit pos for horde " + this + " ignoring light level");
 				basedir = DirectionUtils.getRandomDirectionVecXZ(rand);
-				basepos = DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, 75);
+				basepos = getBasePos(level, basedir, player, false);
 				break;
 			}
 		}
@@ -173,7 +173,20 @@ public class HordeEvent {
 			}
 		}
 	}
-	
+
+	private BlockPos getBasePos(ServerLevel level, Vec3 basedir, ServerPlayer player, boolean checkminlight) {
+		double radius = 75.0D;
+		BlockPos basepos = null;
+		if (checkminlight) {
+			basepos = DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, radius, 7, 0);
+		} else {
+			basepos = DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, radius);
+		}
+		HordeComputeSpawnBasePosEvent event = new HordeComputeSpawnBasePosEvent(player, this, basedir, basepos);
+		MinecraftForge.EVENT_BUS.post(event);
+		return event.getBasePos();
+	}
+
 	private Vec3 getSpawnPos(ServerLevel level, Vec3 basepos) {
 		for (int j = 0; j < 5; j++) {
 			double x = basepos.x() + rand.nextInt(10);
