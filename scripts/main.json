@@ -1,0 +1,109 @@
+[
+    {
+        "function": "hordes:set_spawntable",
+        "value": "hordes:zombies",
+        "conditions": []
+    },
+    {
+        "function": "hordes:set_spawntable",
+        "value": "hordes:parasites",
+        "conditions": [
+            {
+                "name": "hordes:day",
+                "value": 49
+            }
+        ]
+    },
+    {
+        "function": "hordes:set_spawntable",
+        "value": [
+            "hordes:zombies",
+            "hordes:parasites",
+            "hordes:mutants"
+        ],
+        "conditions": [
+            {
+                "name": "hordes:day",
+                "value": 109
+            }
+        ]
+    },
+    {
+        "function": "hordes:set_spawn_duration",
+        "value": 0,
+        "conditions": [
+            {
+                "name": "hordes:and",
+                "value": [
+                    {
+                        "name": "hordes:comparison",
+                        "value": {
+                            "type": "int",
+                            "operation": ">",
+                            "value1": {
+                                "name": "hordes:level_nbt",
+                                "value": "Data.DayTime"
+                            },
+                            "value2": 2400000
+                        }
+                    },
+                    {
+                        "name": "hordes:comparison",
+                        "value": {
+                            "type": "int",
+                            "operation": "<",
+                            "value1": {
+                                "name": "hordes:level_nbt",
+                                "value": "Data.DayTime"
+                            },
+                            "value2": 24240000
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "function": "hordes:multiple",
+        "value": [
+					{
+				"function": "hordes:set_spawntable",
+				"value": "hordes:mercenaries",
+				"conditions": []
+			},
+			{
+				"function": "hordes:set_spawn_sound",
+				"value": "ldoh:tf_enemy",
+				"conditions": []
+			},
+			{
+				"function": "hordes:set_start_message",
+				"value": "message.ldoh.TFHordeStart",
+				"conditions": []
+			},
+			{
+				"function": "hordes:set_end_message",
+				"value": "message.ldoh.TFHordeEnd"",
+				"conditions": []
+			}
+		],
+        "conditions": [
+            {
+                "name": "hordes:comparison",
+                "value": {
+                    "type": "int",
+                    "operation": "==",
+                    "value1": {
+                        "name": "hordes:mod",
+                        "value1": {
+                            "name": "hordes:level_nbt",
+                            "value": "Data.DayTime"
+                        },
+                        "value2": "2400000"
+                    },
+                    "value2": 0
+                }
+            }
+        ]
+    }
+]
