@@ -83,7 +83,7 @@
 			},
 			{
 				"function": "hordes:set_end_message",
-				"value": "message.ldoh.TFHordeEnd"",
+				"value": "message.ldoh.TFHordeEnd",
 				"conditions": []
 			}
 		],
