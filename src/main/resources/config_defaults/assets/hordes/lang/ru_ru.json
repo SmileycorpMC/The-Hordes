@@ -31,7 +31,9 @@
 	"death.attack.infection.zombified": "%1$s был зомбифицирован.",
 
 	"tooltip.hordes.cure": "Лечит инфекцию",
-	"tooltip.hordes.wearableProtection": "Защита %1$s от инфекции",
+	"tooltip.hordes.wearableProtection": "%1$s устойчивость к инфекции",
+
+	"attribute.name.hordes.infection_resistance": "Устойчивость к инфекции",
 
 	"jei.category.hordes.InfectionCures": "Лечение инфекции"
 }
