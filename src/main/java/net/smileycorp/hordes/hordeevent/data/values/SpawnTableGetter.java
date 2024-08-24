@@ -2,7 +2,6 @@ package net.smileycorp.hordes.hordeevent.data.values;
 
 
 import com.google.gson.JsonObject;
-import net.minecraft.world.level.SpawnData;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
 import net.smileycorp.hordes.hordeevent.HordeSpawnData;
