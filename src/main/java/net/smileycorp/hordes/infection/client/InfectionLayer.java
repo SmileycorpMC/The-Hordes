@@ -20,7 +20,7 @@ public class InfectionLayer implements LayeredDraw.Layer {
         if (!player.hasEffect(HordesInfection.INFECTED)) return;
         int a = player.getEffect(HordesInfection.INFECTED).getAmplifier();
         if (a == 0) return;
-        Color colour = new Color(0.4745f, 0.6117f, 0.3961f, 0.01f * a);
+        Color colour = new Color(0.4745f, 0.6117f, 0.3961f, Math.min(0.01f * a, 0.5f));
         Window window = mc.getWindow();
         gui.fill(0, 0, window.getWidth(), window.getHeight(), colour.getRGB());
     }
