@@ -4,6 +4,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
@@ -132,10 +133,14 @@ public class InfectionEventHandler {
 	public void canApplyEffect(MobEffectEvent.Applicable event) {
 		LivingEntity entity = event.getEntity();
 		if (entity.level().isClientSide()) return;
-		if (event.getEffectInstance().getEffect() == HordesInfection.INFECTED
-				&& InfectedEffect.preventInfection(entity)) {
-			event.setResult(MobEffectEvent.Applicable.Result.DO_NOT_APPLY);
-			if (entity instanceof ServerPlayer) InfectionPacketHandler.sendTo(new InfectMessage(true), (ServerPlayer) entity);
+		if (event.getEffectInstance().is(HordesInfection.INFECTED)) {
+			if (InfectedEffect.preventInfection(entity)) {
+				event.setResult(MobEffectEvent.Applicable.Result.DO_NOT_APPLY);
+				if (entity instanceof ServerPlayer)
+					InfectionPacketHandler.sendTo(new InfectMessage(true), (ServerPlayer) entity);
+			} else if (entity.hasEffect(HordesInfection.INFECTED) && entity.getEffect(HordesInfection.INFECTED).getAmplifier()
+					< event.getEffectInstance().getAmplifier())
+				entity.removeEffect(HordesInfection.INFECTED);
 		}
 	}
 
@@ -145,6 +150,22 @@ public class InfectionEventHandler {
 		if (entity.level().isClientSide()) return;
 		if (event.getEffectInstance().getEffect() == HordesInfection.IMMUNITY.get() && entity.hasEffect(HordesInfection.INFECTED))
 			if (entity.removeEffect(HordesInfection.INFECTED)) InfectionPacketHandler.sendTracking(new CureEntityMessage(entity), entity);
+	}
+	
+	@SubscribeEvent
+	public void effectExpired(MobEffectEvent.Expired event) {
+		LivingEntity entity = event.getEntity();
+		MobEffectInstance instance = event.getEffectInstance();
+		if (instance == null) return;
+		if (instance.is(HordesInfection.INFECTED) && InfectionConfig.enableMobInfection.get()) {
+			event.setCanceled(true);
+			int amplifier = instance.getAmplifier();
+			if (amplifier < 3) {
+				entity.addEffect(new MobEffectInstance(HordesInfection.INFECTED, InfectedEffect.getInfectionTime(entity), amplifier + 1));
+				if (entity instanceof ServerPlayer) InfectionPacketHandler.sendTo(new InfectMessage(false), (ServerPlayer) entity);
+			}
+			else entity.hurt(HordesInfection.getInfectionDamage(entity), Float.MAX_VALUE);
+		}
 	}
 	
 	@SubscribeEvent
