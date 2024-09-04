@@ -1,13 +1,13 @@
 package net.smileycorp.hordes.mixin;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.level.Level;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.smileycorp.hordes.common.mixinutils.ChatName;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 import net.smileycorp.hordes.hordeevent.capability.HordeSavedData;
@@ -22,31 +22,31 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Entity.class)
 public class MixinEntity implements ChatName {
     
-    @Shadow public Level level;
+    @Shadow public World level;
     private String chatName;
 
     @Inject(at = @At("HEAD"), method = "getTypeName", cancellable = true)
-    protected void getTypeName(CallbackInfoReturnable<Component> callback) {
-        if (hasChatName()) callback.setReturnValue(new TranslatableComponent(getChatName()));
+    protected void getTypeName(CallbackInfoReturnable<ITextComponent> callback) {
+        if (hasChatName()) callback.setReturnValue(new TranslationTextComponent(getChatName()));
     }
 
-    @Inject(at =@At("HEAD"), method = "remove", cancellable = true)
-    protected void remove(Entity.RemovalReason reason, CallbackInfo callback) {
-        ServerPlayer player = HordeSpawn.getHordePlayer((Entity)(Object)this);
+    @Inject(at =@At("HEAD"), method = "remove(Z)V", cancellable = true, remap = false)
+    protected void remove(boolean keepData, CallbackInfo ci) {
+        ServerPlayerEntity player = HordeSpawn.getHordePlayer((Entity)(Object)this);
         if (player == null) return;
-        HordeEvent horde = HordeSavedData.getData((ServerLevel) player.level).getEvent(player);
-        if (horde != null) horde.removeEntity((Mob)(Object)this);
+        HordeEvent horde = HordeSavedData.getData((ServerWorld) player.level).getEvent(player);
+        if (horde != null) horde.removeEntity((MobEntity) (Object)this);
     }
     
     //load pre 1.5.0 horde data from capability
     @Inject(at = @At("HEAD"), method = "load")
-    public void load(CompoundTag nbt, CallbackInfo callback) {
-        if (!(level instanceof ServerLevel) |! (((Object)this) instanceof ServerPlayer)) return;
+    public void load(CompoundNBT nbt, CallbackInfo callback) {
+        if (!(level instanceof ServerWorld) |! (((Object)this) instanceof ServerPlayerEntity)) return;
         if (!nbt.contains("ForgeCaps", 10)) return;
-        CompoundTag caps = nbt.getCompound("ForgeCaps");
+        CompoundNBT caps = nbt.getCompound("ForgeCaps");
         if (!caps.contains("hordes:hordeevent", 10)) return;
-        HordeSavedData data = HordeSavedData.getData((ServerLevel) level);
-        HordeEvent event = data.getEvent((ServerPlayer) (Object)this);
+        HordeSavedData data = HordeSavedData.getData((ServerWorld) level);
+        HordeEvent event = data.getEvent((ServerPlayerEntity) (Object)this);
         event.readFromNBT(caps.getCompound("hordes:hordeevent"));
     }
 

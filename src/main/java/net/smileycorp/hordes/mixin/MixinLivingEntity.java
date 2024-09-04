@@ -1,14 +1,14 @@
 package net.smileycorp.hordes.mixin;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.Level;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.DataSerializers;
+import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import net.smileycorp.hordes.common.mixinutils.ChatName;
 import net.smileycorp.hordes.common.mixinutils.CustomTexture;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,9 +19,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(LivingEntity.class)
 public abstract class MixinLivingEntity extends Entity implements CustomTexture {
 
-    private static final EntityDataAccessor<String> TEXTURE = SynchedEntityData.defineId(LivingEntity.class, EntityDataSerializers.STRING);
+    private static final DataParameter<String> TEXTURE = EntityDataManager.defineId(LivingEntity.class, DataSerializers.STRING);
 
-    public MixinLivingEntity(EntityType<?> p_19870_, Level p_19871_) {
+    public MixinLivingEntity(EntityType<?> p_19870_, World p_19871_) {
         super(p_19870_, p_19871_);
     }
 
@@ -46,13 +46,13 @@ public abstract class MixinLivingEntity extends Entity implements CustomTexture 
     }
 
     @Inject(at=@At("HEAD"), method = "addAdditionalSaveData")
-    public void addAdditionalSaveData(CompoundTag tag, CallbackInfo callback) {
+    public void addAdditionalSaveData(CompoundNBT tag, CallbackInfo callback) {
         if (hasCustomTexture()) tag.putString("texture", entityData.get(TEXTURE));
         if (((ChatName)this).hasChatName()) tag.putString("chat_name", ((ChatName)this).getChatName());
     }
 
     @Inject(at=@At("HEAD"), method = "readAdditionalSaveData")
-    public void readAdditionalSaveData(CompoundTag tag, CallbackInfo callback) {
+    public void readAdditionalSaveData(CompoundNBT tag, CallbackInfo callback) {
         if (tag.contains("texture")) {
             String texture = tag.getString("texture");
             if (ResourceLocation.isValidResourceLocation(texture)) entityData.set(TEXTURE, texture);

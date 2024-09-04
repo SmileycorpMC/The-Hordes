@@ -1,5 +1,6 @@
 package net.smileycorp.hordes.infection.jei;
 
+import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IGuiItemStackGroup;
@@ -52,12 +53,17 @@ public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapp
 	public IDrawable getIcon() {
 		return icon;
 	}
-
-
+	
+	@Override
+	public void setIngredients(InfectionCureWrapper recipe, IIngredients ingredients) {
+		ingredients.setInputs(VanillaTypes.ITEM, recipe.getItems());
+	}
+	
+	
 	@Override
 	public void setRecipe(IRecipeLayout layout, InfectionCureWrapper recipe, IIngredients ingredients) {
 		IGuiItemStackGroup stacks = layout.getItemStacks();
-		List<ItemStack> items = recipe.getItems();
+		List<List<ItemStack>> items = ingredients.getInputs(VanillaTypes.ITEM);
 		for (int i = 0; i < items.size(); i++) {
 			stacks.init(i, false, (i%9)*18+4, Math.floorDiv(i, 9)*18+4);
 			stacks.set(i, items.get(i));

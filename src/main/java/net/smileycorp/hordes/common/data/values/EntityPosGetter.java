@@ -30,7 +30,7 @@ public class EntityPosGetter<T extends Comparable<T>, Number> implements ValueGe
 	
 	public static <T extends Comparable<T>> ValueGetter deserialize(JsonObject object, DataType<T> type) {
 		try {
-			if (object.has("value")) return new EntityPosGetter(readValue(DataType.STRING, object.get("value")), type);
+			if (object.has("value")) return new EntityPosGetter(ValueGetter.readValue(DataType.STRING, object.get("value")), type);
 		} catch (Exception e) {
 			HordesLogger.logError("invalid value for hordes:entity_pos", e);
 		}

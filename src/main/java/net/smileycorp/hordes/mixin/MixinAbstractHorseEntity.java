@@ -1,13 +1,13 @@
 package net.smileycorp.hordes.mixin;
 
-import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.entity.MobType;
-import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.animal.horse.AbstractHorse;
-import net.minecraft.world.entity.animal.horse.SkeletonHorse;
-import net.minecraft.world.entity.animal.horse.ZombieHorse;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
+import net.minecraft.entity.CreatureAttribute;
+import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.entity.passive.horse.AbstractHorseEntity;
+import net.minecraft.entity.passive.horse.SkeletonHorseEntity;
+import net.minecraft.entity.passive.horse.ZombieHorseEntity;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
 import net.smileycorp.hordes.common.ai.HorseFleeGoal;
 import net.smileycorp.hordes.config.CommonConfigHandler;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,26 +17,25 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(AbstractHorse.class)
-public abstract class MixinAbstractHorse extends Animal {
-
-	@Shadow
-	protected SimpleContainer inventory;
-
-	protected MixinAbstractHorse(Level level) {
+@Mixin(AbstractHorseEntity.class)
+public abstract class MixinAbstractHorseEntity extends AnimalEntity {
+	
+	@Shadow public Inventory inventory;
+	
+	protected MixinAbstractHorseEntity(World level) {
 		super(null, level);
 	}
 
 	@Inject(at=@At("HEAD"), method = "aiStep()V", cancellable = true)
 	public void aiStep(CallbackInfo callback) {
-		if ((Animal)this instanceof ZombieHorse) {
+		if ((AnimalEntity)this instanceof ZombieHorseEntity) {
 			if (CommonConfigHandler.aggressiveZombieHorses.get()) {
 				updateSwingTime();
 				if (getBrightness() > 0.5F) noActionTime += 2;
 			}
 			if (CommonConfigHandler.zombieHorsesBurn.get()) tryBurn();
 		}
-		else if ((Animal)this instanceof SkeletonHorse && CommonConfigHandler.skeletonHorsesBurn.get()) tryBurn();
+		else if ((AnimalEntity)this instanceof SkeletonHorseEntity && CommonConfigHandler.skeletonHorsesBurn.get()) tryBurn();
 	}
 	
 	protected void tryBurn() {
@@ -56,12 +55,12 @@ public abstract class MixinAbstractHorse extends Animal {
 	
 	@Inject(at=@At("HEAD"), method = "registerGoals", cancellable = true)
 	public void registerGoals(CallbackInfo callback) {
-		if (getMobType() != MobType.UNDEAD && CommonConfigHandler.zombiesScareHorses.get()) goalSelector.addGoal(1, new HorseFleeGoal(this));
+		if (getMobType() != CreatureAttribute.UNDEAD && CommonConfigHandler.zombiesScareHorses.get()) goalSelector.addGoal(1, new HorseFleeGoal(this));
 	}
 	
 	@Inject(at=@At("HEAD"), method = "canEatGrass", cancellable = true)
 	public void canEatGrass(CallbackInfoReturnable<Boolean> callback) {
-		if ((Animal)this instanceof ZombieHorse && CommonConfigHandler.aggressiveZombieHorses.get()) callback.setReturnValue(false);
+		if ((AnimalEntity)this instanceof ZombieHorseEntity && CommonConfigHandler.aggressiveZombieHorses.get()) callback.setReturnValue(false);
 	}
 
 }

@@ -12,7 +12,7 @@ import net.smileycorp.hordes.common.capability.ZombifyPlayer;
 public class DamageSourceInfection extends DamageSource {
 
 	public DamageSourceInfection() {
-		super("net/smileycorp/hordes");
+		super("infection");
 	}
 
 	@Override

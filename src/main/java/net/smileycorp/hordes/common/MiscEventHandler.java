@@ -9,8 +9,11 @@ import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.passive.horse.AbstractHorseEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.Difficulty;
+import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -122,7 +125,8 @@ public class MiscEventHandler {
 			event.setEntityType(HordesEntities.DROWNED_PLAYER.get());
 			return;
 		}
-		if (player.level.getBiome(player.blockPosition()).containsTag(HordesEntities.HUSK_PLAYER_SPAWN_BIOMES) && ZombiePlayersConfig.huskPlayers.get())
+		if (BiomeDictionary.hasType(RegistryKey.create(Registry.BIOME_REGISTRY, player.level.getBiome(player.blockPosition()).getRegistryName()),
+				BiomeDictionary.Type.DRY) && ZombiePlayersConfig.huskPlayers.get())
 			event.setEntityType(HordesEntities.HUSK_PLAYER.get());
 	}
 	

@@ -27,7 +27,7 @@ public class LevelNBTGetter<T extends Comparable<T>> extends NBTGetter<T> {
 	
 	public static <T extends Comparable<T>> ValueGetter deserialize(JsonObject object, DataType<T> type) {
 		try {
-			if (object.has("value")) return new LevelNBTGetter<T>(readValue(DataType.STRING, object.get("value")), type);
+			if (object.has("value")) return new LevelNBTGetter<T>(ValueGetter.readValue(DataType.STRING, object.get("value")), type);
 		} catch (Exception e) {
 			HordesLogger.logError("invalid value for hordes:level_nbt", e);
 		}

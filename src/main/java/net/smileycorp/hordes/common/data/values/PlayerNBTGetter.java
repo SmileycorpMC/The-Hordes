@@ -1,7 +1,7 @@
 package net.smileycorp.hordes.common.data.values;
 
 import com.google.gson.JsonObject;
-import net.minecraft.advancements.critereon.NbtPredicate;
+import net.minecraft.advancements.criterion.NBTPredicate;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -19,7 +19,7 @@ public class PlayerNBTGetter<T extends Comparable<T>> extends NBTGetter<T> {
 
 	@Override
 	protected CompoundNBT getNBT(World level, LivingEntity entity, ServerPlayerEntity player, Random rand) {
-		return NbtPredicate.getEntityTagToCompare(player);
+		return NBTPredicate.getEntityTagToCompare(player);
 	}
 	
 	public static <T extends Comparable<T>> ValueGetter deserialize(JsonObject object, DataType<T> type) {

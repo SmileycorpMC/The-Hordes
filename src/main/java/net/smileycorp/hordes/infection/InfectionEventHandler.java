@@ -89,7 +89,7 @@ public class InfectionEventHandler {
 		if (optional.isPresent()) optional.orElseGet(null).increaseInfection();
 		if (!entity.removeEffect(HordesInfection.INFECTED.get())) return;
 		if (entity.level.isClientSide) return;
-		InfectionPacketHandler.send(PacketDistributor.TRACKING_CHUNK.with(()-> entity.level.getChunkAt(entity.getOnPos())),
+		InfectionPacketHandler.send(PacketDistributor.TRACKING_CHUNK.with(()-> entity.level.getChunkAt(entity.blockPosition())),
 				new CureEntityMessage(entity));
 	}
 
@@ -178,7 +178,7 @@ public class InfectionEventHandler {
 		if (entity.level.isClientSide()) return;
 		if (event.getPotionEffect().getEffect() == HordesInfection.IMMUNITY.get() && entity.hasEffect(HordesInfection.INFECTED.get())) {
 			if (entity.removeEffect(HordesInfection.INFECTED.get()))
-				InfectionPacketHandler.send(PacketDistributor.TRACKING_CHUNK.with(()->entity.level.getChunkAt(entity.getOnPos())),
+				InfectionPacketHandler.send(PacketDistributor.TRACKING_CHUNK.with(()->entity.level.getChunkAt(entity.blockPosition())),
 					new CureEntityMessage(entity));
 		}
 	}

@@ -33,13 +33,13 @@ public class ZombiePlayerRenderer<T extends ZombieEntity & PlayerZombie> extends
 	
 	@Override
 	public ResourceLocation getTextureLocation(T entity) {
-		UUID uuid = entity.getPlayerUUID();
+		UUID uuid = (UUID) entity.getPlayerUUID().get();
 		NetworkPlayerInfo playerinfo = Minecraft.getInstance().getConnection().getPlayerInfo(uuid);
 		return playerinfo == null ? getTexture(uuid) : playerinfo.getSkinLocation();
 	}
 	
 	public NetworkPlayerInfo getPlayerInfo(T entity) {
-		UUID uuid = entity.getPlayerUUID();
+		UUID uuid = (UUID) entity.getPlayerUUID().get();
 		return Minecraft.getInstance().getConnection().getPlayerInfo(uuid);
 	}
 	

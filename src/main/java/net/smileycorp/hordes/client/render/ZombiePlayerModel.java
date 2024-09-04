@@ -10,6 +10,7 @@ import net.minecraft.entity.monster.ZombieEntity;
 import net.smileycorp.hordes.common.entities.PlayerZombie;
 
 import java.awt.*;
+import java.util.UUID;
 
 public class ZombiePlayerModel<T extends ZombieEntity & PlayerZombie> extends PlayerModel<T> {
 	
@@ -49,7 +50,7 @@ public class ZombiePlayerModel<T extends ZombieEntity & PlayerZombie> extends Pl
 	}
 	
 	public void fixArms(T entity) {
-		if ("slim".equals(DefaultPlayerSkin.getSkinModelName(entity.getPlayerUUID()))) {
+		if ("slim".equals(DefaultPlayerSkin.getSkinModelName((UUID) entity.getPlayerUUID().get()))) {
 			this.leftArm = new ModelRenderer(this, 32, 48);
 			this.leftArm.addBox(-1.0F, -2.0F, -2.0F, 3, 12, 4, 0.0f);
 			this.leftArm.setPos(5.0F, 2.5F, 0.0F);

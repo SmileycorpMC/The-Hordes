@@ -22,7 +22,7 @@ public class PlayerDayCondition implements Condition {
 
 	@Override
 	public boolean apply(World level, LivingEntity entity, ServerPlayerEntity player, Random rand) {
-		return player.getStats().getValue(Stats.CUSTOM.get(Stats.PLAY_TIME)) / (float) HordeEventConfig.dayLength.get() > day.get(level, entity, player, rand);
+		return player.getStats().getValue(Stats.CUSTOM.get(Stats.PLAY_ONE_MINUTE)) / (float) HordeEventConfig.dayLength.get() > day.get(level, entity, player, rand);
 	}
 
 	public static PlayerDayCondition deserialize(JsonElement json) {

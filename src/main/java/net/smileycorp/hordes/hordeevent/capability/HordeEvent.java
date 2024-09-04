@@ -376,7 +376,7 @@ public class HordeEvent implements IOngoingEvent<ServerPlayerEntity> {
 	}
 	
 	public int getCurrentDay(ServerPlayerEntity player) {
-		return (int) Math.floor((HordeEventConfig.hordeEventByPlayerTime.get() ? player.getStats().getValue(Stats.CUSTOM.get(Stats.PLAY_TIME))
+		return (int) Math.floor((HordeEventConfig.hordeEventByPlayerTime.get() ? player.getStats().getValue(Stats.CUSTOM.get(Stats.PLAY_ONE_MINUTE))
 				: player.level.getDayTime()) / HordeEventConfig.dayLength.get());
 	}
 	

@@ -18,7 +18,7 @@ public class CommandListEntities {
 	}
 
 	public static int execute(CommandContext<CommandSource> ctx) throws CommandSyntaxException {
-		ForgeRegistries.ENTITIES.getKeys().forEach(loc -> HordesLogger.logSilently(loc + " - " + ForgeRegistries.ENTITIES.getValue(loc).toShortString()));
+		ForgeRegistries.ENTITIES.getKeys().forEach(loc -> HordesLogger.logSilently(loc + " - " + ForgeRegistries.ENTITIES.getValue(loc).getDescriptionId()));
 		ctx.getSource().getEntity().sendMessage(new TranslationTextComponent("commands.hordes.ListEntities.success", HordesLogger.getFiletext()), null);
 		return 1;
 	}

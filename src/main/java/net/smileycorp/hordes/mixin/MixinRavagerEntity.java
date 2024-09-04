@@ -1,11 +1,11 @@
 package net.smileycorp.hordes.mixin;
 
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.monster.Ravager;
-import net.minecraft.world.entity.raid.Raider;
-import net.minecraft.world.level.Level;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
+import net.minecraft.entity.monster.AbstractRaiderEntity;
+import net.minecraft.entity.monster.RavagerEntity;
+import net.minecraft.world.World;
 import net.smileycorp.hordes.config.CommonConfigHandler;
 import net.smileycorp.hordes.infection.HordesInfection;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,11 +13,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(Ravager.class)
-public abstract class MixinRavager extends Raider {
+@Mixin(RavagerEntity.class)
+public abstract class MixinRavagerEntity extends AbstractRaiderEntity {
     
-    protected MixinRavager(EntityType<? extends Raider> p_32105_, Level p_32106_) {
-        super(p_32105_, p_32106_);
+    
+    protected MixinRavagerEntity(EntityType<? extends AbstractRaiderEntity> p_i50143_1_, World p_i50143_2_) {
+        super(p_i50143_1_, p_i50143_2_);
     }
     
     @Inject(at=@At("HEAD"), method = "registerGoals", cancellable = true)

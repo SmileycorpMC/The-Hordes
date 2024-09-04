@@ -1,7 +1,7 @@
 package net.smileycorp.hordes.common.data.values;
 
 import com.google.gson.JsonObject;
-import net.minecraft.advancements.critereon.NbtPredicate;
+import net.minecraft.advancements.criterion.NBTPredicate;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -19,12 +19,12 @@ public class EntityNBTGetter<T extends Comparable<T>> extends NBTGetter<T> {
 
 	@Override
 	protected CompoundNBT getNBT(World level, LivingEntity entity, ServerPlayerEntity player, Random rand) {
-		return NbtPredicate.getEntityTagToCompare(entity);
+		return NBTPredicate.getEntityTagToCompare(entity);
 	}
 	
 	public static <T extends Comparable<T>> ValueGetter deserialize(JsonObject object, DataType<T> type) {
 		try {
-			if (object.has("value")) return new EntityNBTGetter<T>(readValue(DataType.STRING, object.get("value")), type);
+			if (object.has("value")) return new EntityNBTGetter<T>(ValueGetter.readValue(DataType.STRING, object.get("value")), type);
 		} catch (Exception e) {
 			HordesLogger.logError("invalid value for hordes:entity_nbt", e);
 		}

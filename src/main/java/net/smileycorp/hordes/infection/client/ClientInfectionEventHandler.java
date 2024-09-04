@@ -51,7 +51,7 @@ public class ClientInfectionEventHandler {
 			Minecraft mc = Minecraft.getInstance();
 			ClientPlayerEntity player = mc.player;
 			if (player.hasEffect(HordesInfection.INFECTED.get()) && event.getEntity() != player) {
-				if (ClientConfigHandler.playerInfectionVisuals.get() && player != null && player.hasEffect(HordesInfection.INFECTED.get()) && entity != player) {
+				if (ClientConfigHandler.playerInfectionVisuals.get() && player != null && player.hasEffect(HordesInfection.INFECTED.get()) && event.getEntity() != player) {
 					int a = player.getEffect(HordesInfection.INFECTED.get()).getAmplifier();
 					if (a > 2) GlStateManager._color4f(1, 0, 0, 1);
 					else if (a == 2) GlStateManager._color4f(1, 0.4f, 0.4f, 1);

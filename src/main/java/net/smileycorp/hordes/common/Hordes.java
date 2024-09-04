@@ -1,13 +1,10 @@
 package net.smileycorp.hordes.common;
 
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.server.packs.FolderPackResources;
-import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
-import net.minecraft.server.packs.repository.Pack;
-import net.minecraft.server.packs.repository.PackSource;
+import net.minecraft.resources.FolderPackFinder;
+import net.minecraft.resources.IPackFinder;
+import net.minecraft.resources.IPackNameDecorator;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -16,6 +13,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
+import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.smileycorp.hordes.client.ClientHandler;
@@ -32,11 +30,12 @@ import net.smileycorp.hordes.infection.HordesInfection;
 import net.smileycorp.hordes.infection.InfectionEventHandler;
 import net.smileycorp.hordes.infection.network.InfectionPacketHandler;
 
-import java.nio.file.Path;
-
 @Mod(value = Constants.MODID)
 @Mod.EventBusSubscriber(modid = Constants.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class Hordes {
+	
+	
+	private static final IPackFinder PACK_FINDER = new FolderPackFinder(FMLPaths.CONFIGDIR.get().resolve("hordes").toFile(), IPackNameDecorator.decorating("Hordes Config"));
 
 	public Hordes() {
 		HordesLogger.clearLog();
@@ -50,15 +49,6 @@ public class Hordes {
 		} else {
 			HordesLogger.logInfo("Config files are up to date, skipping data/asset generation");
 		}
-	}
-	
-	@SubscribeEvent
-	public static void addPacks(AddPackFindersEvent event) {
-		Path path = FMLPaths.CONFIGDIR.get().resolve("hordes");
-		event.addRepositorySource((consumer, constructor) -> consumer.accept(constructor.create(path.toString(), new TextComponent("Hordes Config"), true,
-				()-> new FolderPackResources(path.toFile()), new PackMetadataSection(new TextComponent("Hordes Config"), 8),
-				Pack.Position.TOP, PackSource.BUILT_IN, false))
-		);
 	}
 	
 	@SubscribeEvent
@@ -84,8 +74,14 @@ public class Hordes {
 	}
 	
 	@SubscribeEvent
+	public static void loadServer(FMLServerAboutToStartEvent event) {
+		event.getServer().getPackRepository().addPackFinder(PACK_FINDER);
+	}
+	
+	@SubscribeEvent
 	public static void loadClient(FMLClientSetupEvent event) {
 		MinecraftForge.EVENT_BUS.register(new ClientHandler());
+		event.getMinecraftSupplier().get().getResourcePackRepository().addPackFinder(PACK_FINDER);
 	}
 	
 }

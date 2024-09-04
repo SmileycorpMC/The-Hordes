@@ -33,7 +33,7 @@ public class CommandSpawnZombie {
 		} catch (Exception e) {}
 		PlayerZombie zombie = type.create(level);
 		zombie.setPlayer(player);
-		zombie.asEntity().setPos(pos);
+		zombie.asEntity().setPos(pos.x, pos.y, pos.z);
 		level.addFreshEntity(zombie.asEntity());
 		return 1;
 	}
