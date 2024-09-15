@@ -40,6 +40,10 @@ public class DataRegistry {
 		registerValueGetter(Constants.loc("player_pos"), PlayerPosGetter::deserialize);
 		registerValueGetter(Constants.loc("entity_nbt"), EntityNBTGetter::deserialize);
 		registerValueGetter(Constants.loc("entity_pos"), EntityPosGetter::deserialize);
+		if (Loader.isModLoaded("srparasites")) {
+			registerValueGetter(new ResourceLocation("srparasites:phase"), ParasitePhaseGetter::deserialize);
+			registerValueGetter(new ResourceLocation("srparasites:kills"), ParasiteKillGetter::deserialize);
+		}
 	}
 
 	public static void registerConditionDeserializers() {
@@ -55,7 +59,10 @@ public class DataRegistry {
 		registerConditionDeserializer(Constants.loc("game_difficulty"), GameDifficultyCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("advancement"), AdvancementCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("entity_type"), EntityTypeCondition::deserialize);
-		if (Loader.isModLoaded("gamestages")) registerConditionDeserializer(new ResourceLocation("gamestages:gamestage"), GameStagesCondition::deserialize);
+		if (Loader.isModLoaded("gamestages"))
+			registerConditionDeserializer(new ResourceLocation("gamestages:gamestage"), GameStagesCondition::deserialize);
+		if (Loader.isModLoaded("srparasites"))
+			registerConditionDeserializer(new ResourceLocation("srparasites:phase"), ParasitePhaseCondition::deserialize);
 	}
 
 	public static ValueGetter readValue(DataType type, JsonObject json) {

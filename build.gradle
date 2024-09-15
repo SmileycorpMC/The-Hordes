@@ -82,7 +82,7 @@ dependencies {
 	implementation "curse.maven:jei-238222:4393461"
 	implementation "curse.maven:mpr-285012:2823889"
     implementation "curse.maven:gamestages-268655:2951840"
-
+    implementation files("libs/SRParasites-1.12.2v1.9.21.jar")
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
