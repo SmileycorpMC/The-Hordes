@@ -1,11 +1,20 @@
 package net.smileycorp.hordes.hordeevent;
 
+import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.Lists;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.config.HordeEventConfig;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 import net.smileycorp.hordes.hordeevent.data.HordeTableLoader;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class HordeSpawnData {
     
@@ -17,6 +26,7 @@ public class HordeSpawnData {
     private int spawnDuration = HordeEventConfig.hordeSpawnDuration.get();
     private int spawnInterval = HordeEventConfig.hordeSpawnInterval.get();
     private int spawnAmount;
+    private List<String> commands = Lists.newArrayList();
     
     private double entitySpeed = HordeEventConfig.hordeEntitySpeed.get();
     
@@ -36,6 +46,7 @@ public class HordeSpawnData {
         if (tag.contains("spawnInterval")) spawnInterval = tag.getInt("spawnInterval");
         if (tag.contains("spawnAmount")) spawnAmount = tag.getInt("spawnAmount");
         if (tag.contains("entitySpeed")) entitySpeed = tag.getDouble("entitySpeed");
+        if (tag.contains("commands")) for (Tag command : tag.getList("commands", 8)) commands.add(command.getAsString());
     }
     
     public CompoundTag save() {
@@ -49,6 +60,11 @@ public class HordeSpawnData {
         tag.putInt("spawnInterval", spawnInterval);
         tag.putInt("spawnAmount", spawnAmount);
         tag.putDouble("entitySpeed", entitySpeed);
+        if (!commands.isEmpty()) {
+            ListTag commands = new ListTag();
+            for (String command : this.commands) commands.add(StringTag.valueOf(command));
+            tag.put("commands", commands);
+        }
         return tag;
     }
     
@@ -124,6 +140,14 @@ public class HordeSpawnData {
         this.entitySpeed = entitySpeed;
     }
     
+    public void addCommand(String command) {
+        commands.add(command);
+    }
+    
+    public Collection<String> getCommands() {
+        return Lists.newArrayList(commands);
+    }
+    
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder(getClass().getSimpleName()+"[");
@@ -138,5 +162,4 @@ public class HordeSpawnData {
         builder.append("entitySpeed=" + entitySpeed + "]");
         return builder.toString();
     }
-    
 }

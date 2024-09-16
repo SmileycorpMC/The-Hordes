@@ -1,9 +1,12 @@
 package net.smileycorp.hordes.hordeevent.capability;
 
 import com.google.common.collect.Sets;
+import com.mojang.brigadier.ParseResults;
+import com.mojang.brigadier.context.CommandContextBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
@@ -322,13 +325,16 @@ public class HordeEvent {
 
 	public void stopEvent(ServerPlayer player, boolean isCommand) {
 		entitiesSpawned.clear();
-		HordeEndEvent endEvent = new HordeEndEvent(player, this, isCommand, spawnData.getEndMessage());
+		HordeEndEvent endEvent = new HordeEndEvent(player, this, isCommand, spawnData.getEndMessage(), spawnData.getCommands());
 		postEvent(endEvent);
 		HordeEventPacketHandler.sendTo(new UpdateClientHordeMessage(false), player);
 		sentDay = getCurrentDay(player);
 		timer = 0;
 		spawnData = null;
 		sendMessage(player, endEvent.getMessage());
+		MinecraftServer server = player.getServer();
+		for (String command : endEvent.getCommands()) server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSuppressedOutput()
+				.withPermission(2).withEntity(player).withPosition(player.position()).withLevel(player.serverLevel()), command);
 		for (Mob entity : entitiesSpawned) {
 			for (WrappedGoal entry : entity.goalSelector.getAvailableGoals().toArray(WrappedGoal[]::new)) {
 				if (!(entry.getGoal() instanceof HordeTrackPlayerGoal)) continue;

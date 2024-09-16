@@ -82,6 +82,7 @@ public class DataRegistry {
 		registerFunctionDeserializer(Constants.loc("set_spawn_interval"), HordeBuildSpawnDataEvent.class, SetSpawnIntervalFunction::deserialize);
 		registerFunctionDeserializer(Constants.loc("set_spawn_amount"), HordeBuildSpawnDataEvent.class, SetSpawnAmountFunction::deserialize);
 		registerFunctionDeserializer(Constants.loc("set_entity_speed"), HordeBuildSpawnDataEvent.class, SetEntitySpeedFunction::deserialize);
+		registerFunctionDeserializer(Constants.loc("add_reward_command"), HordeBuildSpawnDataEvent.class, AddRewardCommandFunction::deserialize);
 		//spawn entity functions
 		registerFunctionDeserializer(Constants.loc("set_entity_type"), HordeSpawnEntityEvent.class, SetEntityTypeFunction::deserialize);
 		registerFunctionDeserializer(Constants.loc("set_entity_nbt"), HordeSpawnEntityEvent.class, SetEntityNBTFunction::deserialize);
