@@ -10,6 +10,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -131,8 +132,13 @@ public class ZombiePlayer extends Zombie implements PlayerZombie<ZombiePlayer> {
 	
 	@Override
 	public void remove(Entity.RemovalReason reason) {
-		if (reason == RemovalReason.DISCARDED && level() instanceof ServerLevel) dropCustomDeathLoot((ServerLevel) level(),  null, false);
+		if (reason == RemovalReason.DISCARDED && level() instanceof ServerLevel && level().getDifficulty() == Difficulty.PEACEFUL && shouldDespawnInPeaceful()) dropCustomDeathLoot((ServerLevel) level(),  null, false);
 		super.remove(reason);
+	}
+	
+	@Override
+	public boolean shouldDespawnInPeaceful() {
+		return playerItems.isEmpty() || ZombiePlayersConfig.zombiePlayersDespawnPeaceful.get();
 	}
 	
 	@Override
@@ -206,12 +212,7 @@ public class ZombiePlayer extends Zombie implements PlayerZombie<ZombiePlayer> {
 		super.tick();
 		moveCloak(this);
 	}
-
-	@Override
-	public void checkDespawn() {
-		if (playerItems.isEmpty() |! ZombiePlayersConfig.zombiePlayersDespawnPeaceful.get()) super.checkDespawn();
-	}
-
+	
 	@Override
 	public void setDisplayCape(boolean display) {
 		entityData.set(SHOW_CAPE, display);

@@ -131,8 +131,13 @@ public class DrownedPlayer extends Drowned implements PlayerZombie<DrownedPlayer
 	
 	@Override
 	public void remove(Entity.RemovalReason reason) {
-		if (reason == RemovalReason.DISCARDED && level() instanceof ServerLevel) dropCustomDeathLoot((ServerLevel) level(),  null, false);
+		if (reason == RemovalReason.DISCARDED && level() instanceof ServerLevel && level().getDifficulty() == Difficulty.PEACEFUL && shouldDespawnInPeaceful()) dropCustomDeathLoot((ServerLevel) level(),  null, false);
 		super.remove(reason);
+	}
+	
+	@Override
+	public boolean shouldDespawnInPeaceful() {
+		return playerItems.isEmpty() || ZombiePlayersConfig.zombiePlayersDespawnPeaceful.get();
 	}
 	
 	@Override
@@ -187,11 +192,6 @@ public class DrownedPlayer extends Drowned implements PlayerZombie<DrownedPlayer
 	public void tick() {
 		super.tick();
 		moveCloak(this);
-	}
-	
-	@Override
-	public void checkDespawn() {
-		if (level().getDifficulty() == Difficulty.PEACEFUL) super.checkDespawn();
 	}
 	
 	@Override
