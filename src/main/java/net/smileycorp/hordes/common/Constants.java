@@ -3,6 +3,8 @@ package net.smileycorp.hordes.common;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 
+import java.util.Locale;
+
 public class Constants {
 	
 	public static final String MODID = "hordes";
@@ -25,7 +27,7 @@ public class Constants {
 	}
 	
 	public static ResourceLocation loc(String name) {
-		return new ResourceLocation(MODID, name.toLowerCase());
+		return new ResourceLocation(MODID, name.toLowerCase(Locale.US));
 	}
 	
 	public static String locStr(String string) {
