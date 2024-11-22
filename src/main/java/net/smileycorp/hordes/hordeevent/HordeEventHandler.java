@@ -119,9 +119,9 @@ public class HordeEventHandler {
 		if (HordeEventConfig.canSleepDuringHorde.get() || !(event.getEntity() instanceof ServerPlayer)) return;
 		ServerPlayer player = event.getEntity();
 		ServerLevel level = player.serverLevel();
-		HordeEvent horde = HordeSavedData.getData((ServerLevel) player.level()).getEvent(player);
-		if (horde == null) return;
-		if (level.isDay() |! (level.dimensionType().bedWorks() && (horde.isHordeDay(player) || horde.isActive(player)))) return;
+		HordeSavedData data = HordeSavedData.getData((ServerLevel) player.level());
+		if (data == null) return;
+		if (level.isDay() |! (level.dimensionType().bedWorks() && data.isHordeNight(player))) return;
 		event.setProblem(BedSleepingProblem.OTHER_PROBLEM);
 		player.displayClientMessage(Component.translatable(Constants.hordeTrySleep), true);
 	}
