@@ -3,6 +3,7 @@ package net.smileycorp.hordes.common.entities;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.PlainTextContents;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -25,7 +26,6 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.scores.PlayerTeam;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
-import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.config.ZombiePlayersConfig;
 
 import java.util.Collection;
@@ -169,11 +169,11 @@ public class DrownedPlayer extends Drowned implements PlayerZombie<DrownedPlayer
 	
 	@Override
 	public MutableComponent getDisplayName() {
-		MutableComponent textcomponentstring = PlayerTeam.formatNameForTeam(getTeam(),
-				TextUtils.translatableComponent("entity.hordes.DrownedPlayer.chat", "Drowned Player", getCustomName()));
-		textcomponentstring.getStyle().withHoverEvent(this.createHoverEvent());
-		textcomponentstring.getStyle().withInsertion(this.getEncodeId());
-		return textcomponentstring;
+		MutableComponent component = PlayerTeam.formatNameForTeam(getTeam(),
+				Component.translatable("entity.hordes.DrownedPlayer.chat", getCustomName()));
+		component.getStyle().withHoverEvent(createHoverEvent());
+		component.getStyle().withInsertion(getEncodeId());
+		return component;
 	}
 	
 	@Override

@@ -17,8 +17,8 @@ import net.smileycorp.hordes.common.entities.PlayerZombie;
 public class CommandSpawnZombie {
 
 	public static void register(LiteralArgumentBuilder<CommandSourceStack> command) {
-		command.then(Commands.literal("spawnZombie")
-				.requires((commandSource) -> commandSource.hasPermission(1)).then(Commands.argument("username", StringArgumentType.string())
+		command.then(Commands.literal("spawnZombie").requires((commandSource) -> commandSource.hasPermission(1))
+				.then(Commands.argument("username", StringArgumentType.string())
 						.then(Commands.argument("pos", Vec3Argument.vec3()).executes(CommandSpawnZombie::execute)
 								.then(Commands.argument("type", EnumArgument.enumArgument(Type.class)).executes(CommandSpawnZombie::execute)))));
 	}

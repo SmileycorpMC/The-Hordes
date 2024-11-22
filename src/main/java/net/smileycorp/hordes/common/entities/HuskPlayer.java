@@ -3,6 +3,7 @@ package net.smileycorp.hordes.common.entities;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.PlainTextContents;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -27,7 +28,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.scores.PlayerTeam;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
-import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.config.ZombiePlayersConfig;
 
 import java.util.Collection;
@@ -181,14 +181,14 @@ public class HuskPlayer extends Husk implements PlayerZombie<HuskPlayer> {
 		ContainerHelper.loadAllItems(compound, read, level().registryAccess());
 		playerItems = read;
 	}
-
+	
 	@Override
 	public MutableComponent getDisplayName() {
-		MutableComponent textcomponentstring = PlayerTeam.formatNameForTeam(getTeam(),
-				TextUtils.translatableComponent("entity.hordes.HuskPlayer.chat", "Husk Player", getCustomName()));
-		textcomponentstring.getStyle().withHoverEvent(createHoverEvent());
-		textcomponentstring.getStyle().withInsertion(getEncodeId());
-		return textcomponentstring;
+		MutableComponent component = PlayerTeam.formatNameForTeam(getTeam(),
+				Component.translatable("entity.hordes.HuskPlayer.chat", getCustomName()));
+		component.getStyle().withHoverEvent(createHoverEvent());
+		component.getStyle().withInsertion(getEncodeId());
+		return component;
 	}
 
 	@Override

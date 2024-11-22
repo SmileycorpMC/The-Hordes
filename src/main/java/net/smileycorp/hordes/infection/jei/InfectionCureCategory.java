@@ -7,10 +7,10 @@ import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.common.Constants;
 
 import java.util.List;
@@ -36,7 +36,7 @@ public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapp
 
 	@Override
 	public MutableComponent getTitle() {
-		return TextUtils.translatableComponent("jei.category.hordes.InfectionCures", "Infection Cures");
+		return Component.translatable("jei.category.hordes.InfectionCures");
 	}
 
 	@Override
@@ -48,7 +48,7 @@ public class InfectionCureCategory implements IRecipeCategory<InfectionCureWrapp
 	public void setRecipe(IRecipeLayoutBuilder layout, InfectionCureWrapper recipe, IFocusGroup focuses) {
 		List<ItemStack> items = recipe.getItems();
 		for (int i = 0; i < items.size(); i++) layout.addSlot(RecipeIngredientRole.INPUT,
-				(i%9)*18+4, Math.floorDiv(i, 9)*18+4).addItemStack(items.get(i));
+				(i % 9) * 18 + 4, Math.floorDiv(i, 9) * 18 + 4).addItemStack(items.get(i));
 	}
 
 	@Override

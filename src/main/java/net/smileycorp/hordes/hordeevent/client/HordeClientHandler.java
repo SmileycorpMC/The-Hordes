@@ -5,6 +5,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
@@ -14,7 +15,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
-import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.config.ClientConfigHandler;
 
 import java.awt.*;
@@ -54,7 +54,7 @@ public class HordeClientHandler {
     public void displayMessage(String text) {
         Minecraft mc = Minecraft.getInstance();
         Gui gui = mc.gui;
-        MutableComponent message = TextUtils.translatableComponent(text, null);
+        MutableComponent message = Component.translatable(text);
         message.setStyle(Style.EMPTY.withColor(ClientConfigHandler.getHordeMessageColour()));
         if (ClientConfigHandler.eventNotifyMode.get() == 1) gui.getChat().addMessage(message);
         else if (ClientConfigHandler.eventNotifyMode.get() == 2) {

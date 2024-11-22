@@ -1,6 +1,5 @@
 package net.smileycorp.hordes.hordeevent;
 
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.Lists;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -12,7 +11,6 @@ import net.smileycorp.hordes.config.HordeEventConfig;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 import net.smileycorp.hordes.hordeevent.data.HordeTableLoader;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 

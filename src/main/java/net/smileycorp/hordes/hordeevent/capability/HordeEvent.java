@@ -1,8 +1,6 @@
 package net.smileycorp.hordes.hordeevent.capability;
 
 import com.google.common.collect.Sets;
-import com.mojang.brigadier.ParseResults;
-import com.mojang.brigadier.context.CommandContextBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;

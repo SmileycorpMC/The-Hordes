@@ -1,5 +1,6 @@
 package net.smileycorp.hordes.common;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.LivingEntity;
@@ -13,7 +14,6 @@ import net.neoforged.neoforge.event.entity.living.LivingConversionEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.smileycorp.atlas.api.util.TextUtils;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.common.capability.ZombifyPlayer;
 import net.smileycorp.hordes.common.entities.HordesEntities;
@@ -32,8 +32,7 @@ public class MiscEventHandler {
 	public void onJoin(PlayerEvent.PlayerLoggedInEvent event) {
 		if (event.getEntity() == null) return;
 		if (event.getEntity().level().isClientSide()) return;
-		if (HordesLogger.hasErrors()) event.getEntity().sendSystemMessage(
-				TextUtils.translatableComponent("message.hordes.DataError", null, HordesLogger.getFiletext()));
+		if (HordesLogger.hasErrors()) event.getEntity().sendSystemMessage(Component.translatable("message.hordes.DataError", HordesLogger.getFiletext()));
 	}
 
 	//determine if zombie entity should spawn, and if so create the correct entity and set properties
