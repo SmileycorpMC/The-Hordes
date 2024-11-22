@@ -102,6 +102,7 @@ public class HordeEventHandler {
 		ServerPlayer player = HordeSpawn.getHordePlayer(event.getEntity());
 		if (player == null |! (event.getEntity() instanceof Mob)) return;
 		HordeSpawn cap = event.getEntity().getCapability(HordesCapabilities.HORDESPAWN);
+		if (cap == null) return;
 		if (cap.isSynced()) return;
 		Mob entity = (Mob) event.getEntity();
 		entity.targetSelector.getAvailableGoals().forEach(WrappedGoal::stop);
