@@ -162,14 +162,14 @@ public class HordeEvent {
 				AtomicBoolean cancelled = new AtomicBoolean(false);
 				CompoundTag nbt = entry.getNBT();
 				nbt.putString("id", entry.getName().toString());
-				Mob newEntity = (Mob) EntityType.loadEntityRecursive(nbt, level, (entity) -> loadEntity(level, player, (Mob) entity, pos, cancelled));
+				Mob mob = (Mob) EntityType.loadEntityRecursive(nbt, level, entity -> loadEntity(level, player, (Mob) entity, pos, cancelled));
 				if (cancelled.get()) continue;
-				newEntity.readAdditionalSaveData(entry.getNBT());
-				if (!(level.tryAddFreshEntityWithPassengers(newEntity))) {
+				mob.readAdditionalSaveData(entry.getNBT());
+				if (!(level.tryAddFreshEntityWithPassengers(mob))) {
 					logError("Unable to spawn entity from " + type, new Exception());
 					continue;
 				}
-				finalizeEntity(newEntity, player);
+				finalizeEntity(mob, player, true);
 			} catch (Exception e) {
 				e.printStackTrace();
 				logError("Unable to spawn entity from " + type, e);
@@ -203,18 +203,14 @@ public class HordeEvent {
 		}
 	}
 
-	private void finalizeEntity(Mob entity, ServerPlayer player) {
+	private void finalizeEntity(Mob entity, ServerPlayer player, boolean addToMobCap) {
 		entity.getAttribute(Attributes.FOLLOW_RANGE).addPermanentModifier(new AttributeModifier(FOLLOW_RANGE_MODIFIER,
 				75, AttributeModifier.Operation.ADD_VALUE));
-		HordeSpawn cap = entity.getCapability(HordesCapabilities.HORDESPAWN);
-		if (cap != null) {
-			cap.setPlayerUUID(player.getUUID().toString());
-			registerEntity(entity, player);
-		}
+		if (addToMobCap) registerEntity(entity, player);
 		entity.targetSelector.getAvailableGoals().forEach(WrappedGoal::stop);
 		if (entity instanceof PathfinderMob) entity.targetSelector.addGoal(1, new HurtByTargetGoal((PathfinderMob) entity));
 		entity.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(entity, ServerPlayer.class, true));
-		for (Entity passenger : entity.getPassengers()) if (passenger instanceof Mob) finalizeEntity((Mob) passenger, player);
+		for (Entity passenger : entity.getPassengers()) if (passenger instanceof Mob) finalizeEntity((Mob) passenger, player, false);
 	}
 
 	private void cleanSpawns() {
@@ -351,11 +347,12 @@ public class HordeEvent {
 	}
 
 	public void registerEntity(Mob entity, ServerPlayer player) {
+		HordeSpawn cap = entity.getCapability(HordesCapabilities.HORDESPAWN);
 		if (!isActive(player) || spawnData == null) {
-			HordeSpawn cap = entity.getCapability(HordesCapabilities.HORDESPAWN);
 			if (cap != null) cap.setPlayerUUID("");
 			return;
 		}
+		if (cap != null) cap.setPlayerUUID(player.getUUID().toString());
 		if (!entitiesSpawned.contains(entity)) entitiesSpawned.add(entity);
 		entity.goalSelector.addGoal(6, new HordeTrackPlayerGoal(entity, player, spawnData.getEntitySpeed()));
 	}
