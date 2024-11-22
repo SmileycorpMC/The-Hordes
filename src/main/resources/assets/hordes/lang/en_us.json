@@ -8,7 +8,7 @@
 	"commands.hordes.StartHorde.invalidValue":"%1$s is not a valid argument for <length of event>;",
 	"commands.hordes.StartHorde.wrongArgCount":"Wrong number of arguments supplied for /startHordeEvent",
 	"commands.hordes.StopHorde.usage":"/hordes stop",
-	"commands.hordes.StopHorde.success":"Stopped active horde event",
+	"commands.hordes.StopHorde.success":"Stopped active horde event for player %1$s",
 	"commands.hordes.HordeDebug.usage":"/hordes debug",
 	"commands.hordes.HordeDebug.success":"Output horde log to %1$s",
 	"commands.hordes.HordeClean.usage":"/clearHordeData",

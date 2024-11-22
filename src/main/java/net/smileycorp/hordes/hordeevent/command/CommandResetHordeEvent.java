@@ -30,15 +30,15 @@ public class CommandResetHordeEvent {
 
 	public static int execute(CommandContext<CommandSourceStack> ctx, Collection<ServerPlayer> players) {
 		CommandSourceStack source = ctx.getSource();
+		boolean succeeded = false;
 		for (ServerPlayer player : players) {
 			HordeEvent horde = HordeSavedData.getData(source.getLevel()).getEvent(player);
-			if (horde != null) {
-				horde.reset(player);
-				source.getEntity().sendSystemMessage(Component.translatable("commands.hordes.HordeReset.success", player.getName()));
-				return 1;
-			}
+			if (horde == null) continue;
+			horde.reset(player);
+			source.getEntity().sendSystemMessage(Component.translatable("commands.hordes.HordeReset.success", player.getName()));
+			succeeded = true;
 		}
-		return 0;
+		return succeeded ? 1 : 0;
 	}
 	
 }

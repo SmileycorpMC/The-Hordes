@@ -7,6 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
@@ -32,14 +33,15 @@ public class CommandStopHordeEvent {
 
 	public static int execute(CommandContext<CommandSourceStack> ctx, Collection<ServerPlayer> players) throws CommandSyntaxException {
 		CommandSourceStack source = ctx.getSource();
+		boolean succeeded = false;
 		for (ServerPlayer player : players) {
 			HordeEvent horde = HordeSavedData.getData(source.getLevel()).getEvent(player);
-			if (horde != null) {
-				horde.stopEvent(player, true);
-				return 1;
-			}
+			if (horde == null) continue;
+			horde.stopEvent(player, true);
+			source.getEntity().sendSystemMessage(Component.translatable("commands.hordes.StopHorde.success", player.getName()));
+			succeeded = true;
 		}
-		return 0;
+		return succeeded ? 1 : 0;
 	}
 	
 }
