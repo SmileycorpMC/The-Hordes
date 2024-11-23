@@ -143,7 +143,7 @@ public class InfectionEventHandler {
 	public void applyEffect(MobEffectEvent.Added event) {
 		LivingEntity entity = event.getEntity();
 		if (entity.level().isClientSide()) return;
-		if (event.getEffectInstance().getEffect() == HordesInfection.IMMUNITY.get() && entity.hasEffect(HordesInfection.INFECTED))
+		if (event.getEffectInstance().getEffect().is(HordesInfection.IMMUNITY) && entity.hasEffect(HordesInfection.INFECTED))
 			if (entity.removeEffect(HordesInfection.INFECTED)) InfectionPacketHandler.sendTracking(new CureEntityMessage(entity), entity);
 	}
 	
