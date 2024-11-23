@@ -9,6 +9,7 @@
 	"mod_version": "1.6.2",
 	"data_version": 8,
 	"changes": [
-		"update ru_ru translations"
+		"update ru_ru translations",
+		"fix issues with infection protection attribute tooltip"
 	]
 }

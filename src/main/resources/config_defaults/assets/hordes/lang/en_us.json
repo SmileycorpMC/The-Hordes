@@ -31,7 +31,7 @@
 	"death.attack.infection.zombified":"%1$s was zombified.",
 
 	"tooltip.hordes.cure": "Cures infection",
-	"tooltip.hordes.wearableProtection": "%1$s Infection Resistance",
+	"hordes.infection_resistance": "Infection Resistance",
 
 	"attribute.name.hordes.infection_resistance": "Infection Resistance",
 
