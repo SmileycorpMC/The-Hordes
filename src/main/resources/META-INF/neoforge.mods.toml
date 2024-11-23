@@ -17,6 +17,7 @@ updateJSONURL="https://raw.githubusercontent.com/SmileycorpMC/The-Hordes/1.21/up
     type="required"
     versionRange="${minecraft_version}"
     side="BOTH"
+
 [[dependencies.hordes]]
     modId="neoforge"
     type="required"
