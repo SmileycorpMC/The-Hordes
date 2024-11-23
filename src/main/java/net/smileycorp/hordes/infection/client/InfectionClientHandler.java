@@ -42,14 +42,20 @@ public class InfectionClientHandler {
 	}
 	
 	@SubscribeEvent
-	public void preRenderEntity(RenderLivingEvent.Pre event){
+	public void preRenderEntity(RenderLivingEvent.Pre event) {
 		LivingEntity entity = event.getEntity();
 		Player player = Minecraft.getInstance().player;
-		if (ClientConfigHandler.playerInfectionVisuals.get() && player != null && player.hasEffect(HordesInfection.INFECTED) && entity != player) {
+		if (!ClientConfigHandler.playerInfectionVisuals.get()) return;
+		if (player != null && player.hasEffect(HordesInfection.INFECTED) && entity != player) {
 			int a = player.getEffect(HordesInfection.INFECTED).getAmplifier();
 			if (a > 2) RenderSystem.setShaderColor(1, 0.3f, 0.3f, 1);
 			else if (a == 2) RenderSystem.setShaderColor(1, 0.5f, 0.5f, 1);
 			else if (a == 1) RenderSystem.setShaderColor(1, 0.7f, 0.7f, 1);
+			if (a > 0) return;
+		}
+		if (entity.hasEffect(HordesInfection.INFECTED)) {
+			int a = entity.getEffect(HordesInfection.INFECTED).getAmplifier();
+			RenderSystem.setShaderColor((float) Math.pow(0.95f, a + 1), 1, (float) Math.pow(0.8f, a + 1), 1);
 		}
 	}
 
