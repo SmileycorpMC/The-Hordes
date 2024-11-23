@@ -60,7 +60,7 @@ public class InfectionClientHandler {
 	}
 
 	@SubscribeEvent
-	public void postRenderEntity(RenderLivingEvent.Post event){
+	public void postRenderEntity(RenderLivingEvent.Post event) {
 		if (RenderSystem.getShaderColor().equals(new float[]{1, 1, 1, 1})) return;
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 	}

@@ -33,7 +33,7 @@
 	"tooltip.hordes.cure": "Cures infection",
 	"hordes.infection_resistance": "Infection Resistance",
 
-	"attribute.name.hordes.infection_resistance": "Infection Resistance",
+	"attribute.hordes.infection_resistance": "Infection Resistance",
 
 	"jei.category.hordes.InfectionCures":"Infection Cures"
 }
