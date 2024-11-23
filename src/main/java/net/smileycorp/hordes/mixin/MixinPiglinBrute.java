@@ -35,12 +35,10 @@ public abstract class MixinPiglinBrute extends AbstractPiglin {
 		if(!getBrain().checkMemory(MemoryModuleType.ATTACK_TARGET, MemoryStatus.VALUE_ABSENT)) return;
 		if (!getOffhandItem().isEmpty()) return;
 		ItemStack stack = new ItemStack(Items.GOLDEN_APPLE);
-		if (stack.is(HordesInfection.INFECTION_CURES_TAG)) {
-			if (getOffhandItem().isEmpty()) {
-				setItemInHand(InteractionHand.OFF_HAND, stack);
-				startUsingItem(InteractionHand.OFF_HAND);
-			}
-		}
+		if (!stack.is(HordesInfection.INFECTION_CURES_TAG)) return;
+		if (!getOffhandItem().isEmpty()) return;
+		setItemInHand(InteractionHand.OFF_HAND, stack);
+		startUsingItem(InteractionHand.OFF_HAND);
 	}
 
 }

@@ -38,17 +38,13 @@ public abstract class MixinPiglin extends AbstractPiglin {
 		if (!getBrain().checkMemory(MemoryModuleType.ATTACK_TARGET, MemoryStatus.VALUE_ABSENT)) return;
 		if (!getItemBySlot(EquipmentSlot.OFFHAND).isEmpty()) return;
 		for (int i = 0; i < inventory.getContainerSize(); i++) {
-			if (!getItemBySlot(EquipmentSlot.OFFHAND).isEmpty()) return;
 			ItemStack stack = inventory.getItem(i).copy();
-			if (stack.is(HordesInfection.INFECTION_CURES_TAG)) {
-				if (getItemBySlot(EquipmentSlot.OFFHAND).isEmpty()) {
-					stack.setCount(1);
-					inventory.getItem(i).shrink(1);
-					setItemSlot(EquipmentSlot.OFFHAND, stack);
-					startUsingItem(InteractionHand.OFF_HAND);
-					return;
-				}
-			}
+			if (!stack.is(HordesInfection.INFECTION_CURES_TAG)) continue;
+			stack.setCount(1);
+			inventory.getItem(i).shrink(1);
+			setItemSlot(EquipmentSlot.OFFHAND, stack);
+			startUsingItem(InteractionHand.OFF_HAND);
+			return;
 		}
 	}
 

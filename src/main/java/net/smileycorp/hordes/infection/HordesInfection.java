@@ -38,8 +38,7 @@ public class HordesInfection {
 	}
 	
 	public static List<ItemStack> getCureList() {
-		return BuiltInRegistries.ITEM.getTag(INFECTION_CURES_TAG).get()
-				.stream().map(ItemStack::new).collect(Collectors.toList());
+		return BuiltInRegistries.ITEM.getTag(INFECTION_CURES_TAG).get().stream().map(ItemStack::new).collect(Collectors.toList());
 	}
 
 	public static boolean isCure(ItemStack stack) {

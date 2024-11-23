@@ -22,8 +22,9 @@ public abstract class MixinVex extends Monster {
     
     @Inject(at=@At("HEAD"), method = "registerGoals", cancellable = true)
     public void registerGoals(CallbackInfo callback) {
-        if (CommonConfigHandler.illagersHuntZombies.get())
-            targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 10, true, false, InfectionData.INSTANCE::canCauseInfection));
+        if (!CommonConfigHandler.illagersHuntZombies.get()) return;
+        targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 10, true, false,
+                InfectionData.INSTANCE::canCauseInfection));
     }
     
 }

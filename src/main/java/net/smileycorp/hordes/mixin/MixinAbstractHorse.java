@@ -40,17 +40,15 @@ public abstract class MixinAbstractHorse extends Animal {
 	}
 
 	protected void tryBurn() {
-		boolean burn = isSunBurnTick();
-		if (burn && getPassengers().isEmpty()) {
-			ItemStack itemstack = inventory.getItem(1);
-			if (!itemstack.isEmpty()) {
-				if (itemstack.isDamageableItem()) {
-					itemstack.setDamageValue(itemstack.getDamageValue() + random.nextInt(2));
-					if (itemstack.getDamageValue() >= itemstack.getMaxDamage()) inventory.setItem(1, ItemStack.EMPTY);
-				}
-				burn = false;
-			}
-			if (burn) igniteForSeconds(8);
+		if (!isSunBurnTick() |! getPassengers().isEmpty()) return;
+		ItemStack itemstack = inventory.getItem(1);
+		if (itemstack.isEmpty()) {
+			igniteForSeconds(8);
+			return;
+		}
+		if (itemstack.isDamageableItem()) {
+			itemstack.setDamageValue(itemstack.getDamageValue() + random.nextInt(2));
+			if (itemstack.getDamageValue() >= itemstack.getMaxDamage()) inventory.setItem(1, ItemStack.EMPTY);
 		}
 	}
 

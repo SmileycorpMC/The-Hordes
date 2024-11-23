@@ -46,12 +46,10 @@ public class HordeTrackPlayerGoal extends Goal {
     }
 
     public void tick() {
-        if (timeToRecalcPath-- <= 0) {
-            timeToRecalcPath = HordeEventConfig.hordePathingInterval.get();
-            pather = entity.getNavigation();
-            pather.moveTo(target, speed);
-        }
-
+        if (timeToRecalcPath-- > 0) return;
+        timeToRecalcPath = HordeEventConfig.hordePathingInterval.get();
+        pather = entity.getNavigation();
+        pather.moveTo(target, speed);
     }
 
 }

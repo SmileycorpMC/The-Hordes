@@ -8,7 +8,10 @@ import net.neoforged.fml.loading.moddiscovery.ModFile;
 import net.smileycorp.hordes.common.HordesLogger;
 import org.apache.commons.io.FileUtils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -77,14 +80,9 @@ public class DataGenerator {
         }
     }
     
-    private static void copyFiles(Path path) throws IOException {
-    
-    }
-    
     private static void copyFileFromMod(Path path) {
         try {
-            FileUtils.copyInputStreamToFile(Files.newInputStream(path),
-                    new File(CONFIG_FOLDER.toFile(), path.toString().replace( "config_defaults/", "")));
+            FileUtils.copyInputStreamToFile(Files.newInputStream(path), new File(CONFIG_FOLDER.toFile(), path.toString().replace( "config_defaults/", "")));
             HordesLogger.logInfo("Copied file " + path);
         } catch (Exception e) {
             HordesLogger.logError("Failed to copy file " + path, e);

@@ -90,12 +90,12 @@ public class HordeSavedData extends SavedData {
 		if (HordeEventConfig.hordePreventsOtherPlayersSleeping.get()) {
 			for (Player player1 : level.players()) {
 				HordeEvent horde = getEvent(player1.getUUID());
-				if (horde.isHordeDay(player) || horde.isActive(player)) return true;
+				if (horde.isHordeDay(player)) return true;
 			}
 			return false;
 		}
 		HordeEvent horde = getEvent(player);
-		return horde == null ? false : horde.isHordeDay(player) || horde.isActive(player);
+		return horde == null ? false : horde.isHordeDay(player);
 	}
 	
 	public RandomSource getRandom() {

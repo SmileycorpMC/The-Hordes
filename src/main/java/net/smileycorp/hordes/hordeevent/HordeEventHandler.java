@@ -80,11 +80,10 @@ public class HordeEventHandler {
 	
 	@SubscribeEvent
 	public void logIn(PlayerEvent.PlayerLoggedInEvent event) {
-		if (event.getEntity() instanceof ServerPlayer) {
-			ServerPlayer player = (ServerPlayer) event.getEntity();
-			HordeEvent horde = HordeSavedData.getData(player.serverLevel()).getEvent(player);
-			if (horde != null) horde.setPlayer(player);
-		}
+		if (!(event.getEntity() instanceof ServerPlayer)) return;
+		ServerPlayer player = (ServerPlayer) event.getEntity();
+		HordeEvent horde = HordeSavedData.getData(player.serverLevel()).getEvent(player);
+		if (horde != null) horde.setPlayer(player);
 	}
 	
 	//prevent despawning of entities in an active horde

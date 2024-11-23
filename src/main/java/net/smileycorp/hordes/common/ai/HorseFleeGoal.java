@@ -6,7 +6,7 @@ import net.smileycorp.hordes.infection.data.InfectionData;
 public class HorseFleeGoal extends FleeEntityGoal {
 
 	public HorseFleeGoal(Mob entity) {
-		super(entity, 2D, 15, InfectionData.INSTANCE::canCauseInfection);
+		super(entity, 2, 15, InfectionData.INSTANCE::canCauseInfection);
 	}
 
 	@Override

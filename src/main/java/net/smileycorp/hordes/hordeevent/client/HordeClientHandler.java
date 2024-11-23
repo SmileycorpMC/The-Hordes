@@ -3,7 +3,6 @@ package net.smileycorp.hordes.hordeevent.client;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -12,7 +11,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 import net.smileycorp.hordes.config.ClientConfigHandler;
@@ -34,21 +32,18 @@ public class HordeClientHandler {
         if (isHordeNight(level)) {
             float d = level.getSkyDarken((float)event.getPartialTick()) * 1.4f;
             Color rgb = ClientConfigHandler.getHordeSkyColour();
-            event.setRed((1f - d) * (float)rgb.getRed()/255f + d * event.getRed());
-            event.setGreen((1f - d) * (float)rgb.getGreen()/255f + d * event.getGreen());
-            event.setBlue((1f - d) * (float)rgb.getBlue()/255f + d * event.getBlue());
+            event.setRed((1f - d) * (float)rgb.getRed() / 255f + d * event.getRed());
+            event.setGreen((1f - d) * (float)rgb.getGreen() / 255f + d * event.getGreen());
+            event.setBlue((1f - d) * (float)rgb.getBlue() / 255f + d * event.getBlue());
         }
     }
     
-    public void playHordeSound(Vec3 vec3, ResourceLocation sound) {
-        if (ClientConfigHandler.hordeSpawnSound.get()) {
-            Minecraft mc = Minecraft.getInstance();
-            Level level = mc.level;
-            LocalPlayer player = mc.player;
-            BlockPos pos = BlockPos.containing(player.getX() + (10 * vec3.x), player.getY(), player.getZ() + (10 * vec3.z));
-            float pitch = 1 + ((level.random.nextInt(6) - 3) / 10);
-            level.playSound(player, pos, SoundEvent.createVariableRangeEvent(sound), SoundSource.HOSTILE, 0.5f, pitch);
-        }
+    public void playHordeSound(float dirX, float dirZ, ResourceLocation sound) {
+        if (!ClientConfigHandler.hordeSpawnSound.get()) return;
+        Minecraft mc = Minecraft.getInstance();
+        Level level = mc.level;
+        level.playSound(mc.player, BlockPos.containing(mc.player.getX() + (10f * dirX), mc.player.getY(), mc.player.getZ() + (10f * dirZ)),
+                SoundEvent.createVariableRangeEvent(sound), SoundSource.HOSTILE, 0.5f, 1 + ((level.random.nextInt(6) - 3) / 10f));
     }
     
     public void displayMessage(String text) {

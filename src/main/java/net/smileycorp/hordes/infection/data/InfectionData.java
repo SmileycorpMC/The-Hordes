@@ -60,13 +60,11 @@ public class InfectionData extends SimpleJsonResourceReloadListener {
             if (json == null) continue;
             try {
                 HordesLogger.logInfo("Loading conversion table " + loc);
-                for (JsonElement element : json.getAsJsonArray()) {
-                    try {
-                       InfectionConversionEntry entry = InfectionConversionEntry.deserialize(element.getAsJsonObject());
-                       conversionTable.put(entry.getEntity(), entry);
-                    } catch (Exception e) {
-                       HordesLogger.logError("Failed to load conversion entry " + element.getAsString(), e);
-                    }
+                for (JsonElement element : json.getAsJsonArray()) try {
+                   InfectionConversionEntry entry = InfectionConversionEntry.deserialize(element.getAsJsonObject());
+                   conversionTable.put(entry.getEntity(), entry);
+                } catch (Exception e) {
+                   HordesLogger.logError("Failed to load conversion entry " + element.getAsString(), e);
                 }
             } catch (Exception e) {
                 HordesLogger.logError("Failed to load conversion table " + loc, e);
@@ -80,17 +78,15 @@ public class InfectionData extends SimpleJsonResourceReloadListener {
             if (json == null) continue;
             try {
                 HordesLogger.logInfo("Loading immunity item list " + loc);
-                for (JsonElement element : json.getAsJsonArray()) {
-                    try {
-                        JsonObject obj = element.getAsJsonObject();
-                        ResourceLocation name = ResourceLocation.tryParse(obj.get("item").getAsString());
-                        Item item = BuiltInRegistries.ITEM.get(name);
-                        int duration = obj.get("duration").getAsInt();
-                        immunityItems.put(item, duration);
-                        HordesLogger.logInfo("Loaded immunity item " + name + " with duration " + duration);
-                    } catch (Exception e) {
-                        HordesLogger.logError("Failed to load immunity item " + element.getAsString(), e);
-                    }
+                for (JsonElement element : json.getAsJsonArray()) try {
+                    JsonObject obj = element.getAsJsonObject();
+                    ResourceLocation name = ResourceLocation.tryParse(obj.get("item").getAsString());
+                    Item item = BuiltInRegistries.ITEM.get(name);
+                    int duration = obj.get("duration").getAsInt();
+                    immunityItems.put(item, duration);
+                    HordesLogger.logInfo("Loaded immunity item " + name + " with duration " + duration);
+                } catch (Exception e) {
+                    HordesLogger.logError("Failed to load immunity item " + element.getAsString(), e);
                 }
             } catch (Exception e) {
                 HordesLogger.logError("Failed to load immunity item list " + loc, e);
@@ -104,18 +100,16 @@ public class InfectionData extends SimpleJsonResourceReloadListener {
             if (json == null) continue;
             try {
                 HordesLogger.logInfo("Loading wearables protection list " + loc);
-                for (JsonElement element : json.getAsJsonArray()) {
-                    try {
-                        JsonObject obj = element.getAsJsonObject();
-                        ResourceLocation name = ResourceLocation.tryParse(obj.get("item").getAsString());
-                        Item item = BuiltInRegistries.ITEM.get(name);
-                        float modifier = obj.get("protection").getAsFloat();
-                        if (item == null || item == Items.AIR) throw new NullPointerException();
-                        wearablesProtection.put(item, modifier);
-                        HordesLogger.logInfo("Loaded wearable protection " + name + " with modifier " + modifier);
-                    } catch (Exception e) {
-                        HordesLogger.logError("Failed to load wearable protection " + element.getAsString(), e);
-                    }
+                for (JsonElement element : json.getAsJsonArray()) try {
+                    JsonObject obj = element.getAsJsonObject();
+                    ResourceLocation name = ResourceLocation.tryParse(obj.get("item").getAsString());
+                    Item item = BuiltInRegistries.ITEM.get(name);
+                    float modifier = obj.get("protection").getAsFloat();
+                    if (item == null || item == Items.AIR) throw new NullPointerException();
+                    wearablesProtection.put(item, modifier);
+                    HordesLogger.logInfo("Loaded wearable protection " + name + " with modifier " + modifier);
+                } catch (Exception e) {
+                    HordesLogger.logError("Failed to load wearable protection " + element.getAsString(), e);
                 }
             } catch (Exception e) {
                 HordesLogger.logError("Failed to load wearable protection list " + loc, e);
@@ -129,17 +123,15 @@ public class InfectionData extends SimpleJsonResourceReloadListener {
             if (json == null) continue;
             try {
                 HordesLogger.logInfo("Loading entity infection list " + loc);
-                for (JsonElement element : json.getAsJsonArray()) {
-                    try {
-                        JsonObject obj = element.getAsJsonObject();
-                        ResourceLocation name = ResourceLocation.tryParse(obj.get("entity").getAsString());
-                        EntityType entity = BuiltInRegistries.ENTITY_TYPE.get(name);
-                        float chance = obj.get("chance").getAsFloat();
-                        entityInfectChance.put(entity, chance);
-                        HordesLogger.logInfo("Loaded infection entity " + name + " with infect chance " + chance);
-                    } catch (Exception e) {
-                        HordesLogger.logError("Failed to infection entity " + element.getAsString(), e);
-                    }
+                for (JsonElement element : json.getAsJsonArray()) try {
+                    JsonObject obj = element.getAsJsonObject();
+                    ResourceLocation name = ResourceLocation.tryParse(obj.get("entity").getAsString());
+                    EntityType entity = BuiltInRegistries.ENTITY_TYPE.get(name);
+                    float chance = obj.get("chance").getAsFloat();
+                    entityInfectChance.put(entity, chance);
+                    HordesLogger.logInfo("Loaded infection entity " + name + " with infect chance " + chance);
+                } catch (Exception e) {
+                    HordesLogger.logError("Failed to infection entity " + element.getAsString(), e);
                 }
             } catch (Exception e) {
                 HordesLogger.logError("Failed to load entity infection list " + loc, e);
@@ -173,11 +165,9 @@ public class InfectionData extends SimpleJsonResourceReloadListener {
     }
     
     public boolean applyImmunity(LivingEntity entity, Item item) {
-        if (immunityItems.containsKey(item)) {
-            entity.addEffect(new MobEffectInstance(HordesInfection.IMMUNITY, immunityItems.get(item) * 20));
-            return true;
-        }
-        return false;
+        if (!immunityItems.containsKey(item)) return false;
+        entity.addEffect(new MobEffectInstance(HordesInfection.IMMUNITY, immunityItems.get(item) * 20));
+        return true;
     }
     
     public float getInfectionChance(LivingEntity entity, LivingEntity attacker) {

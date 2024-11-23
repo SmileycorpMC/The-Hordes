@@ -24,10 +24,10 @@ public abstract class MixinPillager extends AbstractIllager implements RangedAtt
     
     @Inject(at=@At("HEAD"), method = "registerGoals", cancellable = true)
     public void registerGoals(CallbackInfo callback) {
-        if (CommonConfigHandler.illagersHuntZombies.get()) {
-            targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 10, true, false, InfectionData.INSTANCE::canCauseInfection));
-            goalSelector.addGoal(1, new FleeEntityGoal(this, 1.5, 5, InfectionData.INSTANCE::canCauseInfection));
-        }
+        if (!CommonConfigHandler.illagersHuntZombies.get()) return;
+        targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 10, true, false,
+                InfectionData.INSTANCE::canCauseInfection));
+        goalSelector.addGoal(1, new FleeEntityGoal(this, 1.5, 5, InfectionData.INSTANCE::canCauseInfection));
     }
     
 }

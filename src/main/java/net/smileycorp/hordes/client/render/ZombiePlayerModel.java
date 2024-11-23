@@ -60,21 +60,21 @@ public class ZombiePlayerModel<T extends Zombie & PlayerZombie> extends PlayerMo
 		AnimationUtils.animateZombieArms(leftArm, rightArm, entity.isAggressive(), attackTime, age);
 		if (isDrowned) {
 			if (leftArmPose == HumanoidModel.ArmPose.THROW_SPEAR) {
-				leftArm.xRot = leftArm.xRot * 0.5F - (float)Math.PI;
-				leftArm.yRot = 0.0F;
+				leftArm.xRot = leftArm.xRot * 0.5f - (float)Math.PI;
+				leftArm.yRot = 0;
 			}
 			if (rightArmPose == HumanoidModel.ArmPose.THROW_SPEAR) {
-				rightArm.xRot = rightArm.xRot * 0.5F - (float)Math.PI;
-				rightArm.yRot = 0.0F;
+				rightArm.xRot = rightArm.xRot * 0.5f - (float)Math.PI;
+				rightArm.yRot = 0;
 			}
-			if (swimAmount > 0.0F) {
-				rightArm.xRot = rotlerpRad(swimAmount, rightArm.xRot, -2.5132742F) + swimAmount * 0.35F * Mth.sin(0.1F * age);
-				leftArm.xRot = rotlerpRad(swimAmount, leftArm.xRot, -2.5132742F) - swimAmount * 0.35F * Mth.sin(0.1F * age);
+			if (swimAmount > 0) {
+				rightArm.xRot = rotlerpRad(swimAmount, rightArm.xRot, -2.5132742f) + swimAmount * 0.35f * Mth.sin(0.1f * age);
+				leftArm.xRot = rotlerpRad(swimAmount, leftArm.xRot, -2.5132742f) - swimAmount * 0.35f * Mth.sin(0.1f * age);
 				rightArm.zRot = rotlerpRad(swimAmount, rightArm.zRot, -0.15F);
 				leftArm.zRot = rotlerpRad(swimAmount, leftArm.zRot, 0.15F);
-				leftLeg.xRot -= swimAmount * 0.55F * Mth.sin(0.1F * age);
-				rightLeg.xRot += swimAmount * 0.55F * Mth.sin(0.1F * age);
-				head.xRot = 0.0F;
+				leftLeg.xRot -= swimAmount * 0.55f * Mth.sin(0.1f * age);
+				rightLeg.xRot += swimAmount * 0.55f * Mth.sin(0.1f * age);
+				head.xRot = 0;
 			}
 		}
 		leftPants.copyFrom(leftLeg);
@@ -85,7 +85,8 @@ public class ZombiePlayerModel<T extends Zombie & PlayerZombie> extends PlayerMo
 
 	@Override
 	public void renderToBuffer(PoseStack poseStack, VertexConsumer consumer, int packedLight, int packedOverlay, int c) {
-		super.renderToBuffer(poseStack, consumer, packedLight, packedOverlay, FastColor.ARGB32.colorFromFloat(1, colour.getRed()/255f, colour.getGreen()/255f, colour.getBlue()/255f));
+		super.renderToBuffer(poseStack, consumer, packedLight, packedOverlay, FastColor.ARGB32.colorFromFloat(1, colour.getRed() / 255f,
+				colour.getGreen() / 255f, colour.getBlue() / 255f));
 	}
 
 }

@@ -150,7 +150,7 @@ public class HordeEvent {
 			logInfo("Stopping wave spawn because count is " + count);
 			return;
 		}
-		HordeEventPacketHandler.sendTo(new HordeSoundMessage(basedir, spawnData.getSpawnSound()), player);
+		HordeEventPacketHandler.sendTo(new HordeSoundMessage((float) basedir.x, (float) basedir.z, spawnData.getSpawnSound()), player);
 		for (HordeSpawnEntry entry : spawntable.getResults(rand, count)) {
 			if (entitiesSpawned.size() > HordeEventConfig.hordeSpawnMax.get()) {
 				logInfo("Can't spawn wave because max cap has been reached");

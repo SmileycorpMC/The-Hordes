@@ -31,17 +31,16 @@ public abstract class MixinZombieHorse extends AbstractHorse {
 
 	@Inject(at=@At("HEAD"), method = "addBehaviourGoals", cancellable = true)
 	public void addBehaviourGoals(CallbackInfo callback) {
-		if (CommonConfigHandler.aggressiveZombieHorses.get()) {
-			targetSelector.addGoal(1, (new HurtByTargetGoal(this)));
-			targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
-			targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, AbstractVillager.class, false));
-			targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, IronGolem.class, true));
-			targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, Turtle.class, 10, true, false, Turtle.BABY_ON_LAND_SELECTOR));
-			goalSelector.addGoal(2, new MeleeAttackGoal(this, 2.0D, false));
-			goalSelector.addGoal(6, new MoveThroughVillageGoal(this, 1.0D, true, 4, () -> false));
-			goalSelector.getAvailableGoals().removeIf(goal -> goal.getGoal() instanceof PanicGoal);
-			goalSelector.getAvailableGoals().removeIf(goal -> goal.getGoal() instanceof RunAroundLikeCrazyGoal);
-		}
+		if (!CommonConfigHandler.aggressiveZombieHorses.get()) return;
+		targetSelector.addGoal(1, (new HurtByTargetGoal(this)));
+		targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
+		targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, AbstractVillager.class, false));
+		targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, IronGolem.class, true));
+		targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, Turtle.class, 10, true, false, Turtle.BABY_ON_LAND_SELECTOR));
+		goalSelector.addGoal(2, new MeleeAttackGoal(this, 2.0D, false));
+		goalSelector.addGoal(6, new MoveThroughVillageGoal(this, 1.0D, true, 4, () -> false));
+		goalSelector.getAvailableGoals().removeIf(goal -> goal.getGoal() instanceof PanicGoal);
+		goalSelector.getAvailableGoals().removeIf(goal -> goal.getGoal() instanceof RunAroundLikeCrazyGoal);
 	}
 
 	@Inject(at=@At("TAIL"), method = "createAttributes", cancellable = true)

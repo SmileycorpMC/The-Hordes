@@ -52,10 +52,8 @@ public class InfectionEventHandler {
 		if (InfectionData.INSTANCE.canBeInfected(entity) && entity instanceof LivingEntity)
 			((LivingEntity) entity).getAttribute(HordesInfection.INFECTION_RESISTANCE).setBaseValue(InfectionData.INSTANCE.getProtection(entity.getType()));
 		if (!(entity instanceof Mob && InfectionConfig.infectionEntitiesAggroConversions.get()) || entity.level().isClientSide) return;
-		if (InfectionData.INSTANCE.canCauseInfection(entity)) {
-			((Mob) entity).targetSelector.addGoal(3, new NearestAttackableTargetGoal<>((Mob) entity, LivingEntity.class,
-					10, true, false, InfectionData.INSTANCE::canBeInfected));
-		}
+		if (InfectionData.INSTANCE.canCauseInfection(entity)) ((Mob) entity).targetSelector.addGoal(3, new NearestAttackableTargetGoal<>((Mob) entity,
+				LivingEntity.class, 10, true, false, InfectionData.INSTANCE::canBeInfected));
 	}
 	
 	@SubscribeEvent
@@ -111,13 +109,12 @@ public class InfectionEventHandler {
 		if (level.isClientSide || !(source.is(HordesInfection.INFECTION_DAMAGE) || entity.hasEffect(HordesInfection.INFECTED))) return;
 		InfectionDeathEvent deathevent = new InfectionDeathEvent(entity, event.getSource());
 		NeoForge.EVENT_BUS.post(deathevent);
-		if (deathevent.isCanceled()) {
-			event.setCanceled(true);
-			if (!(entity instanceof OwnableEntity)) return;
-			LivingEntity owner = ((OwnableEntity) entity).getOwner();
-			if (!(owner instanceof ServerPlayer)) return;
-			owner.sendSystemMessage(Component.translatable("death.attack.infection.zombified", entity.getDisplayName()));
-		}
+		if (!deathevent.isCanceled()) return;
+		event.setCanceled(true);
+		if (!(entity instanceof OwnableEntity)) return;
+		LivingEntity owner = ((OwnableEntity) entity).getOwner();
+		if (!(owner instanceof ServerPlayer)) return;
+		owner.sendSystemMessage(Component.translatable("death.attack.infection.zombified", entity.getDisplayName()));
 	}
 
 	@SubscribeEvent
@@ -133,15 +130,13 @@ public class InfectionEventHandler {
 	public void canApplyEffect(MobEffectEvent.Applicable event) {
 		LivingEntity entity = event.getEntity();
 		if (entity.level().isClientSide()) return;
-		if (event.getEffectInstance().is(HordesInfection.INFECTED)) {
-			if (InfectedEffect.preventInfection(entity)) {
-				event.setResult(MobEffectEvent.Applicable.Result.DO_NOT_APPLY);
-				if (entity instanceof ServerPlayer)
-					InfectionPacketHandler.sendTo(new InfectMessage(true), (ServerPlayer) entity);
-			} else if (entity.hasEffect(HordesInfection.INFECTED) && entity.getEffect(HordesInfection.INFECTED).getAmplifier()
-					< event.getEffectInstance().getAmplifier())
-				entity.removeEffect(HordesInfection.INFECTED);
-		}
+		if (!event.getEffectInstance().is(HordesInfection.INFECTED)) return;
+		if (InfectedEffect.preventInfection(entity)) {
+			event.setResult(MobEffectEvent.Applicable.Result.DO_NOT_APPLY);
+			if (entity instanceof ServerPlayer)
+				InfectionPacketHandler.sendTo(new InfectMessage(true), (ServerPlayer) entity);
+		} else if (entity.hasEffect(HordesInfection.INFECTED) && entity.getEffect(HordesInfection.INFECTED).getAmplifier()
+				< event.getEffectInstance().getAmplifier()) entity.removeEffect(HordesInfection.INFECTED);
 	}
 
 	@SubscribeEvent

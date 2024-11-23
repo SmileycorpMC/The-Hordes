@@ -56,12 +56,12 @@ public class ZombiePlayerRenderer<T extends Zombie & PlayerZombie> extends Human
 	}
 
 	@Override
-	public void render(T entity, float yaw, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int packedLightIn) {
+	public void render(T entity, float yaw, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
 		Optional<UUID> optional = entity.getPlayerUUID();
 		boolean isSlim = "slim".equals(PlayerTextureRenderer.getSkinType(optional));
 		if (isSlim && model != slimModel) model = slimModel;
 		else if (!isSlim && model != defaultModel) model = defaultModel;
-		super.render(entity, yaw, partialTicks, poseStack, bufferSource, packedLightIn);
+		super.render(entity, yaw, partialTicks, poseStack, bufferSource, packedLight);
 	}
 
 	public static LayerDefinition createLayer(boolean slim) {

@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
@@ -84,18 +85,11 @@ public class InfectionClientHandler {
 	}
 	
 	public void onInfect(boolean prevented) {
-		if (ClientConfigHandler.playerInfectSound.get() &! prevented) {
-			Minecraft mc = Minecraft.getInstance();
-			Level level = mc.level;
-			LocalPlayer player = mc.player;
-			level.playSound(player, player.blockPosition(), Constants.INFECT_SOUND, SoundSource.PLAYERS, 0.75f, level.random.nextFloat());
-		}
-		if (ClientConfigHandler.infectionProtectSound.get() && prevented) {
-			Minecraft mc = Minecraft.getInstance();
-			Level level = mc.level;
-			LocalPlayer player = mc.player;
-			level.playSound(player, player.blockPosition(), Constants.IMMUNE_SOUND, SoundSource.PLAYERS, 0.75f, level.random.nextFloat());
-		}
+		SoundEvent event = (prevented && ClientConfigHandler.infectionProtectSound.get()) ? Constants.IMMUNE_SOUND :
+				(!prevented && ClientConfigHandler.playerInfectSound.get()) ? Constants.INFECT_SOUND : null;
+		if (event == null) return;
+		LocalPlayer player = Minecraft.getInstance().player;
+		player.level().playSound(player, player.blockPosition(), event, SoundSource.PLAYERS, 0.75f, player.getRandom().nextFloat());
 	}
 	
 	public void processCureEntity(CureEntityMessage message) {

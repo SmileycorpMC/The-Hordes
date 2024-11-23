@@ -26,14 +26,13 @@ public abstract class MixinZombifiedPiglin extends Zombie {
 
 	@Inject(at=@At("HEAD"), method = "addBehaviourGoals", cancellable = true)
 	public void addBehaviourGoals(CallbackInfo callback) {
-		if (CommonConfigHandler.aggressiveZombiePiglins.get()) {
-			targetSelector.addGoal(1, (new HurtByTargetGoal(this)));
-			targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
-			targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, AbstractVillager.class, false));
-			targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, IronGolem.class, true));
-			targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, Turtle.class, 10, true, false, Turtle.BABY_ON_LAND_SELECTOR));
-			goalSelector.addGoal(6, new MoveThroughVillageGoal(this, 1.0D, true, 4, Func::False));
-		}
+		if (!CommonConfigHandler.aggressiveZombiePiglins.get()) return;
+		targetSelector.addGoal(1, (new HurtByTargetGoal(this)));
+		targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
+		targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, AbstractVillager.class, false));
+		targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, IronGolem.class, true));
+		targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, Turtle.class, 10, true, false, Turtle.BABY_ON_LAND_SELECTOR));
+		goalSelector.addGoal(6, new MoveThroughVillageGoal(this, 1.0D, true, 4, Func::False));
 	}
 
 }

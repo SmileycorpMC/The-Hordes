@@ -2,7 +2,6 @@ package net.smileycorp.hordes.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Camera;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.smileycorp.hordes.config.ClientConfigHandler;
@@ -19,8 +18,6 @@ import java.awt.*;
 
 @Mixin(LevelRenderer.class)
 public class MixinLevelRenderer {
-
-    @Shadow private Minecraft minecraft;
     
     @Shadow @Nullable private ClientLevel level;
     

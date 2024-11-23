@@ -7,7 +7,6 @@ import net.smileycorp.hordes.common.event.HordePlayerEvent;
 
 public class EventDayGetter implements ValueGetter<Integer> {
 	
-
 	@Override
 	public Integer get(HordePlayerEvent event) {
 		return event.getDay();

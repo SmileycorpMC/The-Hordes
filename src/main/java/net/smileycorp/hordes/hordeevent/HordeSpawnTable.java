@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
@@ -58,20 +57,15 @@ public class HordeSpawnTable {
 
     public HordeSpawnEntry getEntryFor(Mob entity, int day) {
         if (!tested) testEntries();
-        for (HordeSpawnEntry entry : getEntriesFor(entity)) {
-            if (entry.getMinDay() <= day && (entry.getMaxDay() == 0 || entry.getMaxDay() >= day)) {
-                return entry;
-            }
-        }
+        for (HordeSpawnEntry entry : getEntriesFor(entity)) if (entry.getMinDay() <= day && (entry.getMaxDay() == 0 || entry.getMaxDay() >= day)) return entry;
         return null;
     }
 
     private void testEntries() {
-        List<HordeSpawnEntry> toRemove = new ArrayList<>();
+        List<HordeSpawnEntry> toRemove = Lists.newArrayList();
         for (HordeSpawnEntry entry : spawns) {
             try {
-                Entity entity = entry.getEntity().create(ServerLifecycleHooks.getCurrentServer().overworld());
-                if (!(entity instanceof Mob)) toRemove.add(entry);
+                if (!(entry.getEntity().create(ServerLifecycleHooks.getCurrentServer().overworld()) instanceof Mob)) toRemove.add(entry);
             } catch(Exception e) {
                 e.printStackTrace();
             }

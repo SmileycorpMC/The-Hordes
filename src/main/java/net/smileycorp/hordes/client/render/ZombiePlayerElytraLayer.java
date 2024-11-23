@@ -32,7 +32,7 @@ public class ZombiePlayerElytraLayer<T extends Zombie & PlayerZombie> extends El
 		ResourceLocation texture = PlayerTextureRenderer.getTexture(entity.getPlayerUUID(), Type.ELYTRA);
 		if (texture != null) loc = texture;
 		poseStack.pushPose();
-		poseStack.translate(0.0D, 0.0D, 0.125D);
+		poseStack.translate(0, 0, 0.125);
 		getParentModel().copyPropertiesTo(elytraModel);
 		elytraModel.setupAnim(entity, limbSwing, limbSwingAmount, age, headYaw, headPitch);
 		VertexConsumer vertexconsumer = ItemRenderer.getArmorFoilBuffer(buffers, RenderType.armorCutoutNoCull(loc), itemstack.hasFoil());

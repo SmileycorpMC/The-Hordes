@@ -65,9 +65,7 @@ public class Hordes {
 		if (DataGenerator.shouldGenerateFiles()) {
 			if (FMLEnvironment.dist == Dist.CLIENT) DataGenerator.generateAssets();
 			DataGenerator.generateData();
-		} else {
-			HordesLogger.logInfo("Config files are up to date, skipping data/asset generation");
-		}
+		} else HordesLogger.logInfo("Config files are up to date, skipping data/asset generation");
 		bus.register(this);
 		bus.addListener(HordeEventPacketHandler::initPackets);
 		bus.addListener(InfectionPacketHandler::initPackets);
