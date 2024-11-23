@@ -69,13 +69,6 @@ public class InfectionClientHandler {
 			if (immunity > 0) PotionContents.addPotionTooltip(Lists.newArrayList(new MobEffectInstance(HordesInfection.IMMUNITY,
 					immunity * 20)), components::add, 1, Minecraft.getInstance().level.tickRateManager().tickrate());
 		}
-		/*if (ClientConfigHandler.wearableProtectionTooltip.get() && wearableProtection.containsKey(item)) {
-			int value = wearableProtection.get(item);
-			if (value == 0) return;
-			String str = value + "%";
-			if (value > 0) str = "+" + str;
-			components.add(Component.translatable("tooltip.hordes.wearableProtection", str).withStyle(ChatFormatting.BLUE));
-		}*/
 		components.forEach(c -> event.getTooltipElements().add(Either.left(c)));
 	}
 	
