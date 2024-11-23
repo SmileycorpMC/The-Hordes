@@ -47,8 +47,9 @@ public class InfectionClientHandler {
 		Player player = Minecraft.getInstance().player;
 		if (ClientConfigHandler.playerInfectionVisuals.get() && player != null && player.hasEffect(HordesInfection.INFECTED) && entity != player) {
 			int a = player.getEffect(HordesInfection.INFECTED).getAmplifier();
-			if (a > 2) RenderSystem.setShaderColor(1, 0, 0, 1);
-			else if (a == 2) RenderSystem.setShaderColor(1, 0.4f, 0.4f, 1);
+			if (a > 2) RenderSystem.setShaderColor(1, 0.3f, 0.3f, 1);
+			else if (a == 2) RenderSystem.setShaderColor(1, 0.5f, 0.5f, 1);
+			else if (a == 1) RenderSystem.setShaderColor(1, 0.7f, 0.7f, 1);
 		}
 	}
 
