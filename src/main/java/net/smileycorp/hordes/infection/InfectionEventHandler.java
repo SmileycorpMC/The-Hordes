@@ -9,6 +9,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.monster.ZombifiedPiglin;
 import net.minecraft.world.entity.monster.ZombieVillager;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
@@ -67,7 +68,11 @@ public class InfectionEventHandler {
 		Entity entity = event.getEntity();
 		if (!(entity instanceof Mob && InfectionConfig.infectionEntitiesAggroConversions.get()) || entity.level().isClientSide) return;
 		if (HordesInfection.canCauseInfection((LivingEntity) entity)) {
-			((Mob) entity).targetSelector.addGoal(3, new NearestAttackableTargetGoal<>((Mob) entity, LivingEntity.class,
+			if (entity instanceof ZombifiedPiglin)
+				((Mob) entity).targetSelector.addGoal(3, new NearestAttackableTargetGoal<>((Mob) entity, LivingEntity.class, 
+						10, true, false, InfectionDataLoader.INSTANCE::canBeInfectedZP));
+			else
+				((Mob) entity).targetSelector.addGoal(3, new NearestAttackableTargetGoal<>((Mob) entity, LivingEntity.class, 
 					10, true, false, InfectionDataLoader.INSTANCE::canBeInfected));
 		}
 	}

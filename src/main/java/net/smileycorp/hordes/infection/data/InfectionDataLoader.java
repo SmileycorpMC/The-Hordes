@@ -22,6 +22,7 @@ import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.InfectEntityEvent;
+import net.smileycorp.hordes.config.CommonConfigHandler;
 import net.smileycorp.hordes.config.InfectionConfig;
 import net.smileycorp.hordes.infection.HordesInfection;
 import net.smileycorp.hordes.infection.InfectedEffect;
@@ -132,6 +133,13 @@ public class InfectionDataLoader extends SimpleJsonResourceReloadListener {
 
     public boolean canBeInfected(Entity entity) {
         if (entity instanceof Player) return InfectionConfig.infectPlayers.get();
+        if (entity instanceof Villager && InfectionConfig.infectVillagers.get()) return true;
+        if (!(entity instanceof Mob)) return false;
+        return conversionTable.containsKey(entity.getType());
+    }
+    
+    public boolean canBeInfectedZP(Entity entity) {
+        if (entity instanceof Player) return CommonConfigHandler.aggressiveZombiePiglins.get();
         if (entity instanceof Villager && InfectionConfig.infectVillagers.get()) return true;
         if (!(entity instanceof Mob)) return false;
         return conversionTable.containsKey(entity.getType());

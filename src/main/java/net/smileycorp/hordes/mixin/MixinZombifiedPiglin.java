@@ -6,6 +6,7 @@ import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.animal.Turtle;
 import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.NeutralMob;
 import net.minecraft.world.entity.monster.ZombifiedPiglin;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
@@ -18,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ZombifiedPiglin.class)
-public abstract class MixinZombifiedPiglin extends Zombie {
+public abstract class MixinZombifiedPiglin extends Zombie implements NeutralMob{
 
 	protected MixinZombifiedPiglin(Level level) {
 		super(null, level);
