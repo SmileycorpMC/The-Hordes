@@ -10,12 +10,14 @@ public class HordeComputeSpawnBasePosEvent extends HordePlayerEvent {
 	protected final Vec3 baseDir;
 	protected final BlockPos firstBasePos;
 	protected BlockPos basePos;
+	private final boolean checkLight;
 
-	public HordeComputeSpawnBasePosEvent(ServerPlayer player, HordeEvent horde, Vec3 basedir, BlockPos basepos) {
+	public HordeComputeSpawnBasePosEvent(ServerPlayer player, HordeEvent horde, Vec3 basedir, BlockPos basepos, boolean checkLight) {
 		super(player, horde);
 		this.baseDir = basedir;
 		this.firstBasePos = basepos;
 		this.basePos = basepos;
+		this.checkLight = checkLight;
 	}
 
 	public Vec3 getBaseDir() {
@@ -32,6 +34,10 @@ public class HordeComputeSpawnBasePosEvent extends HordePlayerEvent {
 
 	public void setBasePos(BlockPos basePos) {
 		this.basePos = basePos;
+	}
+
+	public boolean checksLight() {
+		return checkLight;
 	}
 
 }

@@ -24,6 +24,7 @@ public class HordeEventConfig {
     public static ForgeConfigSpec.ConfigValue<Boolean> hordeEventByPlayerTime;
     public static ForgeConfigSpec.ConfigValue<Integer> hordeStartBuffer;
     public static ForgeConfigSpec.ConfigValue<Integer> hordeSpawnChecks;
+    public static ForgeConfigSpec.ConfigValue<Double> hordeSpawnDistance;
     
     static void build(ForgeConfigSpec.Builder builder) {
         builder.push("Horde Event");
@@ -47,6 +48,7 @@ public class HordeEventConfig {
         hordeEventByPlayerTime = builder.comment("Are horde events tracked by player play time instead of world time.").define("hordeEventByPlayerTime", true);
         hordeStartBuffer = builder.comment("How many ticks after a hordes scheduled time can it start?").define("hordeStartBuffer", 1200);
         hordeSpawnChecks = builder.comment("How many attempts should horde events make to avoid spawning mobs in light areas or outside their spawn type.").define("hordeSpawnChecks", 25);
+        hordeSpawnDistance = builder.comment("How far away should hordes attempt to spawn?").define("hordeSpawnDistance", 75d);
         builder.pop();
     }
     

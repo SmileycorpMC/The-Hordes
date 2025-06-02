@@ -174,15 +174,11 @@ public class HordeEvent {
 		}
 	}
 
-	private BlockPos getBasePos(ServerLevel level, Vec3 basedir, ServerPlayer player, boolean checkminlight) {
-		double radius = 75.0D;
-		BlockPos basepos = null;
-		if (checkminlight) {
-			basepos = DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, radius, 7, 0);
-		} else {
-			basepos = DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, radius);
-		}
-		HordeComputeSpawnBasePosEvent event = new HordeComputeSpawnBasePosEvent(player, this, basedir, basepos);
+	private BlockPos getBasePos(ServerLevel level, Vec3 basedir, ServerPlayer player, boolean checkLight) {
+		double radius = HordeEventConfig.hordeSpawnDistance.get();
+		BlockPos basepos = checkLight ? DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, radius, 7, 0) :
+				DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, radius);
+		HordeComputeSpawnBasePosEvent event = new HordeComputeSpawnBasePosEvent(player, this, basedir, basepos, checkLight);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event.getBasePos();
 	}
