@@ -178,9 +178,9 @@ public class HordeEvent {
 		double radius = HordeEventConfig.hordeSpawnDistance.get();
 		BlockPos basepos = checkLight ? DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, radius, 7, 0) :
 				DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, radius);
-		HordeComputeSpawnBasePosEvent event = new HordeComputeSpawnBasePosEvent(player, this, basedir, basepos, checkLight);
+		HordeFindSpawnPosEvent event = new HordeFindSpawnPosEvent(player, this, basedir, basepos, checkLight);
 		MinecraftForge.EVENT_BUS.post(event);
-		return event.getBasePos();
+		return event.getPos();
 	}
 
 	private Vec3 getSpawnPos(ServerLevel level, Vec3 basepos) {
