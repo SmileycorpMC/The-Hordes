@@ -68,7 +68,7 @@ public class InfectionEventHandler {
 		if (!(entity instanceof Mob && InfectionConfig.infectionEntitiesAggroConversions.get()) || entity.level().isClientSide) return;
 		if (HordesInfection.canCauseInfection((LivingEntity) entity)) {
 			((Mob) entity).targetSelector.addGoal(3, new NearestAttackableTargetGoal<>((Mob) entity, LivingEntity.class,
-					10, true, false, InfectionDataLoader.INSTANCE::canBeInfected));
+					10, true, false, InfectionDataLoader.INSTANCE::infectedTarget));
 		}
 	}
 	

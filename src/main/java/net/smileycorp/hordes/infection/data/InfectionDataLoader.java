@@ -130,6 +130,10 @@ public class InfectionDataLoader extends SimpleJsonResourceReloadListener {
         if (entry != null && entry.shouldInfect(entity)) InfectedEffect.apply(entity);
     }
 
+    public boolean infectedTarget(Entity entity) {
+        return !(entity instanceof Player) && canBeInfected(entity);
+    }
+
     public boolean canBeInfected(Entity entity) {
         if (entity instanceof Player) return InfectionConfig.infectPlayers.get();
         if (entity instanceof Villager && InfectionConfig.infectVillagers.get()) return true;
