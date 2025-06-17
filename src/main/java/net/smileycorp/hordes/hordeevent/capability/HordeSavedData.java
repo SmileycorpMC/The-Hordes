@@ -19,9 +19,8 @@ import java.util.Map.Entry;
 public class HordeSavedData extends SavedData {
 
 	public static final String DATA = "hordes";
-	private final RandomSource rand = RandomSource.create();
 	private int next_day = 0;
-	protected Level level = null;
+	protected ServerLevel level = null;
 
 	private Map<UUID, HordeEvent> events = Maps.newHashMap();
 
@@ -85,8 +84,8 @@ public class HordeSavedData extends SavedData {
 		return uuid.toString();
 	}
 	
-	public RandomSource getRandom() {
-		return rand;
+	public RandomSource getRandom(int day) {
+		return RandomSource.create((level.getSeed() % Short.MAX_VALUE) * day);
 	}
 
 	@Override

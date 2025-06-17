@@ -46,8 +46,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class HordeEvent {
 
+	private final HordeSavedData data;
 	private static UUID FOLLOW_RANGE_MODIFIER = UUID.fromString("51cfe045-4248-409e-be37-556d67de4b97");
-	private final RandomSource rand;
+	private RandomSource rand;
 	private Set<Mob> entitiesSpawned = new HashSet<>();
 	private int timer = 0;
 	private int day = 0;
@@ -57,9 +58,9 @@ public class HordeEvent {
 	private String username;
 
 	HordeEvent(HordeSavedData data){
+		this.data = data;
 		nextDay = HordeEventConfig.hordeEventByPlayerTime.get() ? HordeEventConfig.spawnFirstDay.get() ? 0 : HordeEventConfig.hordeSpawnDays.get()
 				: data.getNextDay();
-		rand = data.getRandom();
 	}
 
 	public void readFromNBT(CompoundTag nbt) {
@@ -103,11 +104,12 @@ public class HordeEvent {
 
 	private boolean shouldReduce(ServerPlayer player, ServerPlayer other) {
 		if (other == player || player.distanceTo(other) > 25) return false;
-		HordeEvent horde = HordeSavedData.getData(other.serverLevel()).getEvent(other);
+		HordeEvent horde = data.getEvent(other);
 		return horde != null && horde.isActive(other);
 	}
 
 	public void spawnWave(ServerPlayer player, int count) {
+		RandomSource rand = getRandom();
 		cleanSpawns();
 		if (spawnData == null) {
 			HordeBuildSpawnDataEvent buildTableEvent = new HordeBuildSpawnDataEvent(player, this);
@@ -263,6 +265,7 @@ public class HordeEvent {
 	}
 
 	public void tryStartEvent(ServerPlayer player, int duration, boolean isCommand) {
+		rand = data.getRandom(day);
 		cleanSpawns();
 		if (HordeEventConfig.hordesCommandOnly.get() &! isCommand) return;
 		if (!isCommand) {
@@ -345,6 +348,7 @@ public class HordeEvent {
 			cap.orElseGet(null).setPlayerUUID("");
 			entity.getAttribute(Attributes.FOLLOW_RANGE).removeModifier(FOLLOW_RANGE_MODIFIER);
 		}
+		rand = null;
 	}
 
 	public void removeEntity(Mob entity) {
@@ -375,12 +379,14 @@ public class HordeEvent {
 	
 	private void setNextDay(ServerPlayer player) {
 		if (!HordeEventConfig.hordeEventByPlayerTime.get()) {
-			nextDay = HordeSavedData.getData(player.serverLevel()).getNextDay();
+			nextDay = data.getNextDay();
 			return;
 		}
 		int expectedDay = HordeEventConfig.hordeSpawnDays.get() * ((getCurrentDay(player) / HordeEventConfig.hordeSpawnDays.get()) + 1);
 		if (nextDay <= getCurrentDay(player) || Math.abs(nextDay - expectedDay) > HordeEventConfig.hordeSpawnDays.get() + HordeEventConfig.hordeSpawnVariation.get()) {
-			if (HordeEventConfig.hordeSpawnVariation.get() > 0) expectedDay += rand.nextInt(HordeEventConfig.hordeSpawnVariation.get());
+			if (HordeEventConfig.hordeSpawnVariation.get() > 0) {
+				expectedDay += getRandom().nextInt(HordeEventConfig.hordeSpawnVariation.get());
+			}
 			nextDay = expectedDay;
 		}
 	}
@@ -437,6 +443,7 @@ public class HordeEvent {
 	}
 	
 	public RandomSource getRandom() {
+		if (rand == null) rand = data.getRandom(day);
 		return rand;
 	}
 	
