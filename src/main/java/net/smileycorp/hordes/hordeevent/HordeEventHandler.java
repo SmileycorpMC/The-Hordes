@@ -76,9 +76,8 @@ public class HordeEventHandler {
 	//spawn the horde at the correct time
 	@SubscribeEvent
 	public void playerTick(PlayerTickEvent event) {
-		if (event.phase != Phase.END || !(event.player instanceof ServerPlayer) || event.player instanceof FakePlayer) return;
-		ServerPlayer player = (ServerPlayer) event.player;
-		ServerLevel level = player.serverLevel();
+		if (event.phase != Phase.END || !(event.player instanceof ServerPlayer player) || event.player instanceof FakePlayer) return;
+        ServerLevel level = player.serverLevel();
 		if (level.dimension() != Level.OVERWORLD) return;
 		HordeEvent horde = HordeSavedData.getData(level).getEvent(player);
 		if (horde == null) return;
@@ -90,9 +89,8 @@ public class HordeEventHandler {
 			return;
 		}
 		if (time >= HordeEventConfig.hordeStartTime.get() && time <= HordeEventConfig.hordeStartTime.get() + HordeEventConfig.hordeStartBuffer.get()
-				&& (day >= horde.getNextDay() && day > 0) || (HordeEventConfig.spawnFirstDay.get() && day == 0)) {
+				&& (day >= horde.getNextDay() && day > 0) || (HordeEventConfig.spawnFirstDay.get() && day == 0))
 			horde.tryStartEvent(player, -1, false);
-		}
 	}
 	
 	@SubscribeEvent
