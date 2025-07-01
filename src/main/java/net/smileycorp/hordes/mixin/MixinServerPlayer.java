@@ -22,7 +22,7 @@ public abstract class MixinServerPlayer {
 	@Shadow public abstract ServerLevel serverLevel();
 	
 	@Inject(at = @At("HEAD"), method = "addAdditionalSaveData")
-	public void addAdditionalSaveData(CompoundTag nbt, CallbackInfo callback) {
+	public void hordes$addAdditionalSaveData(CompoundTag nbt, CallbackInfo callback) {
 		nbt.putInt("playtime", getStats().getValue(Stats.CUSTOM.get(Stats.PLAY_TIME)));
 		HordeEvent event = HordeSavedData.getData(serverLevel()).getEvent((ServerPlayer) (Object)this);
 		if (event != null) nbt.putInt("next_horde_day", event.getNextDay());

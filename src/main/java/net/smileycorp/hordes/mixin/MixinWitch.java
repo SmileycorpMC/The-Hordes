@@ -34,7 +34,7 @@ public abstract class MixinWitch extends Raider implements RangedAttackMob {
     }
     
     @WrapOperation(method = "performRangedAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/alchemy/PotionContents;createItemStack(Lnet/minecraft/world/item/Item;Lnet/minecraft/core/Holder;)Lnet/minecraft/world/item/ItemStack;"))
-    public ItemStack performRangedAttack$setPotion(Item item, Holder<Potion> potion, Operation<ItemStack> original, @Local(ordinal = 0) LivingEntity entity) {
+    public ItemStack hordes$performRangedAttack$setPotion(Item item, Holder<Potion> potion, Operation<ItemStack> original, @Local(ordinal = 0) LivingEntity entity) {
         if (CommonConfigHandler.illagersHuntZombies.get() && (potion == Potions.HARMING || potion == Potions.POISON) && entity.getType().is(EntityTypeTags.UNDEAD)
                 && InfectionData.INSTANCE.canCauseInfection(entity))
             return original.call(item, entity.hasEffect(MobEffects.REGENERATION) && entity.getHealth() >= 8.0F ? Potions.REGENERATION : Potions.HEALING);
@@ -42,7 +42,7 @@ public abstract class MixinWitch extends Raider implements RangedAttackMob {
     }
     
     @WrapOperation(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;distanceToSqr(Lnet/minecraft/world/entity/Entity;)D"))
-    public double aiStep$distanceToSqr(LivingEntity instance, Entity entity, Operation<Double> original) {
+    public double hordes$aiStep$distanceToSqr(LivingEntity instance, Entity entity, Operation<Double> original) {
         double distance = original.call(instance, entity);
         if (CommonConfigHandler.illagersHuntZombies.get() && entity.getType().is(EntityTypeTags.UNDEAD))
             return InfectionData.INSTANCE.canCauseInfection(instance) && distance < 100 ? 122 : 0;
@@ -50,7 +50,7 @@ public abstract class MixinWitch extends Raider implements RangedAttackMob {
     }
     
     @Inject(at=@At("HEAD"), method = "registerGoals", cancellable = true)
-    public void registerGoals(CallbackInfo callback) {
+    public void hordes$registerGoals(CallbackInfo callback) {
         if (!CommonConfigHandler.illagersHuntZombies.get()) return;
         targetSelector.addGoal(2, new NearestAttackableWitchTargetGoal<>(this, LivingEntity.class, 10, true, false,
                 InfectionData.INSTANCE::canCauseInfection));

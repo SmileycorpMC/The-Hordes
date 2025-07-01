@@ -23,7 +23,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
     }
 
     @WrapOperation(method = "getRenderType", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/LivingEntityRenderer;getTextureLocation(Lnet/minecraft/world/entity/Entity;)Lnet/minecraft/resources/ResourceLocation;"))
-    public ResourceLocation getCustomTexture(LivingEntityRenderer instance, Entity entity, Operation<ResourceLocation> original) {
+    public ResourceLocation hordes$getCustomTexture(LivingEntityRenderer instance, Entity entity, Operation<ResourceLocation> original) {
         if (!(entity instanceof LivingEntity)) return getTextureLocation((T) entity);
         CustomTexture textureGetter = (CustomTexture) entity;
         return textureGetter.hasCustomTexture() ? textureGetter.getTexture() : original.call(instance, entity);

@@ -21,12 +21,12 @@ public class MixinEntity implements ChatName {
     private String chatName;
 
     @Inject(at = @At("HEAD"), method = "getTypeName", cancellable = true)
-    protected void getTypeName(CallbackInfoReturnable<Component> callback) {
+    protected void hordes$getTypeName(CallbackInfoReturnable<Component> callback) {
         if (hasChatName()) callback.setReturnValue(Component.translatable(getChatName()));
     }
 
     @Inject(at =@At("HEAD"), method = "remove", cancellable = true)
-    protected void remove(Entity.RemovalReason reason, CallbackInfo callback) {
+    protected void hordes$remove(Entity.RemovalReason reason, CallbackInfo callback) {
         ServerPlayer player = HordeSpawn.getHordePlayer((Entity)(Object)this);
         if (player == null) return;
         HordeEvent horde = HordeSavedData.getData((ServerLevel) player.level()).getEvent(player);

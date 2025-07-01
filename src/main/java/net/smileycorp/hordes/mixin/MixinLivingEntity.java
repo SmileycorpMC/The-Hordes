@@ -41,18 +41,18 @@ public abstract class MixinLivingEntity extends Entity implements CustomTexture 
     }
 
     @Inject(at=@At("HEAD"), method = "defineSynchedData")
-    public void defineSynchedData(SynchedEntityData.Builder builder, CallbackInfo callback){
+    public void hordes$defineSynchedData(SynchedEntityData.Builder builder, CallbackInfo callback){
         builder.define(TEXTURE, "");
     }
 
     @Inject(at=@At("HEAD"), method = "addAdditionalSaveData")
-    public void addAdditionalSaveData(CompoundTag tag, CallbackInfo callback) {
+    public void hordes$addAdditionalSaveData(CompoundTag tag, CallbackInfo callback) {
         if (hasCustomTexture()) tag.putString("texture", entityData.get(TEXTURE));
         if (((ChatName)this).hasChatName()) tag.putString("chat_name", ((ChatName)this).getChatName());
     }
 
     @Inject(at=@At("HEAD"), method = "readAdditionalSaveData")
-    public void readAdditionalSaveData(CompoundTag tag, CallbackInfo callback) {
+    public void hordes$readAdditionalSaveData(CompoundTag tag, CallbackInfo callback) {
         if (tag.contains("texture")) {
             String texture = tag.getString("texture");
             if (ResourceLocation.tryParse(texture) != null) entityData.set(TEXTURE, texture);

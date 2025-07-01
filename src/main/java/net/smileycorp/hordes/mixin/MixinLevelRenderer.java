@@ -22,7 +22,7 @@ public class MixinLevelRenderer {
     @Shadow @Nullable private ClientLevel level;
     
     @Inject(method = "renderSky", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;getMoonPhase()I"))
-    public void renderSky$getMoonPhase(Matrix4f pProjectionMatrix, Matrix4f pFrustrumMatrix, float pPartialTick, Camera pCamera, boolean pIsFoggy, Runnable pSkyFogSetup, CallbackInfo ci) {
+    public void hordes$renderSky$getMoonPhase(Matrix4f pProjectionMatrix, Matrix4f pFrustrumMatrix, float pPartialTick, Camera pCamera, boolean pIsFoggy, Runnable pSkyFogSetup, CallbackInfo ci) {
         if (!ClientConfigHandler.hordeEventTintsSky.get() |! HordeClientHandler.INSTANCE.isHordeNight(level)) return;
         Color rgb = ClientConfigHandler.getHordeMoonColour();
         RenderSystem.setShaderColor((float)rgb.getRed()/255f, (float)rgb.getGreen()/255f, (float)rgb.getBlue()/255f, 1f);

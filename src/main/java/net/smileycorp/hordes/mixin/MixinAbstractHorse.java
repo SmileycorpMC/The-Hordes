@@ -28,7 +28,7 @@ public abstract class MixinAbstractHorse extends Animal {
 	}
 
 	@Inject(at=@At("HEAD"), method = "aiStep", cancellable = true)
-	public void aiStep(CallbackInfo callback) {
+	public void hordes$aiStep(CallbackInfo callback) {
 		if ((Animal)this instanceof ZombieHorse) {
 			if (CommonConfigHandler.aggressiveZombieHorses.get()) {
 				updateSwingTime();
@@ -53,12 +53,12 @@ public abstract class MixinAbstractHorse extends Animal {
 	}
 
 	@Inject(at=@At("HEAD"), method = "registerGoals", cancellable = true)
-	public void registerGoals(CallbackInfo callback) {
+	public void hordes$registerGoals(CallbackInfo callback) {
 		if (getType().is(EntityTypeTags.UNDEAD) && CommonConfigHandler.zombiesScareHorses.get()) goalSelector.addGoal(1, new HorseFleeGoal(this));
 	}
 
 	@Inject(at=@At("HEAD"), method = "canEatGrass", cancellable = true)
-	public void canEatGrass(CallbackInfoReturnable<Boolean> callback) {
+	public void hordes$canEatGrass(CallbackInfoReturnable<Boolean> callback) {
 		if ((Animal)this instanceof ZombieHorse && CommonConfigHandler.aggressiveZombieHorses.get()) callback.setReturnValue(false);
 	}
 

@@ -22,7 +22,7 @@ public abstract class MixinEvoker extends AbstractIllager {
     }
     
     @Inject(at=@At("HEAD"), method = "registerGoals", cancellable = true)
-    public void registerGoals(CallbackInfo callback) {
+    public void hordes$registerGoals(CallbackInfo callback) {
         if (!CommonConfigHandler.illagersHuntZombies.get()) return;
         targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 10, true, false, InfectionData.INSTANCE::canCauseInfection));
         goalSelector.addGoal(1, new FleeEntityGoal(this, 1.5, 5, InfectionData.INSTANCE::canCauseInfection));

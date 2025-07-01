@@ -30,7 +30,7 @@ public abstract class MixinZombieHorse extends AbstractHorse {
 	}
 
 	@Inject(at=@At("HEAD"), method = "addBehaviourGoals", cancellable = true)
-	public void addBehaviourGoals(CallbackInfo callback) {
+	public void hordes$addBehaviourGoals(CallbackInfo callback) {
 		if (!CommonConfigHandler.aggressiveZombieHorses.get()) return;
 		targetSelector.addGoal(1, (new HurtByTargetGoal(this)));
 		targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
@@ -44,7 +44,7 @@ public abstract class MixinZombieHorse extends AbstractHorse {
 	}
 
 	@Inject(at=@At("TAIL"), method = "createAttributes", cancellable = true)
-	private static void createAttributes(CallbackInfoReturnable<AttributeSupplier.Builder> callback) {
+	private static void hordes$createAttributes(CallbackInfoReturnable<AttributeSupplier.Builder> callback) {
 		callback.setReturnValue(callback.getReturnValue().add(Attributes.FOLLOW_RANGE, 35.0D)
 				.add(Attributes.ATTACK_DAMAGE, 3.0D));
 	}

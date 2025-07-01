@@ -25,7 +25,7 @@ public abstract class MixinZombifiedPiglin extends Zombie {
 	}
 
 	@Inject(at=@At("HEAD"), method = "addBehaviourGoals", cancellable = true)
-	public void addBehaviourGoals(CallbackInfo callback) {
+	public void hordes$addBehaviourGoals(CallbackInfo callback) {
 		if (!CommonConfigHandler.aggressiveZombiePiglins.get()) return;
 		targetSelector.addGoal(1, (new HurtByTargetGoal(this)));
 		targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));

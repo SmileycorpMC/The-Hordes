@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MixinDamageSource {
 
     @Inject(at = @At("HEAD"), method = "getLocalizedDeathMessage", cancellable = true)
-    public void getLocalizedDeathMessage(LivingEntity entity, CallbackInfoReturnable<Component> callback) {
+    public void hordes$getLocalizedDeathMessage(LivingEntity entity, CallbackInfoReturnable<Component> callback) {
         if (!(entity instanceof Player && this.equals(HordesInfection.getInfectionDamage(entity)))) return;
         String msg = "death.attack.infection";
         ZombifyPlayer cap = entity.getCapability(HordesCapabilities.ZOMBIFY_PLAYER);

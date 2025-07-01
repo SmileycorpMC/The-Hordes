@@ -39,7 +39,7 @@ public abstract class MixinZombieVillager extends Zombie implements VillageMerch
 	}
 
 	@Inject(at=@At("HEAD"), method = "mobInteract(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;", cancellable = true)
-	public void interact(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> callback) {
+	public void hordes$interact(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> callback) {
 		if (CommonConfigHandler.zombieVillagersCanBeCured.get() &!((CustomTexture)this).hasCustomTexture()) return;
 		callback.setReturnValue(super.mobInteract(player, hand));
 	}
