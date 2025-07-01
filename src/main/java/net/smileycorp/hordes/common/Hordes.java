@@ -1,7 +1,11 @@
 package net.smileycorp.hordes.common;
 
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.repository.PackSource;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -11,6 +15,8 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLPaths;
+import net.minecraftforge.resource.PathPackResources;
 import net.smileycorp.hordes.client.ClientHandler;
 import net.smileycorp.hordes.common.data.DataGenerator;
 import net.smileycorp.hordes.common.data.DataRegistry;
@@ -25,6 +31,8 @@ import net.smileycorp.hordes.infection.HordesInfection;
 import net.smileycorp.hordes.infection.InfectionEventHandler;
 import net.smileycorp.hordes.infection.network.InfectionPacketHandler;
 
+import java.nio.file.Path;
+
 @Mod(value = Constants.MODID)
 @Mod.EventBusSubscriber(modid = Constants.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class Hordes {
@@ -37,9 +45,7 @@ public class Hordes {
 		if (DataGenerator.shouldGenerateFiles()) {
 			DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> DataGenerator::generateAssets);
 			DataGenerator.generateData();
-		} else {
-			HordesLogger.logInfo("Config files are up to date, skipping data/asset generation");
-		}
+		} else HordesLogger.logInfo("Config files are up to date, skipping data/asset generation");
 	}
 
 	@SubscribeEvent
@@ -61,6 +67,13 @@ public class Hordes {
 	@SubscribeEvent
 	public static void loadClient(FMLClientSetupEvent event) {
 		MinecraftForge.EVENT_BUS.register(new ClientHandler());
+	}
+
+	@SubscribeEvent
+	public static void addPackFinders(AddPackFindersEvent event) {
+		Path path = FMLPaths.CONFIGDIR.get().resolve("hordes");
+		event.addRepositorySource(consumer -> consumer.accept(Pack.readMetaAndCreate("hordes-config", Component.literal("Hordes Config"), true,
+				str -> new PathPackResources("hordes-config", true, path), event.getPackType(), Pack.Position.TOP, PackSource.BUILT_IN)));
 	}
 
 }
