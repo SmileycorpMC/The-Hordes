@@ -16,6 +16,7 @@ import net.minecraft.world.entity.monster.Zombie;
 import net.smileycorp.atlas.api.client.PlayerTextureRenderer;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.entities.PlayerZombie;
+import net.smileycorp.hordes.config.ClientConfigHandler;
 
 import java.awt.*;
 import java.util.Optional;
@@ -34,7 +35,7 @@ public class ZombiePlayerRenderer<T extends Zombie & PlayerZombie> extends Human
 		super(ctx, new ZombiePlayerModel<>(ctx.bakeLayer(DEFAULT), colour, isDrowned), 0.5F);
 		addLayer(new HumanoidArmorLayer<>(this, new ZombieModel<>(ctx.bakeLayer(ModelLayers.ZOMBIE_INNER_ARMOR)),
 				new ZombieModel<>(ctx.bakeLayer(ModelLayers.ZOMBIE_OUTER_ARMOR)), ctx.getModelManager()));
-		addLayer(new ZombiePlayerCapeLayer<>(this));
+		if (ClientConfigHandler.zombiePlayerCapes.get()) addLayer(new ZombiePlayerCapeLayer<>(this));
 		addLayer(new ZombiePlayerElytraLayer<>(this, ctx.getModelSet()));
 		addLayer(new ZombiePlayerOverlayLayer(this, new ZombiePlayerModel<>(ctx.bakeLayer(DEFAULT)),
 			new ZombiePlayerModel<>(ctx.bakeLayer(SLIM)), overlay));

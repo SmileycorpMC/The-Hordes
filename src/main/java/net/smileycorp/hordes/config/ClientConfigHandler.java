@@ -13,13 +13,6 @@ public class ClientConfigHandler {
 	
 	public static final ModConfigSpec config;
 
-	private static TextColor hordeMessageColour = null;
-	private static Color zombiePlayerColour = null;
-	private static Color drownedPlayerColour = null;
-	private static Color huskPlayerColour = null;
-	private static Color hordeEventSkyColour = null;
-	private static Color hordeEventMoonColour = null;
-
 	//horde event
 	public static ModConfigSpec.ConfigValue<Integer> eventNotifyMode;
 	public static ModConfigSpec.ConfigValue<Integer> eventNotifyDuration;
@@ -29,6 +22,9 @@ public class ClientConfigHandler {
 	public static ModConfigSpec.ConfigValue<List<? extends Integer>> configHordeEventSkyColour;
 	public static ModConfigSpec.ConfigValue<List<? extends Integer>> configHordeEventMoonColour;
 
+	private static TextColor hordeMessageColour = null;
+	private static Color hordeEventSkyColour = null;
+	private static Color hordeEventMoonColour = null;
 
 	//infection
 	public static ModConfigSpec.ConfigValue<Boolean> playerInfectionVisuals;
@@ -37,9 +33,16 @@ public class ClientConfigHandler {
 	public static ModConfigSpec.ConfigValue<Boolean> cureTooltip;
 	public static ModConfigSpec.ConfigValue<Boolean> immunityTooltip;
 	public static ModConfigSpec.ConfigValue<Boolean> wearableProtectionTooltip;
+
+	//zombie players
 	private static ModConfigSpec.ConfigValue<List<? extends Integer>> configZombiePlayerColour;
 	private static ModConfigSpec.ConfigValue<List<? extends Integer>> configDrownedPlayerColour;
 	private static ModConfigSpec.ConfigValue<List<? extends Integer>> configHuskPlayerColour;
+	public static ModConfigSpec.ConfigValue<Boolean> zombiePlayerCapes;
+
+	private static Color zombiePlayerColour = null;
+	private static Color drownedPlayerColour = null;
+	private static Color huskPlayerColour = null;
 
 	//load config properties
 	static {
@@ -67,12 +70,16 @@ public class ClientConfigHandler {
 		cureTooltip = builder.comment("Show a tooltip on items that can cure infection?").define("cureTooltip", true);
 		immunityTooltip = builder.comment("Show a tooltip on items that give infection immunity?").define("immunityTooltip", true);
 		wearableProtectionTooltip = builder.comment("Show a tooltip on wearable items that grant some protection against infection?").define("wearableProtectionTooltip", true);
+		builder.pop();
+
+		builder.push("Zombie Players");
 		configZombiePlayerColour = builder.comment("Colour tint for zombie players.")
 				.defineList("zombiePlayerColour", Lists.newArrayList(121, 156, 101), x -> (int)x >= 0 && (int)x < 256);
 		configDrownedPlayerColour = builder.comment("Colour tint for drowned players.")
 				.defineList("drownedPlayerColour", Lists.newArrayList(144, 255, 255), x -> (int)x >= 0 && (int)x < 256);
 		configHuskPlayerColour = builder.comment("Colour tint for husk players.")
 				.defineList("huskPlayerColour", Lists.newArrayList(193, 168, 5), x -> (int)x >= 0 && (int)x < 256);
+		zombiePlayerCapes = builder.comment("Render zombie players with capes if the player that got infected has one equipped?").define("zombiePlayerCapes", true);
 		builder.pop();
 		config = builder.build();
 	}
