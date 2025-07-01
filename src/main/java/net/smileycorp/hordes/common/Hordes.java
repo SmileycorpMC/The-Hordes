@@ -52,16 +52,10 @@ public class Hordes {
 	@SubscribeEvent
 	public static void commonSetup(FMLCommonSetupEvent event) {
 		DataRegistry.init();
-		//Horde Event
-		if (HordeEventConfig.enableHordeEvent.get()) {
-			HordeEventPacketHandler.initPackets();
-			MinecraftForge.EVENT_BUS.register(new HordeEventHandler());
-		}
-		//Mob Infection
-		if (InfectionConfig.enableMobInfection.get()) {
-			InfectionPacketHandler.initPackets();
-			MinecraftForge.EVENT_BUS.register(new InfectionEventHandler());
-		}
+		InfectionPacketHandler.initPackets();
+		HordeEventPacketHandler.initPackets();
+		if (HordeEventConfig.enableHordeEvent.get()) MinecraftForge.EVENT_BUS.register(new HordeEventHandler());
+		if (InfectionConfig.enableMobInfection.get()) MinecraftForge.EVENT_BUS.register(new InfectionEventHandler());
 	}
 
 	@SubscribeEvent
