@@ -45,7 +45,7 @@ public class ClientInfectionEventHandler {
 		if (a == 0) return;
 		Color colour = new Color(0.4745f, 0.6117f, 0.3961f, 0.005f * a);
 		Window window = mc.getWindow();
-		event.getGuiGraphics().fill(0, 0, window.getWidth(), window.getHeight(), colour.getRGB());
+		event.getGuiGraphics().fill(0, 0, window.getGuiScaledWidth(), window.getGuiScaledHeight(), colour.getRGB());
 	}
 
 	@SubscribeEvent
