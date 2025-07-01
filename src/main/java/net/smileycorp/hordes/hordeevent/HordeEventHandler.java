@@ -45,12 +45,8 @@ public class HordeEventHandler {
 	@SubscribeEvent
 	public void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
 		Entity entity = event.getObject();
-		if (entity instanceof Mob) {
-			event.addCapability(Constants.loc("HordeSpawn"), new HordeSpawn.Provider());
-		}
-		if (entity instanceof Player && entity.level().isClientSide) {
-			event.addCapability(Constants.loc("HordeEventClient"), new HordeEventClient.Provider());
-		}
+		if (entity instanceof Mob) event.addCapability(Constants.loc("HordeSpawn"), new HordeSpawn.Provider());
+		if (entity instanceof Player && entity.level().isClientSide) event.addCapability(Constants.loc("HordeEventClient"), new HordeEventClient.Provider());
 	}
 
 	//register data listeners
@@ -68,7 +64,8 @@ public class HordeEventHandler {
 		ServerLevel level = server.overworld();
 		int day = (int) Math.floor(level.getDayTime() / HordeEventConfig.dayLength.get());
 		HordeSavedData data = HordeSavedData.getData(level);
-		if (day >= data.getNextDay()) data.setNextDay(level.random.nextInt(HordeEventConfig.hordeSpawnVariation.get() + 1)
+		if (day < data.getNextDay()) return;
+		data.setNextDay(level.random.nextInt(HordeEventConfig.hordeSpawnVariation.get() + 1)
 				+ HordeEventConfig.hordeSpawnDays.get() + data.getNextDay());
 		data.save();
 	}
@@ -95,11 +92,10 @@ public class HordeEventHandler {
 	
 	@SubscribeEvent
 	public void logIn(PlayerEvent.PlayerLoggedInEvent event) {
-		if (event.getEntity() instanceof ServerPlayer) {
-			ServerPlayer player = (ServerPlayer) event.getEntity();
-			HordeEvent horde = HordeSavedData.getData(player.serverLevel()).getEvent(player);
-			if (horde != null) horde.setPlayer(player);
-		}
+		if (!(event.getEntity() instanceof ServerPlayer)) return;
+		ServerPlayer player = (ServerPlayer) event.getEntity();
+		HordeEvent horde = HordeSavedData.getData(player.serverLevel()).getEvent(player);
+		if (horde != null) horde.setPlayer(player);
 	}
 	
 	
