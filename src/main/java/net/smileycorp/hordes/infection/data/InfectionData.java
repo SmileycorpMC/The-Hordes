@@ -51,7 +51,7 @@ public class InfectionData extends SimpleJsonResourceReloadListener {
     }
     
     @Override
-    protected void apply(Map<ResourceLocation, JsonElement> map, ResourceManager manager, ProfilerFiller profiller) {
+    protected void apply(Map<ResourceLocation, JsonElement> map, ResourceManager manager, ProfilerFiller profiler) {
         conversionTable.clear();
         HordesLogger.logInfo("Loading conversion tables");
         for (String id : manager.getNamespaces()) {
@@ -161,7 +161,7 @@ public class InfectionData extends SimpleJsonResourceReloadListener {
     }
     
     public int getImmunityLength(ItemStack stack) {
-        return immunityItems.containsKey(stack.getItem()) ? immunityItems.get(stack.getItem()) : 0;
+        return immunityItems.getOrDefault(stack.getItem(), 0);
     }
     
     public boolean applyImmunity(LivingEntity entity, Item item) {
@@ -169,12 +169,14 @@ public class InfectionData extends SimpleJsonResourceReloadListener {
         entity.addEffect(new MobEffectInstance(HordesInfection.IMMUNITY, immunityItems.get(item) * 20));
         return true;
     }
+
+    public float getInfectionChance(EntityType<?> entity) {
+        return entityInfectChance.containsKey(entity) ? entityInfectChance.get(entity) : 0;
+    }
     
     public float getInfectionChance(LivingEntity entity, LivingEntity attacker) {
-        float base = entityInfectChance.get(attacker.getType());
-        float protection = (float) entity.getAttributeValue(HordesInfection.INFECTION_RESISTANCE);
-        float total = base * (1 - protection);
-        return total;
+        return (float) attacker.getAttributeValue(HordesInfection.INFECTIVITY)
+                * (1 - (float) entity.getAttributeValue(HordesInfection.INFECTION_RESISTANCE));
     }
     
     public float getProtection(EntityType<?> type) {
@@ -191,9 +193,15 @@ public class InfectionData extends SimpleJsonResourceReloadListener {
     public boolean canCauseInfection(EntityType<?> entity) {
         return entityInfectChance.containsKey(entity);
     }
-    
-    public boolean canCauseInfection(Entity entity) {
+
+    public boolean hasInfectGoal(Entity entity) {
         return entity instanceof LivingEntity && entityInfectChance.containsKey(entity.getType());
+    }
+
+    public boolean canCauseInfection(Entity entity) {
+        if (!(entity instanceof LivingEntity)) return false;
+        if (!((LivingEntity) entity).getAttributes().hasAttribute(HordesInfection.INFECTIVITY)) return false;
+        return ((LivingEntity) entity).getAttribute(HordesInfection.INFECTIVITY).getValue() > 0;
     }
     
     public void syncData(ServerPlayer player) {

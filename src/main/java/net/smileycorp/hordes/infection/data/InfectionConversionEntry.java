@@ -58,6 +58,7 @@ public class InfectionConversionEntry {
 	}
 
 	public boolean shouldInfect(LivingEntity entity, LivingEntity attacker) {
+		if (!InfectionData.INSTANCE.canCauseInfection(attacker)) return false;
 		return entity.getRandom().nextFloat() <= InfectionData.INSTANCE.getInfectionChance(entity, attacker);
 	}
 	

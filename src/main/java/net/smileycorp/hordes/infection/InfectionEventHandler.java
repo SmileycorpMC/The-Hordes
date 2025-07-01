@@ -52,7 +52,9 @@ public class InfectionEventHandler {
 		if (InfectionData.INSTANCE.canBeInfected(entity) && entity instanceof LivingEntity)
 			((LivingEntity) entity).getAttribute(HordesInfection.INFECTION_RESISTANCE).setBaseValue(InfectionData.INSTANCE.getProtection(entity.getType()));
 		if (!(entity instanceof Mob && InfectionConfig.infectionEntitiesAggroConversions.get()) || entity.level().isClientSide) return;
-		if (InfectionData.INSTANCE.canCauseInfection(entity)) ((Mob) entity).targetSelector.addGoal(3, new NearestAttackableTargetGoal<>((Mob) entity,
+		if (!InfectionData.INSTANCE.hasInfectGoal(entity)) return;
+		((LivingEntity) entity).getAttribute(HordesInfection.INFECTIVITY).setBaseValue(InfectionData.INSTANCE.getInfectionChance(entity.getType()));
+		((Mob) entity).targetSelector.addGoal(3, new NearestAttackableTargetGoal<>((Mob) entity,
 				LivingEntity.class, 10, true, false, InfectionData.INSTANCE::canBeInfected));
 	}
 	
