@@ -13,6 +13,7 @@ import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.ZombifiedPiglin;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Player.BedSleepingProblem;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -65,7 +66,6 @@ public class HordeEventHandler {
 		if (event.phase != Phase.START || HordeEventConfig.hordesCommandOnly.get()) return;
 		MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
 		ServerLevel level = server.overworld();
-		if (HordeEventConfig.pauseEventServer.get() && level.players().isEmpty()) return;
 		int day = (int) Math.floor(level.getDayTime() / HordeEventConfig.dayLength.get());
 		HordeSavedData data = HordeSavedData.getData(level);
 		if (day >= data.getNextDay()) data.setNextDay(level.random.nextInt(HordeEventConfig.hordeSpawnVariation.get() + 1)
@@ -78,8 +78,8 @@ public class HordeEventHandler {
 	public void playerTick(PlayerTickEvent event) {
 		if (event.phase != Phase.END || !(event.player instanceof ServerPlayer) || event.player instanceof FakePlayer) return;
 		ServerPlayer player = (ServerPlayer) event.player;
-		ServerLevel level = ServerLifecycleHooks.getCurrentServer().overworld();
-		if (HordeEventConfig.pauseEventServer.get() && level.players().isEmpty()) return;
+		ServerLevel level = player.serverLevel();
+		if (level.dimension() != Level.OVERWORLD) return;
 		HordeEvent horde = HordeSavedData.getData(level).getEvent(player);
 		if (horde == null) return;
 		int time = Math.round(level.getDayTime() % HordeEventConfig.dayLength.get());
