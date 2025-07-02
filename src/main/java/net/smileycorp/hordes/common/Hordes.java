@@ -101,7 +101,7 @@ public class Hordes {
 	@SubscribeEvent
 	public void attachCapabilities(RegisterCapabilitiesEvent event) {
 		event.registerEntity(HordesCapabilities.ZOMBIFY_PLAYER, EntityType.PLAYER, (entity, ctx) -> new ZombifyPlayer.Impl(entity));
-		for (EntityType type : BuiltInRegistries.ENTITY_TYPE) {
+		for (EntityType<?> type : BuiltInRegistries.ENTITY_TYPE) {
 			event.registerEntity(HordesCapabilities.HORDESPAWN, type, (entity, ctx) -> entity instanceof Mob ? new HordeSpawn.Impl() : null);
 			event.registerEntity(HordesCapabilities.INFECTION, type, (entity, ctx) -> entity instanceof LivingEntity ? new Infection.Impl() : null);
 		}

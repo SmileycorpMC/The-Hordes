@@ -25,6 +25,7 @@ public class HordeEventConfig {
     public static ModConfigSpec.ConfigValue<Boolean> hordeEventByPlayerTime;
     public static ModConfigSpec.ConfigValue<Integer> hordeStartBuffer;
     public static ModConfigSpec.ConfigValue<Integer> hordeSpawnChecks;
+    public static ModConfigSpec.ConfigValue<Double> hordeSpawnDistance;
     
     static void build(ModConfigSpec.Builder builder) {
         builder.push("Horde Event");
@@ -35,7 +36,7 @@ public class HordeEventConfig {
         hordeSpawnDuration = builder.comment("Time in ticks the event lasts for").define("hordeSpawnDuration", 6000);
         hordeSpawnInterval = builder.comment("Time in ticks between spawns for the horde spawn event.").define("hordeSpawnInterval", 600);
         hordeStartTime = builder.comment("What time of day does the horde event start? eg 18000 is midnight with default day length.").define("hordeStartTime", 18000);
-        hordeSpawnDays = builder.comment("Amount of days between horde spawns.").define("hordeSpawnDays", 10);
+        hordeSpawnDays = builder.comment("Amount of days between horde spawns.").defineInRange("hordeSpawnDays", 10, 1, Integer.MAX_VALUE);
         hordeSpawnVariation = builder.comment("Amount of days a horde event can be randomly delayed by").define("hordeSpawnVariation", 0);
         hordeSpawnMax = builder.comment("Max cap for the number of entities that can exist from the horde at once.").define("hordeSpawnMax", 160);
         dayLength = builder.comment("Length of a day (use only if you have another day that changes the length of the day/night cycle) Default is 24000").define("dayLength", 24000);
@@ -49,6 +50,7 @@ public class HordeEventConfig {
         hordeEventByPlayerTime = builder.comment("Are horde events tracked by player play time instead of world time.").define("hordeEventByPlayerTime", true);
         hordeStartBuffer = builder.comment("How many ticks after a hordes scheduled time can it start?").define("hordeStartBuffer", 1200);
         hordeSpawnChecks = builder.comment("How many attempts should horde events make to avoid spawning mobs in light areas or outside their spawn type.").define("hordeSpawnChecks", 25);
+        hordeSpawnDistance = builder.comment("How far away should hordes attempt to spawn?").define("hordeSpawnDistance", 75d);
         builder.pop();
     }
     

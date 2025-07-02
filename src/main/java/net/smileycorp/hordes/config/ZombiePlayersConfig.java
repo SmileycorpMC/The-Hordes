@@ -23,6 +23,7 @@ public class ZombiePlayersConfig {
         zombiePlayersOnlyHurtByPlayers = builder.comment("Whether zombie players, drowned players and husk players are immune to all damage from non player sources.").define("zombiePlayersOnlyHurtByPlayers", false);
         zombiePlayersStoreItems = builder.comment("Whether zombie players, drowned players and husk players store items dropped by the player that spawned them.").define("zombiePlayersStoreItems", true);
         zombiePlayersDespawnPeaceful = builder.comment("Do zombie players despawn in peaceful mode?").define("zombiePlayersDespawnPeaceful", false);
+        builder.pop();
     }
     
 }

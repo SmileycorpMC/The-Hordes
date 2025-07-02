@@ -37,7 +37,7 @@ public class ZombiePlayerRenderer<T extends Zombie & PlayerZombie> extends Human
 				new ZombieModel<>(ctx.bakeLayer(ModelLayers.ZOMBIE_OUTER_ARMOR)), ctx.getModelManager()));
 		if (ClientConfigHandler.zombiePlayerCapes.get()) addLayer(new ZombiePlayerCapeLayer<>(this));
 		addLayer(new ZombiePlayerElytraLayer<>(this, ctx.getModelSet()));
-		addLayer(new ZombiePlayerOverlayLayer(this, new ZombiePlayerModel<>(ctx.bakeLayer(DEFAULT)),
+		addLayer(new ZombiePlayerOverlayLayer<>(this, new ZombiePlayerModel<>(ctx.bakeLayer(DEFAULT)),
 			new ZombiePlayerModel<>(ctx.bakeLayer(SLIM)), overlay));
 		defaultModel = model;
 		slimModel = new ZombiePlayerModel<>(ctx.bakeLayer(SLIM), colour, isDrowned);

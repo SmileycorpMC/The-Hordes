@@ -12,6 +12,7 @@ import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.ZombifiedPiglin;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Player.BedSleepingProblem;
+import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.common.util.FakePlayer;
@@ -22,7 +23,6 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.config.CommonConfigHandler;
@@ -49,9 +49,10 @@ public class HordeEventHandler {
 		MinecraftServer server = event.getServer();
 		ServerLevel level = server.overworld();
 		if (HordeEventConfig.pauseEventServer.get() && level.players().isEmpty()) return;
-		int day = (int) Math.floor(level.getDayTime() / HordeEventConfig.dayLength.get());
+		int day = (int) Math.floor((double) level.getDayTime() / HordeEventConfig.dayLength.get());
 		HordeSavedData data = HordeSavedData.getData(level);
-		if (day >= data.getNextDay()) data.setNextDay(level.random.nextInt(HordeEventConfig.hordeSpawnVariation.get() + 1)
+		if (day < data.getNextDay()) return;
+		data.setNextDay(level.random.nextInt(HordeEventConfig.hordeSpawnVariation.get() + 1)
 				+ HordeEventConfig.hordeSpawnDays.get() + data.getNextDay());
 		data.save();
 	}
@@ -59,10 +60,9 @@ public class HordeEventHandler {
 	//spawn the horde at the correct time
 	@SubscribeEvent
 	public void playerTick(PlayerTickEvent.Pre event) {
-		if (!(event.getEntity() instanceof ServerPlayer) || event.getEntity() instanceof FakePlayer) return;
-		ServerPlayer player = (ServerPlayer) event.getEntity();
-		ServerLevel level = ServerLifecycleHooks.getCurrentServer().overworld();
-		if (HordeEventConfig.pauseEventServer.get() && level.players().isEmpty()) return;
+		if (!(event.getEntity() instanceof ServerPlayer player) || event.getEntity() instanceof FakePlayer) return;
+		ServerLevel level = player.serverLevel();
+		if (level.dimension() != Level.OVERWORLD) return;
 		HordeEvent horde = HordeSavedData.getData(level).getEvent(player);
 		if (horde == null) return;
 		int time = Math.round(level.getDayTime() % HordeEventConfig.dayLength.get());
@@ -73,16 +73,14 @@ public class HordeEventHandler {
 			return;
 		}
 		if (time >= HordeEventConfig.hordeStartTime.get() && time <= HordeEventConfig.hordeStartTime.get() + HordeEventConfig.hordeStartBuffer.get()
-				&& day >= horde.getNextDay() && (day > 0 || HordeEventConfig.spawnFirstDay.get())) {
+				&& (day >= horde.getNextDay() && day > 0) || (HordeEventConfig.spawnFirstDay.get() && day == 0))
 			horde.tryStartEvent(player, -1, false);
-		}
 	}
 	
 	@SubscribeEvent
 	public void logIn(PlayerEvent.PlayerLoggedInEvent event) {
-		if (!(event.getEntity() instanceof ServerPlayer)) return;
-		ServerPlayer player = (ServerPlayer) event.getEntity();
-		HordeEvent horde = HordeSavedData.getData(player.serverLevel()).getEvent(player);
+		if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        HordeEvent horde = HordeSavedData.getData(player.serverLevel()).getEvent(player);
 		if (horde != null) horde.setPlayer(player);
 	}
 	
@@ -119,7 +117,6 @@ public class HordeEventHandler {
 		ServerPlayer player = event.getEntity();
 		ServerLevel level = player.serverLevel();
 		HordeSavedData data = HordeSavedData.getData((ServerLevel) player.level());
-		if (data == null) return;
 		if (level.isDay() |! (level.dimensionType().bedWorks() && data.isHordeNight(player))) return;
 		event.setProblem(BedSleepingProblem.OTHER_PROBLEM);
 		player.displayClientMessage(Component.translatable(Constants.hordeTrySleep), true);

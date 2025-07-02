@@ -8,7 +8,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.util.DataUtils;
@@ -22,7 +21,7 @@ public class HordeSavedData extends SavedData {
 	public static final String DATA = "hordes";
 	private final RandomSource rand = RandomSource.create();
 	private int next_day = 0;
-	protected Level level = null;
+	protected ServerLevel level = null;
 
 	private Map<UUID, HordeEvent> events = Maps.newHashMap();
 
@@ -65,7 +64,7 @@ public class HordeSavedData extends SavedData {
 
 	public void save() {
 		setDirty();
-		if (level instanceof ServerLevel) ((ServerLevel)level).getChunkSource().getDataStorage().set(DATA, this);
+		if (level instanceof ServerLevel) level.getChunkSource().getDataStorage().set(DATA, this);
 	}
 
 	public HordeEvent getEvent(ServerPlayer player) {
@@ -95,11 +94,11 @@ public class HordeSavedData extends SavedData {
 			return false;
 		}
 		HordeEvent horde = getEvent(player);
-		return horde == null ? false : horde.isHordeDay(player);
+		return horde != null && horde.isHordeDay(player);
 	}
-	
-	public RandomSource getRandom() {
-		return rand;
+
+	public RandomSource getRandom(int day) {
+		return RandomSource.create((level.getSeed() % Short.MAX_VALUE) * day);
 	}
 
 	@Override
@@ -123,7 +122,6 @@ public class HordeSavedData extends SavedData {
 	public static HordeSavedData getData(ServerLevel level) {
 		HordeSavedData data = level.getChunkSource().getDataStorage().computeIfAbsent(new Factory<>(() -> getCleanData(level),
 				(nbt, provider) -> getDataFromNBT(level, nbt)), DATA);
-		if (data == null) data = getCleanData(level);
 		level.getChunkSource().getDataStorage().set(DATA, data);
 		return data;
 	}

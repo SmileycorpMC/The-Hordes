@@ -47,7 +47,6 @@ public class CommonConfigHandler {
 		zoglinsAttackMobs = builder.comment("Whether zoglins are agressive towards non-undead monsters").define("zoglinsAttackMobs", true);
 		builder.pop();
 		ZombiePlayersConfig.build(builder);
-		builder.pop();
 		config = builder.build();
 	}
 

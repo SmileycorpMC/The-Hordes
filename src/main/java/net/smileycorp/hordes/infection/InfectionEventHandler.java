@@ -55,7 +55,7 @@ public class InfectionEventHandler {
 		if (!InfectionData.INSTANCE.hasInfectGoal(entity)) return;
 		((LivingEntity) entity).getAttribute(HordesInfection.INFECTIVITY).setBaseValue(InfectionData.INSTANCE.getInfectionChance(entity.getType()));
 		((Mob) entity).targetSelector.addGoal(3, new NearestAttackableTargetGoal<>((Mob) entity,
-				LivingEntity.class, 10, true, false, InfectionData.INSTANCE::canBeInfected));
+				LivingEntity.class, 10, true, false, InfectionData.INSTANCE::infectedTarget));
 	}
 	
 	@SubscribeEvent

@@ -148,6 +148,10 @@ public class InfectionData extends SimpleJsonResourceReloadListener {
         if (entry != null && entry.shouldInfect(entity, attacker)) InfectedEffect.apply(entity);
     }
 
+    public boolean infectedTarget(Entity entity) {
+        return !(entity instanceof Player) && canBeInfected(entity);
+    }
+
     public boolean canBeInfected(Entity entity) {
         if (entity instanceof Player) return InfectionConfig.infectPlayers.get();
         if (!(entity instanceof Mob)) return false;
