@@ -183,7 +183,10 @@ public class InfectionEventHandler {
 	}
 	
 	public static void addEntityAttributes(EntityAttributeModificationEvent event) {
-		for (EntityType<?> type : event.getTypes()) event.add((EntityType<? extends LivingEntity>) type, HordesInfection.INFECTION_RESISTANCE, 0);
+		for (EntityType<?> type : event.getTypes()) {
+			event.add((EntityType<? extends LivingEntity>) type, HordesInfection.INFECTION_RESISTANCE, 0);
+			event.add((EntityType<? extends LivingEntity>) type, HordesInfection.INFECTIVITY, 0);
+		}
 	}
 	
 }
