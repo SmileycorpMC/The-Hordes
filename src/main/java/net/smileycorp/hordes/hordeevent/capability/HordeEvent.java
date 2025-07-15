@@ -450,6 +450,7 @@ public class HordeEvent {
 	}
 	
 	public RandomSource getRandom() {
+		if (rand == null) rand = data.getRandom(day);
 		return rand;
 	}
 	
