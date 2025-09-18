@@ -1,22 +1,24 @@
 package net.smileycorp.hordes.hordeevent.data.functions;
 
 import com.google.common.collect.Lists;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
+import net.smileycorp.atlas.api.util.WeightedOutputs;
 import net.smileycorp.hordes.common.data.DataRegistry;
 import net.smileycorp.hordes.common.data.conditions.Condition;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
 
+import java.util.AbstractMap;
 import java.util.List;
+import java.util.Map;
 
-public class MultipleFunction<T extends HordePlayerEvent> implements UniversalHordeFunction<T> {
-    
+public class WeightedRandomFunction<T extends HordePlayerEvent> implements UniversalHordeFunction<T> {
+
     private final Class<T> clazz;
-    private final List<Pair<List<Condition>, HordeFunction<T>>> functions;
-    
-    public MultipleFunction(Class<T> clazz, List<Pair<List<Condition>, HordeFunction<T>>> functions) {
+    private final List<Pair<List<Condition>, Pair<Integer, HordeFunction<T>>>> functions;
+
+    public WeightedRandomFunction(Class<T> clazz, List<Pair<List<Condition>, Pair<Integer, HordeFunction<T>>>> functions) {
         this.clazz = clazz;
         this.functions = functions;
     }
@@ -24,8 +26,16 @@ public class MultipleFunction<T extends HordePlayerEvent> implements UniversalHo
     @Override
     public void apply(T event) {
         if (event.getClass() != clazz) return;
-        for (Pair<List<Condition>, HordeFunction<T>> pair : functions)
-            if (canApply(pair.getFirst(), event)) pair.getSecond().apply(event);
+        WeightedOutputs<HordeFunction<T>> functions = new WeightedOutputs<>(1, this.functions.stream().
+                filter(pair -> canApply(pair.getFirst(), event))
+                .map(WeightedRandomFunction::mapEntry).toList());
+        if (functions.isEmpty()) return;
+        functions.getResults(event.getRandom()).forEach(func -> apply(event));
+    }
+
+    private static <T extends HordePlayerEvent> Map.Entry<Integer, HordeFunction<T>> mapEntry(Pair<List<Condition>, Pair<Integer, HordeFunction<T>>> pair) {
+        Pair<Integer, HordeFunction<T>> subpair = pair.getSecond();
+        return new AbstractMap.SimpleEntry<>(subpair.getFirst(), subpair.getSecond());
     }
 
     @Override
@@ -63,7 +73,7 @@ public class MultipleFunction<T extends HordePlayerEvent> implements UniversalHo
                 functions.add(Pair.of(conditions, pair.getSecond()));
             }
         }
-        return new MultipleFunction(clazz, functions);
+        return new WeightedRandomFunction(clazz, functions);
     }
 
 }

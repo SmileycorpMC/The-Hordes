@@ -17,6 +17,7 @@ import net.smileycorp.hordes.common.event.HordePlayerEvent;
 import net.smileycorp.hordes.hordeevent.data.functions.FunctionRegistry;
 import net.smileycorp.hordes.hordeevent.data.functions.HordeFunction;
 import net.smileycorp.hordes.hordeevent.data.functions.MultipleFunction;
+import net.smileycorp.hordes.hordeevent.data.functions.UniversalHordeFunction;
 
 import java.util.List;
 
@@ -104,11 +105,11 @@ public class HordeScript<T extends HordePlayerEvent> {
 		}
 	}
 	
-	public static HordeScript deserialize(ResourceLocation key, JsonElement json) {
+	public static HordeScript<?> deserialize(ResourceLocation key, JsonElement json) {
 		try {
 			if (json instanceof JsonArray) {
-				Pair<Class<HordePlayerEvent>, HordeFunction<HordePlayerEvent>> pair = MultipleFunction.deserialize(json.getAsJsonArray());
-				return new HordeScript(pair.getSecond(), pair.getFirst(), key);
+				UniversalHordeFunction<?> function = MultipleFunction.deserialize(json.getAsJsonArray());
+				return new HordeScript(function, function.getEventClass(), key);
 			}
 			JsonObject obj = json.getAsJsonObject();
 			Pair<Class<HordePlayerEvent>, HordeFunction<HordePlayerEvent>> pair = FunctionRegistry.readFunction(obj);

@@ -1,7 +1,6 @@
 package net.smileycorp.hordes.hordeevent.data.functions;
 
 import com.google.common.collect.Lists;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
@@ -11,12 +10,12 @@ import net.smileycorp.hordes.common.event.HordePlayerEvent;
 
 import java.util.List;
 
-public class MultipleFunction<T extends HordePlayerEvent> implements UniversalHordeFunction<T> {
-    
+public class RandomFunction<T extends HordePlayerEvent> implements UniversalHordeFunction<T> {
+
     private final Class<T> clazz;
     private final List<Pair<List<Condition>, HordeFunction<T>>> functions;
-    
-    public MultipleFunction(Class<T> clazz, List<Pair<List<Condition>, HordeFunction<T>>> functions) {
+
+    public RandomFunction(Class<T> clazz, List<Pair<List<Condition>, HordeFunction<T>>> functions) {
         this.clazz = clazz;
         this.functions = functions;
     }
@@ -24,8 +23,9 @@ public class MultipleFunction<T extends HordePlayerEvent> implements UniversalHo
     @Override
     public void apply(T event) {
         if (event.getClass() != clazz) return;
-        for (Pair<List<Condition>, HordeFunction<T>> pair : functions)
-            if (canApply(pair.getFirst(), event)) pair.getSecond().apply(event);
+        List<HordeFunction<T>> functions = this.functions.stream().filter(pair -> canApply(pair.getFirst(), event)).map(Pair::getSecond).toList();
+        if (functions.isEmpty()) return;
+        functions.get(event.getRandom().nextInt(functions.size())).apply(event);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class MultipleFunction<T extends HordePlayerEvent> implements UniversalHo
                 functions.add(Pair.of(conditions, pair.getSecond()));
             }
         }
-        return new MultipleFunction(clazz, functions);
+        return new RandomFunction(clazz, functions);
     }
 
 }
