@@ -27,9 +27,9 @@ public class HordeSpawnTable {
     private boolean tested;
 
    protected HordeSpawnTable(ResourceLocation name, List<HordeSpawnEntry> spawns) {
-    this.name = name;
-    this.spawns = spawns;
-    }
+        this.name = name;
+        this.spawns = spawns;
+   }
 
     public ResourceLocation getName() {
        return name;
