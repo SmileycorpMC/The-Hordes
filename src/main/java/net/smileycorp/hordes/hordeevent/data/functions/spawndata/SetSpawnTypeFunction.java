@@ -5,6 +5,7 @@ import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.HordeBuildSpawnDataEvent;
 import net.smileycorp.hordes.hordeevent.HordeSpawnType;
 import net.smileycorp.hordes.hordeevent.HordeSpawnTypes;
+import net.smileycorp.hordes.hordeevent.data.HordeContext;
 import net.smileycorp.hordes.hordeevent.data.functions.HordeFunction;
 
 public class SetSpawnTypeFunction implements HordeFunction<HordeBuildSpawnDataEvent> {
@@ -16,8 +17,8 @@ public class SetSpawnTypeFunction implements HordeFunction<HordeBuildSpawnDataEv
     }
 
     @Override
-    public void apply(HordeBuildSpawnDataEvent event) {
-        event.getSpawnData().setSpawnType(type);
+    public void apply(HordeContext<HordeBuildSpawnDataEvent> ctx) {
+        ctx.getEvent().getSpawnData().setSpawnType(type);
     }
 
     public static SetSpawnTypeFunction deserialize(JsonElement json) {

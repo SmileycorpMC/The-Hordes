@@ -36,7 +36,7 @@ public class HordeScript<T extends HordePlayerEvent> {
 	}
 
 	public void apply(T event) {
-		func.apply(event);
+		func.apply(new HordeContext<>(event));
 	}
 
 	public Class<T> getType() {
@@ -125,5 +125,5 @@ public class HordeScript<T extends HordePlayerEvent> {
 		}
 		return null;
 	}
-	
+
 }

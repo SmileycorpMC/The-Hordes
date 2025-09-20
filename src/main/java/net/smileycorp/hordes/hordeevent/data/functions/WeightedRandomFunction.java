@@ -8,6 +8,7 @@ import net.smileycorp.atlas.api.util.WeightedOutputs;
 import net.smileycorp.hordes.common.data.DataRegistry;
 import net.smileycorp.hordes.common.data.conditions.Condition;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
+import net.smileycorp.hordes.hordeevent.data.HordeContext;
 
 import java.util.AbstractMap;
 import java.util.List;
@@ -24,13 +25,13 @@ public class WeightedRandomFunction<T extends HordePlayerEvent> implements Unive
     }
     
     @Override
-    public void apply(T event) {
-        if (event.getClass() != clazz) return;
+    public void apply(HordeContext<T> ctx) {
+        if (ctx.getEventClass() != clazz) return;
         WeightedOutputs<HordeFunction<T>> functions = new WeightedOutputs<>(1, this.functions.stream().
-                filter(pair -> canApply(pair.getFirst(), event))
+                filter(pair -> canApply(pair.getFirst(), ctx))
                 .map(WeightedRandomFunction::mapEntry).toList());
         if (functions.isEmpty()) return;
-        functions.getResults(event.getRandom()).forEach(func -> apply(event));
+        functions.getResults(ctx.getRandom()).forEach(func -> apply(ctx));
     }
 
     private static <T extends HordePlayerEvent> Map.Entry<Integer, HordeFunction<T>> mapEntry(Pair<List<Condition>, Pair<Integer, HordeFunction<T>>> pair) {
@@ -66,7 +67,7 @@ public class WeightedRandomFunction<T extends HordePlayerEvent> implements Unive
                 clazz = pair.getFirst();
                 functions.add(Pair.of(conditions, pair.getSecond()));
             }
-            else if (clazz == pair.getFirst()) {
+            else if (pair.getFirst() != null && clazz != null && pair.getFirst().isAssignableFrom(clazz)) {
                 List<Condition> conditions = Lists.newArrayList();
                 if (obj.has("conditions")) obj.get("conditions").getAsJsonArray().forEach(condition ->
                         conditions.add(DataRegistry.readCondition(condition.getAsJsonObject())));

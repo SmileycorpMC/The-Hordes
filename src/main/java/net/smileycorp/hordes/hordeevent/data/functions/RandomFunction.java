@@ -7,6 +7,7 @@ import com.mojang.datafixers.util.Pair;
 import net.smileycorp.hordes.common.data.DataRegistry;
 import net.smileycorp.hordes.common.data.conditions.Condition;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
+import net.smileycorp.hordes.hordeevent.data.HordeContext;
 
 import java.util.List;
 
@@ -21,11 +22,11 @@ public class RandomFunction<T extends HordePlayerEvent> implements UniversalHord
     }
     
     @Override
-    public void apply(T event) {
-        if (event.getClass() != clazz) return;
-        List<HordeFunction<T>> functions = this.functions.stream().filter(pair -> canApply(pair.getFirst(), event)).map(Pair::getSecond).toList();
+    public void apply(HordeContext<T> ctx) {
+        if (ctx.getEventClass() != clazz) return;
+        List<HordeFunction<T>> functions = this.functions.stream().filter(pair -> canApply(pair.getFirst(), ctx)).map(Pair::getSecond).toList();
         if (functions.isEmpty()) return;
-        functions.get(event.getRandom().nextInt(functions.size())).apply(event);
+        functions.get(ctx.getRandom().nextInt(functions.size())).apply(ctx);
     }
 
     @Override
@@ -56,7 +57,7 @@ public class RandomFunction<T extends HordePlayerEvent> implements UniversalHord
                 clazz = pair.getFirst();
                 functions.add(Pair.of(conditions, pair.getSecond()));
             }
-            else if (clazz == pair.getFirst()) {
+            else if (pair.getFirst() != null && clazz != null && pair.getFirst().isAssignableFrom(clazz)) {
                 List<Condition> conditions = Lists.newArrayList();
                 if (obj.has("conditions")) obj.get("conditions").getAsJsonArray().forEach(condition ->
                         conditions.add(DataRegistry.readCondition(condition.getAsJsonObject())));

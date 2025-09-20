@@ -5,6 +5,7 @@ import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.data.values.ValueGetter;
 import net.smileycorp.hordes.common.event.HordeBuildSpawnDataEvent;
+import net.smileycorp.hordes.hordeevent.data.HordeContext;
 import net.smileycorp.hordes.hordeevent.data.functions.HordeFunction;
 
 public class SetStartMessageFunction implements HordeFunction<HordeBuildSpawnDataEvent> {
@@ -16,8 +17,8 @@ public class SetStartMessageFunction implements HordeFunction<HordeBuildSpawnDat
     }
 
     @Override
-    public void apply(HordeBuildSpawnDataEvent event) {
-        event.getSpawnData().setStartMessage(getter.get(event));
+    public void apply(HordeContext<HordeBuildSpawnDataEvent> ctx) {
+        ctx.getEvent().getSpawnData().setStartMessage(getter.get(ctx));
     }
 
     public static SetStartMessageFunction deserialize(JsonElement json) {

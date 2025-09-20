@@ -6,6 +6,7 @@ import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.data.values.ValueGetter;
 import net.smileycorp.hordes.common.event.HordeSpawnEntityEvent;
+import net.smileycorp.hordes.hordeevent.data.HordeContext;
 import net.smileycorp.hordes.hordeevent.data.functions.HordeFunction;
 
 public class SetEntityLootTableFunction implements HordeFunction<HordeSpawnEntityEvent> {
@@ -17,10 +18,10 @@ public class SetEntityLootTableFunction implements HordeFunction<HordeSpawnEntit
     }
     
     @Override
-    public void apply(HordeSpawnEntityEvent event) {
+    public void apply(HordeContext<HordeSpawnEntityEvent> ctx) {
         CompoundTag tag = new CompoundTag();
-        tag.putString("DeathLootTable", getter.get(event));
-        event.getEntity().readAdditionalSaveData(tag);
+        tag.putString("DeathLootTable", getter.get(ctx));
+        ctx.getEntity().readAdditionalSaveData(tag);
     }
     
     public static SetEntityLootTableFunction deserialize(JsonElement json) {

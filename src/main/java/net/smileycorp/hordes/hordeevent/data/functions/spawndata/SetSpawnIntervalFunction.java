@@ -5,6 +5,7 @@ import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.data.values.ValueGetter;
 import net.smileycorp.hordes.common.event.HordeBuildSpawnDataEvent;
+import net.smileycorp.hordes.hordeevent.data.HordeContext;
 import net.smileycorp.hordes.hordeevent.data.functions.HordeFunction;
 
 public class SetSpawnIntervalFunction implements HordeFunction<HordeBuildSpawnDataEvent> {
@@ -16,8 +17,8 @@ public class SetSpawnIntervalFunction implements HordeFunction<HordeBuildSpawnDa
     }
 
     @Override
-    public void apply(HordeBuildSpawnDataEvent event) {
-        event.getSpawnData().setSpawnInterval(getter.get(event));
+    public void apply(HordeContext<HordeBuildSpawnDataEvent> ctx) {
+        ctx.getEvent().getSpawnData().setSpawnInterval(getter.get(ctx));
     }
 
     public static SetSpawnIntervalFunction deserialize(JsonElement json) {

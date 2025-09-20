@@ -1,13 +1,14 @@
 package net.smileycorp.hordes.hordeevent.data.functions;
 
 import com.google.common.collect.Lists;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
+import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.data.DataRegistry;
 import net.smileycorp.hordes.common.data.conditions.Condition;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
+import net.smileycorp.hordes.hordeevent.data.HordeContext;
 
 import java.util.List;
 
@@ -22,10 +23,13 @@ public class MultipleFunction<T extends HordePlayerEvent> implements UniversalHo
     }
     
     @Override
-    public void apply(T event) {
-        if (event.getClass() != clazz) return;
-        for (Pair<List<Condition>, HordeFunction<T>> pair : functions)
-            if (canApply(pair.getFirst(), event)) pair.getSecond().apply(event);
+    public void apply(HordeContext<T> ctx) {
+        if (ctx.getEventClass() != clazz) return;
+        for (Pair<List<Condition>, HordeFunction<T>> pair : functions) {
+            if (canApply(pair.getFirst(), ctx)) pair.getSecond().apply(ctx);
+            if (ctx.isBroken()) break;
+        }
+        ctx.resetState();
     }
 
     @Override
@@ -56,7 +60,7 @@ public class MultipleFunction<T extends HordePlayerEvent> implements UniversalHo
                 clazz = pair.getFirst();
                 functions.add(Pair.of(conditions, pair.getSecond()));
             }
-            else if (clazz == pair.getFirst()) {
+            else if (pair.getFirst() != null && clazz != null && pair.getFirst().isAssignableFrom(clazz)) {
                 List<Condition> conditions = Lists.newArrayList();
                 if (obj.has("conditions")) obj.get("conditions").getAsJsonArray().forEach(condition ->
                         conditions.add(DataRegistry.readCondition(condition.getAsJsonObject())));

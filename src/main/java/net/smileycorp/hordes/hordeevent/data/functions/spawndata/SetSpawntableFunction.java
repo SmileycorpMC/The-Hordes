@@ -6,6 +6,7 @@ import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.data.values.ValueGetter;
 import net.smileycorp.hordes.common.event.HordeBuildSpawnDataEvent;
+import net.smileycorp.hordes.hordeevent.data.HordeContext;
 import net.smileycorp.hordes.hordeevent.data.HordeTableLoader;
 import net.smileycorp.hordes.hordeevent.data.functions.HordeFunction;
 
@@ -18,8 +19,8 @@ public class SetSpawntableFunction implements HordeFunction<HordeBuildSpawnDataE
     }
 
     @Override
-    public void apply(HordeBuildSpawnDataEvent event) {
-        event.getSpawnData().setTable(HordeTableLoader.INSTANCE.getTable(new ResourceLocation(getter.get(event))));
+    public void apply(HordeContext<HordeBuildSpawnDataEvent> ctx) {
+        ctx.getEvent().getSpawnData().setTable(HordeTableLoader.INSTANCE.getTable(new ResourceLocation(getter.get(ctx))));
     }
 
     public static SetSpawntableFunction deserialize(JsonElement json) {

@@ -10,6 +10,7 @@ import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.HordeBuildSpawnDataEvent;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
 import net.smileycorp.hordes.common.event.HordeSpawnEntityEvent;
+import net.smileycorp.hordes.hordeevent.data.HordeContext;
 import net.smileycorp.hordes.hordeevent.data.functions.spawndata.*;
 import net.smileycorp.hordes.hordeevent.data.functions.spawnentity.*;
 
@@ -24,7 +25,10 @@ public class FunctionRegistry {
         //universal functions
         registerUniversalFunction(Constants.loc("multiple"), MultipleFunction::deserialize);
         registerUniversalFunction(Constants.loc("random"), RandomFunction::deserialize);
-        registerUniversalFunction(Constants.loc("weighted_random"), RandomFunction::deserialize);
+        registerUniversalFunction(Constants.loc("weighted_random"), WeightedRandomFunction::deserialize);
+        registerInstructionFunction(Constants.loc("break"), HordeContext::breakScript);
+        registerInstructionFunction(Constants.loc("return"), HordeContext::returnScript);
+        registerInstructionFunction(Constants.loc("cancel"), HordeContext::cancelEvent);
         //build spawndata functions
         registerFunction(Constants.loc("set_spawntable"), HordeBuildSpawnDataEvent.class, SetSpawntableFunction::deserialize);
         registerFunction(Constants.loc("set_spawn_type"), HordeBuildSpawnDataEvent.class, SetSpawnTypeFunction::deserialize);
@@ -60,8 +64,12 @@ public class FunctionRegistry {
         }
     }
 
-    public static <T extends HordePlayerEvent> void registerUniversalFunction(ResourceLocation name, Function<JsonElement, UniversalHordeFunction> serializer) {
+    public static void registerUniversalFunction(ResourceLocation name, Function<JsonElement, UniversalHordeFunction> serializer) {
         DESERIALIZERS.put(name, new Pair(null, serializer));
+    }
+
+    public static <T extends HordePlayerEvent> void registerInstructionFunction(ResourceLocation name, HordeFunction<HordePlayerEvent> function) {
+        DESERIALIZERS.put(name, new Pair<>(HordePlayerEvent.class, json -> function));
     }
 
     public static <T extends HordePlayerEvent> void registerFunction(ResourceLocation name, Class<T> clazz, Function<JsonElement, HordeFunction<T>> serializer) {

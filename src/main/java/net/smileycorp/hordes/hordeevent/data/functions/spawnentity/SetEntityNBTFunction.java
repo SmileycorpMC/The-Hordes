@@ -7,6 +7,7 @@ import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.data.DataRegistry;
 import net.smileycorp.hordes.common.data.values.ValueGetter;
 import net.smileycorp.hordes.common.event.HordeSpawnEntityEvent;
+import net.smileycorp.hordes.hordeevent.data.HordeContext;
 import net.smileycorp.hordes.hordeevent.data.functions.HordeFunction;
 
 public class SetEntityNBTFunction implements HordeFunction<HordeSpawnEntityEvent> {
@@ -18,13 +19,13 @@ public class SetEntityNBTFunction implements HordeFunction<HordeSpawnEntityEvent
     }
     
     @Override
-    public void apply(HordeSpawnEntityEvent event) {
-        String str = getter.get(event);
+    public void apply(HordeContext<HordeSpawnEntityEvent> ctx) {
+        String str = getter.get(ctx);
         try {
-            CompoundTag nbt = DataRegistry.parseNBT(event.getEntity().toString(), str);
-            event.getEntity().readAdditionalSaveData(nbt);
+            CompoundTag nbt = DataRegistry.parseNBT(ctx.getEntity().toString(), str);
+            ctx.getEntity().readAdditionalSaveData(nbt);
         } catch (Exception e) {
-            HordesLogger.logError("Failed loading nbt " + str + " for entity " + event.getEntity(), e);
+            HordesLogger.logError("Failed loading nbt " + str + " for entity " + ctx.getEntity(), e);
         }
     }
     

@@ -7,15 +7,15 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.data.DataRegistry;
-import net.smileycorp.hordes.common.event.HordePlayerEvent;
+import net.smileycorp.hordes.hordeevent.data.HordeContext;
 
 public interface ValueGetter<T extends Comparable<T>> {
 
    T get(Level level, LivingEntity entity, ServerPlayer player, RandomSource rand);
     
-    default T get(HordePlayerEvent event) {
-        return get(event.getEntityWorld(), event.getEntity(), event.getPlayer(), event.getRandom());
-    }
+   default T get(HordeContext ctx) {
+        return get(ctx.getEntityWorld(), ctx.getEntity(), ctx.getPlayer(), ctx.getRandom());
+   }
     
     static <T extends Comparable<T>> ValueGetter<T> readValue(DataType<T> type, JsonElement value) {
         if (value.isJsonObject()) {
