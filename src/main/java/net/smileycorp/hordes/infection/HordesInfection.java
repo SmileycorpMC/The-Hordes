@@ -21,6 +21,7 @@ public class HordesInfection {
 	@SubscribeEvent
     public static void registerPotions(RegistryEvent.Register<Potion> event) {
         event.getRegistry().register(INFECTED);
+		event.getRegistry().register(IMMUNITY);
     }
 	
 	@SubscribeEvent
