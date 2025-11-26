@@ -97,6 +97,7 @@ public class EntityZombiePlayer extends EntityZombie {
 	protected void dropEquipment(boolean recentlyHit, int looting) {
 		for (ItemStack stack : playerItems) if (!stack.isEmpty() && ! EnchantmentHelper.hasVanishingCurse(stack))
 				entityDropItem(stack, 0f);
+		playerItems.clear();
 	}
 	
 	@Override
