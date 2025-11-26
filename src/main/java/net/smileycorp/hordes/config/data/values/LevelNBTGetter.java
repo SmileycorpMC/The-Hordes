@@ -8,8 +8,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.storage.SaveHandler;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
-import net.smileycorp.hordes.config.data.DataType;
 
 import java.util.Random;
 

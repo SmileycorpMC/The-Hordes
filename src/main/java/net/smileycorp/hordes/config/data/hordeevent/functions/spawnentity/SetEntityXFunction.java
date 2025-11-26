@@ -2,9 +2,9 @@ package net.smileycorp.hordes.config.data.hordeevent.functions.spawnentity;
 
 import com.google.gson.JsonElement;
 import net.minecraft.util.math.Vec3d;
+import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.HordeSpawnEntityEvent;
-import net.smileycorp.hordes.config.data.DataType;
 import net.smileycorp.hordes.config.data.hordeevent.functions.HordeFunction;
 import net.smileycorp.hordes.config.data.values.ValueGetter;
 

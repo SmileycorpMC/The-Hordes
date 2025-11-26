@@ -6,7 +6,7 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.World;
-import net.smileycorp.hordes.config.data.DataType;
+import net.smileycorp.atlas.api.data.DataType;
 
 import java.util.Random;
 

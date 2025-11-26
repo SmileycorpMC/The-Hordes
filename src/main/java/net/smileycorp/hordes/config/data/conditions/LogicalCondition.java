@@ -5,9 +5,9 @@ import com.google.gson.JsonElement;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.World;
+import net.smileycorp.atlas.api.data.LogicalOperation;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.config.data.DataRegistry;
-import net.smileycorp.hordes.config.data.LogicalOperation;
 
 import java.util.List;
 import java.util.Random;

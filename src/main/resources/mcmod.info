@@ -2,14 +2,14 @@
 {
   "modid": "hordes",
   "name": "The Hordes",
-  "description": "",
-  "version": "1.5.3b",
+  "description": "Horde Invasions and Zombie Infection",
+  "version": "1.5.3c",
   "mcversion": "${mcversion}",
-  "url": "",
+  "url": "https://www.curseforge.com/minecraft/mc-mods/the-hordes",
   "updateUrl": "",
   "authorList": ["Smileycorp"],
-  "credits": "bstylia14, Ski_Z",
-  "logoFile": "",
+  "credits": "bstylia14, Ski_Z, ForgeLabs, ForgeLabs, TqLxQuanZ, mpustovoi, SuoHouDaiShi",
+  "logoFile": "assets/hordes/mob_effect/infected.png",
   "screenshots": [],
   "dependencies": []
 }

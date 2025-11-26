@@ -11,8 +11,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.oredict.OreDictionary;
+import net.smileycorp.atlas.api.data.Either;
 import net.smileycorp.hordes.common.HordesLogger;
-import net.smileycorp.hordes.config.data.Either;
 
 import java.util.List;
 

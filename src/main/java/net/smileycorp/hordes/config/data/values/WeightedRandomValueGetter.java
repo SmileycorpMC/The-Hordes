@@ -6,9 +6,9 @@ import com.google.gson.JsonObject;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.World;
+import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.atlas.api.recipe.WeightedOutputs;
 import net.smileycorp.hordes.common.HordesLogger;
-import net.smileycorp.hordes.config.data.DataType;
 
 import java.util.Map;
 import java.util.Random;

@@ -24,7 +24,7 @@ apply plugin: 'eclipse'
 apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'java'
 
-version = "1.12.2-1.5.3b"
+version = "1.12.2-1.5.3c"
 group = "net.smileycorp.hordes"
 archivesBaseName = "The-Hordes"
 
@@ -76,7 +76,7 @@ dependencies {
     minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2860'
 	implementation "org.spongepowered:mixin:0.8"
 	
-	implementation "curse.maven:atlas-463826:3816069"
+	implementation "curse.maven:atlas-463826:6981112"
 	implementation "curse.maven:jei-238222:4393461"
 	implementation "curse.maven:mpr-285012:2823889"
     implementation "curse.maven:gamestages-268655:2951840"

@@ -5,7 +5,7 @@ import com.google.gson.JsonArray;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.World;
-import net.smileycorp.hordes.config.data.DataType;
+import net.smileycorp.atlas.api.data.DataType;
 
 import java.util.List;
 import java.util.Random;

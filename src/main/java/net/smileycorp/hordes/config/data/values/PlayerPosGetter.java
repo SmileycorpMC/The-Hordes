@@ -6,8 +6,8 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
-import net.smileycorp.hordes.config.data.DataType;
 
 import java.util.Random;
 

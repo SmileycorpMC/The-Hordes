@@ -5,9 +5,9 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.HordeSpawnEntityEvent;
-import net.smileycorp.hordes.config.data.DataType;
 import net.smileycorp.hordes.config.data.hordeevent.functions.HordeFunction;
 import net.smileycorp.hordes.config.data.values.ValueGetter;
 
