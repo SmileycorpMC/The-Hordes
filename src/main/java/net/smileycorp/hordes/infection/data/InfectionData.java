@@ -11,6 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -18,6 +19,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -32,6 +34,7 @@ import net.smileycorp.hordes.infection.network.InfectionPacketHandler;
 import net.smileycorp.hordes.infection.network.SyncImmunityItemsMessage;
 import net.smileycorp.hordes.infection.network.SyncWearableProtectionMessage;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 
@@ -43,7 +46,7 @@ public class InfectionData extends SimpleJsonResourceReloadListener {
 
     private final Map<EntityType<?>, InfectionConversionEntry> conversionTable = Maps.newHashMap();
     private final Map<Item, Integer> immunityItems = Maps.newHashMap();
-    private final Map<Item, Float> wearablesProtection = Maps.newHashMap();
+    private final Map<Item, Pair<Float, AttributeModifier.Operation>> wearablesProtection = Maps.newHashMap();
     private final Map<EntityType<?>, Float> entityInfectChance = Maps.newHashMap();
 
     public InfectionData() {
@@ -106,7 +109,11 @@ public class InfectionData extends SimpleJsonResourceReloadListener {
                     Item item = BuiltInRegistries.ITEM.get(name);
                     float modifier = obj.get("protection").getAsFloat();
                     if (item == null || item == Items.AIR) throw new NullPointerException();
-                    wearablesProtection.put(item, modifier);
+                    AttributeModifier.Operation operation = null;
+                    if (obj.has("operation")) operation = ((StringRepresentable.EnumCodec<AttributeModifier.Operation>)AttributeModifier.Operation.CODEC)
+                            .byName(obj.get("operation").getAsString());
+                    wearablesProtection.put(item, Pair.of(modifier, operation == null ?
+                            AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL : operation));
                     HordesLogger.logInfo("Loaded wearable protection " + name + " with modifier " + modifier);
                 } catch (Exception e) {
                     HordesLogger.logError("Failed to load wearable protection " + element.getAsString(), e);
@@ -187,11 +194,18 @@ public class InfectionData extends SimpleJsonResourceReloadListener {
         return type == EntityType.PLAYER ? (float) (double) InfectionConfig.playerInfectionResistance.get() :
                 conversionTable.containsKey(type) ? conversionTable.get(type).protection : 0;
     }
-    
-    public float getProtectionMultiplier(ItemStack stack) {
-        if (stack.isEmpty()) return 0;
+
+    @Nullable
+    public Pair<Float, AttributeModifier.Operation> getProtection(ItemStack stack) {
+        if (stack.isEmpty()) return null;
         Item item = stack.getItem();
-        return wearablesProtection.containsKey(item) ? wearablesProtection.get(item) : 0;
+        return wearablesProtection.containsKey(item) ? wearablesProtection.get(item) : null;
+    }
+
+    @Deprecated
+    public float getProtectionMultiplier(ItemStack stack) {
+        Pair<Float, AttributeModifier.Operation> pair = getProtection(stack);
+        return pair == null ? 0 : pair.getFirst();
     }
     
     public boolean canCauseInfection(EntityType<?> entity) {
@@ -218,7 +232,7 @@ public class InfectionData extends SimpleJsonResourceReloadListener {
         data.forEach(e -> immunityItems.put(e.getKey(), e.getValue()));
     }
     
-    public void readWearableProtection(List<Pair<Item, Float>> data) {
+    public void readWearableProtection(List<Pair<Item, Pair<Float, AttributeModifier.Operation>>> data) {
         wearablesProtection.clear();
         data.forEach(e -> wearablesProtection.put(e.getFirst(), e.getSecond()));
     }

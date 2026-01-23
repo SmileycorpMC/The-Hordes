@@ -1,5 +1,6 @@
 package net.smileycorp.hordes.infection;
 
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -169,10 +170,10 @@ public class InfectionEventHandler {
 	public void addItemAttributes(ItemAttributeModifierEvent event) {
 		ItemStack stack = event.getItemStack();
 		EquipmentSlot slot = getSlot(stack);
-		float value = InfectionData.INSTANCE.getProtectionMultiplier(stack);
-		if (value == 0) return;
-		event.addModifier(HordesInfection.INFECTION_RESISTANCE, new AttributeModifier(Constants.loc(slot.getName()), value,
-				AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL), EquipmentSlotGroup.bySlot(slot));
+		Pair<Float, AttributeModifier.Operation> pair = InfectionData.INSTANCE.getProtection(stack);
+		if (pair == null) return;
+		event.addModifier(HordesInfection.INFECTION_RESISTANCE, new AttributeModifier(Constants.loc(slot.getName()), pair.getFirst(),
+				pair.getSecond()), EquipmentSlotGroup.bySlot(slot));
 	}
 	
 	public static EquipmentSlot getSlot(ItemStack stack) {
