@@ -23,11 +23,12 @@ public class InfectionConfig {
         villagerInfectChance = config.get("Infection", "villagerInfectChance", 0.85, "Chance for a villager to get infected, a value of 1 or higher makes it guaranteed").getDouble();
         infectPlayers = config.get("Infection", "infectPlayers", true, "Can players be infected.").getBoolean();
         infectSlowness = config.get("Infection", "infectSlowness", true, "Whether later levels of infected should slightly slow movement speed? ").getBoolean();
-        infectHunger = config.get("Infection", "infectHunger", true, "Whether later levels of infected should depleet hunger quicker? ").getBoolean();
+        infectHunger = config.get("Infection", "infectHunger", true, "Whether later levels of infected should deplete hunger quicker? ").getBoolean();
         playerInfectChance = config.get("Infection", "playerInfectChance", 0.75, "Chance for a player to get infected, a value of 1 or higher makes it guaranteed").getDouble();
         ticksForEffectStage = config.get("Infection", "ticksForEffectStage", 6000, "How long do each of the 4 effect phases last for before the next phase is activated?").getInt();
         infectionSpawnsZombiePlayers = config.get("Infection", "infectionSpawnsZombiePlayers", true, "Do players who die to infection spawn a zombie??").getBoolean();
         effectStageTickReduction = config.get("Infection", "effectStageTickReduction", 0.95, "What factor should the infection potion effect timer be multiplied by for each cured infection? (Resets on death, set to 1 to disable scaling)").getDouble();
+        infectionEntitiesAggroConversions = config.get("Infection", "infectionEntitiesAggroConversions", true, "Should infectious entities be aggressive towards mobs they can infect? (aside from vanilla behavior)").getBoolean();
     }
     
 }
