@@ -67,17 +67,22 @@ public class EntityAIFleeEntity extends EntityAIBase {
 
 	private BlockPos findSafePos() {
 		Vec3d pos = entity.getPositionVector();
-		Vec3d resultDir = new Vec3d(0, 0, 0);
+		Vec3d resultDir = Vec3d.ZERO;
 		for (EntityLivingBase entity : getEntities()) {
 			Vec3d dir = DirectionUtils.getDirectionVecXZ(this.entity, entity);
-			resultDir = new Vec3d((dir.x + resultDir.x)/2, (dir.y + resultDir.y)/2, (dir.z + resultDir.z)/2);
+			resultDir = resultDir.subtract(dir);
 		}
+		if (resultDir.lengthSquared() == 0) return entity.getPosition();
+		resultDir = resultDir.normalize().scale(range);
 		return new BlockPos(pos.add(resultDir));
 	}
 
 	private List<EntityLivingBase> getEntities() {
-		return world.getEntitiesWithinAABB(EntityLivingBase.class, new AxisAlignedBB(entity.posX - range, entity.posY - range, entity.posZ - range,
-				entity.posX + range, entity.posY + range, entity.posZ + range), predicate);
+        return world.getEntitiesWithinAABB(
+                EntityLivingBase.class,
+                new AxisAlignedBB(entity.posX - range, entity.posY - range, entity.posZ - range,
+                entity.posX + range, entity.posY + range, entity.posZ + range),
+                predicate);
 	}
 
 }

@@ -24,7 +24,7 @@ apply plugin: 'eclipse'
 apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'java'
 
-version = "1.12.2-1.5.3c"
+version = "1.12.2-1.5.3d-SNAPSHOT"
 group = "net.smileycorp.hordes"
 archivesBaseName = "The-Hordes"
 

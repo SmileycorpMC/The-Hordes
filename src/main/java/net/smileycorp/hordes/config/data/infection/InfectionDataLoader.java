@@ -219,7 +219,17 @@ public class InfectionDataLoader {
 
     public boolean convertEntity(EntityLivingBase entity) {
         InfectionConversionEntry entry = conversionTable.get(entity.getClass());
-        if (entry != null) return entry.convertEntity(entity) != null;
+        if (entry != null) {
+            EntityLiving zombie = entry.convertEntity(entity);
+            if (zombie != null) {
+                zombie.setLocationAndAngles(entity.posX, entity.posY, entity.posZ, entity.rotationYaw, entity.rotationPitch);
+                entity.world.spawnEntity(zombie);
+                zombie.renderYawOffset = entity.renderYawOffset;
+                zombie.rotationYawHead = entity.rotationYawHead;
+                return true;
+            }
+            return false;
+        }
         return false;
     }
 
