@@ -1,12 +1,10 @@
 package net.smileycorp.hordes.common.data.conditions;
 
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.Level;
+import net.smileycorp.hordes.common.event.HordePlayerEvent;
+import net.smileycorp.hordes.hordeevent.data.HordeContext;
 
 public interface Condition {
 
-	boolean apply(Level level, LivingEntity entity, ServerPlayer player, RandomSource rand);
+	boolean apply(HordeContext<? extends HordePlayerEvent> ctx);
 
 }

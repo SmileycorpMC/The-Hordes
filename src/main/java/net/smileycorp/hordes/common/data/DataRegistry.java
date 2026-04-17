@@ -44,6 +44,7 @@ public class DataRegistry {
 		registerValueGetter(Constants.loc("player_pos"), PlayerPosGetter::deserialize);
 		registerValueGetter(Constants.loc("entity_nbt"), EntityNBTGetter::deserialize);
 		registerValueGetter(Constants.loc("entity_pos"), EntityPosGetter::deserialize);
+		registerValueGetter(Constants.loc("get_variable"), VariableGetter::deserialize);
 	}
 
 	public static void registerConditionDeserializers() {
@@ -54,11 +55,12 @@ public class DataRegistry {
 		registerConditionDeserializer(Constants.loc("random"), RandomCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("biome"), BiomeCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("day"), DayCondition::deserialize);
-		registerConditionDeserializer(Constants.loc("player_day"), PlayerDayCondition::deserialize);
+		registerConditionDeserializer(Constants.loc("player_day"), DayCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("local_difficulty"), LocalDifficultyCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("game_difficulty"), GameDifficultyCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("advancement"), AdvancementCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("entity_type"), EntityTypeCondition::deserialize);
+		registerConditionDeserializer(Constants.loc("is_called"), IsCalledCondition::deserialize);
 		if (ModList.get().isLoaded("gamestages")) registerConditionDeserializer(new ResourceLocation("gamestages:gamestage"), GameStagesCondition::deserialize);
 	}
 

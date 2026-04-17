@@ -6,12 +6,12 @@ import net.smileycorp.hordes.hordeevent.data.HordeContext;
 
 import java.util.List;
 
-public interface UniversalHordeFunction<T extends HordePlayerEvent> extends HordeFunction<T> {
+public interface NestedHordeFunction<T extends HordePlayerEvent> extends HordeFunction<T> {
 
     Class<T> getEventClass();
 
     default boolean canApply(List<Condition> conditions, HordeContext<T> ctx) {
-        for (Condition condition : conditions) if (!condition.apply(ctx.getEntityWorld(), ctx.getEntity(), ctx.getPlayer(), ctx.getRandom())) return false;
+        for (Condition condition : conditions) if (!condition.apply(ctx)) return false;
         return true;
     }
 

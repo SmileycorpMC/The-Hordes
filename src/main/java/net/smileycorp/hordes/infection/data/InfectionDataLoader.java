@@ -1,14 +1,11 @@
 package net.smileycorp.hordes.infection.data;
 
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.network.Connection;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -21,6 +18,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.smileycorp.hordes.common.HordesLogger;
+import net.smileycorp.hordes.common.data.HordesJsonLoader;
 import net.smileycorp.hordes.common.event.InfectEntityEvent;
 import net.smileycorp.hordes.config.InfectionConfig;
 import net.smileycorp.hordes.infection.HordesInfection;
@@ -31,9 +29,7 @@ import net.smileycorp.hordes.infection.network.SyncWearableProtectionMessage;
 
 import java.util.Map;
 
-public class InfectionDataLoader extends SimpleJsonResourceReloadListener {
-
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+public class InfectionDataLoader extends HordesJsonLoader {
 
     public static InfectionDataLoader INSTANCE = new InfectionDataLoader();
 
@@ -43,18 +39,20 @@ public class InfectionDataLoader extends SimpleJsonResourceReloadListener {
     private final Map<Item, Float> wearablesProtection = Maps.newHashMap();
 
     public InfectionDataLoader() {
-        super(GSON, "horde_data");
+        super("horde_data");
     }
     
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> map, ResourceManager manager, ProfilerFiller profiller) {
+        HordesLogger.blankLine();
+        HordesLogger.heading("LOADING CONVERSION TABLE");
         conversionTable.clear();
-        HordesLogger.logInfo("Loading conversion tables");
         for (String id : manager.getNamespaces()) {
             ResourceLocation loc = new ResourceLocation(id, "infection_conversions");
             JsonElement json = map.get(loc);
             if (json == null) continue;
             try {
+                HordesLogger.blankLine();
                 HordesLogger.logInfo("Loading conversion table " + loc);
                 for (JsonElement element : json.getAsJsonArray()) {
                     try {
@@ -68,13 +66,15 @@ public class InfectionDataLoader extends SimpleJsonResourceReloadListener {
                 HordesLogger.logError("Failed to load conversion table " + loc, e);
             }
         }
+        HordesLogger.blankLine();
+        HordesLogger.heading("LOADING IMMUNITY ITEMS");
         immunityItems.clear();
-        HordesLogger.logInfo("Loading immunity item list");
         for (String id : manager.getNamespaces()) {
             ResourceLocation loc = new ResourceLocation(id, "immunity_items");
             JsonElement json = map.get(loc);
             if (json == null) continue;
             try {
+                HordesLogger.blankLine();
                 HordesLogger.logInfo("Loading immunity item list " + loc);
                 for (JsonElement element : json.getAsJsonArray()) {
                     try {
@@ -92,13 +92,15 @@ public class InfectionDataLoader extends SimpleJsonResourceReloadListener {
                 HordesLogger.logError("Failed to load immunity item list " + loc, e);
             }
         }
+        HordesLogger.blankLine();
+        HordesLogger.heading("LOADING WEARABLE PROTECTION LIST");
         wearablesProtection.clear();
-        HordesLogger.logInfo("Loading wearables protection list");
         for (String id : manager.getNamespaces()) {
             ResourceLocation loc = new ResourceLocation(id, "immune_wearables");
             JsonElement json = map.get(loc);
             if (json == null) continue;
             try {
+                HordesLogger.blankLine();
                 HordesLogger.logInfo("Loading wearables protection list " + loc);
                 for (JsonElement element : json.getAsJsonArray()) {
                     try {

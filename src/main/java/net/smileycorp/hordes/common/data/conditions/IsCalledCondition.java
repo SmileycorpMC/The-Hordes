@@ -7,24 +7,24 @@ import net.smileycorp.hordes.common.data.values.ValueGetter;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
 import net.smileycorp.hordes.hordeevent.data.HordeContext;
 
-public class DayCondition implements Condition {
+public class IsCalledCondition implements Condition {
 
-	protected ValueGetter<Integer> day;
+	protected ValueGetter<Boolean> isCalled;
 
-	public DayCondition(ValueGetter<Integer> day) {
-		this.day = day;
+	public IsCalledCondition(ValueGetter<Boolean> isCalled) {
+		this.isCalled = isCalled;
 	}
 
 	@Override
 	public boolean apply(HordeContext<? extends HordePlayerEvent> ctx) {
-		return ctx.getDay() > day.get(ctx);
+		return ctx.isCalled() == isCalled.get(ctx);
 	}
 
-	public static DayCondition deserialize(JsonElement json) {
+	public static IsCalledCondition deserialize(JsonElement json) {
 		try {
-			return new DayCondition(ValueGetter.readValue(DataType.INT, json));
+			return new IsCalledCondition(ValueGetter.readValue(DataType.BOOLEAN, json));
 		} catch(Exception e) {
-			HordesLogger.logError("Incorrect parameters for condition hordes:day", e);
+			HordesLogger.logError("Incorrect parameters for condition hordes:random", e);
 		}
 		return null;
 	}

@@ -1,12 +1,10 @@
 package net.smileycorp.hordes.common.data.conditions;
 
 import com.google.gson.JsonElement;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.Level;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.data.DataRegistry;
+import net.smileycorp.hordes.common.event.HordePlayerEvent;
+import net.smileycorp.hordes.hordeevent.data.HordeContext;
 
 public class NotCondition implements Condition {
 
@@ -17,8 +15,8 @@ public class NotCondition implements Condition {
 	}
 
 	@Override
-	public boolean apply(Level level, LivingEntity entity, ServerPlayer player, RandomSource rand) {
-		return !condition.apply(level, entity, player, rand);
+	public boolean apply(HordeContext<? extends HordePlayerEvent> ctx) {
+		return !condition.apply(ctx);
 	}
 
 	public static NotCondition deserialize(JsonElement json) {

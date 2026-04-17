@@ -114,6 +114,7 @@ public class HordeEvent {
 		if (spawnData == null) {
 			HordeBuildSpawnDataEvent buildTableEvent = new HordeBuildSpawnDataEvent(player, this);
 			postEvent(buildTableEvent);
+			if (buildTableEvent.isCanceled()) return;
 			spawnData = buildTableEvent.getSpawnData();
 		}
 		if (spawnData == null || spawnData.getTable() == null) {
@@ -287,6 +288,7 @@ public class HordeEvent {
 		if (spawnData == null) {
 			HordeBuildSpawnDataEvent event = new HordeBuildSpawnDataEvent(player, this);
 			postEvent(event);
+			if (event.isCanceled()) return;
 			spawnData = event.getSpawnData();
 		}
 		if (spawnData == null || spawnData.getTable() == null || spawnData.getTable().getSpawnTable(day).isEmpty()) {

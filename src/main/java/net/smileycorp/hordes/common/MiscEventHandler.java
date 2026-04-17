@@ -1,6 +1,8 @@
 package net.smileycorp.hordes.common;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.Entity;
@@ -23,6 +25,7 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.common.capability.ZombifyPlayer;
 import net.smileycorp.hordes.common.entities.HordesEntities;
@@ -33,6 +36,7 @@ import net.smileycorp.hordes.config.ZombiePlayersConfig;
 import net.smileycorp.hordes.infection.HordesInfection;
 
 import java.util.Collection;
+import java.util.List;
 
 @EventBusSubscriber(modid = Constants.MODID, bus = Bus.MOD)
 public class MiscEventHandler {
@@ -42,7 +46,22 @@ public class MiscEventHandler {
 	public void onJoin(PlayerEvent.PlayerLoggedInEvent event) {
 		if (event.getEntity() == null) return;
 		if (event.getEntity().level().isClientSide()) return;
-		if (HordesLogger.hasErrors()) event.getEntity().sendSystemMessage(Component.translatable("message.hordes.DataError", HordesLogger.getFiletext()));
+		if (HordesLogger.hasErrors()) {
+			List<ResourceLocation> scripts = HordesLogger.getErroredScripts();
+			MutableComponent message = scripts.isEmpty() ? Component.translatable("message.hordes.DataError", HordesLogger.getFiletext()) :
+					Component.translatable("message.hordes.DataErrorScripts", scripts, HordesLogger.getFiletext());
+			event.getEntity().sendSystemMessage(message);
+		}
+	}
+
+	//clear errors on world leave
+	@SubscribeEvent
+	public void onLeave(PlayerEvent.PlayerLoggedOutEvent event) {
+		if (event.getEntity() == null) return;
+		if (event.getEntity().level().isClientSide()) return;
+		if (ServerLifecycleHooks.getCurrentServer().isDedicatedServer()) return;
+		HordesLogger.clearLog(false);
+		HordesLogger.clearErrors();
 	}
 
 	//determine if zombie entity should spawn, and if so create the correct entity and set properties

@@ -25,7 +25,7 @@ public class SetEntityTypeFunction implements HordeFunction<HordeSpawnEntityEven
         String str = getter.get(ctx);
         try {
             EntityType<?> type = ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(str));
-            ctx.getEvent().setEntity((Mob) type.create(ctx.getEntityWorld()));
+            ctx.getEvent().setEntity((Mob) type.create(ctx.getWorld()));
         } catch (Exception e) {
             HordesLogger.logError("Failed changing entity " + ctx.getEntity() + " to type " + str, e);
         }

@@ -2,17 +2,19 @@ package net.smileycorp.hordes.hordeevent.data.functions;
 
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.resources.ResourceLocation;
 import net.smileycorp.hordes.common.Constants;
-import net.smileycorp.hordes.common.HordesLogger;
+import net.smileycorp.hordes.common.data.HordesParsingException;
 import net.smileycorp.hordes.common.event.HordeBuildSpawnDataEvent;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
 import net.smileycorp.hordes.common.event.HordeSpawnEntityEvent;
 import net.smileycorp.hordes.hordeevent.data.HordeContext;
 import net.smileycorp.hordes.hordeevent.data.functions.spawndata.*;
 import net.smileycorp.hordes.hordeevent.data.functions.spawnentity.*;
+import net.smileycorp.hordes.hordeevent.data.functions.universal.*;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -23,12 +25,16 @@ public class FunctionRegistry {
 
     public static void registerFunctionSerializers() {
         //universal functions
-        registerUniversalFunction(Constants.loc("multiple"), MultipleFunction::deserialize);
-        registerUniversalFunction(Constants.loc("random"), RandomFunction::deserialize);
-        registerUniversalFunction(Constants.loc("weighted_random"), WeightedRandomFunction::deserialize);
+        registerNestedFunction(Constants.loc("multiple"), MultipleFunction::deserialize);
+        registerNestedFunction(Constants.loc("random"), RandomFunction::deserialize);
+        registerNestedFunction(Constants.loc("weighted_random"), WeightedRandomFunction::deserialize);
         registerInstructionFunction(Constants.loc("break"), HordeContext::breakScript);
         registerInstructionFunction(Constants.loc("return"), HordeContext::returnScript);
         registerInstructionFunction(Constants.loc("cancel"), HordeContext::cancelEvent);
+        registerFunction(Constants.loc("set_entity_nbt"), HordePlayerEvent.class, SetEntityNBTFunction::deserialize);
+        registerFunction(Constants.loc("set_player_nbt"), HordePlayerEvent.class, SetPlayerNBTFunction::deserialize);
+        registerFunction(Constants.loc("set_variable"), HordePlayerEvent.class, SetVariableFunction::deserialize);
+        registerFunction(Constants.loc("call_script"), HordePlayerEvent.class, CallScriptFunction::deserialize);
         //build spawndata functions
         registerFunction(Constants.loc("set_spawntable"), HordeBuildSpawnDataEvent.class, SetSpawntableFunction::deserialize);
         registerFunction(Constants.loc("set_spawn_type"), HordeBuildSpawnDataEvent.class, SetSpawnTypeFunction::deserialize);
@@ -41,30 +47,25 @@ public class FunctionRegistry {
         registerFunction(Constants.loc("set_entity_speed"), HordeBuildSpawnDataEvent.class, SetEntitySpeedFunction::deserialize);
         //spawn entity functions
         registerFunction(Constants.loc("set_entity_type"), HordeSpawnEntityEvent.class, SetEntityTypeFunction::deserialize);
-        registerFunction(Constants.loc("set_entity_nbt"), HordeSpawnEntityEvent.class, SetEntityNBTFunction::deserialize);
         registerFunction(Constants.loc("set_entity_x"), HordeSpawnEntityEvent.class, SetEntityXFunction::deserialize);
         registerFunction(Constants.loc("set_entity_y"), HordeSpawnEntityEvent.class, SetEntityYFunction::deserialize);
         registerFunction(Constants.loc("set_entity_z"), HordeSpawnEntityEvent.class, SetEntityZFunction::deserialize);
         registerFunction(Constants.loc("set_entity_loot_table"), HordeSpawnEntityEvent.class, SetEntityLootTableFunction::deserialize);
     }
 
-    public static <T extends HordePlayerEvent> Pair<Class<T>, HordeFunction<T>> readFunction(JsonObject json) {
-        if (!(json.has("function") && json.has("value"))) return Pair.of(null, null);
-        try {
-            ResourceLocation loc = new ResourceLocation(json.get("function").getAsString());
-            Pair<Class<? extends HordePlayerEvent>, Function<JsonElement, HordeFunction<? extends HordePlayerEvent>>> pair
-                    = DESERIALIZERS.get(loc);
-            if (pair == null) throw new NullPointerException("function " + loc + " is not registered");
-            HordeFunction<T> function = (HordeFunction<T>) pair.getSecond().apply(json.get("value"));
-            return Pair.of(function instanceof UniversalHordeFunction ? ((UniversalHordeFunction<T>) function).getEventClass()
-                    : (Class<T>) pair.getFirst(), function);
-        } catch (Exception e) {
-            HordesLogger.logError("Failed to read function " + json, e);
-            return Pair.of(null, null);
-        }
+    public static <T extends HordePlayerEvent> Pair<Class<T>, HordeFunction<T>> readFunction(JsonObject json) throws Exception {
+        if (!(json.has("function"))) return Pair.of(null, null);
+        ResourceLocation loc = new ResourceLocation(json.get("function").getAsString());
+        Pair<Class<? extends HordePlayerEvent>, Function<JsonElement, HordeFunction<? extends HordePlayerEvent>>> pair
+                = DESERIALIZERS.get(loc);
+        if (pair == null) throw new HordesParsingException("function " + loc + " is not registered");
+        HordeFunction<T> function = (HordeFunction<T>) pair.getSecond().apply(json.has("value") ?
+                json.get("value") : new JsonNull());
+        return Pair.of(function instanceof NestedHordeFunction ? ((NestedHordeFunction<T>) function).getEventClass()
+                : (Class<T>) pair.getFirst(), function);
     }
 
-    public static void registerUniversalFunction(ResourceLocation name, Function<JsonElement, UniversalHordeFunction> serializer) {
+    public static void registerNestedFunction(ResourceLocation name, Function<JsonElement, NestedHordeFunction> serializer) {
         DESERIALIZERS.put(name, new Pair(null, serializer));
     }
 

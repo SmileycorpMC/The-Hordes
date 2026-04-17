@@ -2,11 +2,10 @@ package net.smileycorp.hordes.common.data.values;
 
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.Level;
 import net.smileycorp.atlas.api.data.DataType;
+import net.smileycorp.hordes.common.HordesLogger;
+import net.smileycorp.hordes.common.event.HordePlayerEvent;
+import net.smileycorp.hordes.hordeevent.data.HordeContext;
 
 import java.util.List;
 
@@ -15,12 +14,16 @@ public class RandomValue<T extends Comparable<T>> implements ValueGetter<T> {
     private final List<ValueGetter<T>> values = Lists.newArrayList();
 
     public RandomValue(DataType<T> type, JsonArray json) {
-        json.forEach(element -> values.add(ValueGetter.readValue(type, element)));
+        json.forEach(element -> { try {
+            values.add(ValueGetter.readValue(type, element));
+        } catch (Exception e) {
+            HordesLogger.logError("Error loading value hordes:random", e);
+        }});
     }
 
     @Override
-    public T get(Level level, LivingEntity entity, ServerPlayer player, RandomSource rand) {
-        return values.get(rand.nextInt(values.size())).get(level, entity, player, rand);
+    public T get(HordeContext<? extends HordePlayerEvent> ctx) {
+        return values.get(ctx.getRandom().nextInt(values.size())).get(ctx);
     }
 
 }

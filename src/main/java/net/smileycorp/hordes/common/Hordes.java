@@ -38,14 +38,20 @@ import java.nio.file.Path;
 public class Hordes {
 
 	public Hordes() {
-		HordesLogger.clearLog();
+		HordesLogger.clearLog(true);
+		HordesLogger.heading("LOADING CONFIGS");
+		HordesLogger.blankLine();
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CommonConfigHandler.config);
 		ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfigHandler.config);
 		//generate data files
+		HordesLogger.blankLine();
+		HordesLogger.heading("CHECKING CONFIG DATA");
+		HordesLogger.blankLine();
 		if (DataGenerator.shouldGenerateFiles()) {
 			DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> DataGenerator::generateAssets);
 			DataGenerator.generateData();
-		} else HordesLogger.logInfo("Config files are up to date, skipping data/asset generation");
+		} else HordesLogger.logInfo("Config data files are up to date, skipping data/asset generation");
+		HordesLogger.markVolatile();
 	}
 
 	@SubscribeEvent

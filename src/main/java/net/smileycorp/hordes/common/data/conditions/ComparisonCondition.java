@@ -2,14 +2,12 @@ package net.smileycorp.hordes.common.data.conditions;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.Level;
 import net.smileycorp.atlas.api.data.ComparableOperation;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.data.values.ValueGetter;
+import net.smileycorp.hordes.common.event.HordePlayerEvent;
+import net.smileycorp.hordes.hordeevent.data.HordeContext;
 
 public class ComparisonCondition<T extends Comparable<T>> implements Condition {
 
@@ -24,8 +22,8 @@ public class ComparisonCondition<T extends Comparable<T>> implements Condition {
 	}
 
 	@Override
-	public boolean apply(Level level, LivingEntity entity, ServerPlayer player, RandomSource rand) {
-		return operation.apply(value1.get(level, entity, player, rand), value2.get(level, entity, player, rand));
+	public boolean apply(HordeContext<? extends HordePlayerEvent> ctx) {
+		return operation.apply(value1.get(ctx), value2.get(ctx));
 	}
 
 	public static ComparisonCondition deserialize(JsonElement json) {
@@ -33,8 +31,8 @@ public class ComparisonCondition<T extends Comparable<T>> implements Condition {
 			JsonObject obj = json.getAsJsonObject();
 			DataType type = DataType.of(obj.get("type").getAsString());
 			ComparableOperation operation = ComparableOperation.of(obj.get("operation").getAsString());
-			ValueGetter value1 = ValueGetter.readValue(type,  obj.get("value1"));
-			ValueGetter value2 = ValueGetter.readValue(type,  obj.get("value2"));
+			ValueGetter value1 = ValueGetter.readValue(type, obj.get("value1"));
+			ValueGetter value2 = ValueGetter.readValue(type, obj.get("value2"));
 			return new ComparisonCondition(value1, operation, value2);
 		} catch(Exception e) {
 			HordesLogger.logError("Incorrect parameters for condition hordes:comparison", e);

@@ -1,30 +1,26 @@
 package net.smileycorp.hordes.common.data.values;
 
 import com.google.gson.JsonElement;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.Level;
+import com.google.gson.JsonNull;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.data.DataRegistry;
+import net.smileycorp.hordes.common.data.HordesParsingException;
+import net.smileycorp.hordes.common.event.HordePlayerEvent;
 import net.smileycorp.hordes.hordeevent.data.HordeContext;
 
 public interface ValueGetter<T extends Comparable<T>> {
-
-   T get(Level level, LivingEntity entity, ServerPlayer player, RandomSource rand);
     
-   default T get(HordeContext ctx) {
-        return get(ctx.getEntityWorld(), ctx.getEntity(), ctx.getPlayer(), ctx.getRandom());
-   }
+   T get(HordeContext<? extends HordePlayerEvent> ctx);
     
-    static <T extends Comparable<T>> ValueGetter<T> readValue(DataType<T> type, JsonElement value) {
+    static <T extends Comparable<T>> ValueGetter<T> readValue(DataType<T> type, JsonElement value) throws Exception {
+        if (value instanceof JsonNull) throw new HordesParsingException("No value present");
         if (value.isJsonObject()) {
             return DataRegistry.readValue(type, value.getAsJsonObject());
         } else if (value.isJsonArray()) {
             return new RandomValue(type, value.getAsJsonArray());
         }
         T v = type.readFromJson(value);
-        return (l, e, p, r) -> v;
+        return ctx -> v;
     }
 
 
