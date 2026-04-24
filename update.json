@@ -13,10 +13,11 @@
 		"1.5.4": "a lot of bug fixes, new translations",
 		"1.5.4a": "fixes for zombie piglins, certain system language crashes and spawnFirstDay, as well as more configuration options",
 		"1.5.4b": "made horde event random more determanistic so that scripts function the same for every player on a given night",
-		"1.5.4c": "config option to disable player zombie capes, issues with the server not recognising mod versions with certain config options, lag caused by infection visuals"
+		"1.5.4c": "config option to disable player zombie capes, issues with the server not recognising mod versions with certain config options, lag caused by infection visuals",
+		"1.6.3": "full version parity update with 1.21.1"
     },
     "promos": {
-        "1.20.1-latest": "1.5.4c",
-        "1.20.1-recommended": "1.5.4c"
+        "1.20.1-latest": "1.6.3",
+        "1.20.1-recommended": "1.6.3"
     }
 }
