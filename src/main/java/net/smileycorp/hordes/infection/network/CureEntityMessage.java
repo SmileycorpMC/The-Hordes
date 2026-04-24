@@ -9,6 +9,7 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 import net.smileycorp.atlas.api.network.AbstractMessage;
 import net.smileycorp.hordes.client.ClientHandler;
+import net.smileycorp.hordes.infection.client.InfectionClientHandler;
 
 public class CureEntityMessage extends AbstractMessage {
 
@@ -39,7 +40,7 @@ public class CureEntityMessage extends AbstractMessage {
 
 	@Override
 	public void process(NetworkEvent.Context ctx) {
-		ctx.enqueueWork(() -> DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> ClientHandler.processCureEntity(this)));
+		ctx.enqueueWork(() -> DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> InfectionClientHandler.INSTANCE.processCureEntity(this)));
 		ctx.setPacketHandled(true);
 	}
 

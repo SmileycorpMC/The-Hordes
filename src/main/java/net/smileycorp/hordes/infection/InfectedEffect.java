@@ -27,7 +27,7 @@ public class InfectedEffect extends MobEffect {
 
 	private final UUID SPEED_MOD_UUID = UUID.fromString("05d68949-cb8b-4031-92a6-bd75e42b5cdd");
 	private final String SPEED_MOD_NAME = Constants.name("Infected");
-	private final AttributeModifier SPEED_MOD = new AttributeModifier(SPEED_MOD_NAME, -0.1, AttributeModifier.Operation.MULTIPLY_TOTAL);
+	private final double SPEED_MOD_AMOUNT = -0.1;
 
 	public InfectedEffect() {
 		super(MobEffectCategory.HARMFUL, 0x00440002);
@@ -51,11 +51,11 @@ public class InfectedEffect extends MobEffect {
 	@Override
 	public void addAttributeModifiers(LivingEntity entity, AttributeMap map, int amplifier) {
 		if (amplifier < 0 |! InfectionConfig.infectSlowness.get()) return;
-			AttributeInstance attribute = map.getInstance(Attributes.MOVEMENT_SPEED);
+		AttributeInstance attribute = map.getInstance(Attributes.MOVEMENT_SPEED);
 		if (attribute == null) return;
 		attribute.removeModifier(SPEED_MOD_UUID);
-		attribute.addPermanentModifier(new AttributeModifier(SPEED_MOD_UUID, SPEED_MOD_NAME + " " + amplifier,
-				getAttributeModifierValue(amplifier - 1, SPEED_MOD), AttributeModifier.Operation.MULTIPLY_TOTAL));
+		attribute.addPermanentModifier(new AttributeModifier(SPEED_MOD_NAME,
+				SPEED_MOD_AMOUNT * amplifier, AttributeModifier.Operation.MULTIPLY_TOTAL));
 	}
 
 	@Override
@@ -66,8 +66,7 @@ public class InfectedEffect extends MobEffect {
 
 	public static void apply(LivingEntity entity) {
 		boolean prevented = preventInfection(entity);
-		if (entity instanceof ServerPlayer) InfectionPacketHandler.sendTo(new InfectMessage(prevented),
-				((ServerPlayer) entity).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+		if (entity instanceof ServerPlayer) InfectionPacketHandler.sendTo(new InfectMessage(prevented), ((ServerPlayer) entity));
 		if (!prevented) entity.addEffect(new MobEffectInstance(HordesInfection.INFECTED.get(), getInfectionTime(entity)));
 	}
 

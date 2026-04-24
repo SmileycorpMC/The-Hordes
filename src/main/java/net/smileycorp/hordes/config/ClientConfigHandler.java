@@ -32,7 +32,6 @@ public class ClientConfigHandler {
 	public static ForgeConfigSpec.ConfigValue<Boolean> infectionProtectSound;
 	public static ForgeConfigSpec.ConfigValue<Boolean> cureTooltip;
 	public static ForgeConfigSpec.ConfigValue<Boolean> immunityTooltip;
-	public static ForgeConfigSpec.ConfigValue<Boolean> wearableProtectionTooltip;
 
 	//zombie players
 	private static ForgeConfigSpec.ConfigValue<List<? extends Integer>> configZombiePlayerColour;
@@ -69,7 +68,6 @@ public class ClientConfigHandler {
 		infectionProtectSound = builder.comment("Play a sound when infection gets prevented?").define("infectionProtectSound", false);
 		cureTooltip = builder.comment("Show a tooltip on items that can cure infection?").define("cureTooltip", true);
 		immunityTooltip = builder.comment("Show a tooltip on items that give infection immunity?").define("immunityTooltip", true);
-		wearableProtectionTooltip = builder.comment("Show a tooltip on wearable items that grant some protection against infection?").define("wearableProtectionTooltip", true);
 		builder.pop();
 
 		builder.push("Zombie Players");

@@ -11,6 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.smileycorp.hordes.config.CommonConfigHandler;
 import net.smileycorp.hordes.infection.HordesInfection;
+import net.smileycorp.hordes.infection.data.InfectionData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -23,17 +24,17 @@ import java.util.Optional;
 public abstract class MixinPiglinAi {
 
 	@Inject(at=@At("HEAD"), method = "isNearZombified(Lnet/minecraft/world/entity/monster/piglin/Piglin;)Z", cancellable = true)
-	private static void isNearZombified(Piglin piglin, CallbackInfoReturnable<Boolean> callback) {
+	private static void hordes$isNearZombified(Piglin piglin, CallbackInfoReturnable<Boolean> callback) {
 		if (CommonConfigHandler.piglinsHuntZombies.get()) callback.setReturnValue(false);
 	}
 
 	@Inject(at=@At("HEAD"), method = "isZombified", cancellable = true)
-	private static void isZombified(EntityType<?> type, CallbackInfoReturnable<Boolean> callback) {
-		if (CommonConfigHandler.piglinsHuntZombies.get() && type.is(HordesInfection.INFECTION_ENTITIES_TAG)) callback.setReturnValue(true);
+	private static void hordes$isZombified(EntityType<?> type, CallbackInfoReturnable<Boolean> callback) {
+		if (CommonConfigHandler.piglinsHuntZombies.get() && InfectionData.INSTANCE.canCauseInfection(type)) callback.setReturnValue(true);
 	}
 
 	@Inject(at=@At("TAIL"), method = "findNearestValidAttackTarget", cancellable = true)
-	private static void findNearestValidAttackTarget(Piglin piglin, CallbackInfoReturnable<Optional<? extends LivingEntity>> callback ) {
+	private static void hordes$findNearestValidAttackTarget(Piglin piglin, CallbackInfoReturnable<Optional<? extends LivingEntity>> callback ) {
 		if (!CommonConfigHandler.piglinsHuntZombies.get() || callback.getReturnValue().isPresent()) return;
 		ItemStack stack = piglin.getItemInHand(InteractionHand.MAIN_HAND);
 		if (stack == null) return;
@@ -43,7 +44,7 @@ public abstract class MixinPiglinAi {
 	}
 
 	@Inject(at=@At("HEAD"), method = "admireGoldItem", cancellable = true)
-	private static void admireGoldItem(LivingEntity entity, CallbackInfo callback) {
+	private static void hordes$admireGoldItem(LivingEntity entity, CallbackInfo callback) {
 		if (entity.hasEffect(HordesInfection.INFECTED.get()) && entity.getOffhandItem().is(HordesInfection.INFECTION_CURES_TAG)) entity.startUsingItem(InteractionHand.OFF_HAND);
 	}
 

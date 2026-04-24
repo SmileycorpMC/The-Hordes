@@ -15,6 +15,7 @@ public class HordeBuildSpawnDataEvent extends HordePlayerEvent {
 		spawnData = new HordeSpawnData(horde);
 	}
 
+	@Override
 	public HordeSpawnData getSpawnData() {
 		return spawnData;
 	}

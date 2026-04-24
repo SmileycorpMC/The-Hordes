@@ -18,7 +18,7 @@ public class SetEndMessageFunction implements HordeFunction<HordeBuildSpawnDataE
 
     @Override
     public void apply(HordeContext<HordeBuildSpawnDataEvent> ctx) {
-        ctx.getEvent().getSpawnData().setEndMessage(getter.get(ctx));
+        ctx.getSpawnData().setEndMessage(getter.get(ctx));
     }
 
     public static SetEndMessageFunction deserialize(JsonElement json) {

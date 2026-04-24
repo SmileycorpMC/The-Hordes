@@ -5,6 +5,7 @@
 	"minecraft:creeper-5-30-30",
 	"minecraft:husk-20-30-50",
 	"minecraft:stray-10-40-50",
+	"minecraft:bogged-5-40-50",
 	"minecraft:cave_spider-10-40-50",
 	"minecraft:witch-5-40-50",
 	"minecraft:pillager-10-40-50",
@@ -24,11 +25,18 @@
 	"minecraft:evoker-5-50-50",
 	"minecraft:piglin_brute-10-60-0",
 	{
-		"entity": "minecraft:cave_spider",
-		"weight": 15,
+		"entity": "minecraft:skeleton_horse",
+		"weight": 10,
 		"first_day": 60,
 		"last_day": 0,
 		"nbt": "{Passengers:[{id:stray,HandItems:[{id:bow,Count:1b}]}]}"
+	},
+	{
+		"entity": "minecraft:cave_spider",
+		"weight": 10,
+		"first_day": 60,
+		"last_day": 0,
+		"nbt": "{Passengers:[{id:bogged,HandItems:[{id:bow,Count:1b}]}]}"
 	},
 	{
 		"entity": "minecraft:zombie_horse",

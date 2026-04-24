@@ -28,13 +28,14 @@ public class FunctionRegistry {
         registerNestedFunction(Constants.loc("multiple"), MultipleFunction::deserialize);
         registerNestedFunction(Constants.loc("random"), RandomFunction::deserialize);
         registerNestedFunction(Constants.loc("weighted_random"), WeightedRandomFunction::deserialize);
-        registerInstructionFunction(Constants.loc("break"), HordeContext::breakScript);
-        registerInstructionFunction(Constants.loc("return"), HordeContext::returnScript);
-        registerInstructionFunction(Constants.loc("cancel"), HordeContext::cancelEvent);
         registerFunction(Constants.loc("set_entity_nbt"), HordePlayerEvent.class, SetEntityNBTFunction::deserialize);
         registerFunction(Constants.loc("set_player_nbt"), HordePlayerEvent.class, SetPlayerNBTFunction::deserialize);
         registerFunction(Constants.loc("set_variable"), HordePlayerEvent.class, SetVariableFunction::deserialize);
         registerFunction(Constants.loc("call_script"), HordePlayerEvent.class, CallScriptFunction::deserialize);
+        registerInstructionFunction(Constants.loc("break"), HordeContext::breakScript);
+        registerInstructionFunction(Constants.loc("return"), HordeContext::returnScript);
+        registerInstructionFunction(Constants.loc("cancel"), HordeContext::cancelEvent);
+
         //build spawndata functions
         registerFunction(Constants.loc("set_spawntable"), HordeBuildSpawnDataEvent.class, SetSpawntableFunction::deserialize);
         registerFunction(Constants.loc("set_spawn_type"), HordeBuildSpawnDataEvent.class, SetSpawnTypeFunction::deserialize);
@@ -45,6 +46,7 @@ public class FunctionRegistry {
         registerFunction(Constants.loc("set_spawn_interval"), HordeBuildSpawnDataEvent.class, SetSpawnIntervalFunction::deserialize);
         registerFunction(Constants.loc("set_spawn_amount"), HordeBuildSpawnDataEvent.class, SetSpawnAmountFunction::deserialize);
         registerFunction(Constants.loc("set_entity_speed"), HordeBuildSpawnDataEvent.class, SetEntitySpeedFunction::deserialize);
+        registerFunction(Constants.loc("add_reward_command"), HordeBuildSpawnDataEvent.class, AddRewardCommandFunction::deserialize);
         //spawn entity functions
         registerFunction(Constants.loc("set_entity_type"), HordeSpawnEntityEvent.class, SetEntityTypeFunction::deserialize);
         registerFunction(Constants.loc("set_entity_x"), HordeSpawnEntityEvent.class, SetEntityXFunction::deserialize);

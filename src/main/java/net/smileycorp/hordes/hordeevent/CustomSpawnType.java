@@ -3,6 +3,7 @@ package net.smileycorp.hordes.hordeevent;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Either;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -45,9 +46,7 @@ public class CustomSpawnType implements HordeSpawnType{
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder(getClass().getSimpleName()+"[");
-        for (Either<TagKey<Block>, Block> either : blocks) {
-            builder.append(either.map(t -> "#" + t.location(), b -> ForgeRegistries.BLOCKS.getKey(b).toString()) + ", ");
-        }
+        blocks.forEach(either -> builder.append(either.map(t -> "#" + t.location(), b -> ForgeRegistries.BLOCKS.getKey(b).toString()) + ", "));
         return builder.append("]").toString();
     }
     

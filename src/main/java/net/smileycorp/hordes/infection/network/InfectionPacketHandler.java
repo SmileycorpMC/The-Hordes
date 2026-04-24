@@ -1,6 +1,7 @@
 package net.smileycorp.hordes.infection.network;
 
-import net.minecraft.network.Connection;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
@@ -13,14 +14,14 @@ public class InfectionPacketHandler {
 
 	private static SimpleChannel NETWORK_INSTANCE;
 	
-	public static void sendTo(AbstractMessage message, Connection manager, NetworkDirection direction) {
+	public static void sendTo(AbstractMessage message, ServerPlayer player) {
 		if (!InfectionConfig.enableMobInfection.get()) return;
-		NETWORK_INSTANCE.sendTo(message, manager, direction);
+		NETWORK_INSTANCE.sendTo(message, player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 	}
 	
-	public static void send(PacketDistributor.PacketTarget target, AbstractMessage message) {
+	public static void sendTracking(AbstractMessage message, Entity entity) {
 		if (!InfectionConfig.enableMobInfection.get()) return;
-		NETWORK_INSTANCE.send(target, message);
+		NETWORK_INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(()-> entity), message);
 	}
 
 	public static void initPackets() {

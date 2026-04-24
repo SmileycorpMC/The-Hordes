@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MixinAbstractPiglin {
 
 	@Inject(at=@At("HEAD"), method = "isImmuneToZombification", cancellable = true)
-	public void isImmuneToZombification(CallbackInfoReturnable<Boolean> callback) {
+	public void hordes$isImmuneToZombification(CallbackInfoReturnable<Boolean> callback) {
 		if (!CommonConfigHandler.piglinsHoglinsConvert.get()) callback.setReturnValue(true);
 	}
 

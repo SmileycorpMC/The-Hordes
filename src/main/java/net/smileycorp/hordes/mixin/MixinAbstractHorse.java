@@ -27,8 +27,8 @@ public abstract class MixinAbstractHorse extends Animal {
 		super(null, level);
 	}
 
-	@Inject(at=@At("HEAD"), method = "aiStep", cancellable = true)
-	public void aiStep(CallbackInfo callback) {
+	@Inject(at=@At("HEAD"), method = "aiStep")
+	public void hordes$aiStep(CallbackInfo callback) {
 		if ((Animal)this instanceof ZombieHorse) {
 			if (CommonConfigHandler.aggressiveZombieHorses.get()) {
 				updateSwingTime();
@@ -40,27 +40,25 @@ public abstract class MixinAbstractHorse extends Animal {
 	}
 
 	protected void tryBurn() {
-		boolean burn = isSunBurnTick();
-		if (burn && getPassengers().isEmpty()) {
-			ItemStack itemstack = inventory.getItem(1);
-			if (!itemstack.isEmpty()) {
-				if (itemstack.isDamageableItem()) {
-					itemstack.setDamageValue(itemstack.getDamageValue() + random.nextInt(2));
-					if (itemstack.getDamageValue() >= itemstack.getMaxDamage()) inventory.setItem(1, ItemStack.EMPTY);
-				}
-				burn = false;
-			}
-			if (burn) setSecondsOnFire(8);
+		if (!isSunBurnTick() |! getPassengers().isEmpty()) return;
+		ItemStack itemstack = inventory.getItem(1);
+		if (itemstack.isEmpty()) {
+			setSecondsOnFire(8);
+			return;
+		}
+		if (itemstack.isDamageableItem()) {
+			itemstack.setDamageValue(itemstack.getDamageValue() + random.nextInt(2));
+			if (itemstack.getDamageValue() >= itemstack.getMaxDamage()) inventory.setItem(1, ItemStack.EMPTY);
 		}
 	}
 
-	@Inject(at=@At("HEAD"), method = "registerGoals", cancellable = true)
-	public void registerGoals(CallbackInfo callback) {
+	@Inject(at=@At("HEAD"), method = "registerGoals")
+	public void hordes$registerGoals(CallbackInfo callback) {
 		if (getMobType() != MobType.UNDEAD && CommonConfigHandler.zombiesScareHorses.get()) goalSelector.addGoal(1, new HorseFleeGoal(this));
 	}
 
 	@Inject(at=@At("HEAD"), method = "canEatGrass", cancellable = true)
-	public void canEatGrass(CallbackInfoReturnable<Boolean> callback) {
+	public void hordes$canEatGrass(CallbackInfoReturnable<Boolean> callback) {
 		if ((Animal)this instanceof ZombieHorse && CommonConfigHandler.aggressiveZombieHorses.get()) callback.setReturnValue(false);
 	}
 

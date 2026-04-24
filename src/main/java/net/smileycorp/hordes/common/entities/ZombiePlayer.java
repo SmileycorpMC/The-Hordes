@@ -9,7 +9,9 @@ import net.minecraft.network.chat.contents.LiteralContents;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -125,10 +127,10 @@ public class ZombiePlayer extends Zombie implements PlayerZombie<ZombiePlayer> {
 	protected void dropCustomDeathLoot(DamageSource source, int looting, boolean recentlyHitIn){
 		for (ItemStack stack : playerItems) if (!stack.isEmpty() && ! EnchantmentHelper.hasVanishingCurse(stack)) spawnAtLocation(stack, 0f);
 	}
-	
+
 	@Override
 	public void remove(Entity.RemovalReason reason) {
-		if (reason == RemovalReason.DISCARDED) dropCustomDeathLoot(null, 0 , false);
+		if (reason == RemovalReason.DISCARDED && level() instanceof ServerLevel && level().getDifficulty() == Difficulty.PEACEFUL && shouldDespawnInPeaceful()) dropCustomDeathLoot(null, 0 , false);
 		super.remove(reason);
 	}
 

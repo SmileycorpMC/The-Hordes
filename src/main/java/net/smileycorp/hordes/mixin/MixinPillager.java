@@ -10,6 +10,7 @@ import net.minecraft.world.level.Level;
 import net.smileycorp.hordes.common.ai.FleeEntityGoal;
 import net.smileycorp.hordes.config.CommonConfigHandler;
 import net.smileycorp.hordes.infection.HordesInfection;
+import net.smileycorp.hordes.infection.data.InfectionData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -22,12 +23,12 @@ public abstract class MixinPillager extends AbstractIllager implements RangedAtt
         super(p_32105_, p_32106_);
     }
     
-    @Inject(at=@At("HEAD"), method = "registerGoals", cancellable = true)
-    public void registerGoals(CallbackInfo callback) {
-        if (CommonConfigHandler.illagersHuntZombies.get()) {
-            targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 10, true, false, HordesInfection::canCauseInfection));
-            goalSelector.addGoal(1, new FleeEntityGoal(this, 1.5, 5, HordesInfection::canCauseInfection));
-        }
+    @Inject(at=@At("HEAD"), method = "registerGoals")
+    public void hordes$registerGoals(CallbackInfo callback) {
+        if (!CommonConfigHandler.illagersHuntZombies.get()) return;
+        targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 10, true, false,
+                InfectionData.INSTANCE::canCauseInfection));
+        goalSelector.addGoal(1, new FleeEntityGoal(this, 1.7, 5, InfectionData.INSTANCE::canCauseInfection));
     }
     
 }

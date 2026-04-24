@@ -3,7 +3,9 @@ package net.smileycorp.hordes.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobType;
@@ -18,6 +20,7 @@ import net.minecraft.world.level.Level;
 import net.smileycorp.hordes.common.ai.FleeEntityGoal;
 import net.smileycorp.hordes.config.CommonConfigHandler;
 import net.smileycorp.hordes.infection.HordesInfection;
+import net.smileycorp.hordes.infection.data.InfectionData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -31,26 +34,27 @@ public abstract class MixinWitch extends Raider implements RangedAttackMob {
     }
     
     @WrapOperation(method = "performRangedAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/alchemy/PotionUtils;setPotion(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/alchemy/Potion;)Lnet/minecraft/world/item/ItemStack;"))
-    public ItemStack performRangedAttack$setPotion(ItemStack stack, Potion potion, Operation<ItemStack> original, @Local(ordinal = 0) LivingEntity entity) {
-        if (CommonConfigHandler.illagersHuntZombies.get() && (potion == Potions.HARMING || potion == Potions.POISON) && entity.getMobType() == MobType.UNDEAD && HordesInfection.canCauseInfection(entity))
+    public ItemStack hordes$performRangedAttack$setPotion(ItemStack stack, Potion potion, Operation<ItemStack> original, @Local(ordinal = 0) LivingEntity entity) {
+        if (CommonConfigHandler.illagersHuntZombies.get() && (potion == Potions.HARMING || potion == Potions.POISON) && entity.getMobType() == MobType.UNDEAD
+                && InfectionData.INSTANCE.canCauseInfection(entity))
             return original.call(stack, entity.hasEffect(MobEffects.REGENERATION) && entity.getHealth() >= 8.0F ? Potions.REGENERATION : Potions.HEALING);
         return original.call(stack, potion);
     }
     
     @WrapOperation(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;distanceToSqr(Lnet/minecraft/world/entity/Entity;)D"))
-    public double aiStep$distanceToSqr(Witch witch, Operation<Double> original, @Local(ordinal = 0) LivingEntity entity) {
-        double distance = original.call(witch);
-        if (CommonConfigHandler.illagersHuntZombies.get() && entity.getMobType() == MobType.UNDEAD)
-            return HordesInfection.canCauseInfection(entity) && distance < 100 ? 122 : 0;
+    public double hordes$aiStep$distanceToSqr(LivingEntity instance, Entity entity, Operation<Double> original) {
+        double distance = original.call(instance, entity);
+        if (CommonConfigHandler.illagersHuntZombies.get() && ((LivingEntity)entity).getMobType() != MobType.UNDEAD)
+            return InfectionData.INSTANCE.canCauseInfection(instance) && distance < 100 ? 122 : 0;
         return distance;
     }
     
-    @Inject(at=@At("HEAD"), method = "registerGoals", cancellable = true)
-    public void registerGoals(CallbackInfo callback) {
-        if (CommonConfigHandler.illagersHuntZombies.get()) {
-            targetSelector.addGoal(2, new NearestAttackableWitchTargetGoal<>(this, LivingEntity.class, 10, true, false, HordesInfection::canCauseInfection));
-            goalSelector.addGoal(1, new FleeEntityGoal(this, 1.5, 5, HordesInfection::canCauseInfection));
-        }
+    @Inject(at=@At("HEAD"), method = "registerGoals")
+    public void hordes$registerGoals(CallbackInfo callback) {
+        if (!CommonConfigHandler.illagersHuntZombies.get()) return;
+        targetSelector.addGoal(2, new NearestAttackableWitchTargetGoal<>(this, LivingEntity.class, 10, true, false,
+                InfectionData.INSTANCE::canCauseInfection));
+        goalSelector.addGoal(1, new FleeEntityGoal(this, 1.5, 5, InfectionData.INSTANCE::canCauseInfection));
     }
     
 }

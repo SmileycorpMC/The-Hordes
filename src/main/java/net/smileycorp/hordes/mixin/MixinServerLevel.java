@@ -19,7 +19,7 @@ public abstract class MixinServerLevel {
     @Shadow public abstract List<ServerPlayer> players();
 
     @Inject(at = @At("HEAD"), method = "tick", cancellable = true)
-    public void tick(BooleanSupplier bool, CallbackInfo callback) {
+    public void hordes$tick(BooleanSupplier bool, CallbackInfo callback) {
         if (HordeEventConfig.pauseEventServer.get() && ServerLifecycleHooks.getCurrentServer().getPlayerCount() <= 0) callback.cancel();
     }
 

@@ -1,11 +1,16 @@
 package net.smileycorp.hordes.hordeevent;
 
+import com.google.common.collect.Lists;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.config.HordeEventConfig;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 import net.smileycorp.hordes.hordeevent.data.HordeTableLoader;
+
+import java.util.Collection;
+import java.util.List;
 
 public class HordeSpawnData {
     
@@ -17,7 +22,8 @@ public class HordeSpawnData {
     private int spawnDuration = HordeEventConfig.hordeSpawnDuration.get();
     private int spawnInterval = HordeEventConfig.hordeSpawnInterval.get();
     private int spawnAmount;
-    
+    private final List<String> commands = Lists.newArrayList();
+
     private double entitySpeed = HordeEventConfig.hordeEntitySpeed.get();
     
     public HordeSpawnData(HordeEvent horde) {
@@ -36,6 +42,7 @@ public class HordeSpawnData {
         if (tag.contains("spawnInterval")) spawnInterval = tag.getInt("spawnInterval");
         if (tag.contains("spawnAmount")) spawnAmount = tag.getInt("spawnAmount");
         if (tag.contains("entitySpeed")) entitySpeed = tag.getDouble("entitySpeed");
+        if (tag.contains("commands")) for (Tag command : tag.getList("commands", 8)) commands.add(command.getAsString());
     }
     
     public CompoundTag save() {
@@ -123,7 +130,15 @@ public class HordeSpawnData {
     public void setEntitySpeed(double entitySpeed) {
         this.entitySpeed = entitySpeed;
     }
-    
+
+    public void addCommand(String command) {
+        commands.add(command);
+    }
+
+    public Collection<String> getCommands() {
+        return Lists.newArrayList(commands);
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder(getClass().getSimpleName()+"[");

@@ -21,15 +21,14 @@ import java.util.List;
 
 public class HordesLogger {
 
-    private static Logger logger = LogManager.getLogger(Constants.MODID);
+    private static final Logger logger = LogManager.getLogger(Constants.MODID);
+    private static final Path log_file = Paths.get("logs/hordes.log");
 
     private static final List<String> persistent_data = Lists.newArrayList();
-    private static boolean is_volatile = false;
-
-    private static boolean has_errors;
     private static final List<ResourceLocation> errored_scripts = Lists.newArrayList();
 
-    private static Path log_file = Paths.get("logs/hordes.log");
+    private static boolean is_volatile = false;
+    private static boolean has_errors = false;
 
     public static void clearLog(boolean clear_persistent) {
         try {

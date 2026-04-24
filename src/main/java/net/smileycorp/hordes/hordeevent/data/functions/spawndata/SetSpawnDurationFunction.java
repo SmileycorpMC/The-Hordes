@@ -18,7 +18,7 @@ public class SetSpawnDurationFunction implements HordeFunction<HordeBuildSpawnDa
 
     @Override
     public void apply(HordeContext<HordeBuildSpawnDataEvent> ctx) {
-        ctx.getEvent().getSpawnData().setSpawnDuration(getter.get(ctx));
+        ctx.getSpawnData().setSpawnDuration(getter.get(ctx));
     }
 
     public static SetSpawnDurationFunction deserialize(JsonElement json) {

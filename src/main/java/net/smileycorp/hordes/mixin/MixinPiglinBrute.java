@@ -28,19 +28,17 @@ public abstract class MixinPiglinBrute extends AbstractPiglin {
 		super(null, level);
 	}
 
-	@Inject(at=@At("HEAD"), method = "customServerAiStep", cancellable = true)
-	public void customServerAiStep(CallbackInfo callback) {
+	@Inject(at=@At("HEAD"), method = "customServerAiStep")
+	public void hordes$customServerAiStep(CallbackInfo callback) {
 		if (!(InfectionConfig.enableMobInfection.get() && CommonConfigHandler.piglinsCureThemself.get())) return;
 		if (!hasEffect(HordesInfection.INFECTED.get())) return;
 		if(!getBrain().checkMemory(MemoryModuleType.ATTACK_TARGET, MemoryStatus.VALUE_ABSENT)) return;
 		if (!getOffhandItem().isEmpty()) return;
 		ItemStack stack = new ItemStack(Items.GOLDEN_APPLE);
-		if (stack.is(HordesInfection.INFECTION_CURES_TAG)) {
-			if (getOffhandItem().isEmpty()) {
-				setItemInHand(InteractionHand.OFF_HAND, stack);
-				startUsingItem(InteractionHand.OFF_HAND);
-			}
-		}
+		if (!stack.is(HordesInfection.INFECTION_CURES_TAG)) return;
+		if (!getOffhandItem().isEmpty()) return;
+		setItemInHand(InteractionHand.OFF_HAND, stack);
+		startUsingItem(InteractionHand.OFF_HAND);
 	}
 
 }

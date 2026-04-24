@@ -67,10 +67,9 @@ public class FleeEntityGoal extends Goal  {
 
 	@Override
 	public void tick() {
-		if (--timeToRecalcPath <= 0)  {
-			timeToRecalcPath = 5;
-			pather.moveTo(pather.createPath(findSafePos(), 1), speed);
-		}
+		if (timeToRecalcPath-- > 0) return;
+		timeToRecalcPath = 5;
+		pather.moveTo(pather.createPath(findSafePos(), 1), speed);
 	}
 
 	private Stream<BlockPos> findSafePos() {

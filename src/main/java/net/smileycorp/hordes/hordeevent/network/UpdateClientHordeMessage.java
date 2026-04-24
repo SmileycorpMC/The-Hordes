@@ -8,6 +8,7 @@ import net.minecraftforge.network.NetworkEvent;
 import net.smileycorp.atlas.api.network.AbstractMessage;
 import net.smileycorp.hordes.client.ClientHandler;
 import net.smileycorp.hordes.config.HordeEventConfig;
+import net.smileycorp.hordes.hordeevent.client.HordeClientHandler;
 
 public class UpdateClientHordeMessage extends AbstractMessage {
     
@@ -35,7 +36,7 @@ public class UpdateClientHordeMessage extends AbstractMessage {
 
     @Override
     public void process(NetworkEvent.Context ctx) {
-        ctx.enqueueWork(() -> DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> ClientHandler.setHordeDay(horde_day, day_length)));
+        ctx.enqueueWork(() -> DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> HordeClientHandler.INSTANCE.setHordeDay(horde_day, day_length)));
         ctx.setPacketHandled(true);
     }
 

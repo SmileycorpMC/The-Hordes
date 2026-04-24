@@ -18,7 +18,7 @@ public class SetSpawnTypeFunction implements HordeFunction<HordeBuildSpawnDataEv
 
     @Override
     public void apply(HordeContext<HordeBuildSpawnDataEvent> ctx) {
-        ctx.getEvent().getSpawnData().setSpawnType(type);
+        ctx.getSpawnData().setSpawnType(type);
     }
 
     public static SetSpawnTypeFunction deserialize(JsonElement json) {

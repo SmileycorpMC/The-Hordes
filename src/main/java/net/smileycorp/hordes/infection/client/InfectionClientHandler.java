@@ -9,30 +9,39 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.config.ClientConfigHandler;
 import net.smileycorp.hordes.infection.HordesInfection;
+import net.smileycorp.hordes.infection.data.InfectionData;
+import net.smileycorp.hordes.infection.network.CureEntityMessage;
 
 import java.awt.*;
 import java.util.List;
 import java.util.Map;
 
-public class ClientInfectionEventHandler {
-	
-	private static Map<Item, Integer> immunityItems = Maps.newHashMap();
-	private static Map<Item, Integer> wearableProtection = Maps.newHashMap();
+public class InfectionClientHandler {
+
+	public static final InfectionClientHandler INSTANCE = new InfectionClientHandler();
 	
 	@SubscribeEvent
 	public void renderOverlay(RenderGuiOverlayEvent.Pre event) {
@@ -43,19 +52,26 @@ public class ClientInfectionEventHandler {
 		if (!player.hasEffect(HordesInfection.INFECTED.get())) return;
 		int a = player.getEffect(HordesInfection.INFECTED.get()).getAmplifier();
 		if (a == 0) return;
-		Color colour = new Color(0.4745f, 0.6117f, 0.3961f, 0.005f * a);
+		Color colour = new Color(0.4745f, 0.6117f, 0.3961f, Math.min(0.05f * a, 0.5f));
 		Window window = mc.getWindow();
 		event.getGuiGraphics().fill(0, 0, window.getGuiScaledWidth(), window.getGuiScaledHeight(), colour.getRGB());
 	}
 
 	@SubscribeEvent
-	public void preRenderEntity(RenderLivingEvent.Pre event){
+	public void preRenderEntity(RenderLivingEvent.Pre event) {
 		LivingEntity entity = event.getEntity();
 		Player player = Minecraft.getInstance().player;
-		if (ClientConfigHandler.playerInfectionVisuals.get() && player != null && player.hasEffect(HordesInfection.INFECTED.get()) && entity != player) {
+		if (!ClientConfigHandler.playerInfectionVisuals.get()) return;
+		if (player != null && player.hasEffect(HordesInfection.INFECTED.get()) && entity != player) {
 			int a = player.getEffect(HordesInfection.INFECTED.get()).getAmplifier();
-			if (a > 2) RenderSystem.setShaderColor(1, 0, 0, 1);
-			else if (a == 2) RenderSystem.setShaderColor(1, 0.4f, 0.4f, 1);
+			if (a > 2) RenderSystem.setShaderColor(1, 0.3f, 0.3f, 1);
+			else if (a == 2) RenderSystem.setShaderColor(1, 0.5f, 0.5f, 1);
+			else if (a == 1) RenderSystem.setShaderColor(1, 0.7f, 0.7f, 1);
+			if (a > 0) return;
+		}
+		if (entity.hasEffect(HordesInfection.INFECTED.get())) {
+			int a = entity.getEffect(HordesInfection.INFECTED.get()).getAmplifier();
+			RenderSystem.setShaderColor((float) Math.pow(0.95f, a + 1), 1, (float) Math.pow(0.8f, a + 1), 1);
 		}
 	}
 
@@ -72,33 +88,36 @@ public class ClientInfectionEventHandler {
 		List<Component> components = Lists.newArrayList();
 		if (ClientConfigHandler.cureTooltip.get() && stack.is(HordesInfection.INFECTION_CURES_TAG))
 			components.add(Component.translatable("tooltip.hordes.cure"));
-		if (ClientConfigHandler.immunityTooltip.get() && immunityItems.containsKey(item))
-			PotionUtils.addPotionTooltip(Lists.newArrayList(new MobEffectInstance(HordesInfection.IMMUNITY.get(),
-					immunityItems.get(item) * 20)), components, 1);
-		if (ClientConfigHandler.wearableProtectionTooltip.get() && wearableProtection.containsKey(item)) {
-			int value = wearableProtection.get(item);
-			if (value == 0) return;
-			String str = value + "%";
-			if (value > 0) str = "+" + str;
-			components.add(Component.translatable("tooltip.hordes.wearableProtection", str).withStyle(ChatFormatting.BLUE));
+		if (ClientConfigHandler.immunityTooltip.get())  {
+			int immunity = InfectionData.INSTANCE.getImmunityLength(stack);
+			if (immunity > 0) PotionUtils.addPotionTooltip(Lists.newArrayList(
+					new MobEffectInstance(HordesInfection.IMMUNITY.get(), immunity * 20)), components, 1);
 		}
+
 		components.forEach(c -> event.getTooltipElements().add(Either.left(c)));
 	}
 	
 	@SubscribeEvent
 	public void logOut(PlayerEvent.PlayerLoggedOutEvent event) {
-		immunityItems.clear();
-		wearableProtection.clear();
+		InfectionData.INSTANCE.clear();
 	}
-	
-	public static void readImmunityItems(List<Map.Entry<Item, Integer>> data) {
-		immunityItems.clear();
-		data.forEach(e -> immunityItems.put(e.getKey(), e.getValue()));
+
+	public void onInfect(boolean prevented) {
+		SoundEvent event = (prevented && ClientConfigHandler.infectionProtectSound.get()) ? Constants.IMMUNE_SOUND :
+				(!prevented && ClientConfigHandler.playerInfectSound.get()) ? Constants.INFECT_SOUND : null;
+		if (event == null) return;
+		LocalPlayer player = Minecraft.getInstance().player;
+		player.level().playSound(player, player.blockPosition(), event, SoundSource.PLAYERS, 0.75f, player.getRandom().nextFloat());
 	}
-	
-	public static void readWearableProtection(List<Pair<Item, Integer>> data) {
-		wearableProtection.clear();
-		data.forEach(e -> wearableProtection.put(e.getFirst(), e.getSecond()));
+
+	public void processCureEntity(CureEntityMessage message) {
+		Minecraft mc = Minecraft.getInstance();
+		Level level = mc.level;
+		Entity entity = message.getEntity(level);
+		level.playLocalSound(entity.getX(), entity.getY(), entity.getZ(), SoundEvents.EXPERIENCE_ORB_PICKUP, entity.getSoundSource(), 1f, 1f, true);
+		RandomSource rand = level.random;
+		for (int i = 0; i < 10; i++) level.addParticle(ParticleTypes.HAPPY_VILLAGER, entity.getX() + (rand.nextDouble() - 0.5D) * entity.getBbWidth() * 1.5,
+				entity.getY() + rand.nextDouble() * entity.getBbHeight(), entity.getZ() + (rand.nextDouble() - 0.5D) * entity.getBbWidth() * 1.5, 0.0D, 0.3D, 0.0D);
 	}
 
 }

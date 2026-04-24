@@ -77,14 +77,9 @@ public class DataGenerator {
         }
     }
     
-    private static void copyFiles(Path path) throws IOException {
-    
-    }
-    
     private static void copyFileFromMod(Path path) {
         try {
-            FileUtils.copyInputStreamToFile(Files.newInputStream(path),
-                    new File(CONFIG_FOLDER.toFile(), path.toString().replace( "config_defaults/", "")));
+            FileUtils.copyInputStreamToFile(Files.newInputStream(path), new File(CONFIG_FOLDER.toFile(), path.toString().replace( "config_defaults/", "")));
             HordesLogger.logInfo("Copied file " + path);
         } catch (Exception e) {
             HordesLogger.logError("Failed to copy file " + path, e);

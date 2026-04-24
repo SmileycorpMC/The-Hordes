@@ -3,6 +3,7 @@ package net.smileycorp.hordes.hordeevent.capability;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
@@ -69,10 +70,9 @@ public class HordeEvent {
 		if (nbt.contains("nextDay")) nextDay = nbt.getInt("nextDay");
 		if (nbt.contains("day")) day = nbt.getInt("day");
 		if (nbt.contains("spawnData")) spawnData = new HordeSpawnData(this, nbt.getCompound("spawnData"));
-		if (nbt.contains("loadedTable")) {
-			spawnData = new HordeSpawnData(this);
-			spawnData.setTable(HordeTableLoader.INSTANCE.getTable(new ResourceLocation(nbt.getString("loadedTable"))));
-		}
+		if (!nbt.contains("loadedTable")) return;
+		spawnData = new HordeSpawnData(this);
+		spawnData.setTable(HordeTableLoader.INSTANCE.getTable(new ResourceLocation(nbt.getString("loadedTable"))));
 	}
 	
 	public CompoundTag writeToNBT(CompoundTag nbt, UUID uuid) {
@@ -112,6 +112,8 @@ public class HordeEvent {
 		RandomSource rand = getRandom();
 		cleanSpawns();
 		if (spawnData == null) {
+			this.rand = null;
+			rand = getRandom();
 			HordeBuildSpawnDataEvent buildTableEvent = new HordeBuildSpawnDataEvent(player, this);
 			postEvent(buildTableEvent);
 			if (buildTableEvent.isCanceled()) return;
@@ -149,8 +151,7 @@ public class HordeEvent {
 			logInfo("Stopping wave spawn because count is " + count);
 			return;
 		}
-		HordeEventPacketHandler.sendTo(new HordeSoundMessage(basedir, spawnData.getSpawnSound()),
-					player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+		HordeEventPacketHandler.sendTo(new HordeSoundMessage((float) basedir.x, (float) basedir.z, spawnData.getSpawnSound()), player);
 		for (HordeSpawnEntry entry : spawntable.getResults(rand, count)) {
 			if (entitiesSpawned.size() > HordeEventConfig.hordeSpawnMax.get()) {
 				logInfo("Can't spawn wave because max cap has been reached");
@@ -169,7 +170,7 @@ public class HordeEvent {
 					logError("Unable to spawn entity from " + type, new Exception());
 					continue;
 				}
-				finalizeEntity(newEntity, player);
+				finalizeEntity(newEntity, player, true);
 			} catch (Exception e) {
 				e.printStackTrace();
 				logError("Unable to spawn entity from " + type, e);
@@ -212,18 +213,14 @@ public class HordeEvent {
 		}
 	}
 
-	private void finalizeEntity(Mob entity, ServerPlayer player) {
+	private void finalizeEntity(Mob entity, ServerPlayer player, boolean addToMobCap) {
 		entity.getAttribute(Attributes.FOLLOW_RANGE).addPermanentModifier(new AttributeModifier(FOLLOW_RANGE_MODIFIER,
 				"hordes:horde_range", 75, AttributeModifier.Operation.ADDITION));
-		LazyOptional<HordeSpawn> optional = entity.getCapability(HordesCapabilities.HORDESPAWN);
-		if (optional.isPresent()) {
-			optional.orElseGet(null).setPlayerUUID(player.getUUID().toString());
-			registerEntity(entity, player);
-		}
+		if (addToMobCap) registerEntity(entity, player);
 		entity.targetSelector.getRunningGoals().forEach(WrappedGoal::stop);
 		if (entity instanceof PathfinderMob) entity.targetSelector.addGoal(1, new HurtByTargetGoal((PathfinderMob) entity));
 		entity.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(entity, ServerPlayer.class, true));
-		for (Entity passenger : entity.getPassengers()) if (passenger instanceof Mob) finalizeEntity((Mob) passenger, player);
+		for (Entity passenger : entity.getPassengers()) if (passenger instanceof Mob) finalizeEntity((Mob) passenger, player, false);
 	}
 
 	private void cleanSpawns() {
@@ -313,8 +310,12 @@ public class HordeEvent {
 		spawnData.setTable(table);
 	}
 
-	public HordeSpawnTable getSpawntable() {
+	public HordeSpawnTable getSpawnTable() {
 		return spawnData == null ? null : spawnData.getTable();
+	}
+
+	public HordeSpawnData getSpawnData() {
+		return spawnData;
 	}
 
 	public void setNextDay(int day) {
@@ -326,19 +327,21 @@ public class HordeEvent {
 	}
 
 	private void sendMessage(ServerPlayer player, String str) {
-		HordeEventPacketHandler.sendTo(new GenericStringMessage(str), player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+		HordeEventPacketHandler.sendTo(new GenericStringMessage(str), player);
 	}
 
 	public void stopEvent(ServerPlayer player, boolean isCommand) {
 		entitiesSpawned.clear();
-		HordeEndEvent endEvent = new HordeEndEvent(player, this, isCommand, spawnData.getEndMessage());
+		HordeEndEvent endEvent = new HordeEndEvent(player, this, isCommand, spawnData.getEndMessage(), spawnData.getCommands());
 		postEvent(endEvent);
-		HordeEventPacketHandler.sendTo(new UpdateClientHordeMessage(false),
-				player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+		HordeEventPacketHandler.sendTo(new UpdateClientHordeMessage(false), player);
 		sentDay = getCurrentDay(player);
 		timer = 0;
 		spawnData = null;
 		sendMessage(player, endEvent.getMessage());
+		MinecraftServer server = player.getServer();
+		for (String command : endEvent.getCommands()) server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSuppressedOutput()
+				.withPermission(2).withEntity(player).withPosition(player.position()).withLevel(player.serverLevel()), command);
 		for (Mob entity : entitiesSpawned) {
 			for (WrappedGoal entry : entity.goalSelector.getRunningGoals().toArray(WrappedGoal[]::new)) {
 				if (!(entry.getGoal() instanceof HordeTrackPlayerGoal)) continue;
@@ -388,6 +391,7 @@ public class HordeEvent {
 		if (nextDay <= getCurrentDay(player) || Math.abs(nextDay - expectedDay) > HordeEventConfig.hordeSpawnDays.get() + HordeEventConfig.hordeSpawnVariation.get()) {
 			if (HordeEventConfig.hordeSpawnVariation.get() > 0) {
 				expectedDay += getRandom().nextInt(HordeEventConfig.hordeSpawnVariation.get());
+				rand = null;
 			}
 			nextDay = expectedDay;
 		}
@@ -398,8 +402,7 @@ public class HordeEvent {
 	}
 	
 	public void sync(ServerPlayer player, int day) {
-		HordeEventPacketHandler.sendTo(new UpdateClientHordeMessage(isHordeDay(player)),
-				player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+		HordeEventPacketHandler.sendTo(new UpdateClientHordeMessage(isHordeDay(player)), player);
 		sentDay = day;
 	}
 	

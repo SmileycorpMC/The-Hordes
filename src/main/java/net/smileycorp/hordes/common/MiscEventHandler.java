@@ -73,7 +73,7 @@ public class MiscEventHandler {
 				&& InfectionConfig.enableMobInfection.get()) || ZombiePlayersConfig.zombieGraves.get()) {
 			LazyOptional<ZombifyPlayer> optional = entity.getCapability(HordesCapabilities.ZOMBIFY_PLAYER, null);
 			if (!optional.isPresent()) return;
-			optional.orElseGet(null).createZombie((Player) entity);
+			optional.orElseGet(null).createZombie();
 		}
 	}
 
@@ -106,9 +106,8 @@ public class MiscEventHandler {
 	@SubscribeEvent
 	public void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
 		Entity entity = event.getObject();
-		if (entity instanceof Player &!(entity instanceof FakePlayer)) {
-			event.addCapability(Constants.loc("Zombify"), new ZombifyPlayer.Provider());
-		}
+		if (!(entity instanceof Player) || (entity instanceof FakePlayer)) return;
+		event.addCapability(Constants.loc("Zombify"), new ZombifyPlayer.Provider((Player) entity));
 	}
 
 	//copy horse inventories if they convert to another entity, useful for copying armor and saddles to zombie horses
@@ -120,9 +119,8 @@ public class MiscEventHandler {
 		if (before instanceof AbstractHorse && after instanceof AbstractHorse) {
 			SimpleContainer beforeInv = ((AbstractHorse)before).inventory;
 			SimpleContainer afterInv = ((AbstractHorse)after).inventory;
-			for (int i = 0; i < Math.min(beforeInv.getContainerSize(), afterInv.getContainerSize()); i++) {
+			for (int i = 0; i < Math.min(beforeInv.getContainerSize(), afterInv.getContainerSize()); i++)
 				afterInv.setItem(i, beforeInv.getItem(i).copy());
-			}
 		}
 	}
 

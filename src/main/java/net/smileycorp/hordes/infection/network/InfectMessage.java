@@ -7,6 +7,7 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 import net.smileycorp.atlas.api.network.AbstractMessage;
 import net.smileycorp.hordes.client.ClientHandler;
+import net.smileycorp.hordes.infection.client.InfectionClientHandler;
 
 public class InfectMessage extends AbstractMessage {
 
@@ -34,7 +35,7 @@ public class InfectMessage extends AbstractMessage {
 
 	@Override
 	public void process(NetworkEvent.Context ctx) {
-		ctx.enqueueWork(() -> DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> ClientHandler.onInfect(prevented)));
+		ctx.enqueueWork(() -> DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> InfectionClientHandler.INSTANCE.onInfect(prevented)));
 		ctx.setPacketHandled(true);
 	}
 

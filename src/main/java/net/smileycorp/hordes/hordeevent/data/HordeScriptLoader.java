@@ -64,8 +64,7 @@ public class HordeScriptLoader extends HordesJsonLoader {
     
     public <T extends HordePlayerEvent> void applyScripts(T event) {
         HordeContext<T> ctx = new HordeContext<>(event);
-        getScripts().stream().filter(script -> script.getType() == event.getClass()
-                && script.shouldApply(ctx)).forEach(script -> {
+        getScripts().stream().filter(script -> script.getType() == event.getClass() && script.shouldApply(ctx)).forEach(script -> {
             script.apply(ctx);
             HordesLogger.logInfo("Applying script " + script.getName() + " for event " + event);
         });

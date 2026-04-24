@@ -13,7 +13,7 @@ import net.smileycorp.hordes.common.event.SpawnZombiePlayerEvent;
 
 public interface ZombifyPlayer {
 
-	PlayerZombie createZombie(Player player);
+	PlayerZombie createZombie();
 
 	PlayerZombie getZombie();
 
@@ -23,10 +23,15 @@ public interface ZombifyPlayer {
 
 	class Impl implements ZombifyPlayer {
 
+		private final Player player;
 		private PlayerZombie zombie = null;
 
+		public Impl(Player player) {
+			this.player = player;
+		}
+
 		@Override
-		public PlayerZombie createZombie(Player player) {
+		public PlayerZombie createZombie() {
 			HordesEntities.ZOMBIE_PLAYER.get();
 			SpawnZombiePlayerEvent event = new SpawnZombiePlayerEvent(player, HordesEntities.ZOMBIE_PLAYER.get());
 			MinecraftForge.EVENT_BUS.post(event);
@@ -58,7 +63,11 @@ public interface ZombifyPlayer {
 
 	class Provider implements ICapabilityProvider {
 
-		protected final ZombifyPlayer impl = new Impl();
+		protected final ZombifyPlayer impl;
+
+		public Provider(Player player) {
+			impl = new Impl(player);
+		}
 
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> capability, Direction facing) {

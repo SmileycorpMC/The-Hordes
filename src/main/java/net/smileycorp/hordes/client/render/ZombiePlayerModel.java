@@ -54,26 +54,26 @@ public class ZombiePlayerModel<T extends Zombie & PlayerZombie> extends PlayerMo
 	}
 
 	@Override
-	public void setupAnim(T entity, float p_225597_2_, float p_225597_3_, float p_225597_4_, float p_225597_5_, float p_225597_6_) {
-		super.setupAnim(entity, p_225597_2_, p_225597_3_, p_225597_4_, p_225597_5_, p_225597_6_);
-		AnimationUtils.animateZombieArms(leftArm, rightArm, entity.isAggressive(), attackTime, p_225597_4_);
+	public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float age, float headYaw, float headPitch) {
+		super.setupAnim(entity, limbSwing, limbSwingAmount, age, headYaw, headPitch);
+		AnimationUtils.animateZombieArms(leftArm, rightArm, entity.isAggressive(), attackTime, age);
 		if (isDrowned) {
 			if (leftArmPose == HumanoidModel.ArmPose.THROW_SPEAR) {
-				leftArm.xRot = leftArm.xRot * 0.5F - (float)Math.PI;
-				leftArm.yRot = 0.0F;
+				leftArm.xRot = leftArm.xRot * 0.5f - (float)Math.PI;
+				leftArm.yRot = 0.0f;
 			}
 			if (rightArmPose == HumanoidModel.ArmPose.THROW_SPEAR) {
-				rightArm.xRot = rightArm.xRot * 0.5F - (float)Math.PI;
-				rightArm.yRot = 0.0F;
+				rightArm.xRot = rightArm.xRot * 0.5f - (float)Math.PI;
+				rightArm.yRot = 0.0f;
 			}
-			if (swimAmount > 0.0F) {
-				rightArm.xRot = rotlerpRad(swimAmount, rightArm.xRot, -2.5132742F) + swimAmount * 0.35F * Mth.sin(0.1F * p_225597_4_);
-				leftArm.xRot = rotlerpRad(swimAmount, leftArm.xRot, -2.5132742F) - swimAmount * 0.35F * Mth.sin(0.1F * p_225597_4_);
-				rightArm.zRot = rotlerpRad(swimAmount, rightArm.zRot, -0.15F);
-				leftArm.zRot = rotlerpRad(swimAmount, leftArm.zRot, 0.15F);
-				leftLeg.xRot -= swimAmount * 0.55F * Mth.sin(0.1F * p_225597_4_);
-				rightLeg.xRot += swimAmount * 0.55F * Mth.sin(0.1F * p_225597_4_);
-				head.xRot = 0.0F;
+			if (swimAmount > 0.0f) {
+				rightArm.xRot = rotlerpRad(swimAmount, rightArm.xRot, -2.5132742f) + swimAmount * 0.35f * Mth.sin(0.1f * age);
+				leftArm.xRot = rotlerpRad(swimAmount, leftArm.xRot, -2.5132742f) - swimAmount * 0.35f * Mth.sin(0.1f * age);
+				rightArm.zRot = rotlerpRad(swimAmount, rightArm.zRot, -0.15f);
+				leftArm.zRot = rotlerpRad(swimAmount, leftArm.zRot, 0.15f);
+				leftLeg.xRot -= swimAmount * 0.55f * Mth.sin(0.1f * age);
+				rightLeg.xRot += swimAmount * 0.55f * Mth.sin(0.1f * age);
+				head.xRot = 0.0f;
 			}
 		}
 		leftPants.copyFrom(leftLeg);
@@ -84,7 +84,7 @@ public class ZombiePlayerModel<T extends Zombie & PlayerZombie> extends PlayerMo
 
 	@Override
 	public void renderToBuffer(PoseStack poseStack, VertexConsumer consumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-		super.renderToBuffer(poseStack, consumer, packedLight, packedOverlay, colour.getRed()/255f, colour.getGreen()/255f, colour.getBlue()/255f, 1);
+		super.renderToBuffer(poseStack, consumer, packedLight, packedOverlay, colour.getRed() / 255f, colour.getGreen() / 255f, colour.getBlue() / 255f, 1);
 	}
 
 }

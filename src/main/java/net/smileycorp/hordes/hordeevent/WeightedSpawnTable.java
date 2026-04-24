@@ -50,15 +50,13 @@ public class WeightedSpawnTable extends WeightedOutputs<HordeSpawnEntry> {
         return list;
     }
     
-    public HordeSpawnEntry getEntry(RandomSource rand, List<Entry<HordeSpawnEntry, Integer>> mappedEntries, int maxWeight) {
-        int result = rand.nextInt(maxWeight);
-        for(Entry<HordeSpawnEntry, Integer> entry : mappedEntries) {
-            if (result >= entry.getValue()) {
-                HordeSpawnEntry spawnEntry = entry.getKey();
-                if (spawnEntry.maxSpawns > 0 && spawnEntry.maxSpawns < timesSpawned.get(spawnEntry)) return getEntry(rand, mappedEntries, maxWeight);
-                timesSpawned.put(spawnEntry, timesSpawned.get(spawnEntry) + 1);
-                return entry.getKey();
-            }
+    public HordeSpawnEntry getEntry(RandomSource rand, List<Entry<HordeSpawnEntry, Integer>> mappedEntries, int max) {
+        int result = rand.nextInt(max);
+        for (Entry<HordeSpawnEntry, Integer> entry : mappedEntries) if (result >= entry.getValue()) {
+            HordeSpawnEntry spawnEntry = entry.getKey();
+            if (spawnEntry.maxSpawns > 0 && spawnEntry.maxSpawns <= timesSpawned.get(spawnEntry)) return getEntry(rand, mappedEntries, max);
+            timesSpawned.put(spawnEntry, timesSpawned.get(spawnEntry) + 1);
+            return entry.getKey();
         }
         return null;
     }

@@ -59,14 +59,17 @@ public class Hordes {
 		MinecraftForge.EVENT_BUS.register(new MiscEventHandler());
 		HordesInfection.EFFECTS.register(FMLJavaModLoadingContext.get().getModEventBus());
 		HordesEntities.ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
+		InfectionPacketHandler.initPackets();
+		HordeEventPacketHandler.initPackets();
+		FMLJavaModLoadingContext.get().getModEventBus().addListener(InfectionEventHandler::addEntityAttributes);
 	}
 
 	@SubscribeEvent
 	public static void commonSetup(FMLCommonSetupEvent event) {
 		DataRegistry.init();
-		InfectionPacketHandler.initPackets();
-		HordeEventPacketHandler.initPackets();
+		//Horde Event
 		if (HordeEventConfig.enableHordeEvent.get()) MinecraftForge.EVENT_BUS.register(new HordeEventHandler());
+		//Mob Infection
 		if (InfectionConfig.enableMobInfection.get()) MinecraftForge.EVENT_BUS.register(new InfectionEventHandler());
 	}
 

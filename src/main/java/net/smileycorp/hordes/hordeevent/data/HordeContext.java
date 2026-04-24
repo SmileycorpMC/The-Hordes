@@ -8,6 +8,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.eventbus.api.Event;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
+import net.smileycorp.hordes.hordeevent.HordeSpawnData;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 
 import java.util.Map;
@@ -49,6 +50,10 @@ public class HordeContext<T extends HordePlayerEvent> {
 
     public LivingEntity getEntity() {
         return event.getEntity();
+    }
+
+    public HordeSpawnData getSpawnData() {
+        return event.getSpawnData();
     }
 
     public Class<? extends HordePlayerEvent> getEventClass() {

@@ -10,7 +10,8 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.smileycorp.atlas.api.network.AbstractMessage;
-import net.smileycorp.hordes.infection.client.ClientInfectionEventHandler;
+import net.smileycorp.hordes.infection.client.InfectionClientHandler;
+import net.smileycorp.hordes.infection.data.InfectionData;
 
 import java.util.AbstractMap;
 import java.util.List;
@@ -47,7 +48,7 @@ public class SyncImmunityItemsMessage extends AbstractMessage {
 
 	@Override
 	public void process(NetworkEvent.Context ctx) {
-		ctx.enqueueWork(() -> DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> ClientInfectionEventHandler.readImmunityItems(data)));
+		ctx.enqueueWork(() -> DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> InfectionData.INSTANCE.readImmunityItems(data)));
 		ctx.setPacketHandled(true);
 	}
 

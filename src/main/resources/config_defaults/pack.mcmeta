@@ -1,6 +1,6 @@
 {
   "pack": {
     "description": "The Hordes config datapack",
-    "pack_format": 8
+    "pack_format": 15
   }
 }

@@ -27,13 +27,11 @@ import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.config.CommonConfigHandler;
 import net.smileycorp.hordes.config.HordeEventConfig;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
-import net.smileycorp.hordes.hordeevent.capability.HordeEventClient;
 import net.smileycorp.hordes.hordeevent.capability.HordeSavedData;
 import net.smileycorp.hordes.hordeevent.capability.HordeSpawn;
 import net.smileycorp.hordes.hordeevent.data.HordeScriptLoader;
@@ -46,7 +44,6 @@ public class HordeEventHandler {
 	public void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
 		Entity entity = event.getObject();
 		if (entity instanceof Mob) event.addCapability(Constants.loc("HordeSpawn"), new HordeSpawn.Provider());
-		if (entity instanceof Player && entity.level().isClientSide) event.addCapability(Constants.loc("HordeEventClient"), new HordeEventClient.Provider());
 	}
 
 	//register data listeners
@@ -60,9 +57,10 @@ public class HordeEventHandler {
 	@SubscribeEvent
 	public void serverTick(ServerTickEvent event) {
 		if (event.phase != Phase.START || HordeEventConfig.hordesCommandOnly.get()) return;
-		MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+		MinecraftServer server = event.getServer();
 		ServerLevel level = server.overworld();
-		int day = (int) Math.floor(level.getDayTime() / HordeEventConfig.dayLength.get());
+		if (HordeEventConfig.pauseEventServer.get() && level.players().isEmpty()) return;
+		int day = (int) Math.floor((double) level.getDayTime() / HordeEventConfig.dayLength.get());
 		HordeSavedData data = HordeSavedData.getData(level);
 		if (day < data.getNextDay()) return;
 		data.setNextDay(level.random.nextInt(HordeEventConfig.hordeSpawnVariation.get() + 1)
@@ -131,9 +129,8 @@ public class HordeEventHandler {
 		if (HordeEventConfig.canSleepDuringHorde.get() || !(event.getEntity() instanceof ServerPlayer)) return;
 		ServerPlayer player = (ServerPlayer) event.getEntity();
 		ServerLevel level = player.serverLevel();
-		HordeEvent horde = HordeSavedData.getData((ServerLevel) player.level()).getEvent(player);
-		if (horde == null) return;
-		if (level.isDay() |! (level.dimensionType().bedWorks() && (horde.isHordeDay(player) || horde.isActive(player)))) return;
+		HordeSavedData data = HordeSavedData.getData((ServerLevel) player.level());
+		if (level.isDay() |! (level.dimensionType().bedWorks() && data.isHordeNight(player))) return;
 		event.setResult(BedSleepingProblem.OTHER_PROBLEM);
 		player.displayClientMessage(Component.translatable(Constants.hordeTrySleep), true);
 	}

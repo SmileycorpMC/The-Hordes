@@ -26,10 +26,10 @@ public class HordeSpawnTable {
 
     private boolean tested;
 
-   protected HordeSpawnTable(ResourceLocation name, List<HordeSpawnEntry> spawns) {
+    protected HordeSpawnTable(ResourceLocation name, List<HordeSpawnEntry> spawns) {
         this.name = name;
         this.spawns = spawns;
-   }
+    }
 
     public ResourceLocation getName() {
        return name;
@@ -70,8 +70,7 @@ public class HordeSpawnTable {
         List<HordeSpawnEntry> toRemove = new ArrayList<>();
         for (HordeSpawnEntry entry : spawns) {
             try {
-                Entity entity = entry.getEntity().create(ServerLifecycleHooks.getCurrentServer().overworld());
-                if (!(entity instanceof Mob)) toRemove.add(entry);
+                if (!(entry.getEntity().create(ServerLifecycleHooks.getCurrentServer().overworld()) instanceof Mob)) toRemove.add(entry);
             } catch(Exception e) {
                 e.printStackTrace();
             }

@@ -18,7 +18,7 @@ public class SetEntitySpeedFunction implements HordeFunction<HordeBuildSpawnData
 
     @Override
     public void apply(HordeContext<HordeBuildSpawnDataEvent> ctx) {
-        ctx.getEvent().getSpawnData().setEntitySpeed(getter.get(ctx));
+        ctx.getSpawnData().setEntitySpeed(getter.get(ctx));
     }
 
     public static SetEntitySpeedFunction deserialize(JsonElement json) {

@@ -9,33 +9,32 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 import net.smileycorp.atlas.api.network.AbstractMessage;
 import net.smileycorp.hordes.client.ClientHandler;
+import net.smileycorp.hordes.hordeevent.client.HordeClientHandler;
 
 public class HordeSoundMessage extends AbstractMessage {
 
-	protected Vec3 direction;
+	protected float dirX, dirZ;
 	protected ResourceLocation sound;
 
 	public HordeSoundMessage() {}
 
-	public HordeSoundMessage(Vec3 direction, ResourceLocation sound) {
-		this.direction = direction;
+	public HordeSoundMessage(float dirX, float dirZ, ResourceLocation sound) {
+		this.dirX = dirX;
+		this.dirZ = dirZ;
 		this.sound = sound;
 	}
 
 	@Override
 	public void read(FriendlyByteBuf buf) {
-		double x = buf.readDouble();
-		double z = buf.readDouble();
-		direction = new Vec3(x, 0, z);
-		sound = new ResourceLocation(buf.readUtf());
+		dirX = buf.readFloat();
+		dirZ = buf.readFloat();
+		sound = ResourceLocation.tryParse(buf.readUtf());
 	}
 
 	@Override
 	public void write(FriendlyByteBuf buf) {
-		if (direction != null) {
-			buf.writeDouble(direction.x);
-			buf.writeDouble(direction.z);
-		}
+		buf.writeFloat(dirX);
+		buf.writeFloat(dirZ);
 		if (sound != null) buf.writeUtf(sound.toString());
 	}
 
@@ -44,7 +43,7 @@ public class HordeSoundMessage extends AbstractMessage {
 
 	@Override
 	public void process(NetworkEvent.Context ctx) {
-		ctx.enqueueWork(() -> DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> ClientHandler.playHordeSound(direction, sound)));
+		ctx.enqueueWork(() -> DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> HordeClientHandler.INSTANCE.playHordeSound(dirX, dirZ, sound)));
 		ctx.setPacketHandled(true);
 	}
 
