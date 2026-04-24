@@ -119,6 +119,7 @@ public class HordeEvent {
 			rand = getRandom();
 			HordeBuildSpawnDataEvent buildTableEvent = new HordeBuildSpawnDataEvent(player, this);
 			postEvent(buildTableEvent);
+			if (buildTableEvent.isCanceled()) return;
 			spawnData = buildTableEvent.getSpawnData();
 		}
 		if (spawnData == null || spawnData.getTable() == null) {
@@ -131,7 +132,7 @@ public class HordeEvent {
 		if (startEvent.isCanceled()) return;
 		count = startEvent.getCount();
 		Vec3 basedir = VecMath.randomXZVec(rand);
-		BlockPos basepos = VecMath.closestLoadedPos(level, player.blockPosition(), basedir, 50, 7, 0);
+		BlockPos basepos = getBasePos(level, basedir, player, true);
 		int i = 0;
 		while (basepos.equals(player.blockPosition())) {
 			basedir = VecMath.randomXZVec(rand);
@@ -286,6 +287,7 @@ public class HordeEvent {
 		if (spawnData == null) {
 			HordeBuildSpawnDataEvent event = new HordeBuildSpawnDataEvent(player, this);
 			postEvent(event);
+			if (event.isCanceled()) return;
 			spawnData = event.getSpawnData();
 		}
 		if (spawnData == null || spawnData.getTable() == null || spawnData.getTable().getSpawnTable(day).isEmpty()) {

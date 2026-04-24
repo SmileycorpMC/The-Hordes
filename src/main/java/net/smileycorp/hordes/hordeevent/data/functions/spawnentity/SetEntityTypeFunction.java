@@ -7,9 +7,10 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
+import net.smileycorp.hordes.common.data.values.ValueGetter;
 import net.smileycorp.hordes.common.event.HordeSpawnEntityEvent;
+import net.smileycorp.hordes.hordeevent.data.HordeContext;
 import net.smileycorp.hordes.hordeevent.data.functions.HordeFunction;
-import net.smileycorp.hordes.hordeevent.data.values.ValueGetter;
 
 public class SetEntityTypeFunction implements HordeFunction<HordeSpawnEntityEvent> {
     
@@ -20,13 +21,13 @@ public class SetEntityTypeFunction implements HordeFunction<HordeSpawnEntityEven
     }
     
     @Override
-    public void apply(HordeSpawnEntityEvent event) {
-        String str = getter.get(event);
+    public void apply(HordeContext<HordeSpawnEntityEvent> ctx) {
+        String str = getter.get(ctx);
         try {
             EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.tryParse(str));
-            event.setEntity((Mob) type.create(event.getLevel()));
+            ctx.getEvent().setEntity((Mob) type.create(ctx.getWorld()));
         } catch (Exception e) {
-            HordesLogger.logError("Failed changing entity " + event.getEntity() + " to type " + str, e);
+            HordesLogger.logError("Failed changing entity " + ctx.getEntity() + " to type " + str, e);
         }
     }
     

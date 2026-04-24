@@ -32,6 +32,7 @@ import net.smileycorp.hordes.DataGenerator;
 import net.smileycorp.hordes.client.ClientHandler;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.common.capability.ZombifyPlayer;
+import net.smileycorp.hordes.common.data.DataRegistry;
 import net.smileycorp.hordes.common.entities.HordesEntities;
 import net.smileycorp.hordes.config.ClientConfigHandler;
 import net.smileycorp.hordes.config.CommonConfigHandler;
@@ -40,7 +41,6 @@ import net.smileycorp.hordes.config.InfectionConfig;
 import net.smileycorp.hordes.hordeevent.HordeEventHandler;
 import net.smileycorp.hordes.hordeevent.capability.HordeSpawn;
 import net.smileycorp.hordes.hordeevent.client.HordeClientHandler;
-import net.smileycorp.hordes.hordeevent.data.DataRegistry;
 import net.smileycorp.hordes.hordeevent.network.HordeEventPacketHandler;
 import net.smileycorp.hordes.infection.HordesInfection;
 import net.smileycorp.hordes.infection.InfectionEventHandler;
@@ -55,17 +55,24 @@ import java.util.Optional;
 public class Hordes {
 
 	public Hordes(ModContainer container, IEventBus bus) {
-		HordesLogger.clearLog();
+		HordesLogger.clearLog(true);
+		HordesLogger.heading("LOADING CONFIGS");
+		HordesLogger.blankLine();
 		container.registerConfig(ModConfig.Type.COMMON, CommonConfigHandler.config);
 		container.registerConfig(ModConfig.Type.CLIENT, ClientConfigHandler.config);
 		HordesEntities.ENTITIES.register(bus);
 		HordesInfection.ATTRIBUTES.register(bus);
 		HordesInfection.EFFECTS.register(bus);
 		//generate data files
+		HordesLogger.blankLine();
+		HordesLogger.heading("CHECKING CONFIG DATA");
+		HordesLogger.blankLine();
 		if (DataGenerator.shouldGenerateFiles()) {
 			if (FMLEnvironment.dist == Dist.CLIENT) DataGenerator.generateAssets();
 			DataGenerator.generateData();
-		} else HordesLogger.logInfo("Config files are up to date, skipping data/asset generation");
+		} else HordesLogger.logInfo("Config data files are up to date, skipping data/asset generation");
+		HordesLogger.markVolatile();
+		//1.21 neoforge exclusive code buses have to be registered in the mod constructor
 		bus.register(this);
 		bus.addListener(HordeEventPacketHandler::initPackets);
 		bus.addListener(InfectionPacketHandler::initPackets);

@@ -37,16 +37,15 @@ public abstract class MixinZombieHorse extends AbstractHorse {
 		targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, AbstractVillager.class, false));
 		targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, IronGolem.class, true));
 		targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, Turtle.class, 10, true, false, Turtle.BABY_ON_LAND_SELECTOR));
-		goalSelector.addGoal(2, new MeleeAttackGoal(this, 2.0D, false));
-		goalSelector.addGoal(6, new MoveThroughVillageGoal(this, 1.0D, true, 4, () -> false));
+		goalSelector.addGoal(2, new MeleeAttackGoal(this, 2, false));
+		goalSelector.addGoal(6, new MoveThroughVillageGoal(this, 1, true, 4, () -> false));
 		goalSelector.getAvailableGoals().removeIf(goal -> goal.getGoal() instanceof PanicGoal);
 		goalSelector.getAvailableGoals().removeIf(goal -> goal.getGoal() instanceof RunAroundLikeCrazyGoal);
 	}
 
 	@Inject(at=@At("TAIL"), method = "createAttributes", cancellable = true)
 	private static void hordes$createAttributes(CallbackInfoReturnable<AttributeSupplier.Builder> callback) {
-		callback.setReturnValue(callback.getReturnValue().add(Attributes.FOLLOW_RANGE, 35.0D)
-				.add(Attributes.ATTACK_DAMAGE, 3.0D));
+		callback.setReturnValue(callback.getReturnValue().add(Attributes.FOLLOW_RANGE, 35).add(Attributes.ATTACK_DAMAGE, 3));
 	}
 
 }

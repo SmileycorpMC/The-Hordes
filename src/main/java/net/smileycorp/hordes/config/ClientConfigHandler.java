@@ -32,7 +32,6 @@ public class ClientConfigHandler {
 	public static ModConfigSpec.ConfigValue<Boolean> infectionProtectSound;
 	public static ModConfigSpec.ConfigValue<Boolean> cureTooltip;
 	public static ModConfigSpec.ConfigValue<Boolean> immunityTooltip;
-	public static ModConfigSpec.ConfigValue<Boolean> wearableProtectionTooltip;
 
 	//zombie players
 	private static ModConfigSpec.ConfigValue<List<? extends Integer>> configZombiePlayerColour;
@@ -69,7 +68,6 @@ public class ClientConfigHandler {
 		infectionProtectSound = builder.comment("Play a sound when infection gets prevented?").define("infectionProtectSound", false);
 		cureTooltip = builder.comment("Show a tooltip on items that can cure infection?").define("cureTooltip", true);
 		immunityTooltip = builder.comment("Show a tooltip on items that give infection immunity?").define("immunityTooltip", true);
-		wearableProtectionTooltip = builder.comment("Show a tooltip on wearable items that grant some protection against infection?").define("wearableProtectionTooltip", true);
 		builder.pop();
 
 		builder.push("Zombie Players");
@@ -78,7 +76,7 @@ public class ClientConfigHandler {
 		configDrownedPlayerColour = builder.comment("Colour tint for drowned players.")
 				.defineList("drownedPlayerColour", Lists.newArrayList(144, 255, 255), x -> (int)x >= 0 && (int)x < 256);
 		configHuskPlayerColour = builder.comment("Colour tint for husk players.")
-				.defineList("huskPlayerColour", Lists.newArrayList(193, 168, 5), x -> (int)x >= 0 && (int)x < 256);
+				.defineList("huskPlayerColour", Lists.newArrayList(222, 215, 172), x -> (int)x >= 0 && (int)x < 256);
 		zombiePlayerCapes = builder.comment("Render zombie players with capes if the player that got infected has one equipped?").define("zombiePlayerCapes", true);
 		builder.pop();
 		config = builder.build();
@@ -133,7 +131,7 @@ public class ClientConfigHandler {
 		if (huskPlayerColour == null) {
 			List<? extends Integer> rgb = configHuskPlayerColour.get();
 			if (rgb.size() >= 3) huskPlayerColour = new Color(rgb.get(0), rgb.get(1), + rgb.get(2));
-			else huskPlayerColour = new Color(193, 168, 5);
+			else huskPlayerColour = new Color(222, 215, 172);
 		}
 		return huskPlayerColour;
 	}

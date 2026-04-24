@@ -28,9 +28,10 @@ public class ZombiePlayerElytraLayer<T extends Zombie & PlayerZombie> extends El
 		ItemStack itemstack = entity.getItemBySlot(EquipmentSlot.CHEST);
 		if (!shouldRender(itemstack, entity)) return;
 		ResourceLocation loc = getElytraTexture(itemstack, entity);
-		if (!entity.displayCape()) return;
-		ResourceLocation texture = PlayerTextureRenderer.getTexture(entity.getPlayerUUID(), Type.ELYTRA);
-		if (texture != null) loc = texture;
+		if (entity.displayCape()) {
+			ResourceLocation texture = PlayerTextureRenderer.getTexture(entity.getPlayerUUID(), Type.ELYTRA);
+			if (texture != null) loc = texture;
+		}
 		poseStack.pushPose();
 		poseStack.translate(0, 0, 0.125);
 		getParentModel().copyPropertiesTo(elytraModel);

@@ -81,7 +81,7 @@ public abstract class MixinMob extends LivingEntity {
 
 	//copy horde data to converted entities after conversion before capabilities are cleared
 	@WrapOperation(method = "convertTo", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/EntityType;create(Lnet/minecraft/world/level/Level;)Lnet/minecraft/world/entity/Entity;"))
-	private Entity hordes$convertTo(EntityType instance, Level level, Operation<Entity> original) {
+	private Entity hordes$convertTo$create(EntityType instance, Level level, Operation<Entity> original) {
 		Entity entity = original.call(instance, level);
 		if (!(entity instanceof Mob)) return entity;
 		Mob converted = (Mob) entity;
@@ -106,8 +106,8 @@ public abstract class MixinMob extends LivingEntity {
 	}
 
 	//add horde ai to converted mobs
-	@Inject(at=@At("TAIL"), method = "convertTo", cancellable = true)
-	public void hordes$convertTo(EntityType<?> type, boolean keepEquipment, CallbackInfoReturnable<Mob> callback) {
+	@Inject(at=@At("TAIL"), method = "convertTo")
+	public void hordes$convertTo$TAIL(EntityType<?> type, boolean keepEquipment, CallbackInfoReturnable<Mob> callback) {
 		Mob converted = callback.getReturnValue();
 		HordeSpawn cap = converted.getCapability(HordesCapabilities.HORDESPAWN);
 		if (cap == null) return;
@@ -123,7 +123,7 @@ public abstract class MixinMob extends LivingEntity {
 		}
 	}
 
-	@Inject(at=@At("HEAD"), method = "registerGoals", cancellable = true)
+	@Inject(at=@At("HEAD"), method = "registerGoals")
 	public void hordes$registerGoals(CallbackInfo callback) {
 		if (CommonConfigHandler.piglinsHuntZombies.get() && ((LivingEntity)this) instanceof Piglin)
 			goalSelector.addGoal(1, new FleeEntityGoal((Mob)(LivingEntity)this, 1.5, 5, InfectionData.INSTANCE::canCauseInfection));

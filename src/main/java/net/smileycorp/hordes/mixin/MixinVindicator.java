@@ -20,7 +20,7 @@ public abstract class MixinVindicator extends AbstractIllager {
         super(p_32105_, p_32106_);
     }
     
-    @Inject(at=@At("HEAD"), method = "registerGoals", cancellable = true)
+    @Inject(at=@At("HEAD"), method = "registerGoals")
     public void hordes$registerGoals(CallbackInfo callback) {
         if (!CommonConfigHandler.illagersHuntZombies.get()) return;
         targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 10, true, false,

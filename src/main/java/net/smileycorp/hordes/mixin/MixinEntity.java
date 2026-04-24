@@ -25,7 +25,7 @@ public class MixinEntity implements ChatName {
         if (hasChatName()) callback.setReturnValue(Component.translatable(getChatName()));
     }
 
-    @Inject(at =@At("HEAD"), method = "remove", cancellable = true)
+    @Inject(at =@At("HEAD"), method = "remove")
     protected void hordes$remove(Entity.RemovalReason reason, CallbackInfo callback) {
         ServerPlayer player = HordeSpawn.getHordePlayer((Entity)(Object)this);
         if (player == null) return;

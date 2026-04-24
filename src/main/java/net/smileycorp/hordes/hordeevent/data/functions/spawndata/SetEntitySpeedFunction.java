@@ -3,9 +3,10 @@ package net.smileycorp.hordes.hordeevent.data.functions.spawndata;
 import com.google.gson.JsonElement;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
+import net.smileycorp.hordes.common.data.values.ValueGetter;
 import net.smileycorp.hordes.common.event.HordeBuildSpawnDataEvent;
+import net.smileycorp.hordes.hordeevent.data.HordeContext;
 import net.smileycorp.hordes.hordeevent.data.functions.HordeFunction;
-import net.smileycorp.hordes.hordeevent.data.values.ValueGetter;
 
 public class SetEntitySpeedFunction implements HordeFunction<HordeBuildSpawnDataEvent> {
 
@@ -16,8 +17,8 @@ public class SetEntitySpeedFunction implements HordeFunction<HordeBuildSpawnData
     }
 
     @Override
-    public void apply(HordeBuildSpawnDataEvent event) {
-        event.getSpawnData().setEntitySpeed(getter.get(event));
+    public void apply(HordeContext<HordeBuildSpawnDataEvent> ctx) {
+        ctx.getSpawnData().setEntitySpeed(getter.get(ctx));
     }
 
     public static SetEntitySpeedFunction deserialize(JsonElement json) {

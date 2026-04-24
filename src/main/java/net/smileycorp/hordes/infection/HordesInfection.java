@@ -28,6 +28,7 @@ public class HordesInfection {
 	
 	public static final DeferredHolder<MobEffect, InfectedEffect> INFECTED = EFFECTS.register("infected", InfectedEffect::new);
 	public static final DeferredHolder<MobEffect, ImmuneEffect> IMMUNITY = EFFECTS.register("immunity", ImmuneEffect::new);
+
 	public static final DeferredHolder<Attribute, Attribute> INFECTIVITY = ATTRIBUTES.register("infectivity",
 			() -> new RangedAttribute("attribute.hordes.infectivity", 0, 0, 1).setSyncable(true));
 	public static final DeferredHolder<Attribute, Attribute> INFECTION_RESISTANCE = ATTRIBUTES.register("infection_resistance",

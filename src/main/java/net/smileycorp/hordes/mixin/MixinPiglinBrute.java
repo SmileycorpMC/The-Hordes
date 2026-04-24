@@ -28,7 +28,7 @@ public abstract class MixinPiglinBrute extends AbstractPiglin {
 		super(null, level);
 	}
 
-	@Inject(at=@At("HEAD"), method = "customServerAiStep", cancellable = true)
+	@Inject(at=@At("HEAD"), method = "customServerAiStep")
 	public void hordes$customServerAiStep(CallbackInfo callback) {
 		if (!(InfectionConfig.enableMobInfection.get() && CommonConfigHandler.piglinsCureThemself.get())) return;
 		if (!hasEffect(HordesInfection.INFECTED)) return;

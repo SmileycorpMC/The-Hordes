@@ -4,9 +4,10 @@ import com.google.gson.JsonElement;
 import net.minecraft.resources.ResourceLocation;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
+import net.smileycorp.hordes.common.data.values.ValueGetter;
 import net.smileycorp.hordes.common.event.HordeBuildSpawnDataEvent;
+import net.smileycorp.hordes.hordeevent.data.HordeContext;
 import net.smileycorp.hordes.hordeevent.data.functions.HordeFunction;
-import net.smileycorp.hordes.hordeevent.data.values.ValueGetter;
 
 public class SetSpawnSoundFunction implements HordeFunction<HordeBuildSpawnDataEvent> {
 
@@ -17,8 +18,8 @@ public class SetSpawnSoundFunction implements HordeFunction<HordeBuildSpawnDataE
     }
 
     @Override
-    public void apply(HordeBuildSpawnDataEvent event) {
-        event.getSpawnData().setSpawnSound(ResourceLocation.tryParse(getter.get(event)));
+    public void apply(HordeContext<HordeBuildSpawnDataEvent> ctx) {
+        ctx.getSpawnData().setSpawnSound(ResourceLocation.tryParse(getter.get(ctx)));
     }
 
     public static SetSpawnSoundFunction deserialize(JsonElement json) {

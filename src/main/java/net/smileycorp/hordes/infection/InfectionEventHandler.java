@@ -112,8 +112,10 @@ public class InfectionEventHandler {
 		if (level.isClientSide || !(source.is(HordesInfection.INFECTION_DAMAGE) || entity.hasEffect(HordesInfection.INFECTED))) return;
 		InfectionDeathEvent deathevent = new InfectionDeathEvent(entity, event.getSource());
 		NeoForge.EVENT_BUS.post(deathevent);
-		if (!deathevent.isCanceled()) return;
-		event.setCanceled(true);
+		if (deathevent.isCanceled()) {
+			event.setCanceled(true);
+			return;
+		}
 		if (!(entity instanceof OwnableEntity)) return;
 		LivingEntity owner = ((OwnableEntity) entity).getOwner();
 		if (!(owner instanceof ServerPlayer)) return;

@@ -21,6 +21,7 @@
 	"commands.hordes.SpawnZombie.usage":"/hordes spawnZombie <username> <pos> <type>",
 	
 	"message.hordes.DataError":"Errors exist in currently loaded data, please check the file %1$s for more information.",
+	"message.hordes.DataErrorScripts":"Errors exist in loaded scripts %1$s, please check the file %2$s for more information.",
 	
 	"jei.category.hordes.InfectionCures":"Infection Cures"
 }
