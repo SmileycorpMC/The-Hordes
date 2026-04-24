@@ -12,12 +12,13 @@
 		"1.6.1": "add hordes:spawn_table and hordes:day values, rework hordes:day to include the functionality of hordes:player_day, update to neo version 21.0.42",
 		"1.6.2": "various fixes, infectivity is now an attribute, infection visual effect changes, update to neo version 21.1.186",
 		"1.6.2a": "fix crash related to attributes",
-		"1.6.2b": "fix null pointer crash on spawning horde waves"
+		"1.6.2b": "fix null pointer crash on spawning horde waves",
+		"1.6.3": "add several new script features, improve script error feedback"
     },
     "promos": {
-        "1.21-latest": "1.6.2b",
-        "1.21-recommended": "1.6.2b",
-		"1.21.1-latest": "1.6.2b",
-        "1.21.1-recommended": "1.6.2b"
+        "1.21-latest": "1.6.3",
+        "1.21-recommended": "1.6.3",
+		"1.21.1-latest": "1.6.3",
+        "1.21.1-recommended": "1.6.3"
     }
 }
