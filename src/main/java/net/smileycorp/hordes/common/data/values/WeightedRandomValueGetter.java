@@ -24,7 +24,7 @@ public class WeightedRandomValueGetter<T extends Comparable<T>> implements Value
         return outputs.getResult(ctx.getRandom()).get(ctx);
     }
     
-    public static <T extends Number & Comparable<T>> WeightedRandomValueGetter deserialize(JsonObject json, DataType<T> type) {
+    public static <T extends Number & Comparable<T>> WeightedRandomValueGetter<T> deserialize(JsonObject json, DataType<T> type) {
         Map<ValueGetter<T>, Integer> values = Maps.newHashMap();
         for (JsonElement element : json.get("value").getAsJsonArray()) {
             try {
@@ -35,7 +35,7 @@ public class WeightedRandomValueGetter<T extends Comparable<T>> implements Value
                 HordesLogger.logError("invalid entry for " + element + " for hordes:weighted_random", e);
             }
         }
-        return new WeightedRandomValueGetter(new WeightedOutputs(values));
+        return new WeightedRandomValueGetter<>(new WeightedOutputs<>(values));
     }
     
 }

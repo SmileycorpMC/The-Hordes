@@ -10,7 +10,7 @@ import net.smileycorp.hordes.hordeevent.data.HordeContext;
 
 public interface ValueGetter<T extends Comparable<T>> {
     
-   T get(HordeContext<? extends HordePlayerEvent> ctx);
+    T get(HordeContext<? extends HordePlayerEvent> ctx);
     
     static <T extends Comparable<T>> ValueGetter<T> readValue(DataType<T> type, JsonElement value) throws Exception {
         if (value instanceof JsonNull) throw new HordesParsingException("No value present");
@@ -22,6 +22,5 @@ public interface ValueGetter<T extends Comparable<T>> {
         T v = type.readFromJson(value);
         return ctx -> v;
     }
-
 
 }

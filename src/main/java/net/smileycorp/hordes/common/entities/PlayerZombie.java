@@ -2,9 +2,9 @@ package net.smileycorp.hordes.common.entities;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.NonNullList;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
@@ -29,8 +29,6 @@ public interface PlayerZombie<T extends Mob & PlayerZombie<T>> {
 	void setInventory(NonNullList<ItemStack> drops);
 
 	NonNullList<ItemStack> getInventory();
-
-	void copyFrom(PlayerZombie entity);
 
 	void setDisplayCape(boolean display);
 
@@ -60,7 +58,8 @@ public interface PlayerZombie<T extends Mob & PlayerZombie<T>> {
 
 	void setZCloak(double value);
 
-	default void moveCloak(Zombie entity) {
+	default void moveCloak() {
+		T entity = asEntity();
 		setXCloakO(getXCloak());
 		setYCloakO(getYCloak());
 		setZCloakO(getZCloak());
@@ -100,6 +99,17 @@ public interface PlayerZombie<T extends Mob & PlayerZombie<T>> {
 		setXCloak(getXCloak() + (d0 * 0.25D));
 		setYCloak(getYCloak() + (d1 * 0.25D));
 		setZCloak(getZCloak() + (d2 * 0.25D));
+	}
+
+	default <U extends Mob & PlayerZombie<U>> void copyFrom(U entity) {
+		Optional<UUID> optional = entity.getPlayerUUID();
+		if(optional.isPresent()) setPlayer(optional.get());
+		setInventory(entity.getInventory());
+		for (EquipmentSlot slot : EquipmentSlot.values()) {
+			ItemStack stack = entity.getItemBySlot(slot);
+			asEntity().setItemSlot(slot, stack);
+		}
+		setDisplayCape(entity.displayCape());
 	}
 
 	default T asEntity() {

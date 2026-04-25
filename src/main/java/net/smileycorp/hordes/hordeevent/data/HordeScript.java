@@ -43,7 +43,7 @@ public class HordeScript<T extends HordePlayerEvent> {
 		return name;
 	}
 
-	public boolean shouldApply(HordeContext<? extends HordePlayerEvent> ctx) {
+	public boolean shouldApply(HordeContext<T> ctx) {
 		for (Condition condition : conditions)  if (!condition.apply(ctx)) return false;
 		return true;
 	}

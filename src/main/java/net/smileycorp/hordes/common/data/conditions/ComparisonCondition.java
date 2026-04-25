@@ -26,14 +26,14 @@ public class ComparisonCondition<T extends Comparable<T>> implements Condition {
 		return operation.apply(value1.get(ctx), value2.get(ctx));
 	}
 
-	public static ComparisonCondition deserialize(JsonElement json) {
+	public static <T extends Comparable<T>> ComparisonCondition<T> deserialize(JsonElement json) {
 		try {
 			JsonObject obj = json.getAsJsonObject();
-			DataType type = DataType.of(obj.get("type").getAsString());
+			DataType<T> type = (DataType<T>) DataType.of(obj.get("type").getAsString());
 			ComparableOperation operation = ComparableOperation.of(obj.get("operation").getAsString());
-			ValueGetter value1 = ValueGetter.readValue(type, obj.get("value1"));
-			ValueGetter value2 = ValueGetter.readValue(type, obj.get("value2"));
-			return new ComparisonCondition(value1, operation, value2);
+			ValueGetter<T> value1 = ValueGetter.readValue(type,  obj.get("value1"));
+			ValueGetter<T> value2 = ValueGetter.readValue(type,  obj.get("value2"));
+			return new ComparisonCondition<>(value1, operation, value2);
 		} catch(Exception e) {
 			HordesLogger.logError("Incorrect parameters for condition hordes:comparison", e);
 		}
