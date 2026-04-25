@@ -8,7 +8,7 @@ import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
 import net.smileycorp.hordes.hordeevent.data.HordeContext;
 
-public class EntityPosGetter<T extends Number & Comparable<T>> implements ValueGetter<T> {
+public class EntityPosGetter<T extends Comparable<T>> implements ValueGetter<T> {
 	
 	private final ValueGetter<String> value;
 	private final DataType<T> type;
@@ -27,7 +27,7 @@ public class EntityPosGetter<T extends Number & Comparable<T>> implements ValueG
 		return type.cast(entity.position().get(axis));
 	}
 
-	public static <T extends java.lang.Number & Comparable<T>> EntityPosGetter<T> deserialize(JsonObject object, DataType<T> type) {
+	public static <T extends Number & Comparable<T>> EntityPosGetter<T> deserialize(JsonObject object, DataType<T> type) {
 		try {
 			if (object.has("value")) return new EntityPosGetter<>(ValueGetter.readValue(DataType.STRING, object.get("value")), type);
 		} catch (Exception e) {
