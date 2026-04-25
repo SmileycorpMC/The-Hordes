@@ -65,9 +65,9 @@ public class InfectionConversionEntry {
 	public static InfectionConversionEntry deserialize(JsonObject json) throws Exception {
 		EntityType<?> entity = ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(json.get("entity").getAsString()));
 		EntityType<?> converts_to = ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(json.get("converts_to").getAsString()));
-		float chance = json.get("chance").getAsFloat();
+		float protection = json.get("protection").getAsFloat();
 		CompoundTag nbt = json.has("nbt") ? DataRegistry.parseNBT(entity.toShortString(), json.get("nbt").getAsString()) : null;
-		return new InfectionConversionEntry((EntityType<? extends Mob>)entity, (EntityType<? extends Mob>)converts_to, chance, nbt);
+		return new InfectionConversionEntry((EntityType<? extends Mob>)entity, (EntityType<? extends Mob>)converts_to, protection, nbt);
 	}
 
 }

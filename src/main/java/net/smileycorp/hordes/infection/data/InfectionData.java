@@ -68,10 +68,10 @@ public class InfectionData extends HordesJsonLoader {
                    InfectionConversionEntry entry = InfectionConversionEntry.deserialize(element.getAsJsonObject());
                    conversionTable.put(entry.getEntity(), entry);
                 } catch (Exception e) {
-                   HordesLogger.logError("Failed to load conversion entry " + element.getAsString(), e);
+                   HordesLogger.logError("Failed to load conversion entry " + element.toString(), e);
                 }
             } catch (Exception e) {
-                HordesLogger.logError("Failed to load conversion table " + loc, e);
+                HordesLogger.logError("Failed to load conversion table " + loc + " " + e.getMessage(), e);
             }
         }
         HordesLogger.blankLine();
@@ -92,7 +92,7 @@ public class InfectionData extends HordesJsonLoader {
                     immunityItems.put(item, duration);
                     HordesLogger.logInfo("Loaded immunity item " + name + " with duration " + duration);
                 } catch (Exception e) {
-                    HordesLogger.logError("Failed to load immunity item " + element.getAsString(), e);
+                    HordesLogger.logError("Failed to load immunity item " + element.toString(), e);
                 }
             } catch (Exception e) {
                 HordesLogger.logError("Failed to load immunity item list " + loc, e);
@@ -120,7 +120,7 @@ public class InfectionData extends HordesJsonLoader {
                             AttributeModifier.Operation.MULTIPLY_TOTAL : operation));
                     HordesLogger.logInfo("Loaded wearable protection " + name + " with modifier " + modifier);
                 } catch (Exception e) {
-                    HordesLogger.logError("Failed to load wearable protection " + element.getAsString(), e);
+                    HordesLogger.logError("Failed to load wearable protection " + element.toString(), e);
                 }
             } catch (Exception e) {
                 HordesLogger.logError("Failed to load wearable protection list " + loc, e);
@@ -143,7 +143,7 @@ public class InfectionData extends HordesJsonLoader {
                     entityInfectChance.put(entity, chance);
                     HordesLogger.logInfo("Loaded infection entity " + name + " with infect chance " + chance);
                 } catch (Exception e) {
-                    HordesLogger.logError("Failed to infection entity " + element.getAsString(), e);
+                    HordesLogger.logError("Failed to infection entity " + element.toString(), e);
                 }
             } catch (Exception e) {
                 HordesLogger.logError("Failed to load entity infection list " + loc, e);

@@ -52,7 +52,7 @@ public class InfectionClientHandler {
 		if (!player.hasEffect(HordesInfection.INFECTED.get())) return;
 		int a = player.getEffect(HordesInfection.INFECTED.get()).getAmplifier();
 		if (a == 0) return;
-		Color colour = new Color(0.4745f, 0.6117f, 0.3961f, Math.min(0.05f * a, 0.5f));
+		Color colour = new Color(0.4745f, 0.6117f, 0.3961f, Math.min(0.005f * a, 0.1f));
 		Window window = mc.getWindow();
 		event.getGuiGraphics().fill(0, 0, window.getGuiScaledWidth(), window.getGuiScaledHeight(), colour.getRGB());
 	}

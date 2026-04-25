@@ -14,8 +14,7 @@
 		"last_day": 50,
 		"nbt": "{Passengers:[{id:skeleton,HandItems:[{id:bow,Count:1b}]}]}"
 	},
-	"minecraft:stray-8-20-0",
-	"minecraft:bogged-2-20-0",
+	"minecraft:stray-10-20-0",
 	"minecraft:wither_skeleton-10-40-0",
 	{
 		"entity": "minecraft:skeleton_horse",

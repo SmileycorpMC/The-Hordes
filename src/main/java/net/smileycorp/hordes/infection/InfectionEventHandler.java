@@ -181,7 +181,6 @@ public class InfectionEventHandler {
 		MobEffectInstance instance = event.getEffectInstance();
 		if (instance == null) return;
 		if (instance.getEffect() == HordesInfection.INFECTED.get() && InfectionConfig.enableMobInfection.get()) {
-			event.setCanceled(true);
 			int amplifier = instance.getAmplifier();
 			if (amplifier < 3) {
 				entity.addEffect(new MobEffectInstance(HordesInfection.INFECTED.get(), InfectedEffect.getInfectionTime(entity), amplifier + 1));

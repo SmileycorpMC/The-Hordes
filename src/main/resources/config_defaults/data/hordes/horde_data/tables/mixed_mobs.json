@@ -4,8 +4,7 @@
 	"minecraft:spider-15-20-30",
 	"minecraft:creeper-5-30-30",
 	"minecraft:husk-20-30-50",
-	"minecraft:stray-10-40-50",
-	"minecraft:bogged-5-40-50",
+	"minecraft:stray-15-40-50",
 	"minecraft:cave_spider-10-40-50",
 	"minecraft:witch-5-40-50",
 	"minecraft:pillager-10-40-50",
@@ -36,7 +35,7 @@
 		"weight": 10,
 		"first_day": 60,
 		"last_day": 0,
-		"nbt": "{Passengers:[{id:bogged,HandItems:[{id:bow,Count:1b}]}]}"
+		"nbt": "{Passengers:[{id:skeleton,HandItems:[{id:bow,Count:1},{id:tipped_arrow,tag:{Potion:\"minecraft:poison\"},Count:1}]}]}"
 	},
 	{
 		"entity": "minecraft:zombie_horse",
