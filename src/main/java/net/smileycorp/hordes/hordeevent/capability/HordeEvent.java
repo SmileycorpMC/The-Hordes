@@ -8,10 +8,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
@@ -172,7 +169,6 @@ public class HordeEvent {
 				}
 				finalizeEntity(newEntity, player, true);
 			} catch (Exception e) {
-				e.printStackTrace();
 				logError("Unable to spawn entity from " + type, e);
 			}
 		}
@@ -203,15 +199,14 @@ public class HordeEvent {
 		if (!spawnEntityEvent.isCanceled()) {
 			entity = spawnEntityEvent.getEntity();
 			pos = spawnEntityEvent.getPos();
-			entity.finalizeSpawn(level, level.getCurrentDifficultyAt(BlockPos.containing(pos)), null, null, null);
+			entity.finalizeSpawn(level, level.getCurrentDifficultyAt(BlockPos.containing(pos)), MobSpawnType.EVENT, null, null);
 			entity.setPos(pos.x(), pos.y(), pos.z());
-			return entity;
-		} else {
+        } else {
 			logInfo("Entity spawn event has been cancelled, not spawning entity  of class " + entity.getType());
 			cancel.set(true);
-			return entity;
-		}
-	}
+        }
+        return entity;
+    }
 
 	private void finalizeEntity(Mob entity, ServerPlayer player, boolean addToMobCap) {
 		entity.getAttribute(Attributes.FOLLOW_RANGE).addPermanentModifier(new AttributeModifier(FOLLOW_RANGE_MODIFIER,
