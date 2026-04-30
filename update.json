@@ -13,12 +13,13 @@
 		"1.6.2": "various fixes, infectivity is now an attribute, infection visual effect changes, update to neo version 21.1.186",
 		"1.6.2a": "fix crash related to attributes",
 		"1.6.2b": "fix null pointer crash on spawning horde waves",
-		"1.6.3": "add several new script features, improve script error feedback"
+		"1.6.3": "add several new script features, improve script error feedback",
+		"1.6.3a": "fixed crash on servers caused by incorrect import"
     },
     "promos": {
-        "1.21-latest": "1.6.3",
-        "1.21-recommended": "1.6.3",
-		"1.21.1-latest": "1.6.3",
-        "1.21.1-recommended": "1.6.3"
+        "1.21-latest": "1.6.2b",
+        "1.21-recommended": "1.6.2b",
+		"1.21.1-latest": "1.6.3a",
+        "1.21.1-recommended": "1.6.3a"
     }
 }
