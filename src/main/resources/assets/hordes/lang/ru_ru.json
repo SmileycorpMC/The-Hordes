@@ -17,10 +17,11 @@
 	"commands.hordes.HordeReset.success": "Все данные бродячей орды для игрока %1$s сброшены",
 	"commands.hordes.ListEntities.usage": "/hordes listEntities",
 	"commands.hordes.ListEntities.success": "Список всех существ бродячей орды выведен в %1$s",
-	
+
 	"commands.hordes.SpawnZombie.usage": "/hordes spawnZombie <имя> <позиция> <тип>",
-	
+
 	"message.hordes.DataError": "В текущих загруженных данных имеются ошибки, пожалуйста, проверьте файл %1$s для дополнительной информации.",
-	
-	"jei.category.hordes.InfectionCures": "Лечение инфекции"
+	"message.hordes.DataErrorScripts": "В загруженных скриптах %1$s обнаружены ошибки. Для получения дополнительной информации проверьте файл %2$s.",
+
+	"jei.category.hordes.InfectionCures": "Лечение зомби-инфекции"
 }
