@@ -1,9 +1,9 @@
-{	
+{
 	"message.hordes.EventStart": "Поблизости слышится вой бродячей орды",
 	"message.hordes.EventEnd": "В воздухе тихо, бродячая орда остановилась",
 	"message.hordes.TrySleep": "Чувство надвигающегося ужаса мешает вам заснуть",
 	"message.hordes.title": "Бродячие орды",
-	
+
 	"hordes.subtitle.hordeHowls": "Вой зомби",
 	"hordes.subtitle.infected": "Игрок заражён",
 	"hordes.subtitle.immune": "Заражение игрока заблокировано",
@@ -11,11 +11,11 @@
 	"entity.hordes.ZombiePlayer.chat": "%1$s-зомби",
 	"entity.hordes.DrownedPlayer.chat": "%1$s-утопленник",
 	"entity.hordes.HuskPlayer.chat": "%1$s-кадавр",
-	
+
 	"entity.hordes.ZombiePlayer.name": "Игрок-зомби",
 	"entity.hordes.DrownedPlayer.name": "Игрок-утопленник",
 	"entity.hordes.HuskPlayer.name": "Игрок-кадавр",
-	
+
 	"entity.hordes.ZombifiedPiglinBrute.name": "Зомбифицированный брутальный пиглин",
 	"entity.hordes.ZombieWanderingTrader.name": "Странствующий торговец-зомби",
 	"entity.hordes.ZombiePillager.name": "Разбойник-зомби",
@@ -24,15 +24,16 @@
 	"entity.hordes.ZombieIllusioner.name": "Иллюзионист-зомби",
 	"entity.hordes.ZombieWitch.name": "Ведьма-зомби",
 
-	"effect.hordes.infected": "Инфекция",
+	"effect.hordes.infected": "Зомби-инфекция",
 	"effect.hordes.immunity": "Иммунитет",
 	"death.attack.infection": "%1$s умер от инфекции.",
 	"death.attack.infection.zombified": "%1$s был зомбифицирован.",
 
-	"tooltip.hordes.cure": "Лечит инфекцию",
-	"tooltip.hordes.wearableProtection": "Устойчивость к инфекции",
+	"tooltip.hordes.cure": "Лечит зомби-инфекцию",
+	"hordes.infection_resistance": "Устойчивость к зомби-инфекции",
 
-	"attribute.name.hordes.infection_resistance": "Устойчивость к инфекции",
+	"attribute.hordes.infectivity": "Зомби-инфекционность",
+	"attribute.hordes.infection_resistance": "Устойчивость к зомби-инфекции",
 
-	"jei.category.hordes.InfectionCures": "Лечение инфекции"
+	"jei.category.hordes.InfectionCures": "Лечение зомби-инфекции"
 }
