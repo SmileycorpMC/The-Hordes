@@ -1,5 +1,6 @@
 package net.smileycorp.hordes.common.data;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -14,7 +15,6 @@ import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.smileycorp.hordes.common.HordesLogger;
-import org.apache.commons.compress.utils.Lists;
 
 import java.io.Reader;
 import java.util.List;
