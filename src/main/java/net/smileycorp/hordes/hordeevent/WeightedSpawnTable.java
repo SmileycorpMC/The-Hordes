@@ -25,7 +25,6 @@ public class WeightedSpawnTable extends WeightedOutputs<HordeSpawnEntry> {
         List<Entry<HordeSpawnEntry, Integer>> mappedEntries = Lists.newArrayList();
         int maxWeight = 0;
         int max = 0;
-        System.out.println(tries);
         for(Entry<HordeSpawnEntry, Integer> entry : entries) {
             HordeSpawnEntry spawnEntry = entry.getKey();
             if (spawnEntry.maxSpawns <= 0) max = -1;
