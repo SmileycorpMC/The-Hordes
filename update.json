@@ -17,10 +17,11 @@
 		"1.6.3": "full version parity update with 1.21.1",
 		"1.6.3a": "fix crash caused by mixin config error",
 		"1.6.3b": "attribute registry crash and datapack errors",
-		"1.6.3c": "fix issue with entities spawning from hordes"
+		"1.6.3c": "fix issue with entities spawning from hordes",
+		"1.6.3d": "fix crash on servers caused by incorrect import"
     },
     "promos": {
-        "1.20.1-latest": "1.6.3c",
-        "1.20.1-recommended": "1.6.3c"
+        "1.20.1-latest": "1.6.3d",
+        "1.20.1-recommended": "1.6.3d"
     }
 }
