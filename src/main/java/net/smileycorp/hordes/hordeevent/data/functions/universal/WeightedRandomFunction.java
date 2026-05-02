@@ -61,7 +61,7 @@ public class WeightedRandomFunction<T extends HordePlayerEvent> implements Neste
     public static <T extends HordePlayerEvent> WeightedRandomFunction<T> deserialize(JsonElement json) {
         try {
             Class<T> clazz = null;
-            List<Pair<List<Condition>, HordeFunction<T>>> functions = Lists.newArrayList();
+            List<Pair<List<Condition>, Pair<Integer, HordeFunction<T>>>> functions = Lists.newArrayList();
             for (JsonElement element : json.getAsJsonArray()) {
                 JsonObject obj = element.getAsJsonObject();
                 Pair<Class<T>, HordeFunction<T>> pair = FunctionRegistry.readFunction(obj);
@@ -70,7 +70,7 @@ public class WeightedRandomFunction<T extends HordePlayerEvent> implements Neste
                     if (obj.has("conditions")) obj.get("conditions").getAsJsonArray().forEach(condition ->
                             conditions.add(DataRegistry.readCondition(condition.getAsJsonObject())));
                     clazz = pair.getFirst();
-                    functions.add(Pair.of(conditions, pair.getSecond()));
+                    functions.add(Pair.of(conditions, Pair.of(obj.has("weight") ? obj.get("weight").getAsInt() : 0, pair.getSecond())));
                 }
                 else if (pair.getFirst() != null && clazz != null && pair.getFirst().isAssignableFrom(clazz)) {
                     List<Condition> conditions = Lists.newArrayList();
