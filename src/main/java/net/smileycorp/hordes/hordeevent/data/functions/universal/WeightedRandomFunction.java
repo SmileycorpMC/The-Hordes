@@ -76,7 +76,7 @@ public class WeightedRandomFunction<T extends HordePlayerEvent> implements Neste
                     List<Condition> conditions = Lists.newArrayList();
                     if (obj.has("conditions")) obj.get("conditions").getAsJsonArray().forEach(condition ->
                             conditions.add(DataRegistry.readCondition(condition.getAsJsonObject())));
-                    functions.add(Pair.of(conditions, pair.getSecond()));
+                    functions.add(Pair.of(conditions, Pair.of(obj.has("weight") ? obj.get("weight").getAsInt() : 0, pair.getSecond())));
                 }
             }
             return new WeightedRandomFunction(clazz, functions);
