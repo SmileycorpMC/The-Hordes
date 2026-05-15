@@ -32,7 +32,6 @@ public interface ZombifyPlayer {
 
 		@Override
 		public PlayerZombie createZombie() {
-			HordesEntities.ZOMBIE_PLAYER.get();
 			SpawnZombiePlayerEvent event = new SpawnZombiePlayerEvent(player, HordesEntities.ZOMBIE_PLAYER.get());
 			MinecraftForge.EVENT_BUS.post(event);
 			if (event.isCanceled()) return null;
