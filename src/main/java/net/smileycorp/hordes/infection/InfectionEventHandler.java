@@ -1,9 +1,7 @@
 package net.smileycorp.hordes.infection;
 
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -11,24 +9,18 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.monster.Zombie;
-import net.minecraft.world.entity.monster.ZombieVillager;
-import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Equipable;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.ItemAttributeModifierEvent;
-import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
@@ -40,8 +32,6 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.PacketDistributor;
 import net.smileycorp.atlas.api.util.DirectionUtils;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
@@ -72,12 +62,14 @@ public class InfectionEventHandler {
 
 	@SubscribeEvent
 	public void onEntityAdded(EntityJoinLevelEvent event) {
-		Entity entity = event.getEntity();
-		if (InfectionData.INSTANCE.canBeInfected(entity) && entity instanceof LivingEntity)
-			((LivingEntity) entity).getAttribute(HordesInfection.INFECTION_RESISTANCE.get()).setBaseValue(InfectionData.INSTANCE.getProtection(entity.getType()));
-		if (!(entity instanceof Mob && InfectionConfig.infectionEntitiesAggroConversions.get()) || entity.level().isClientSide) return;
-		if (!InfectionData.INSTANCE.hasInfectGoal(entity)) return;
-		((LivingEntity) entity).getAttribute(HordesInfection.INFECTIVITY.get()).setBaseValue(InfectionData.INSTANCE.getInfectionChance(entity.getType()));
+		if (!(event.getEntity() instanceof LivingEntity)) return;
+		LivingEntity entity = (LivingEntity) event.getEntity();
+		if (entity.level().isClientSide) return;
+		if (InfectionData.INSTANCE.canBeInfected(entity))
+			entity.getAttribute(HordesInfection.INFECTION_RESISTANCE.get()).setBaseValue(InfectionData.INSTANCE.getProtection(entity.getType()));
+		if (!InfectionData.INSTANCE.hasInfectAttribute(entity)) return;
+		entity.getAttribute(HordesInfection.INFECTIVITY.get()).setBaseValue(InfectionData.INSTANCE.getInfectionChance(entity.getType()));
+		if (!(entity instanceof Mob && InfectionConfig.infectionEntitiesAggroConversions.get())) return;
 		((Mob) entity).targetSelector.addGoal(3, new NearestAttackableTargetGoal<>((Mob) entity,
 				LivingEntity.class, 10, true, false, InfectionData.INSTANCE::infectedTarget));
 	}
@@ -133,9 +125,7 @@ public class InfectionEventHandler {
 		DamageSource source = event.getSource();
 		Level level = entity.level();
 		if (level.isClientSide || !(source.is(HordesInfection.INFECTION_DAMAGE) || entity.hasEffect(HordesInfection.INFECTED.get()))) return;
-		InfectionDeathEvent deathevent = new InfectionDeathEvent(entity, event.getSource());
-		MinecraftForge.EVENT_BUS.post(deathevent);
-		if (deathevent.isCanceled()) {
+		if (MinecraftForge.EVENT_BUS.post(new InfectionDeathEvent(entity, event.getSource()))) {
 			event.setCanceled(true);
 			return;
 		}
