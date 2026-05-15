@@ -1,5 +1,6 @@
 package net.smileycorp.hordes.hordeevent.capability;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.nbt.CompoundTag;
@@ -62,7 +63,7 @@ public class HordeSavedData extends SavedData {
 
 	public void save() {
 		setDirty();
-		if (level instanceof ServerLevel) ((ServerLevel)level).getChunkSource().getDataStorage().set(DATA, this);
+		if (level instanceof ServerLevel) level.getChunkSource().getDataStorage().set(DATA, this);
 	}
 
 	public HordeEvent getEvent(ServerPlayer player) {
@@ -106,7 +107,7 @@ public class HordeSavedData extends SavedData {
 	}
 
 	public List<String> getDebugText() {
-		List<String> out = new ArrayList<>();
+		List<String> out = Lists.newArrayList();
 		out.add(toString());
 		out.add("Existing events: {");
 		for (Entry<UUID, HordeEvent> entry : events.entrySet()) {

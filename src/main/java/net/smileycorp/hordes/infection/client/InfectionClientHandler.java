@@ -84,7 +84,6 @@ public class InfectionClientHandler {
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public void tooltip(RenderTooltipEvent.GatherComponents event) {
 		ItemStack stack = event.getItemStack();
-		Item item = stack.getItem();
 		List<Component> components = Lists.newArrayList();
 		if (ClientConfigHandler.cureTooltip.get() && stack.is(HordesInfection.INFECTION_CURES_TAG))
 			components.add(Component.translatable("tooltip.hordes.cure"));
@@ -93,7 +92,6 @@ public class InfectionClientHandler {
 			if (immunity > 0) PotionUtils.addPotionTooltip(Lists.newArrayList(
 					new MobEffectInstance(HordesInfection.IMMUNITY.get(), immunity * 20)), components, 1);
 		}
-
 		components.forEach(c -> event.getTooltipElements().add(Either.left(c)));
 	}
 	

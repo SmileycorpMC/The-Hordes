@@ -45,9 +45,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class HordeEvent {
 
 	private final HordeSavedData data;
-	private static UUID FOLLOW_RANGE_MODIFIER = UUID.fromString("51cfe045-4248-409e-be37-556d67de4b97");
+	private static final UUID FOLLOW_RANGE_MODIFIER = UUID.fromString("51cfe045-4248-409e-be37-556d67de4b97");
 	private RandomSource rand;
-	private Set<Mob> entitiesSpawned = new HashSet<>();
+	private final Set<Mob> entitiesSpawned = new HashSet<>();
 	private int timer = 0;
 	private int day = 0;
 	private int nextDay = -1;
@@ -223,11 +223,8 @@ public class HordeEvent {
 		for (Mob entity : entitiesSpawned) {
 			if (entity.isAlive() |! entity.isRemoved()) continue;
 			LazyOptional<HordeSpawn> optional = entity.getCapability(HordesCapabilities.HORDESPAWN, null);
-			if (optional.isPresent()) {
-				HordeSpawn cap = optional.orElseGet(null);
-				cap.setPlayerUUID("");
-				toRemove.add(entity);
-			}
+			toRemove.add(entity);
+			optional.ifPresent(cap -> cap.setPlayerUUID(""));
 		}
 		entitiesSpawned.removeAll(toRemove);
 	}

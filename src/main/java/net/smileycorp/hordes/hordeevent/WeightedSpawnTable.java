@@ -19,7 +19,8 @@ public class WeightedSpawnTable extends WeightedOutputs<HordeSpawnEntry> {
     public WeightedSpawnTable(List<Entry<HordeSpawnEntry, Integer>> spawnmap) {
         super(1, spawnmap);
     }
-    
+
+    @Override
     public List<HordeSpawnEntry> getResults(RandomSource rand, int tries) {
         List<HordeSpawnEntry> list = Lists.newArrayList();
         List<Entry<HordeSpawnEntry, Integer>> mappedEntries = Lists.newArrayList();

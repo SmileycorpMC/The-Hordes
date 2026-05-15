@@ -24,7 +24,7 @@ public class BiomeCondition implements Condition {
 
 	@Override
 	public boolean apply(HordeContext<? extends HordePlayerEvent> ctx) {
-		Holder<Biome> biome = ctx.getWorld().getBiomeManager().getBiome(ctx.getPlayer().blockPosition());
+		Holder<Biome> biome = ctx.getWorld().getBiome(ctx.getPlayer().blockPosition());
 		for (Either<TagKey<Biome>, ResourceLocation> either : biomes) if (either.map(biome::is, biome::is)) return true;
 		return false;
 	}

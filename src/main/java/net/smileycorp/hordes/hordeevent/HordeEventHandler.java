@@ -96,8 +96,6 @@ public class HordeEventHandler {
 		if (horde != null) horde.setPlayer(player);
 	}
 	
-	
-	
 	//prevent despawning of entities in an active horde
 	@SubscribeEvent
 	public void tryDespawn(MobSpawnEvent.AllowDespawn event) {
@@ -117,7 +115,7 @@ public class HordeEventHandler {
 		Mob entity = (Mob) event.getEntity();
 		entity.targetSelector.getRunningGoals().forEach(WrappedGoal::stop);
 		if (entity instanceof PathfinderMob) entity.targetSelector.addGoal(1, new HurtByTargetGoal((PathfinderMob) entity));
-		if (!(entity instanceof ZombifiedPiglin && CommonConfigHandler.aggressiveZombiePiglins.get())) entity.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(entity, Player.class, true));
+		entity.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(entity, Player.class, true));
 		HordeEvent horde = HordeSavedData.getData((ServerLevel) player.level()).getEvent(player);
 		if (horde != null) if (horde.isActive(player)) horde.registerEntity(entity, player);
 		cap.setSynced();

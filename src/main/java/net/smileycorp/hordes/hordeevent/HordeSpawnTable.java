@@ -67,7 +67,7 @@ public class HordeSpawnTable {
     }
 
     private void testEntries() {
-        List<HordeSpawnEntry> toRemove = new ArrayList<>();
+        List<HordeSpawnEntry> toRemove = Lists.newArrayList();
         for (HordeSpawnEntry entry : spawns) {
             try {
                 if (!(entry.getEntity().create(ServerLifecycleHooks.getCurrentServer().overworld()) instanceof Mob)) toRemove.add(entry);
