@@ -98,7 +98,7 @@ public class InfectionData extends HordesJsonLoader {
         HordesLogger.heading("LOADING WEARABLE PROTECTION LIST");
         wearablesProtection.clear();
         for (String id : manager.getNamespaces()) {
-            ResourceLocation loc = new ResourceLocation(id, "immune_wearables");
+            ResourceLocation loc = new ResourceLocation(id, "wearables_protection");
             JsonElement json = map.get(loc);
             if (json == null) continue;
             try {
