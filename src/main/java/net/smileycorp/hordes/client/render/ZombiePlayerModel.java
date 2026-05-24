@@ -6,7 +6,6 @@ import net.minecraft.client.model.AnimationUtils;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
@@ -16,8 +15,6 @@ import net.minecraft.world.item.Items;
 import net.smileycorp.hordes.common.entities.PlayerZombie;
 
 import java.awt.*;
-import java.util.Optional;
-import java.util.UUID;
 
 public class ZombiePlayerModel<T extends Zombie & PlayerZombie> extends PlayerModel<T> {
 

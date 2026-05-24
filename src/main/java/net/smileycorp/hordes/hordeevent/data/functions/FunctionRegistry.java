@@ -1,7 +1,6 @@
 package net.smileycorp.hordes.hordeevent.data.functions;
 
 import com.google.common.collect.Maps;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
@@ -17,7 +16,6 @@ import net.smileycorp.hordes.hordeevent.data.functions.spawnentity.*;
 import net.smileycorp.hordes.hordeevent.data.functions.universal.*;
 
 import java.util.Map;
-import java.util.function.Function;
 
 public class FunctionRegistry {
 

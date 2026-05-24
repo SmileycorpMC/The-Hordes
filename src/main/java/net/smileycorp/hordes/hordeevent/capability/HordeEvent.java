@@ -20,7 +20,6 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.network.GenericStringMessage;
 import net.smileycorp.atlas.api.util.DirectionUtils;

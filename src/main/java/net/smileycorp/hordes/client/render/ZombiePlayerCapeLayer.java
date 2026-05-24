@@ -14,7 +14,6 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.ElytraItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.smileycorp.atlas.api.client.PlayerTextureRenderer;
 import net.smileycorp.hordes.common.entities.PlayerZombie;
 

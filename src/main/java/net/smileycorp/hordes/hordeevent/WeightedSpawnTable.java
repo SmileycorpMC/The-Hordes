@@ -6,7 +6,6 @@ import net.minecraft.util.RandomSource;
 import net.smileycorp.atlas.api.util.WeightedOutputs;
 
 import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
