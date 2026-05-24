@@ -46,8 +46,8 @@ public class CommonConfigHandler {
 		illagersHuntZombies = builder.comment("Whether illagers kill zombie mobs").define("illagersHuntZombies", true);
 		zoglinsAttackUndead = builder.comment("Whether zoglins are agressive towards other undead mobs").define("zoglinsAttackUndead", false);
 		zoglinsAttackMobs = builder.comment("Whether zoglins are agressive towards non-undead monsters").define("zoglinsAttackMobs", true);
-		ZombiePlayersConfig.build(builder);
 		builder.pop();
+		ZombiePlayersConfig.build(builder);
 		config = builder.build();
 	}
 
