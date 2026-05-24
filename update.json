@@ -18,10 +18,12 @@
 		"1.6.3a": "fix crash caused by mixin config error",
 		"1.6.3b": "attribute registry crash and datapack errors",
 		"1.6.3c": "fix issue with entities spawning from hordes",
-		"1.6.3d": "fix crash on servers caused by incorrect import"
+		"1.6.3d": "fix crash on servers caused by incorrect import",
+		"1.6.3e": "fixed issue with hordes:weighted_random function deserialization",
+		"1.6.3f": "fixed config, and logging issues, issues with infection protection and the default datapack, as well as adding a unique message if another player's horde is preventing sleep"
     },
     "promos": {
-        "1.20.1-latest": "1.6.3d",
-        "1.20.1-recommended": "1.6.3d"
+        "1.20.1-latest": "1.6.3f",
+        "1.20.1-recommended": "1.6.3f"
     }
 }
