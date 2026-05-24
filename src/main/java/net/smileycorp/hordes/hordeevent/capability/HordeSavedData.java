@@ -13,8 +13,12 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.hordes.config.HordeEventConfig;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Stream;
 
 public class HordeSavedData extends SavedData {
 
@@ -85,15 +89,12 @@ public class HordeSavedData extends SavedData {
 	}
 
 	public boolean isHordeNight(ServerPlayer player) {
-		if (HordeEventConfig.hordePreventsOtherPlayersSleeping.get()) {
-			for (Player player1 : level.players()) {
-				HordeEvent horde = getEvent(player1.getUUID());
-				if (horde.isHordeDay(player)) return true;
-			}
-			return false;
-		}
 		HordeEvent horde = getEvent(player);
 		return horde != null && horde.isHordeDay(player);
+	}
+
+	public Stream<ServerPlayer> getPlayersWithHorde() {
+		return level.players().stream().filter(this::isHordeNight);
 	}
 
 	public RandomSource getRandom(int day) {
@@ -142,5 +143,5 @@ public class HordeSavedData extends SavedData {
 		data.setNextDay(nextDay);
 		return data;
 	}
-	
+
 }

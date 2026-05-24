@@ -10,7 +10,6 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.monster.ZombifiedPiglin;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Player.BedSleepingProblem;
 import net.minecraft.world.level.Level;
@@ -29,13 +28,16 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
-import net.smileycorp.hordes.config.CommonConfigHandler;
 import net.smileycorp.hordes.config.HordeEventConfig;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 import net.smileycorp.hordes.hordeevent.capability.HordeSavedData;
 import net.smileycorp.hordes.hordeevent.capability.HordeSpawn;
 import net.smileycorp.hordes.hordeevent.data.HordeScriptLoader;
 import net.smileycorp.hordes.hordeevent.data.HordeTableLoader;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 public class HordeEventHandler {
 
@@ -127,10 +129,18 @@ public class HordeEventHandler {
 		if (HordeEventConfig.canSleepDuringHorde.get() || !(event.getEntity() instanceof ServerPlayer)) return;
 		ServerPlayer player = (ServerPlayer) event.getEntity();
 		ServerLevel level = player.serverLevel();
+		if (level.isDay() |! level.dimensionType().bedWorks()) return;
 		HordeSavedData data = HordeSavedData.getData((ServerLevel) player.level());
-		if (level.isDay() |! (level.dimensionType().bedWorks() && data.isHordeNight(player))) return;
+		if (data.isHordeNight(player)) {
+			event.setResult(BedSleepingProblem.OTHER_PROBLEM);
+			player.displayClientMessage(Component.translatable(Constants.hordeTrySleep), true);
+			return;
+		}
+		if (!HordeEventConfig.hordePreventsOtherPlayersSleeping.get()) return;
+		Optional<ServerPlayer> optional = data.getPlayersWithHorde().findAny();
+		if (optional.isEmpty()) return;
 		event.setResult(BedSleepingProblem.OTHER_PROBLEM);
-		player.displayClientMessage(Component.translatable(Constants.hordeTrySleep), true);
+		player.displayClientMessage(Component.translatable(Constants.otherPlayerTrySleep, optional.get()), true);
 	}
 
 }

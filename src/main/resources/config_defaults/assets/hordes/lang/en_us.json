@@ -3,6 +3,7 @@
 	"message.hordes.EventStart":"You hear the howls of a nearby horde",
 	"message.hordes.EventEnd":"The air is quiet, the horde has stopped",
 	"message.hordes.TrySleep":"A feeling of impending dread prevents you from sleeping",
+	"message.hordes.OtherPlayerTrySleep":"%1$s is restless, it seems this night will be eventful",
 	"message.hordes.title":"The Hordes",
 	
 	"hordes.subtitle.hordeHowls":"Zombie Howls",
