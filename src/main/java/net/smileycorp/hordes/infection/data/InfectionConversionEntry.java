@@ -34,9 +34,10 @@ public class InfectionConversionEntry {
 	public LivingEntity convertEntity(Mob entity) {
 		LivingConversionEvent.Pre preEvent = new LivingConversionEvent.Pre(entity, result, Func::Void);
 		NeoForge.EVENT_BUS.post(preEvent);
+		Entity.RemovalReason reason = entity.getRemovalReason();
+		if (reason != null) entity.unsetRemoved();
 		LivingEntity zombie = entity.convertTo(result, true);
-		if (zombie instanceof AgeableMob) ((AgeableMob) zombie).setAge(entity.isBaby() ? -1000000 : 0);
-		if (zombie instanceof Zombie) ((Zombie) zombie).setBaby(entity.isBaby());
+		if (zombie == null) return null;
 		if (nbt != null) zombie.readAdditionalSaveData(nbt);
 		if (entity instanceof VillagerDataHolder && zombie instanceof VillagerDataHolder)
 			((VillagerDataHolder)zombie).setVillagerData(((VillagerDataHolder)entity).getVillagerData());
@@ -48,6 +49,7 @@ public class InfectionConversionEntry {
 		if (entity instanceof Zombie) ((Zombie)zombie).finalizeSpawn((ServerLevel) entity.level(),
 				entity.level().getCurrentDifficultyAt(zombie.blockPosition()), MobSpawnType.CONVERSION,
 				new Zombie.ZombieGroupData(false, true));
+		if (reason != null) entity.setRemoved(reason);
 		LivingConversionEvent.Post postEvent = new LivingConversionEvent.Post(entity, zombie);
 		NeoForge.EVENT_BUS.post(postEvent);
 		return zombie;
