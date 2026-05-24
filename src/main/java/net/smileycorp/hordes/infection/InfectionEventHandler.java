@@ -43,6 +43,8 @@ import net.smileycorp.hordes.infection.network.CureEntityMessage;
 import net.smileycorp.hordes.infection.network.InfectMessage;
 import net.smileycorp.hordes.infection.network.InfectionPacketHandler;
 
+import java.util.UUID;
+
 public class InfectionEventHandler {
 
 	//attach required entity capabilities for event to function
@@ -183,19 +185,13 @@ public class InfectionEventHandler {
 	@SubscribeEvent
 	public void addItemAttributes(ItemAttributeModifierEvent event) {
 		ItemStack stack = event.getItemStack();
-		EquipmentSlot slot = getSlot(stack);
+		EquipmentSlot slot = LivingEntity.getEquipmentSlotForItem(stack);
 		if (event.getSlotType() != slot) return;
 		Pair<Float, AttributeModifier.Operation> pair = InfectionData.INSTANCE.getProtection(stack);
 		if (pair == null) return;
-		event.addModifier(HordesInfection.INFECTION_RESISTANCE.get(), new AttributeModifier(Constants.locStr(slot.getName()),
+		String name = Constants.locStr("infection_resistance", slot.getName());
+		event.addModifier(HordesInfection.INFECTION_RESISTANCE.get(), new AttributeModifier(UUID.nameUUIDFromBytes(name.getBytes()), name,
 				pair.getFirst(), pair.getSecond()));
-	}
-
-	public static EquipmentSlot getSlot(ItemStack stack) {
-		EquipmentSlot slot = stack.getEquipmentSlot();
-		if (slot != null) return slot;
-		Equipable equip = Equipable.get(stack);
-		return equip == null ? null : equip.getEquipmentSlot();
 	}
 
 	public static void addEntityAttributes(EntityAttributeModificationEvent event) {

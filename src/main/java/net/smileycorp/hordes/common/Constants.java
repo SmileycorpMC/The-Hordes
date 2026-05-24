@@ -30,8 +30,10 @@ public class Constants {
 		return new ResourceLocation(MODID, name.toLowerCase(Locale.US));
 	}
 
-	public static String locStr(String string) {
-		return loc(string).toString();
+	public static String locStr(String... strings) {
+		StringBuilder builder = new StringBuilder(MODID);
+		for (String string : strings) builder.append(".").append(string);
+		return builder.toString();
 	}
 
 }
