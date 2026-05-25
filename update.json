@@ -16,7 +16,7 @@
 		"1.6.3": "add several new script features, improve script error feedback",
 		"1.6.3a": "fixed crash on servers caused by incorrect import",
 		"1.6.3b": "fixed issue with hordes:weighted_random function deserialization",
-		"1.6.3c": "fixed capability, zombie players and logging issues, issues with infection protection and the default datapack, as well as adding a unique message if another player's horde is preventing sleep"
+		"1.6.3c": "fixed capability, zombie players and logging issues, issues with infection protection and the default datapack, as well as adding a unique message if another player's horde is preventing sleep, update to neo version 21.1.230"
     },
     "promos": {
         "1.21-latest": "1.6.2b",
