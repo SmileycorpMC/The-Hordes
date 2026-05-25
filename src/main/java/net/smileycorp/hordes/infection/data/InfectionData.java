@@ -8,6 +8,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -66,7 +67,7 @@ public class InfectionData extends HordesJsonLoader {
                     InfectionConversionEntry entry = InfectionConversionEntry.deserialize(element.getAsJsonObject());
                     conversionTable.put(entry.getEntity(), entry);
                 } catch (Exception e) {
-                    HordesLogger.logError("Failed to load conversion entry " + element.getAsString(), e);
+                    HordesLogger.logError("Failed to load conversion entry " + element.toString(), e);
                 }
             } catch (Exception e) {
                 HordesLogger.logError("Failed to load conversion table " + loc, e);
@@ -90,7 +91,7 @@ public class InfectionData extends HordesJsonLoader {
                     immunityItems.put(item, duration);
                     HordesLogger.logInfo("Loaded immunity item " + name + " with duration " + duration);
                 } catch (Exception e) {
-                    HordesLogger.logError("Failed to load immunity item " + element.getAsString(), e);
+                    HordesLogger.logError("Failed to load immunity item " + element.toString(), e);
                 }
             } catch (Exception e) {
                 HordesLogger.logError("Failed to load immunity item list " + loc, e);
@@ -113,12 +114,13 @@ public class InfectionData extends HordesJsonLoader {
                     float modifier = obj.get("protection").getAsFloat();
                     if (item == null || item == Items.AIR) throw new HordesParsingException("Invalid or missing item");
                     AttributeModifier.Operation operation = null;
-                    if (obj.has("operation")) operation = AttributeModifier.Operation.valueOf(obj.get("operation").getAsString());
+                    if (obj.has("operation")) operation = ((StringRepresentable.EnumCodec<AttributeModifier.Operation>)AttributeModifier.Operation.CODEC)
+                            .byName(obj.get("operation").getAsString());
                     wearablesProtection.put(item, Pair.of(modifier, operation == null ?
                             AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL : operation));
                     HordesLogger.logInfo("Loaded wearable protection " + name + " with modifier " + modifier);
                 } catch (Exception e) {
-                    HordesLogger.logError("Failed to load wearable protection " + element.getAsString(), e);
+                    HordesLogger.logError("Failed to load wearable protection " + element.toString(), e);
                 }
             } catch (Exception e) {
                 HordesLogger.logError("Failed to load wearable protection list " + loc, e);
@@ -141,7 +143,7 @@ public class InfectionData extends HordesJsonLoader {
                     entityInfectChance.put(entity, chance);
                     HordesLogger.logInfo("Loaded infection entity " + name + " with infect chance " + chance);
                 } catch (Exception e) {
-                    HordesLogger.logError("Failed to infection entity " + element.getAsString(), e);
+                    HordesLogger.logError("Failed to infection entity " + element.toString(), e);
                 }
             } catch (Exception e) {
                 HordesLogger.logError("Failed to load entity infection list " + loc, e);
