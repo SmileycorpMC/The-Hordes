@@ -50,9 +50,8 @@ public class InfectionEventHandler {
 	@SubscribeEvent
 	public void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
 		Entity entity = event.getObject();
-		if (entity instanceof Player && !(entity instanceof FakePlayer) || InfectionData.INSTANCE.canBeInfected(entity)) {
-			event.addCapability(Constants.loc("InfectionCounter"), new Infection.Provider());
-		}
+		if (!(entity instanceof Player && !(entity instanceof FakePlayer)) &! InfectionData.INSTANCE.canBeInfected(entity)) return;
+		event.addCapability(Constants.loc("InfectionCounter"), new Infection.Provider());
 	}
 
 	//register data listeners
@@ -109,7 +108,7 @@ public class InfectionEventHandler {
 		event.setCancellationResult(InteractionResult.FAIL);
 	}
 
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onDamage(LivingDamageEvent event) {
 		LivingEntity entity = event.getEntity();
 		Entity attacker = event.getSource().getDirectEntity();
@@ -141,8 +140,7 @@ public class InfectionEventHandler {
 		LivingEntity entity = event.getEntity();
 		if (entity instanceof Player) return;
 		if (!InfectionData.INSTANCE.canBeInfected(entity)) return;
-		if (InfectionData.INSTANCE.convertEntity((Mob) entity)) return;
-		event.setCanceled(true);
+		InfectionData.INSTANCE.convertEntity((Mob) entity);
 	}
 
 	@SubscribeEvent

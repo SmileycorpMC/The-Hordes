@@ -1,5 +1,7 @@
 package net.smileycorp.hordes.hordeevent.capability;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -40,21 +42,22 @@ import net.smileycorp.hordes.hordeevent.network.UpdateClientHordeMessage;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Stream;
 
 public class HordeEvent {
 
 	private final HordeSavedData data;
 	private static final UUID FOLLOW_RANGE_MODIFIER = UUID.fromString("51cfe045-4248-409e-be37-556d67de4b97");
 	private RandomSource rand;
-	private final Set<Mob> entitiesSpawned = new HashSet<>();
+	private final Set<Mob> entitiesSpawned = Sets.newHashSet();
 	private int timer = 0;
 	private int day = 0;
-	private int nextDay = -1;
+	private int nextDay;
 	private HordeSpawnData spawnData = null;
 	int sentDay = 0;
 	private String username;
 
-	HordeEvent(HordeSavedData data){
+	HordeEvent(HordeSavedData data) {
 		this.data = data;
 		nextDay = HordeEventConfig.hordeEventByPlayerTime.get() ? HordeEventConfig.spawnFirstDay.get() ? 0 : HordeEventConfig.hordeSpawnDays.get()
 				: data.getNextDay();
@@ -77,11 +80,12 @@ public class HordeEvent {
 		nbt.putInt("day", day);
 		if (spawnData != null) nbt.put("spawnData", spawnData.save());
 		ServerPlayer player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(uuid);
-		nbt.putString("username", player == null ? username == null ? uuid.toString() : username : player.getName().getString());
+		nbt.putString("username", player == null ? username == null ? uuid.toString() : username : player.getGameProfile().getName());
 		return nbt;
 	}
 	
 	public void update(ServerPlayer player) {
+		if (username == null) username = player.getGameProfile().getName();
 		Level level = player.level();
 		if (level.dimension() != Level.OVERWORLD) return;
 		if (spawnData == null) return;
@@ -101,7 +105,7 @@ public class HordeEvent {
 	private boolean shouldReduce(ServerPlayer player, ServerPlayer other) {
 		if (other == player || player.distanceTo(other) > 25) return false;
 		HordeEvent horde = data.getEvent(other);
-		return horde != null && horde.isActive(other);
+		return horde != null && horde.isActive();
 	}
 
 	public void spawnWave(ServerPlayer player, int count) {
@@ -111,8 +115,7 @@ public class HordeEvent {
 			this.rand = null;
 			rand = getRandom();
 			HordeBuildSpawnDataEvent buildTableEvent = new HordeBuildSpawnDataEvent(player, this);
-			postEvent(buildTableEvent);
-			if (buildTableEvent.isCanceled()) return;
+			if (postEvent(buildTableEvent)) return;
 			spawnData = buildTableEvent.getSpawnData();
 		}
 		if (spawnData == null || spawnData.getTable() == null) {
@@ -121,8 +124,7 @@ public class HordeEvent {
 		}
 		ServerLevel level = player.serverLevel();
 		HordeStartWaveEvent startEvent = new HordeStartWaveEvent(player, this, count);
-		postEvent(startEvent);
-		if (startEvent.isCanceled()) return;
+		if (postEvent(startEvent)) return;
 		count = startEvent.getCount();
 		Vec3 basedir = DirectionUtils.getRandomDirectionVecXZ(rand);
 		BlockPos basepos = getBasePos(level, basedir, player, true);
@@ -175,9 +177,9 @@ public class HordeEvent {
 
 	private BlockPos getBasePos(ServerLevel level, Vec3 basedir, ServerPlayer player, boolean checkLight) {
 		double radius = HordeEventConfig.hordeSpawnDistance.get();
-		BlockPos basepos = checkLight ? DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, radius, 7, 0) :
+		BlockPos pos = checkLight ? DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, radius, 7, 0) :
 				DirectionUtils.getClosestLoadedPos(level, player.blockPosition(), basedir, radius);
-		HordeFindSpawnPosEvent event = new HordeFindSpawnPosEvent(player, this, basedir, basepos, checkLight);
+		HordeFindSpawnPosEvent event = new HordeFindSpawnPosEvent(player, this, basedir, pos, checkLight);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event.getPos();
 	}
@@ -194,8 +196,7 @@ public class HordeEvent {
 	
 	private Entity loadEntity(ServerLevel level, ServerPlayer player, Mob entity, Vec3 pos, AtomicBoolean cancel) {
 		HordeSpawnEntityEvent spawnEntityEvent = new HordeSpawnEntityEvent(player, entity, pos, this);
-		postEvent(spawnEntityEvent);
-		if (!spawnEntityEvent.isCanceled()) {
+		if (!postEvent(spawnEntityEvent)) {
 			entity = spawnEntityEvent.getEntity();
 			pos = spawnEntityEvent.getPos();
 			entity.finalizeSpawn(level, level.getCurrentDifficultyAt(BlockPos.containing(pos)), MobSpawnType.EVENT, null, null);
@@ -218,7 +219,7 @@ public class HordeEvent {
 	}
 
 	private void cleanSpawns() {
-		List<Mob> toRemove = new ArrayList<>();
+		List<Mob> toRemove = Lists.newArrayList();
 		for (Mob entity : entitiesSpawned) {
 			if (entity.isAlive() |! entity.isRemoved()) continue;
 			LazyOptional<HordeSpawn> optional = entity.getCapability(HordesCapabilities.HORDESPAWN, null);
@@ -231,10 +232,10 @@ public class HordeEvent {
 	public boolean isHordeDay(ServerPlayer player) {
 		ServerLevel level = player.serverLevel();
 		if (level.dimension() != Level.OVERWORLD) return false;
-		return isActive(player) || getCurrentDay(player) >= nextDay;
+		return isActive() || getCurrentDay(player) >= nextDay;
 	}
 
-	public boolean isActive(ServerPlayer player) {
+	public boolean isActive() {
 		return timer > 0;
 	}
 	
@@ -245,38 +246,30 @@ public class HordeEvent {
 	}
 
 	private void fixGoals(ServerPlayer player, Mob entity) {
-		for (WrappedGoal entry : entity.goalSelector.getRunningGoals().toArray(WrappedGoal[]::new)) {
-			if (!(entry.getGoal() instanceof HordeTrackPlayerGoal)) continue;
-			entity.goalSelector.removeGoal(entry.getGoal());
-			entity.goalSelector.addGoal(6, new HordeTrackPlayerGoal(entity, player, spawnData.getEntitySpeed()));
-			return;
-		}
+		Stream<WrappedGoal> goals = entity.goalSelector.getAvailableGoals().stream().filter(entry -> entry.getGoal() instanceof HordeTrackPlayerGoal);
+		goals.forEach(entry -> entity.goalSelector.removeGoal(entry.getGoal()));
+		entity.goalSelector.addGoal(6, new HordeTrackPlayerGoal(entity, player, spawnData.getEntitySpeed()));
 	}
 
 	public void tryStartEvent(ServerPlayer player, int duration, boolean isCommand) {
 		rand = data.getRandom(day);
 		cleanSpawns();
 		if (HordeEventConfig.hordesCommandOnly.get() &! isCommand) return;
-		if (!isCommand) {
-			logInfo("Trying to start horde event on day " + getCurrentDay(player) + " with nextDay " + nextDay + " and time "
+		if (!isCommand) logInfo("Trying to start horde event on day " + getCurrentDay(player) + " with nextDay " + nextDay + " and time "
 					+ player.level().getDayTime() % HordeEventConfig.dayLength.get());
-		}
 		if (player == null) {
 			logError("player is null for " + this, new NullPointerException());
 			return;
 		}
 		ServerLevel level = player.serverLevel();
 		if (level.dimension() != Level.OVERWORLD) return;
-		HordeStartEvent startEvent = new HordeStartEvent(player, this, isCommand);
-		postEvent(startEvent);
-		if (startEvent.isCanceled()) {
+		if (postEvent(new HordeStartEvent(player, this, isCommand))) {
 			spawnData = null;
 			return;
 		}
 		if (spawnData == null) {
 			HordeBuildSpawnDataEvent event = new HordeBuildSpawnDataEvent(player, this);
-			postEvent(event);
-			if (event.isCanceled()) return;
+			if (postEvent(event)) return;
 			spawnData = event.getSpawnData();
 		}
 		if (spawnData == null || spawnData.getTable() == null || spawnData.getTable().getSpawnTable(day).isEmpty()) {
@@ -334,11 +327,8 @@ public class HordeEvent {
 		for (String command : endEvent.getCommands()) server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSuppressedOutput()
 				.withPermission(2).withEntity(player).withPosition(player.position()).withLevel(player.serverLevel()), command);
 		for (Mob entity : entitiesSpawned) {
-			for (WrappedGoal entry : entity.goalSelector.getRunningGoals().toArray(WrappedGoal[]::new)) {
-				if (!(entry.getGoal() instanceof HordeTrackPlayerGoal)) continue;
-				entity.goalSelector.removeGoal(entry.getGoal());
-				break;
-			}
+			entity.goalSelector.getRunningGoals().filter(entry -> entry.getGoal() instanceof HordeTrackPlayerGoal)
+					.forEach(entry -> entity.goalSelector.removeGoal(entry.getGoal()));
 			LazyOptional<HordeSpawn> cap = entity.getCapability(HordesCapabilities.HORDESPAWN);
 			if (!cap.isPresent()) continue;
 			cap.orElseGet(null).setPlayerUUID("");
@@ -352,18 +342,19 @@ public class HordeEvent {
 	}
 
 	public void registerEntity(Mob entity, ServerPlayer player) {
-		if (!isActive(player) || spawnData == null) {
-			LazyOptional<HordeSpawn> optional = entity.getCapability(HordesCapabilities.HORDESPAWN);
+		LazyOptional<HordeSpawn> optional = entity.getCapability(HordesCapabilities.HORDESPAWN);
+		if (!isActive() || spawnData == null) {
 			if (optional.isPresent()) optional.orElseGet(null).setPlayerUUID("");
 			return;
 		}
+		optional.ifPresent(cap -> cap.setPlayerUUID(player.getUUID().toString()));
 		if (!entitiesSpawned.contains(entity)) entitiesSpawned.add(entity);
 		entity.goalSelector.addGoal(6, new HordeTrackPlayerGoal(entity, player, spawnData.getEntitySpeed()));
 	}
 
-	private void postEvent(HordePlayerEvent event) {
+	private boolean postEvent(HordePlayerEvent event) {
 		HordeScriptLoader.INSTANCE.applyScripts(event);
-		MinecraftForge.EVENT_BUS.post(event);
+		return MinecraftForge.EVENT_BUS.post(event);
 	}
 	
 	public void reset(ServerPlayer player) {
@@ -379,7 +370,8 @@ public class HordeEvent {
 			return;
 		}
 		int expectedDay = HordeEventConfig.hordeSpawnDays.get() * ((getCurrentDay(player) / HordeEventConfig.hordeSpawnDays.get()) + 1);
-		if (nextDay <= getCurrentDay(player) || Math.abs(nextDay - expectedDay) > HordeEventConfig.hordeSpawnDays.get() + HordeEventConfig.hordeSpawnVariation.get()) {
+		if (nextDay <= getCurrentDay(player) || Math.abs(nextDay - expectedDay) > HordeEventConfig.hordeSpawnDays.get()
+				+ HordeEventConfig.hordeSpawnVariation.get()) {
 			if (HordeEventConfig.hordeSpawnVariation.get() > 0) {
 				expectedDay += getRandom().nextInt(HordeEventConfig.hordeSpawnVariation.get());
 				rand = null;

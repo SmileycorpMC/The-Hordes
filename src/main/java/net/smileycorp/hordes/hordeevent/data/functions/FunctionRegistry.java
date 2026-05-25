@@ -65,7 +65,7 @@ public class FunctionRegistry {
                 : (Class<T>) pair.getFirst(), function);
     }
 
-    public static void registerNestedFunction(ResourceLocation name, HordeFunction.Deserializer<?> serializer) {
+    public static void registerNestedFunction(ResourceLocation name, NestedHordeFunction.Deserializer<?> serializer) {
         DESERIALIZERS.put(name, Pair.of(null, serializer));
     }
 

@@ -35,9 +35,7 @@ import net.smileycorp.hordes.hordeevent.capability.HordeSpawn;
 import net.smileycorp.hordes.hordeevent.data.HordeScriptLoader;
 import net.smileycorp.hordes.hordeevent.data.HordeTableLoader;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 public class HordeEventHandler {
 
@@ -81,7 +79,7 @@ public class HordeEventHandler {
 		int time = Math.round(level.getDayTime() % HordeEventConfig.dayLength.get());
 		int day = horde.getCurrentDay(player);
 		if (!horde.hasSynced(day)) horde.sync(player, day);
-		if (horde.isActive(player)) {
+		if (horde.isActive()) {
 			horde.update(player);
 			return;
 		}
@@ -104,7 +102,7 @@ public class HordeEventHandler {
 		ServerPlayer player = HordeSpawn.getHordePlayer(event.getEntity());
 		if (player == null) return;
 		HordeEvent horde = HordeSavedData.getData((ServerLevel) player.level()).getEvent(player);
-		if (horde != null && horde.isActive(player)) event.setResult(Result.DENY);
+		if (horde != null && horde.isActive()) event.setResult(Result.DENY);
 	}
 
 	//sync entity capabilities when added to level
@@ -119,7 +117,7 @@ public class HordeEventHandler {
 		if (entity instanceof PathfinderMob) entity.targetSelector.addGoal(1, new HurtByTargetGoal((PathfinderMob) entity));
 		entity.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(entity, Player.class, true));
 		HordeEvent horde = HordeSavedData.getData((ServerLevel) player.level()).getEvent(player);
-		if (horde != null) if (horde.isActive(player)) horde.registerEntity(entity, player);
+		if (horde != null) if (horde.isActive()) horde.registerEntity(entity, player);
 		cap.setSynced();
 	}
 
