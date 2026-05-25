@@ -28,6 +28,7 @@ import net.smileycorp.hordes.common.event.InfectEntityEvent;
 import net.smileycorp.hordes.config.InfectionConfig;
 import net.smileycorp.hordes.infection.HordesInfection;
 import net.smileycorp.hordes.infection.InfectedEffect;
+import net.smileycorp.hordes.infection.network.InfectMessage;
 import net.smileycorp.hordes.infection.network.InfectionPacketHandler;
 import net.smileycorp.hordes.infection.network.SyncImmunityItemsMessage;
 import net.smileycorp.hordes.infection.network.SyncWearableProtectionMessage;
@@ -99,7 +100,7 @@ public class InfectionData extends HordesJsonLoader {
         HordesLogger.heading("LOADING WEARABLE PROTECTION LIST");
         wearablesProtection.clear();
         for (String id : manager.getNamespaces()) {
-            ResourceLocation loc = ResourceLocation.tryBuild(id, "immune_wearables");
+            ResourceLocation loc = ResourceLocation.tryBuild(id, "wearables_protection");
             JsonElement json = map.get(loc);
             if (json == null) continue;
             try {
@@ -135,7 +136,7 @@ public class InfectionData extends HordesJsonLoader {
                 for (JsonElement element : json.getAsJsonArray()) try {
                     JsonObject obj = element.getAsJsonObject();
                     ResourceLocation name = ResourceLocation.tryParse(obj.get("entity").getAsString());
-                    EntityType entity = BuiltInRegistries.ENTITY_TYPE.get(name);
+                    EntityType<?> entity = BuiltInRegistries.ENTITY_TYPE.get(name);
                     float chance = obj.get("chance").getAsFloat();
                     entityInfectChance.put(entity, chance);
                     HordesLogger.logInfo("Loaded infection entity " + name + " with infect chance " + chance);
@@ -150,11 +151,13 @@ public class InfectionData extends HordesJsonLoader {
 
     public void tryToInfect(LivingEntity entity, LivingEntity attacker, DamageSource source, float amount) {
         if (NeoForge.EVENT_BUS.post(new InfectEntityEvent(entity, attacker, source, amount)).isCanceled()) return;
-        if ((entity instanceof Player && InfectionConfig.infectPlayers.get()))
-            if (entity.getRandom().nextFloat() <= getInfectionChance(entity, attacker))
-                InfectedEffect.apply(entity);
-        InfectionConversionEntry entry = conversionTable.get(entity.getType());
-        if (entry != null && entry.shouldInfect(entity, attacker)) InfectedEffect.apply(entity);
+        if (!canCauseInfection(attacker) |! canBeInfected(entity)) return;
+        float r = attacker.getRandom().nextFloat();
+        if (r <= getInfectionChance(entity, attacker)) InfectedEffect.apply(entity);
+            //if the entity is a player would the infection have succeeded if the player didn't have infection resistance?
+            //if so send a protection sound message
+        else if (entity instanceof ServerPlayer && r <= attacker.getAttribute(HordesInfection.INFECTIVITY).getValue())
+            InfectionPacketHandler.sendTo(new InfectMessage(true), (ServerPlayer) entity);
     }
 
     public boolean infectedTarget(Entity entity) {
@@ -214,7 +217,7 @@ public class InfectionData extends HordesJsonLoader {
         return entityInfectChance.containsKey(entity);
     }
 
-    public boolean hasInfectGoal(Entity entity) {
+    public boolean hasInfectAttribute(Entity entity) {
         return entity instanceof LivingEntity && entityInfectChance.containsKey(entity.getType());
     }
 

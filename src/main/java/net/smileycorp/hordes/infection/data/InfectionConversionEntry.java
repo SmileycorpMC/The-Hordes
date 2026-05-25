@@ -58,11 +58,6 @@ public class InfectionConversionEntry {
 	public EntityType<?> getEntity() {
 		return entity;
 	}
-
-	public boolean shouldInfect(LivingEntity entity, LivingEntity attacker) {
-		if (!InfectionData.INSTANCE.canCauseInfection(attacker)) return false;
-		return entity.getRandom().nextFloat() <= InfectionData.INSTANCE.getInfectionChance(entity, attacker);
-	}
 	
 	public static InfectionConversionEntry deserialize(JsonObject json) throws Exception {
 		EntityType<?> entity = BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.tryParse(json.get("entity").getAsString()));

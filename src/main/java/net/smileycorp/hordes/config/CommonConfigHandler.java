@@ -28,8 +28,6 @@ public class CommonConfigHandler {
 	static {
 		HordesLogger.logInfo("Trying to load common config");
 		ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
-		HordeEventConfig.build(builder);
-		InfectionConfig.build(builder);
 		builder.push("Misc");
 		zombiesBurn = builder.comment("Whether zombies and drowned burn in sunlight.").define("zombiesBurn", false);
 		skeletonsBurn = builder.comment("Whether skeletons and strays burn in sunlight.").define("skeletonsBurn", false);
@@ -46,6 +44,8 @@ public class CommonConfigHandler {
 		zoglinsAttackUndead = builder.comment("Whether zoglins are agressive towards other undead mobs").define("zoglinsAttackUndead", false);
 		zoglinsAttackMobs = builder.comment("Whether zoglins are agressive towards non-undead monsters").define("zoglinsAttackMobs", true);
 		builder.pop();
+		HordeEventConfig.build(builder);
+		InfectionConfig.build(builder);
 		ZombiePlayersConfig.build(builder);
 		config = builder.build();
 	}

@@ -13,6 +13,7 @@ public class Constants {
 	public static final String hordeEventStart = "message.hordes.EventStart";
 	public static final String hordeEventEnd = "message.hordes.EventEnd";
 	public static final String hordeTrySleep = "message.hordes.TrySleep";
+	public static final String otherPlayerTrySleep = "message.hordes.OtherPlayerTrySleep";
 
 	public static final ResourceLocation HORDE_SOUND = loc("horde_spawn");
 	public static final SoundEvent INFECT_SOUND = SoundEvent.createVariableRangeEvent(loc("infect"));
@@ -30,8 +31,10 @@ public class Constants {
 		return ResourceLocation.tryBuild(MODID, name.toLowerCase(Locale.US));
 	}
 
-	public static String locStr(String string) {
-		return loc(string).toString();
+	public static String locStr(String... strings) {
+		StringBuilder builder = new StringBuilder(MODID);
+		for (String string : strings) builder.append(".").append(string);
+		return builder.toString();
 	}
 
 }

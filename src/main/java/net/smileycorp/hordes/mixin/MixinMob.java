@@ -118,7 +118,7 @@ public abstract class MixinMob extends LivingEntity {
 			if (player == null) return;
 			HordeEvent horde = HordeSavedData.getData((ServerLevel)level()).getEvent(player);
 			if (horde == null) return;
-			if (!horde.isActive(player)) return;
+			if (!horde.isActive()) return;
 			horde.registerEntity((Mob)(LivingEntity)this, player);
 		}
 	}

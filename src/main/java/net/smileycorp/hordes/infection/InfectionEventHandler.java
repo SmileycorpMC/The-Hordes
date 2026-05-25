@@ -49,12 +49,14 @@ public class InfectionEventHandler {
 
 	@SubscribeEvent
 	public void onEntityAdded(EntityJoinLevelEvent event) {
-		Entity entity = event.getEntity();
-		if (InfectionData.INSTANCE.canBeInfected(entity) && entity instanceof LivingEntity)
-			((LivingEntity) entity).getAttribute(HordesInfection.INFECTION_RESISTANCE).setBaseValue(InfectionData.INSTANCE.getProtection(entity.getType()));
-		if (!(entity instanceof Mob && InfectionConfig.infectionEntitiesAggroConversions.get()) || entity.level().isClientSide) return;
-		if (!InfectionData.INSTANCE.hasInfectGoal(entity)) return;
-		((LivingEntity) entity).getAttribute(HordesInfection.INFECTIVITY).setBaseValue(InfectionData.INSTANCE.getInfectionChance(entity.getType()));
+		if (!(event.getEntity() instanceof LivingEntity)) return;
+		LivingEntity entity = (LivingEntity) event.getEntity();
+		if (entity.level().isClientSide) return;
+		if (InfectionData.INSTANCE.canBeInfected(entity))
+			entity.getAttribute(HordesInfection.INFECTION_RESISTANCE).setBaseValue(InfectionData.INSTANCE.getProtection(entity.getType()));
+		if (!InfectionData.INSTANCE.hasInfectAttribute(entity)) return;
+		entity.getAttribute(HordesInfection.INFECTIVITY).setBaseValue(InfectionData.INSTANCE.getInfectionChance(entity.getType()));
+		if (!(entity instanceof Mob && InfectionConfig.infectionEntitiesAggroConversions.get())) return;
 		((Mob) entity).targetSelector.addGoal(3, new NearestAttackableTargetGoal<>((Mob) entity,
 				LivingEntity.class, 10, true, false, InfectionData.INSTANCE::infectedTarget));
 	}
@@ -93,12 +95,12 @@ public class InfectionEventHandler {
 		event.setCancellationResult(InteractionResult.FAIL);
 	}
 
-	@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
+	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onDamage(LivingDamageEvent.Post event) {
 		LivingEntity entity = event.getEntity();
 		Entity attacker = event.getSource().getDirectEntity();
 		Level level = entity.level();
-		if (level.isClientSide) return;
+		if (level.isClientSide |! (entity instanceof LivingEntity && attacker instanceof LivingEntity)) return;
 		if (!InfectionData.INSTANCE.canCauseInfection(attacker) || entity.hasEffect(HordesInfection.INFECTED)) return;
 		if (InfectionData.INSTANCE.canBeInfected(entity))
 			InfectionData.INSTANCE.tryToInfect(entity, (LivingEntity) attacker, event.getSource(), event.getNewDamage());
@@ -110,9 +112,7 @@ public class InfectionEventHandler {
 		DamageSource source = event.getSource();
 		Level level = entity.level();
 		if (level.isClientSide || !(source.is(HordesInfection.INFECTION_DAMAGE) || entity.hasEffect(HordesInfection.INFECTED))) return;
-		InfectionDeathEvent deathevent = new InfectionDeathEvent(entity, event.getSource());
-		NeoForge.EVENT_BUS.post(deathevent);
-		if (deathevent.isCanceled()) {
+		if (NeoForge.EVENT_BUS.post(new InfectionDeathEvent(entity, event.getSource())).isCanceled()) {
 			event.setCanceled(true);
 			return;
 		}
@@ -127,8 +127,7 @@ public class InfectionEventHandler {
 		LivingEntity entity = event.getEntity();
 		if (entity instanceof Player) return;
 		if (!InfectionData.INSTANCE.canBeInfected(entity)) return;
-		if (InfectionData.INSTANCE.convertEntity((Mob) entity)) return;
-		event.setCanceled(true);
+		InfectionData.INSTANCE.convertEntity((Mob) entity);
 	}
 
 	@SubscribeEvent
@@ -174,10 +173,10 @@ public class InfectionEventHandler {
 		EquipmentSlot slot = getSlot(stack);
 		Pair<Float, AttributeModifier.Operation> pair = InfectionData.INSTANCE.getProtection(stack);
 		if (pair == null) return;
-		event.addModifier(HordesInfection.INFECTION_RESISTANCE, new AttributeModifier(Constants.loc(slot.getName()), pair.getFirst(),
+		event.addModifier(HordesInfection.INFECTION_RESISTANCE, new AttributeModifier(Constants.loc("infection_resistance." + slot.getName()), pair.getFirst(),
 				pair.getSecond()), EquipmentSlotGroup.bySlot(slot));
 	}
-	
+
 	public static EquipmentSlot getSlot(ItemStack stack) {
 		EquipmentSlot slot = stack.getEquipmentSlot();
 		if (slot != null) return slot;

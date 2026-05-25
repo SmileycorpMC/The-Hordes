@@ -1,5 +1,6 @@
 package net.smileycorp.hordes.hordeevent.capability;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -22,6 +23,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.bus.api.ICancellableEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.network.GenericStringMessage;
@@ -47,6 +49,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Stream;
 
 public class HordeEvent {
 
@@ -56,12 +59,12 @@ public class HordeEvent {
 	private final Set<Mob> entitiesSpawned = Sets.newHashSet();
 	private int timer = 0;
 	private int day = 0;
-	private int nextDay = -1;
+	private int nextDay;
 	private HordeSpawnData spawnData = null;
 	int sentDay = 0;
 	private String username;
 
-	HordeEvent(HordeSavedData data){
+	HordeEvent(HordeSavedData data) {
 		this.data = data;
 		nextDay = HordeEventConfig.hordeEventByPlayerTime.get() ? HordeEventConfig.spawnFirstDay.get() ? 0 : HordeEventConfig.hordeSpawnDays.get()
 				: data.getNextDay();
@@ -84,11 +87,12 @@ public class HordeEvent {
 		nbt.putInt("day", day);
 		if (spawnData != null) nbt.put("spawnData", spawnData.save());
 		ServerPlayer player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(uuid);
-		nbt.putString("username", player == null ? username == null ? uuid.toString() : username : player.getName().getString());
+		nbt.putString("username", player == null ? username == null ? uuid.toString() : username : player.getGameProfile().getName());
 		return nbt;
 	}
 	
 	public void update(ServerPlayer player) {
+		if (username == null) username = player.getGameProfile().getName();
 		Level level = player.level();
 		if (level.dimension() != Level.OVERWORLD) return;
 		if (spawnData == null) return;
@@ -108,7 +112,7 @@ public class HordeEvent {
 	private boolean shouldReduce(ServerPlayer player, ServerPlayer other) {
 		if (other == player || player.distanceTo(other) > 25) return false;
 		HordeEvent horde = data.getEvent(other);
-		return horde != null && horde.isActive(other);
+		return horde != null && horde.isActive();
 	}
 
 	public void spawnWave(ServerPlayer player, int count) {
@@ -118,8 +122,7 @@ public class HordeEvent {
 			this.rand = null;
 			rand = getRandom();
 			HordeBuildSpawnDataEvent buildTableEvent = new HordeBuildSpawnDataEvent(player, this);
-			postEvent(buildTableEvent);
-			if (buildTableEvent.isCanceled()) return;
+			if (postEvent(buildTableEvent)) return;
 			spawnData = buildTableEvent.getSpawnData();
 		}
 		if (spawnData == null || spawnData.getTable() == null) {
@@ -128,8 +131,7 @@ public class HordeEvent {
 		}
 		ServerLevel level = player.serverLevel();
 		HordeStartWaveEvent startEvent = new HordeStartWaveEvent(player, this, count);
-		postEvent(startEvent);
-		if (startEvent.isCanceled()) return;
+		if (postEvent(startEvent)) return;
 		count = startEvent.getCount();
 		Vec3 basedir = VecMath.randomXZVec(rand);
 		BlockPos basepos = getBasePos(level, basedir, player, true);
@@ -175,7 +177,6 @@ public class HordeEvent {
 				}
 				finalizeEntity(mob, player, true);
 			} catch (Exception e) {
-				e.printStackTrace();
 				logError("Unable to spawn entity from " + type, e);
 			}
 		}
@@ -202,39 +203,35 @@ public class HordeEvent {
 	
 	private Entity loadEntity(ServerLevel level, ServerPlayer player, Mob entity, Vec3 pos, AtomicBoolean cancel) {
 		HordeSpawnEntityEvent spawnEntityEvent = new HordeSpawnEntityEvent(player, entity, pos, this);
-		postEvent(spawnEntityEvent);
-		if (!spawnEntityEvent.isCanceled()) {
+		if (!postEvent(spawnEntityEvent)) {
 			entity = spawnEntityEvent.getEntity();
 			pos = spawnEntityEvent.getPos();
 			entity.finalizeSpawn(level, level.getCurrentDifficultyAt(BlockPos.containing(pos)), null, null);
 			entity.setPos(pos.x(), pos.y(), pos.z());
-			return entity;
-		} else {
+        } else {
 			logInfo("Entity spawn event has been cancelled, not spawning entity  of class " + entity.getType());
 			cancel.set(true);
-			return entity;
-		}
-	}
+        }
+        return entity;
+    }
 
 	private void finalizeEntity(Mob entity, ServerPlayer player, boolean addToMobCap) {
 		entity.getAttribute(Attributes.FOLLOW_RANGE).addPermanentModifier(new AttributeModifier(FOLLOW_RANGE_MODIFIER,
 				75, AttributeModifier.Operation.ADD_VALUE));
 		if (addToMobCap) registerEntity(entity, player);
-		entity.targetSelector.getAvailableGoals().forEach(WrappedGoal::stop);
+		entity.targetSelector.getAvailableGoals().stream().forEach(WrappedGoal::stop);
 		if (entity instanceof PathfinderMob) entity.targetSelector.addGoal(1, new HurtByTargetGoal((PathfinderMob) entity));
 		entity.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(entity, ServerPlayer.class, true));
 		for (Entity passenger : entity.getPassengers()) if (passenger instanceof Mob) finalizeEntity((Mob) passenger, player, false);
 	}
 
 	private void cleanSpawns() {
-		List<Mob> toRemove = new ArrayList<>();
+		List<Mob> toRemove = Lists.newArrayList();
 		for (Mob entity : entitiesSpawned) {
 			if (entity.isAlive() |! entity.isRemoved()) continue;
 			HordeSpawn cap = entity.getCapability(HordesCapabilities.HORDESPAWN, null);
-			if (cap != null) {
-				cap.setPlayerUUID("");
-				toRemove.add(entity);
-			}
+			if (cap != null) cap.setPlayerUUID("");
+			toRemove.add(entity);
 		}
 		entitiesSpawned.removeAll(toRemove);
 	}
@@ -242,10 +239,10 @@ public class HordeEvent {
 	public boolean isHordeDay(ServerPlayer player) {
 		ServerLevel level = player.serverLevel();
 		if (level.dimension() != Level.OVERWORLD) return false;
-		return isActive(player) || getCurrentDay(player) >= nextDay;
+		return isActive() || getCurrentDay(player) >= nextDay;
 	}
 
-	public boolean isActive(ServerPlayer player) {
+	public boolean isActive() {
 		return timer > 0;
 	}
 	
@@ -256,38 +253,30 @@ public class HordeEvent {
 	}
 
 	private void fixGoals(ServerPlayer player, Mob entity) {
-		for (WrappedGoal entry : entity.goalSelector.getAvailableGoals().toArray(WrappedGoal[]::new)) {
-			if (!(entry.getGoal() instanceof HordeTrackPlayerGoal)) continue;
-			entity.goalSelector.removeGoal(entry.getGoal());
-			entity.goalSelector.addGoal(6, new HordeTrackPlayerGoal(entity, player, spawnData.getEntitySpeed()));
-			return;
-		}
+		Stream<WrappedGoal> goals = entity.goalSelector.getAvailableGoals().stream().filter(entry -> entry.getGoal() instanceof HordeTrackPlayerGoal);
+		goals.forEach(entry -> entity.goalSelector.removeGoal(entry.getGoal()));
+		entity.goalSelector.addGoal(6, new HordeTrackPlayerGoal(entity, player, spawnData.getEntitySpeed()));
 	}
 
 	public void tryStartEvent(ServerPlayer player, int duration, boolean isCommand) {
+		rand = data.getRandom(day);
 		cleanSpawns();
 		if (HordeEventConfig.hordesCommandOnly.get() &! isCommand) return;
-		if (!isCommand) {
-			logInfo("Trying to start horde event on day " + getCurrentDay(player) + " with nextDay " + nextDay + " and time "
+		if (!isCommand) logInfo("Trying to start horde event on day " + getCurrentDay(player) + " with nextDay " + nextDay + " and time "
 					+ player.level().getDayTime() % HordeEventConfig.dayLength.get());
-		}
 		if (player == null) {
 			logError("player is null for " + this, new NullPointerException());
 			return;
 		}
 		ServerLevel level = player.serverLevel();
 		if (level.dimension() != Level.OVERWORLD) return;
-		rand = data.getRandom(day);
-		HordeStartEvent startEvent = new HordeStartEvent(player, this, isCommand);
-		postEvent(startEvent);
-		if (startEvent.isCanceled()) {
+		if (postEvent(new HordeStartEvent(player, this, isCommand))) {
 			spawnData = null;
 			return;
 		}
 		if (spawnData == null) {
 			HordeBuildSpawnDataEvent event = new HordeBuildSpawnDataEvent(player, this);
-			postEvent(event);
-			if (event.isCanceled()) return;
+			if (postEvent(event)) return;
 			spawnData = event.getSpawnData();
 		}
 		if (spawnData == null || spawnData.getTable() == null || spawnData.getTable().getSpawnTable(day).isEmpty()) {
@@ -345,13 +334,10 @@ public class HordeEvent {
 		for (String command : endEvent.getCommands()) server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSuppressedOutput()
 				.withPermission(2).withEntity(player).withPosition(player.position()).withLevel(player.serverLevel()), command);
 		for (Mob entity : entitiesSpawned) {
-			for (WrappedGoal entry : entity.goalSelector.getAvailableGoals().toArray(WrappedGoal[]::new)) {
-				if (!(entry.getGoal() instanceof HordeTrackPlayerGoal)) continue;
-				entity.goalSelector.removeGoal(entry.getGoal());
-				break;
-			}
+			entity.goalSelector.getAvailableGoals().stream().filter(entry -> entry.getGoal() instanceof HordeTrackPlayerGoal)
+					.forEach(entry -> entity.goalSelector.removeGoal(entry.getGoal()));
 			HordeSpawn cap = entity.getCapability(HordesCapabilities.HORDESPAWN);
-			if (cap != null) continue;
+			if (cap == null) continue;
 			cap.setPlayerUUID("");
 			entity.getAttribute(Attributes.FOLLOW_RANGE).removeModifier(FOLLOW_RANGE_MODIFIER);
 		}
@@ -364,7 +350,7 @@ public class HordeEvent {
 
 	public void registerEntity(Mob entity, ServerPlayer player) {
 		HordeSpawn cap = entity.getCapability(HordesCapabilities.HORDESPAWN);
-		if (!isActive(player) || spawnData == null) {
+		if (!isActive() || spawnData == null) {
 			if (cap != null) cap.setPlayerUUID("");
 			return;
 		}
@@ -373,9 +359,10 @@ public class HordeEvent {
 		entity.goalSelector.addGoal(6, new HordeTrackPlayerGoal(entity, player, spawnData.getEntitySpeed()));
 	}
 
-	private void postEvent(HordePlayerEvent event) {
+	private boolean postEvent(HordePlayerEvent event) {
 		HordeScriptLoader.INSTANCE.applyScripts(event);
 		NeoForge.EVENT_BUS.post(event);
+		return event instanceof ICancellableEvent && ((ICancellableEvent) event).isCanceled();
 	}
 	
 	public void reset(ServerPlayer player) {

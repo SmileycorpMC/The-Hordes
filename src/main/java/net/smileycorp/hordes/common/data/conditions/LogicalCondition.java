@@ -49,7 +49,7 @@ public class LogicalCondition implements Condition {
 			}
 			return new LogicalCondition(operation, conditions.toArray(new Condition[]{}));
 		} catch(Exception e) {
-			HordesLogger.logError("Incorrect parameters for condition hordes:"+operation.getName(), e);
+			HordesLogger.logError("Incorrect parameters for condition hordes:" + operation.getName(), e);
 		}
 		return null;
 	}

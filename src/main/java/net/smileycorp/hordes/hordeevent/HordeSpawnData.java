@@ -24,9 +24,8 @@ public class HordeSpawnData {
     private int spawnDuration = HordeEventConfig.hordeSpawnDuration.get();
     private int spawnInterval = HordeEventConfig.hordeSpawnInterval.get();
     private int spawnAmount;
-    private final List<String> commands = Lists.newArrayList();
-    
     private double entitySpeed = HordeEventConfig.hordeEntitySpeed.get();
+    private final List<String> commands = Lists.newArrayList();
     
     public HordeSpawnData(HordeEvent horde) {
         spawnAmount = (int) (HordeEventConfig.hordeSpawnAmount.get() * (1 + (horde.getDay() / HordeEventConfig.hordeSpawnDays.get())
