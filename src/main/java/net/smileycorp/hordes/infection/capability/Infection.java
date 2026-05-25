@@ -1,6 +1,10 @@
 package net.smileycorp.hordes.infection.capability;
 
-import net.minecraft.nbt.IntTag;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.neoforged.neoforge.capabilities.ICapabilityProvider;
+import net.smileycorp.hordes.common.capability.HordesCapabilities;
+import org.jetbrains.annotations.Nullable;
 
 public interface Infection {
 	
@@ -8,34 +12,37 @@ public interface Infection {
 	
 	void increaseInfection();
 	
-	void loadInfectionCount(IntTag tag);
-	
-	IntTag saveInfectionCount();
-	
 	class Impl implements Infection {
-		
-		protected int count = 0;
-		
+
+		private final Entity entity;
+
+		public Impl(Entity entity) {
+			this.entity = entity;
+		}
+
 		@Override
 		public int getInfectionCount() {
-			return count;
+			return entity.getData(HordesCapabilities.INFECTION_COUNT);
 		}
 		
 		@Override
 		public void increaseInfection() {
-			count++;
+			entity.setData(HordesCapabilities.INFECTION_COUNT, getInfectionCount() + 1);
 		}
 		
+	}
+
+	class Provider implements ICapabilityProvider<Entity, Void, Infection> {
+
+		private Infection instance;
+
 		@Override
-		public void loadInfectionCount(IntTag tag) {
-			count = tag.getAsInt();
+		public @Nullable Infection getCapability(Entity entity, Void unused) {
+			if (!(entity instanceof LivingEntity)) return null;
+			if (instance == null) instance = new Impl(entity);
+			return instance;
 		}
-		
-		@Override
-		public IntTag saveInfectionCount() {
-			return IntTag.valueOf(count);
-		}
-		
+
 	}
 	
 }

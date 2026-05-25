@@ -2,13 +2,15 @@ package net.smileycorp.hordes.common.capability;
 
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.capabilities.ICapabilityProvider;
 import net.neoforged.neoforge.common.NeoForge;
 import net.smileycorp.hordes.common.entities.HordesEntities;
 import net.smileycorp.hordes.common.entities.PlayerZombie;
 import net.smileycorp.hordes.common.event.SpawnZombiePlayerEvent;
+import org.jetbrains.annotations.Nullable;
 
 public interface ZombifyPlayer {
-	
+
 	PlayerZombie createZombie();
 	
 	PlayerZombie getZombie();
@@ -55,5 +57,17 @@ public interface ZombifyPlayer {
 		}
 		
 	}
-	
+
+	class Provider implements ICapabilityProvider<Player, Void, ZombifyPlayer> {
+
+		private ZombifyPlayer instance;
+
+		@Override
+		public @Nullable ZombifyPlayer getCapability(Player player, Void unused) {
+			if (instance == null) instance = new Impl(player);
+			return instance;
+		}
+
+	}
+
 }

@@ -8,8 +8,6 @@ import net.minecraft.server.packs.PathPackResources;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.monster.Drowned;
 import net.minecraft.world.entity.monster.Husk;
 import net.minecraft.world.entity.monster.Zombie;
@@ -61,6 +59,7 @@ public class Hordes {
 		container.registerConfig(ModConfig.Type.COMMON, CommonConfigHandler.config);
 		container.registerConfig(ModConfig.Type.CLIENT, ClientConfigHandler.config);
 		HordesEntities.ENTITIES.register(bus);
+		HordesCapabilities.ATTACHMENT_TYPES.register(bus);
 		HordesInfection.ATTRIBUTES.register(bus);
 		HordesInfection.EFFECTS.register(bus);
 		//generate data files
@@ -107,10 +106,11 @@ public class Hordes {
 	//attach zombie player provider to players
 	@SubscribeEvent
 	public void attachCapabilities(RegisterCapabilitiesEvent event) {
-		event.registerEntity(HordesCapabilities.ZOMBIFY_PLAYER, EntityType.PLAYER, (entity, ctx) -> new ZombifyPlayer.Impl(entity));
+		HordesLogger.logInfo("boingus");
+		event.registerEntity(HordesCapabilities.ZOMBIFY_PLAYER, EntityType.PLAYER, new ZombifyPlayer.Provider());
 		for (EntityType<?> type : BuiltInRegistries.ENTITY_TYPE) {
-			event.registerEntity(HordesCapabilities.HORDESPAWN, type, (entity, ctx) -> entity instanceof Mob ? new HordeSpawn.Impl() : null);
-			event.registerEntity(HordesCapabilities.INFECTION, type, (entity, ctx) -> entity instanceof LivingEntity ? new Infection.Impl() : null);
+			event.registerEntity(HordesCapabilities.HORDESPAWN, type, new HordeSpawn.Provider());
+			event.registerEntity(HordesCapabilities.INFECTION, type, new Infection.Provider());
 		}
 	}
 	
