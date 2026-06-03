@@ -5,6 +5,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.smileycorp.hordes.config.HordeEventConfig;
+import net.smileycorp.hordes.hordeevent.HordeSpawnData;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 
 import java.util.Random;
@@ -45,6 +46,10 @@ public class HordePlayerEvent extends Event {
 	
 	public EntityLivingBase getEntity() {
 		return player;
+	}
+
+	public HordeSpawnData getSpawnData() {
+		return horde.getSpawnData();
 	}
 	
 }

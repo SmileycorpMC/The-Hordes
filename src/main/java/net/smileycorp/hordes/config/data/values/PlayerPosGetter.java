@@ -2,53 +2,25 @@ package net.smileycorp.hordes.config.data.values;
 
 import com.google.gson.JsonObject;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
+import net.smileycorp.hordes.common.event.HordePlayerEvent;
+import net.smileycorp.hordes.config.data.hordeevent.HordeContext;
 
-import java.util.Random;
+public class PlayerPosGetter<T extends Number & Comparable<T>> extends PosGetter<T> {
 
-public class PlayerPosGetter<T extends Comparable<T>, Number> implements ValueGetter<T> {
-	
-	private final ValueGetter<String> value;
-	private final DataType<T> type;
-	
-	private PlayerPosGetter(ValueGetter<String> value, DataType<T> type) {
-		this.value = value;
-		this.type = type;
+	public PlayerPosGetter(ValueGetter<String> value, DataType<T> type) {
+		super(value, type);
 	}
-	
+
 	@Override
-	public T get(World level, EntityLivingBase entity, EntityPlayerMP player, Random rand) {
-		if (!type.isNumber()) return null;
-		EnumFacing.Axis axis = EnumFacing.Axis.byName(value.get(level, entity, player, rand));
-		if (type == DataType.INT || type == DataType.LONG) {
-			BlockPos pos = player.getPosition();
-			switch (axis) {
-				case X:
-					return type.cast(pos.getX());
-				case Y:
-					return type.cast(pos.getY());
-				default:
-					return type.cast(pos.getZ());
-			}
-		}
-		switch (axis) {
-			case X:
-				return type.cast(player.posX);
-			case Y:
-				return type.cast(player.posY);
-			default:
-				return type.cast(player.posZ);
-		}
+	protected EntityLivingBase getEntity(HordeContext<? extends HordePlayerEvent> ctx) {
+		return ctx.getPlayer();
 	}
 	
-	public static <T extends Comparable<T>> ValueGetter deserialize(JsonObject object, DataType<T> type) {
+	public static <T extends Number & Comparable<T>> PlayerPosGetter<T> deserialize(JsonObject object, DataType<T> type) {
 		try {
-			if (object.has("value")) return new PlayerPosGetter(ValueGetter.readValue(DataType.STRING, object.get("value")), type);
+			if (object.has("value")) return new PlayerPosGetter<>(ValueGetter.readValue(DataType.STRING, object.get("value")), type);
 		} catch (Exception e) {
 			HordesLogger.logError("invalid value for hordes:player_pos", e);
 		}

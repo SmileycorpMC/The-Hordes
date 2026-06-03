@@ -1,57 +1,69 @@
 package net.smileycorp.hordes.config.data.hordeevent;
 
 import com.google.common.collect.Maps;
-import com.google.gson.JsonParser;
+import com.google.gson.JsonElement;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.HordesLogger;
+import net.smileycorp.hordes.config.HordeEventConfig;
+import net.smileycorp.hordes.config.data.HordesJsonLoader;
 import net.smileycorp.hordes.hordeevent.HordeSpawnEntry;
 import net.smileycorp.hordes.hordeevent.HordeSpawnTable;
 
 import java.io.File;
-import java.io.FileReader;
 import java.util.Map;
 
-public class HordeTableLoader {
+public class HordeTableLoader extends HordesJsonLoader {
 
     public static ResourceLocation FALLBACK_TABLE = Constants.loc("fallback");
     public static HordeTableLoader INSTANCE;
 
     private final Map<ResourceLocation, HordeSpawnTable> SPAWN_TABLES = Maps.newHashMap();
-    private final File directory;
-    
-    public static void init(FMLPreInitializationEvent event) {
-        INSTANCE = new HordeTableLoader(new File(event.getModConfigurationDirectory().getPath() + "/hordes/tables"));
+
+    public HordeTableLoader(FMLPreInitializationEvent event) {
+        super(new File(event.getModConfigurationDirectory().getPath() + "/hordes/tables"));
+        INSTANCE = this;
     }
-    
-    public HordeTableLoader(File directory) {
-        this.directory = directory;
+
+    @Override
+    protected boolean shouldLoad() {
+        return HordeEventConfig.enableHordeEvent;
     }
-    
-    public void loadTables() {
-        JsonParser parser = new JsonParser();
-        SPAWN_TABLES.clear();
+
+    @Override
+    protected void dataInit() {
+        HordesLogger.blankLine();
+        HordesLogger.heading("LOADING HORDE TABLES");
         try {
             SPAWN_TABLES.put(FALLBACK_TABLE, new HordeSpawnTable.Builder("fallback").addEntry(
                     new HordeSpawnEntry(ForgeRegistries.ENTITIES.getValue(new ResourceLocation("zombie")))
                             .setNBT(JsonToNBT.getTagFromJson("{ArmorItems:[{},{},{},{id:pumpkin,Count:1}]}"))).build());
         } catch (Exception e) {
-            HordesLogger.logError("Failed generating fallback table", e);
+            HordesLogger.logError("Failed registering fallback table", e);
         }
-        for (File file : directory.listFiles((f, s) -> s.endsWith(".json"))) {
-            ResourceLocation name =  Constants.loc(file.getName().replace(".json", ""));
+    }
+
+    @Override
+    protected void readData(Map<ResourceLocation, JsonElement> data) {
+        for (Map.Entry<ResourceLocation, JsonElement> entry : data.entrySet()) {
             try {
-                HordeSpawnTable table = HordeSpawnTable.deserialize(name, parser.parse(new FileReader(file)));
+                HordesLogger.blankLine();
+                HordeSpawnTable table = HordeSpawnTable.deserialize(entry.getKey(), entry.getValue());
                 if (table == null) throw new NullPointerException();
-                SPAWN_TABLES.put(name, table);
-                HordesLogger.logInfo("loaded horde table " + name);
+                SPAWN_TABLES.put(entry.getKey(), table);
+                HordesLogger.logInfo("loaded horde table " + entry.getKey());
             } catch (Exception e) {
-                HordesLogger.logError("Failed to parse table " + name, e);
+                HordesLogger.logError("Failed to parse table " + entry.getKey(), e);
             }
         }
+    }
+
+    @Override
+    public void clearData() {
+        SPAWN_TABLES.clear();
     }
 
     public HordeSpawnTable getFallbackTable() {

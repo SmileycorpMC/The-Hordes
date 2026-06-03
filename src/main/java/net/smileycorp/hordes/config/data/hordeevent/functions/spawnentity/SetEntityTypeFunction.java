@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.HordeSpawnEntityEvent;
+import net.smileycorp.hordes.config.data.hordeevent.HordeContext;
 import net.smileycorp.hordes.config.data.hordeevent.functions.HordeFunction;
 import net.smileycorp.hordes.config.data.values.ValueGetter;
 
@@ -20,13 +21,13 @@ public class SetEntityTypeFunction implements HordeFunction<HordeSpawnEntityEven
     }
     
     @Override
-    public void apply(HordeSpawnEntityEvent event) {
-        String str = getter.get(event);
+    public void apply(HordeContext<HordeSpawnEntityEvent> ctx) {
+        String str = getter.get(ctx);
         try {
             EntityEntry type = ForgeRegistries.ENTITIES.getValue(new ResourceLocation(str));
-            event.setEntity((EntityLiving) type.newInstance(event.getEntityWorld()));
+            ctx.getEvent().setEntity((EntityLiving) type.newInstance(ctx.getWorld()));
         } catch (Exception e) {
-            HordesLogger.logError("Failed changing entity " + event.getEntity() + " to type " + str, e);
+            HordesLogger.logError("Failed changing entity " + ctx.getEntity() + " to type " + str, e);
         }
     }
     

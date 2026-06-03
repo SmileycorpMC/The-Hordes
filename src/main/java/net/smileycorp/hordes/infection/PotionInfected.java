@@ -12,7 +12,7 @@ import net.minecraft.potion.PotionEffect;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.config.InfectionConfig;
-import net.smileycorp.hordes.config.data.infection.InfectionDataLoader;
+import net.smileycorp.hordes.config.data.infection.InfectionData;
 import net.smileycorp.hordes.infection.network.InfectMessage;
 import net.smileycorp.hordes.infection.network.InfectionPacketHandler;
 
@@ -23,15 +23,15 @@ public class PotionInfected extends PotionHordes {
 	
 	private final UUID SPEED_MOD_UUID = UUID.fromString("05d68949-cb8b-4031-92a6-bd75e42b5cdd");
 	private final String SPEED_MOD_NAME = Constants.name("Infected");
-	private final AttributeModifier SPEED_MOD = new AttributeModifier(SPEED_MOD_NAME, -0.1f, 2);
+    private final double SPEED_MOD_AMOUNT = -0.1;
 	
 	public PotionInfected() {
-		super("Infected", true, 0x00440002);
+		super("infected", true, 0x00440002);
 	}
 
     @Override
 	public List<ItemStack> getCurativeItems() {
-    	return InfectionConfig.enableMobInfection ? InfectionDataLoader.INSTANCE.getCureList() : super.getCurativeItems();
+    	return InfectionConfig.enableMobInfection ? InfectionData.INSTANCE.getCureList() : super.getCurativeItems();
     }
     
     @Override
@@ -50,7 +50,7 @@ public class PotionInfected extends PotionHordes {
         IAttributeInstance attribute = map.getAttributeInstance(SharedMonsterAttributes.MOVEMENT_SPEED);
         if (attribute == null) return;
         attribute.removeModifier(SPEED_MOD_UUID);
-        attribute.applyModifier(new AttributeModifier(SPEED_MOD_UUID, SPEED_MOD_NAME + " " + amplifier, this.getAttributeModifierAmount(amplifier - 1, SPEED_MOD), 2));
+        attribute.applyModifier(new AttributeModifier(SPEED_MOD_UUID, SPEED_MOD_NAME, SPEED_MOD_AMOUNT * amplifier, 2));
     }
     
     @Override

@@ -18,11 +18,10 @@ public abstract class MixinAbstractSkeleton extends EntityMob implements IRanged
 	}
 
 	@Inject(at=@At("HEAD"), method = "onLivingUpdate()V", cancellable = true)
-	public void onLivingUpdate(CallbackInfo callback) {
-		if (!CommonConfigHandler.skeletonsBurn) {
-			super.onLivingUpdate();
-			callback.cancel();
-		}
+	public void hordes$onLivingUpdate(CallbackInfo callback) {
+		if (CommonConfigHandler.skeletonsBurn) return;
+		super.onLivingUpdate();
+		callback.cancel();
 	}
 
 }

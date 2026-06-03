@@ -27,25 +27,12 @@ public abstract class MixinEntityLivingBase extends Entity {
 	@Shadow
 	public abstract IAttributeInstance getEntityAttribute(IAttribute attribute);
 
-	@Inject(at=@At("HEAD"), method = "attackEntityAsMob(Lnet/minecraft/entity/Entity;)Z", cancellable = true)
-	public void attackEntityAsMob(Entity entityIn, CallbackInfoReturnable<Boolean> callback) {
-		if (((Entity)this) instanceof EntityZombieHorse && CommonConfigHandler.aggressiveZombieHorses) {
-			float f = (float)this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
-			boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage((EntityLivingBase)(Entity)this), f);
-			if (flag) {
-				if (entityIn instanceof EntityPlayer) {
-					EntityPlayer entityplayer = (EntityPlayer)entityIn;
-					ItemStack itemstack1 = entityplayer.isHandActive() ? entityplayer.getActiveItemStack() : ItemStack.EMPTY;
-					if (!itemstack1.isEmpty() && itemstack1.getItem().isShield(itemstack1, entityplayer)) {
-						if (this.rand.nextFloat() < 0.25F ) {
-							entityplayer.getCooldownTracker().setCooldown(itemstack1.getItem(), 100);
-							this.world.setEntityState(entityplayer, (byte)30);
-						}
-					}
-				}
-			}
-			callback.setReturnValue(flag);
-		}
+	@Inject(at=@At("RETURN"), method = "attackEntityAsMob(Lnet/minecraft/entity/Entity;)Z", cancellable = true)
+	public void hordes$attackEntityAsMob(Entity entity, CallbackInfoReturnable<Boolean> callback) {
+		if (!(((Entity)this) instanceof EntityZombieHorse) |! CommonConfigHandler.aggressiveZombieHorses) return;
+		if (!entity.attackEntityFrom(DamageSource.causeMobDamage((EntityLivingBase)(Entity)this),
+				(float) getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue())) return;
+		callback.setReturnValue(true);
 	}
 
 }

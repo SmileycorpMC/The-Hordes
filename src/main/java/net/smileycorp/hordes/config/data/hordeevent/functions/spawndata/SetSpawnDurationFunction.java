@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.HordeBuildSpawnDataEvent;
+import net.smileycorp.hordes.config.data.hordeevent.HordeContext;
 import net.smileycorp.hordes.config.data.hordeevent.functions.HordeFunction;
 import net.smileycorp.hordes.config.data.values.ValueGetter;
 
@@ -16,8 +17,8 @@ public class SetSpawnDurationFunction implements HordeFunction<HordeBuildSpawnDa
     }
 
     @Override
-    public void apply(HordeBuildSpawnDataEvent event) {
-        event.getSpawnData().setSpawnDuration(getter.get(event));
+    public void apply(HordeContext<HordeBuildSpawnDataEvent> ctx) {
+        ctx.getSpawnData().setSpawnDuration(getter.get(ctx));
     }
 
     public static SetSpawnDurationFunction deserialize(JsonElement json) {

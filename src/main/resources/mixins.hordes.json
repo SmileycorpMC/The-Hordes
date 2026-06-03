@@ -9,10 +9,11 @@
 	"MixinEntityAnimal",
     "MixinEntityLiving",
 	"MixinEntityLivingBase",
+    "MixinEntityPlayerMP",
 	"MixinEntityZombie",
 	"MixinEntityZombieHorse",
 	"MixinEntityZombieVillager",
-	"MixinPotionEffect"
+    "MixinItemStack"
   ],
   "client": [
     "MixinRenderGlobal"

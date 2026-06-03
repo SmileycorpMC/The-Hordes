@@ -1,17 +1,14 @@
 package net.smileycorp.hordes.config.data.conditions;
 
 import com.google.gson.JsonElement;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
+import net.smileycorp.hordes.common.event.HordePlayerEvent;
+import net.smileycorp.hordes.config.data.hordeevent.HordeContext;
 import net.smileycorp.hordes.config.data.values.ValueGetter;
-
-import java.util.Random;
 
 public class EntityTypeCondition implements Condition {
 
@@ -22,9 +19,9 @@ public class EntityTypeCondition implements Condition {
 	}
 
 	@Override
-	public boolean apply(World level, EntityLivingBase entity, EntityPlayerMP player, Random rand) {
-		EntityEntry entry = ForgeRegistries.ENTITIES.getValue(new ResourceLocation(getter.get(level, entity, player, rand)));
-		return entry != null && entry.getEntityClass() == entity.getClass();
+	public boolean apply(HordeContext<? extends HordePlayerEvent> ctx) {
+		EntityEntry entry = ForgeRegistries.ENTITIES.getValue(new ResourceLocation(getter.get(ctx)));
+		return entry != null && entry.getEntityClass() == ctx.getEntity().getClass();
 	}
 
 	public static EntityTypeCondition deserialize(JsonElement json) {

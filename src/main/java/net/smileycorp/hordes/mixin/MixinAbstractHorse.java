@@ -28,30 +28,8 @@ public abstract class MixinAbstractHorse extends EntityAnimal {
 		super(worldIn);
 	}
 
-	@Inject(at=@At("TAIL"), method = "initEntityAI()V", cancellable = true)
-	protected void initEntityAI(CallbackInfo callback) {
-		if (CommonConfigHandler.aggressiveZombieHorses && ((EntityAnimal)this) instanceof EntityZombieHorse) {
-			tasks.addTask(0, new EntityAISwimming(this));
-			tasks.addTask(2, new EntityAIAttackMelee(this, 1.0D, false));
-			tasks.addTask(5, new EntityAIMoveTowardsRestriction(this, 1.0D));
-			tasks.addTask(7, new EntityAIWanderAvoidWater(this, 1.0D));
-			tasks.addTask(8, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F));
-			tasks.addTask(8, new EntityAILookIdle(this));
-			tasks.addTask(6, new EntityAIMoveThroughVillage(this, 1.0D, false));
-			targetTasks.addTask(1, new EntityAIHurtByTarget(this, true, new Class[] {EntityPigZombie.class}));
-			targetTasks.addTask(2, new EntityAINearestAttackableTarget<>(this, EntityPlayer.class, true));
-			targetTasks.addTask(3, new EntityAINearestAttackableTarget<>(this, EntityVillager.class, false));
-			targetTasks.addTask(3, new EntityAINearestAttackableTarget<>(this, EntityIronGolem.class, true));
-			tasks.taskEntries.removeIf(g->g.action instanceof EntityAIPanic);
-			tasks.taskEntries.removeIf(g->g.action instanceof EntityAIPanic);
-		}
-		if (getCreatureAttribute() != EnumCreatureAttribute.UNDEAD && CommonConfigHandler.zombiesScareHorses) {
-			tasks.addTask(1, new EntityAIHorseFlee(this));
-		}
-	}
-
 	@Inject(at=@At("HEAD"), method = "onLivingUpdate()V", cancellable = true)
-	public void onLivingUpdate(CallbackInfo callback) {
+	public void hordes$onLivingUpdate(CallbackInfo callback) {
 		if ((EntityAnimal)this instanceof EntityZombieHorse) {
 			if (CommonConfigHandler.aggressiveZombieHorses) {
 				updateArmSwingProgress();
@@ -63,18 +41,38 @@ public abstract class MixinAbstractHorse extends EntityAnimal {
 	}
 
 	protected void tryBurn() {
-		boolean burn = world.isDaytime() && !world.isRemote;
-		if (burn && getPassengers().isEmpty()) {
-			ItemStack itemstack = horseChest.getStackInSlot(1);
-			if (!itemstack.isEmpty()) {
-				if (itemstack.isItemDamaged()) {
-					itemstack.setItemDamage(itemstack.getItemDamage() + rand.nextInt(2));
-					if (itemstack.getItemDamage() >= itemstack.getMaxDamage()) horseChest.decrStackSize(1, 1);
-				}
-				burn = false;
-			}
-			if (burn) setFire(8);
+		if (!world.isDaytime() || world.isRemote |! getPassengers().isEmpty()) return;
+		ItemStack itemstack = horseChest.getStackInSlot(1);
+		if (itemstack.isEmpty()) {
+			setFire(8);
+			return;
 		}
+		if (itemstack.isItemDamaged()) {
+			itemstack.setItemDamage(itemstack.getItemDamage() + rand.nextInt(2));
+			if (itemstack.getItemDamage() >= itemstack.getMaxDamage()) horseChest.decrStackSize(1, 1);
+		}
+	}
+
+	@Inject(at=@At("TAIL"), method = "initEntityAI()V", cancellable = true)
+	protected void hordes$initEntityAI(CallbackInfo callback) {
+		if (getCreatureAttribute() != EnumCreatureAttribute.UNDEAD && CommonConfigHandler.zombiesScareHorses) {
+			tasks.addTask(1, new EntityAIHorseFlee(this));
+			return;
+		}
+		if (!CommonConfigHandler.aggressiveZombieHorses |! (((EntityAnimal)this) instanceof EntityZombieHorse)) return;
+		tasks.addTask(0, new EntityAISwimming(this));
+		tasks.addTask(2, new EntityAIAttackMelee(this, 1.0D, false));
+		tasks.addTask(5, new EntityAIMoveTowardsRestriction(this, 1.0D));
+		tasks.addTask(7, new EntityAIWanderAvoidWater(this, 1.0D));
+		tasks.addTask(8, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F));
+		tasks.addTask(8, new EntityAILookIdle(this));
+		tasks.addTask(6, new EntityAIMoveThroughVillage(this, 1.0D, false));
+		targetTasks.addTask(1, new EntityAIHurtByTarget(this, true, new Class[] {EntityPigZombie.class}));
+		targetTasks.addTask(2, new EntityAINearestAttackableTarget<>(this, EntityPlayer.class, true));
+		targetTasks.addTask(3, new EntityAINearestAttackableTarget<>(this, EntityVillager.class, false));
+		targetTasks.addTask(3, new EntityAINearestAttackableTarget<>(this, EntityIronGolem.class, true));
+		tasks.taskEntries.removeIf(g->g.action instanceof EntityAIPanic);
+		tasks.taskEntries.removeIf(g->g.action instanceof EntityAIPanic);
 	}
 
 	@Inject(at=@At("HEAD"), method = "canEatGrass()Z", cancellable = true)

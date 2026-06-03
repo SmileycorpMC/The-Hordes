@@ -1,5 +1,6 @@
 package net.smileycorp.hordes.hordeevent.capability;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.player.EntityPlayer;
@@ -10,23 +11,24 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.smileycorp.atlas.api.util.DataUtils;
+import net.smileycorp.atlas.api.util.Func;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.config.HordeEventConfig;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
+import java.util.UUID;
+import java.util.stream.Stream;
 
 public class WorldDataHordes extends WorldSavedData {
 
 	public static final String DATA = Constants.MODID + "_HordeEvent";
-	
-	private final Random rand = new Random();
-
 	private int next_day = 0;
-
-	protected World world = null;
+	protected WorldServer world = null;
 	
-	private Map<UUID, HordeEvent> events = Maps.newHashMap();
+	private final Map<UUID, HordeEvent> events = Maps.newHashMap();
 
 	public WorldDataHordes() {
 		this(DATA);
@@ -60,9 +62,7 @@ public class WorldDataHordes extends WorldSavedData {
 		for (Entry<UUID, HordeEvent> entry : this.events.entrySet()) {
 			UUID uuid = entry.getKey();
 			NBTTagCompound tag = new NBTTagCompound();
-			EntityPlayerMP player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(uuid);
-			if (player != null) tag.setString("username", player.getName());
-			events.setTag(uuid.toString(), entry.getValue().writeToNBT(tag));
+			events.setTag(uuid.toString(), entry.getValue().writeToNBT(tag, uuid));
 		}
 		nbt.setTag("events", events);
 		return nbt;
@@ -82,7 +82,7 @@ public class WorldDataHordes extends WorldSavedData {
 	}
 	
 	public HordeEvent getEvent(EntityPlayerMP player) {
-		return player == null ? null : getEvent(EntityPlayer.getUUID(player.getGameProfile()));
+		return player == null ? null : getEvent(player.getUniqueID());
 	}
 	
 	public HordeEvent getEvent(UUID uuid) {
@@ -98,9 +98,18 @@ public class WorldDataHordes extends WorldSavedData {
 		if (profile != null && profile.getName() != null) return profile.getName();
 		return uuid.toString();
 	}
-	
-	public Random getRandom() {
-		return rand;
+
+	public boolean isHordeNight(EntityPlayerMP player) {
+		HordeEvent horde = getEvent(player);
+		return horde != null && horde.isHordeDay(player);
+	}
+
+	public Stream<EntityPlayerMP> getPlayersWithHorde() {
+		return world.getPlayers(EntityPlayerMP.class, Func::True).stream().filter(this::isHordeNight);
+	}
+
+	public Random getRandom(int day) {
+		return new Random((world.getSeed() % Short.MAX_VALUE) * day);
 	}
 	
 	@Override
@@ -110,7 +119,7 @@ public class WorldDataHordes extends WorldSavedData {
 	}
 	
 	public List<String> getDebugText() {
-		List<String> out = new ArrayList<>();
+		List<String> out = Lists.newArrayList();
 		out.add(toString());
 		out.add("Existing events: {");
 		for (Entry<UUID, HordeEvent> entry : events.entrySet()) {
@@ -121,7 +130,7 @@ public class WorldDataHordes extends WorldSavedData {
 		return out;
 	}
 	
-	public static WorldDataHordes getData(World world) {
+	public static WorldDataHordes getData(WorldServer world) {
 		WorldDataHordes data = (WorldDataHordes) world.getMapStorage().getOrLoadData(WorldDataHordes.class, DATA);
 		if (data == null) data = getCleanData(world);
 		if (data.world == null) data.world = world;
@@ -129,7 +138,7 @@ public class WorldDataHordes extends WorldSavedData {
 		return data;
 	}
 	
-	public static WorldDataHordes getCleanData(World world) {
+	public static WorldDataHordes getCleanData(WorldServer world) {
 		WorldDataHordes data = new WorldDataHordes();
 		data.world = world;
 		int day = Math.round(world.getWorldTime()/ HordeEventConfig.dayLength);

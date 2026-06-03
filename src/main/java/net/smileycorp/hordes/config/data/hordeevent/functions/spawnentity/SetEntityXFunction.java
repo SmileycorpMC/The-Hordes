@@ -5,6 +5,7 @@ import net.minecraft.util.math.Vec3d;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.HordeSpawnEntityEvent;
+import net.smileycorp.hordes.config.data.hordeevent.HordeContext;
 import net.smileycorp.hordes.config.data.hordeevent.functions.HordeFunction;
 import net.smileycorp.hordes.config.data.values.ValueGetter;
 
@@ -15,11 +16,12 @@ public class SetEntityXFunction implements HordeFunction<HordeSpawnEntityEvent> 
     public SetEntityXFunction(ValueGetter<Double> getter) {
         this.getter = getter;
     }
-    
+
     @Override
-    public void apply(HordeSpawnEntityEvent event) {
+    public void apply(HordeContext<HordeSpawnEntityEvent> ctx) {
+        HordeSpawnEntityEvent event = ctx.getEvent();
         Vec3d pos = event.getPos();
-        event.setPos(new Vec3d(getter.get(event), pos.y, pos.z));
+        event.setPos(new Vec3d(getter.get(ctx), pos.y, pos.z));
     }
     
     public static SetEntityXFunction deserialize(JsonElement json) {

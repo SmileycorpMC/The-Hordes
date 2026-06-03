@@ -28,7 +28,7 @@ public class CommonConfigHandler {
 			aggressiveZombieHorses = config.get("Misc", "aggressiveZombieHorses", true, "Whether zombie horses are aggressive or not.").getBoolean();
 			zombieHorsesBurn = config.get("Misc", "zombieHorsesBurn", false, "Whether zombie horses burn in sunlight").getBoolean();
 			skeletonHorsesBurn = config.get("Misc", "skeletonHorsesBurn", false, "Whether skeleton horses burn in sunlight").getBoolean();
-			zombiesScareHorses = config.get("Misc", "zombiesScareHorses", true, "Whether zombies scare horses").getBoolean();
+			zombiesScareHorses = config.get("Misc", "zombiesScareHorses", true, "Whether unmounted horses are scared of zombies.").getBoolean();
 		} catch(Exception e) {
 		} finally {
 			if (config.hasChanged()) config.save();

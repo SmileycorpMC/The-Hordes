@@ -1,34 +1,17 @@
 package net.smileycorp.hordes.client.render;
 
 import net.minecraft.client.model.ModelPlayer;
-import net.minecraft.client.model.ModelRenderer;
-import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
 import net.smileycorp.hordes.common.entities.EntityZombiePlayer;
 
 public class ModelZombiePlayer extends ModelPlayer {
-	
-	protected boolean fixedArms = false;
-	
-	public ModelZombiePlayer() {
-		super(0.0f, false);
-	}
-	
-	@Override
-	public void render(Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
-		if (!fixedArms) {
-			if (DefaultPlayerSkin.getSkinType(((EntityZombiePlayer) entity).getPlayerUUID()).equals("slim")) {
-				bipedLeftArm = new ModelRenderer(this, 32, 48);
-		        bipedLeftArm.addBox(-1.0F, -2.0F, -2.0F, 3, 12, 4, 0.0f);
-		        bipedLeftArm.setRotationPoint(5.0F, 2.5F, 0.0F);
-		        bipedRightArm = new ModelRenderer(this, 40, 16);
-		        bipedRightArm.addBox(-2.0F, -2.0F, -2.0F, 3, 12, 4, 0.0f);
-		        bipedRightArm.setRotationPoint(-5.0F, 2.5F, 0.0F);
-			}
-			fixedArms = true;
-		}
-		super.render(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
+
+    private final boolean isDrowned;
+
+    public ModelZombiePlayer(boolean isDrowned, boolean slim) {
+		super(0.0f, slim);
+        this.isDrowned = isDrowned;
 	}
 	
 	@Override
@@ -50,6 +33,11 @@ public class ModelZombiePlayer extends ModelPlayer {
         bipedLeftArm.rotateAngleZ -= MathHelper.cos(ageInTicks * 0.09F) * 0.05F + 0.05F;
         bipedRightArm.rotateAngleX += MathHelper.sin(ageInTicks * 0.067F) * 0.05F;
         bipedLeftArm.rotateAngleX -= MathHelper.sin(ageInTicks * 0.067F) * 0.05F;
+        //drowned animations
+        if (isDrowned) {
+            if (entityIn.isInWater()) {
+            }
+        }
         copyModelAngles(bipedLeftLeg, bipedLeftLegwear);
         copyModelAngles(bipedRightLeg, bipedRightLegwear);
         copyModelAngles(bipedLeftArm, bipedLeftArmwear);

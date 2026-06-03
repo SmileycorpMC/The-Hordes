@@ -26,7 +26,6 @@ import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.config.HordeEventConfig;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
-import net.smileycorp.hordes.hordeevent.capability.HordeEventClient;
 import net.smileycorp.hordes.hordeevent.capability.HordeSpawn;
 import net.smileycorp.hordes.hordeevent.capability.WorldDataHordes;
 
@@ -38,8 +37,6 @@ public class HordeEventHandler {
 		Entity entity = event.getObject();
 		if (entity instanceof EntityLiving &! entity.hasCapability(HordesCapabilities.HORDESPAWN, null))
 			event.addCapability(Constants.loc("HordeSpawn"), new HordeSpawn.Provider());
-		if (entity instanceof EntityPlayer && entity.world.isRemote &! entity.hasCapability(HordesCapabilities.HORDE_EVENT_CLIENT, null))
-			event.addCapability(Constants.loc("HordeEventClient"), new HordeEventClient.Provider());
 	}
 	
 	//update the next day in the horde world data
@@ -68,7 +65,7 @@ public class HordeEventHandler {
 		int time = Math.round(world.getWorldTime() % HordeEventConfig.dayLength);
 		int day = horde.getCurrentDay(player);
 		if (!horde.hasSynced(day)) horde.sync(player, day);
-		if (horde.isActive(player)) {
+		if (horde.isActive()) {
 			horde.update(player);
 			return;
 		}
@@ -80,11 +77,10 @@ public class HordeEventHandler {
 	
 	@SubscribeEvent
 	public void logIn(PlayerEvent.PlayerLoggedInEvent event) {
-		if (event.player instanceof EntityPlayerMP) {
-			EntityPlayerMP player = (EntityPlayerMP) event.player;
-			HordeEvent horde = WorldDataHordes.getData(player.getServerWorld()).getEvent(player);
-			if (horde != null) horde.setPlayer(player);
-		}
+		if (!(event.player instanceof EntityPlayerMP)) return;
+		EntityPlayerMP player = (EntityPlayerMP) event.player;
+		HordeEvent horde = WorldDataHordes.getData(player.getServerWorld()).getEvent(player);
+		if (horde != null) horde.setPlayer(player);
 	}
 			
 	//prevent despawning of entities in an active horde
@@ -92,8 +88,8 @@ public class HordeEventHandler {
 	public void tryDespawn(LivingSpawnEvent.AllowDespawn event) {
 		EntityPlayerMP player = HordeSpawn.getHordePlayer(event.getEntity());
 		if (player == null) return;
-		HordeEvent horde = WorldDataHordes.getData(player.world).getEvent(player);
-		if (horde != null && horde.isActive(player)) event.setResult(Event.Result.DENY);
+		HordeEvent horde = WorldDataHordes.getData(player.getServerWorld()).getEvent(player);
+		if (horde != null && horde.isActive()) event.setResult(Event.Result.DENY);
 	}
 	
 	//sync entity capabilities when added to world
@@ -109,8 +105,8 @@ public class HordeEventHandler {
 			entity.targetTasks.addTask(1, new EntityAIHurtByTarget((EntityCreature) entity, false));
 			entity.targetTasks.addTask(2, new EntityAINearestAttackableTarget<>((EntityCreature) entity, EntityPlayer.class, true));
 		}
-		HordeEvent horde = WorldDataHordes.getData(player.world).getEvent(player);
-		if (horde != null) if (horde.isActive(player)) horde.registerEntity(entity, player);
+		HordeEvent horde = WorldDataHordes.getData(player.getServerWorld()).getEvent(player);
+		if (horde != null) if (horde.isActive()) horde.registerEntity(entity, player);
 		cap.setSynced();
 	}
 	
@@ -122,7 +118,7 @@ public class HordeEventHandler {
 		WorldServer world = player.getServerWorld();
 		HordeEvent horde = WorldDataHordes.getData(world).getEvent(player);
 		if (horde == null) return;
-		if (world.isDaytime() |! (world.provider.getDimension() == 0 && (horde.isHordeDay(player) || horde.isActive(player)))) return;
+		if (world.isDaytime() |! (world.provider.getDimension() == 0 && (horde.isHordeDay(player) || horde.isActive()))) return;
 		event.setResult(EntityPlayer.SleepResult.OTHER_PROBLEM);
 		player.sendMessage(new TextComponentTranslation(Constants.hordeTrySleep));
 	}

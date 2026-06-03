@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.world.WorldServer;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.hordeevent.capability.WorldDataHordes;
 
@@ -37,7 +38,7 @@ public class CommandStartHordeEvent extends CommandBase {
 			int duration = parseInt(args[0], 0);
 			server.addScheduledTask(() -> {
 				EntityPlayer player = (EntityPlayer) sender.getCommandSenderEntity();
-				WorldDataHordes data = WorldDataHordes.getData(sender.getEntityWorld());
+				WorldDataHordes data = WorldDataHordes.getData((WorldServer) sender.getEntityWorld());
 				data.getEvent((EntityPlayerMP) player).tryStartEvent((EntityPlayerMP) player, duration, true);
 			});
 			notifyCommandListener(sender, this, "commands."+Constants.MODID +".StartHorde.success", new Object[] {new TextComponentTranslation(args[0])});

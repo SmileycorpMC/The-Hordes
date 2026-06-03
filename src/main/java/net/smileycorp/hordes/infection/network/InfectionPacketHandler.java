@@ -18,7 +18,7 @@ public class InfectionPacketHandler {
 		NETWORK_INSTANCE.sendTo(message, playerMP);
 	}
 	
-	public static void send(Entity entity, IMessage message) {
+	public static void sendTracking(IMessage message, Entity entity) {
 		if (!InfectionConfig.enableMobInfection) return;
 		NETWORK_INSTANCE.sendToAllTracking(message, entity);
 	}

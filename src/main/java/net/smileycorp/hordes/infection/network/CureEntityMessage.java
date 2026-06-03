@@ -7,7 +7,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
-import net.smileycorp.hordes.client.ClientHandler;
+import net.smileycorp.hordes.infection.client.InfectionClientHandler;
 
 public class CureEntityMessage implements IMessage {
 
@@ -34,7 +34,7 @@ public class CureEntityMessage implements IMessage {
 	}
 	
 	public IMessage process(MessageContext ctx) {
-		if (ctx.side == Side.CLIENT) Minecraft.getMinecraft().addScheduledTask(() -> ClientHandler.processCureEntityMessage(this));
+		if (ctx.side == Side.CLIENT) Minecraft.getMinecraft().addScheduledTask(() -> InfectionClientHandler.INSTANCE.processCureEntity(this));
 		return null;
 	}
 	

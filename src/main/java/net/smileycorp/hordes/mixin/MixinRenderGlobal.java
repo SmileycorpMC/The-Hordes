@@ -6,7 +6,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.config.ClientConfigHandler;
-import net.smileycorp.hordes.hordeevent.capability.HordeEventClient;
+import net.smileycorp.hordes.hordeevent.client.HordeClientHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,11 +25,9 @@ public class MixinRenderGlobal {
     @Inject(method = "renderSky(FI)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/WorldClient;getMoonPhase()I"))
     public void renderSky$getMoonPhase(float partialTicks, int pass, CallbackInfo callback) {
         if (!ClientConfigHandler.hordeEventTintsSky) return;
-        HordeEventClient horde = mc.player.getCapability(HordesCapabilities.HORDE_EVENT_CLIENT, null);
-        if (horde != null && horde.isHordeNight(world)) {
-            int[] rgb = ClientConfigHandler.getHordeMoonColour();
-            GlStateManager.color((float)rgb[0]/255f, (float)rgb[1]/255f, (float)rgb[2]/255f, 1f);
-        }
+        if (!HordeClientHandler.INSTANCE.isHordeNight(world)) return;
+        int[] rgb = ClientConfigHandler.getHordeMoonColour();
+        GlStateManager.color((float)rgb[0]/255f, (float)rgb[1]/255f, (float)rgb[2]/255f, 1f);
     }
     
 }

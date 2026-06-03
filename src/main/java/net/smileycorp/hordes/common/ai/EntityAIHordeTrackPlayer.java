@@ -48,11 +48,10 @@ public class EntityAIHordeTrackPlayer extends EntityAIBase {
     
     @Override
     public void updateTask() {
-        if (timeToRecalcPath-- <= 0) {
-            timeToRecalcPath = HordeEventConfig.hordePathingInterval;
-            pather = entity.getNavigator();
-            pather.tryMoveToEntityLiving(target, speed);
-        }
+        if (timeToRecalcPath-- > 0) return;
+        timeToRecalcPath = HordeEventConfig.hordePathingInterval;
+        pather = entity.getNavigator();
+        pather.tryMoveToEntityLiving(target, speed);
     }
     
 }

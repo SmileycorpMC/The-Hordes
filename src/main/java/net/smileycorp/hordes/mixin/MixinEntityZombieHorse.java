@@ -19,11 +19,10 @@ public abstract class MixinEntityZombieHorse extends AbstractHorse implements IM
 	}
 
 	@Inject(at=@At("TAIL"), method = "applyEntityAttributes()V", cancellable = true)
-	protected void applyEntityAttributes(CallbackInfo callback) {
-		if (CommonConfigHandler.aggressiveZombieHorses) {
-			getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(35.0D);
-			getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(3.0D);
-		}
+	protected void hordes$applyEntityAttributes(CallbackInfo callback) {
+		if (!CommonConfigHandler.aggressiveZombieHorses) return;
+		getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(35);
+		getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(3);
 	}
 
 }

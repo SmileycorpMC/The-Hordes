@@ -5,6 +5,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.HordeSpawnEntityEvent;
+import net.smileycorp.hordes.config.data.hordeevent.HordeContext;
 import net.smileycorp.hordes.config.data.hordeevent.functions.HordeFunction;
 import net.smileycorp.hordes.config.data.values.ValueGetter;
 
@@ -17,10 +18,10 @@ public class SetEntityLootTableFunction implements HordeFunction<HordeSpawnEntit
     }
     
     @Override
-    public void apply(HordeSpawnEntityEvent event) {
+    public void apply(HordeContext<HordeSpawnEntityEvent> ctx) {
         NBTTagCompound tag = new NBTTagCompound();
-        tag.setString("DeathLootTable", getter.get(event));
-        event.getEntity().readFromNBT(tag);
+        tag.setString("DeathLootTable", getter.get(ctx));
+        ctx.getEntity().readFromNBT(tag);
     }
     
     public static SetEntityLootTableFunction deserialize(JsonElement json) {

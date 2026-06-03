@@ -3,8 +3,7 @@ package net.smileycorp.hordes.config;
 import net.minecraftforge.common.config.Configuration;
 
 public class HordeEventConfig {
-    
-    //horde event
+
     public static boolean enableHordeEvent;
     public static boolean hordesCommandOnly;
     public static int hordeSpawnAmount;
@@ -20,11 +19,13 @@ public class HordeEventConfig {
     public static double hordeEntitySpeed;
     public static boolean spawnFirstDay;
     public static boolean canSleepDuringHorde;
+    public static boolean hordePreventsOtherPlayersSleeping;
     public static double hordeMultiplayerScaling;
     public static boolean pauseEventServer;
     public static boolean hordeEventByPlayerTime;
     public static int hordeStartBuffer;
     public static int hordeSpawnChecks;
+    public static double hordeSpawnDistance;
     
     public static void syncConfig(Configuration config) {
         enableHordeEvent = config.get("Horde Spawn Event", "enableHordeEvent", true, "Set to false to completely disable the horde event and anything relating to it.").getBoolean();
@@ -42,11 +43,13 @@ public class HordeEventConfig {
         hordeEntitySpeed = config.get("Horde Spawn Event", "hordeEntitySpeed", 1, "How fast do horde mobs move towards their tracked player?").getDouble();
         spawnFirstDay = config.get("Horde Spawn Event", "spawnFirstDay", false, "Set to true to enable the horde spawning on the first day. (Game day 0)").getBoolean();
         canSleepDuringHorde = config.get("Horde Spawn Event", "canSleepDuringHorde", false, "Set to false to disable the use of beds during a horde event.").getBoolean();
+        hordePreventsOtherPlayersSleeping = config.get("Horde Spawn Event", "hordePreventsOtherPlayersSleeping", true, "Does a scheduled horde for an online player prevent other players sleeping?").getBoolean();
         hordeMultiplayerScaling = config.get("Horde Spawn Event", "hordeMultiplayerScaling", 0.8, "How much should the size of each horde scale down by when multiple players are near each other?").getDouble();
         pauseEventServer = config.get("Horde Spawn Event", "pauseEventServer", true, "Do the daylight cycle (and active horde events get paused while there are no players online.).").getBoolean();
         hordeEventByPlayerTime = config.get("Horde Spawn Event", "hordeEventByPlayerTime", true, "Are horde events tracked by player play time instead of world time.").getBoolean();
         hordeStartBuffer = config.get("Horde Spawn Event", "hordeStartBuffer", 1200, "How many ticks after a hordes scheduled time can it start?").getInt();
         hordeSpawnChecks = config.get("Horde Spawn Event", "hordeSpawnChecks", 25, "How many attempts should horde events make to avoid spawning mobs in light areas or outside their spawn type.").getInt();
+        hordeSpawnDistance = config.get("Horde Spawn Event", "hordeSpawnDistance", 75, "How far away should hordes attempt to spawn?").getDouble();
     }
     
 }

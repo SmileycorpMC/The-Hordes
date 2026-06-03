@@ -1,5 +1,6 @@
 package net.smileycorp.hordes.config.data;
 
+import com.google.common.collect.Lists;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -15,14 +16,17 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.List;
 
-public class DataGenerator {
+public class ConfigDataManager {
 
     private static Path CONFIG_FOLDER;
+    private static List<HordesJsonLoader> jsonLoaders = Lists.newArrayList();
     
     public static void init(FMLPreInitializationEvent event) {
         CONFIG_FOLDER = event.getModConfigurationDirectory().toPath().resolve("hordes");
         if (shouldGenerateFiles(event.getModConfigurationDirectory().toPath())) generateData();
+        else HordesLogger.logInfo("Config data files are up to date, skipping data/asset generation");
     }
 
     public static boolean shouldGenerateFiles(Path folder) {
@@ -41,10 +45,10 @@ public class DataGenerator {
     }
 
     public static void generateData() {
-        try (FileSystem mod = FileSystems.newFileSystem(DataGenerator.class.getProtectionDomain().getCodeSource().getLocation().toURI(),
+        try (FileSystem mod = FileSystems.newFileSystem(ConfigDataManager.class.getProtectionDomain().getCodeSource().getLocation().toURI(),
                 Collections.emptyMap())) {
             Files.find(mod.getPath("config_defaults"), Integer.MAX_VALUE, (matcher, options) -> options.isRegularFile())
-                    .forEach(DataGenerator::copyFileFromMod);
+                    .forEach(ConfigDataManager::copyFileFromMod);
             HordesLogger.logInfo("Generated data files.");
         } catch (Exception e) {
             HordesLogger.logInfo("Failed to generate data files.");
@@ -57,7 +61,7 @@ public class DataGenerator {
             HordesLogger.logInfo("Hordes data does not exist, generating new files.");
             return false;
         }
-        try (FileSystem mod = FileSystems.newFileSystem(DataGenerator.class.getProtectionDomain().getCodeSource().getLocation().toURI(),
+        try (FileSystem mod = FileSystems.newFileSystem(ConfigDataManager.class.getProtectionDomain().getCodeSource().getLocation().toURI(),
                 Collections.emptyMap())) {
             JsonParser parser = new JsonParser();
             JsonObject config_json = parser.parse(new FileReader(config_file)).getAsJsonObject();
@@ -73,16 +77,6 @@ public class DataGenerator {
         }
     }
     
-    private static void copyFileFromMod(String path) {
-        try {
-            FileUtils.copyInputStreamToFile(DataGenerator.class.getResourceAsStream(path),
-                    new File(CONFIG_FOLDER.toFile(), path.replace( "config_defaults/", "")));
-            HordesLogger.logInfo("Copied file " + path);
-        } catch (Exception e) {
-            HordesLogger.logError("Failed to copy file " + path, e);
-        }
-    }
-    
     private static void copyFileFromMod(Path path) {
         try {
             FileUtils.copyInputStreamToFile(Files.newInputStream(path),
@@ -91,6 +85,18 @@ public class DataGenerator {
         } catch (Exception e) {
             HordesLogger.logError("Failed to copy file " + path, e);
         }
+    }
+
+    public static void reload() {
+        HordesLogger.clearLog(false);
+        for (HordesJsonLoader loader : jsonLoaders) {
+            loader.clearData();
+            loader.loadData();
+        }
+    }
+
+    public static void registerJsonLoader(HordesJsonLoader loader) {
+        jsonLoaders.add(loader);
     }
 
 }

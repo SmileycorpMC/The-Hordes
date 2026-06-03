@@ -2,17 +2,15 @@ package net.smileycorp.hordes.config.data.conditions;
 
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.smileycorp.atlas.api.data.Either;
 import net.smileycorp.hordes.common.HordesLogger;
+import net.smileycorp.hordes.common.event.HordePlayerEvent;
+import net.smileycorp.hordes.config.data.hordeevent.HordeContext;
 
 import java.util.List;
-import java.util.Random;
 
 public class BiomeCondition implements Condition {
 	
@@ -23,9 +21,10 @@ public class BiomeCondition implements Condition {
 	}
 
 	@Override
-	public boolean apply(World level, EntityLivingBase entity, EntityPlayerMP player, Random rand) {
-		Biome biome = level.getBiome(player.getPosition());
-		for (Either<BiomeDictionary.Type, ResourceLocation> either : biomes) if (either.map(t -> BiomeDictionary.hasType(biome, t), biome::equals)) return true;
+	public boolean apply(HordeContext<? extends HordePlayerEvent> ctx) {
+		Biome biome = ctx.getWorld().getBiome(ctx.getPlayer().getPosition());
+		for (Either<BiomeDictionary.Type, ResourceLocation> either : biomes) if (either.map(t -> BiomeDictionary.hasType(biome, t),
+				biome.getRegistryName()::equals)) return true;
 		return false;
 	}
 

@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MixinEntityZombie {
 
 	@Inject(at=@At("HEAD"), method = "shouldBurnInDay()Z", cancellable = true)
-	public void shouldBurnInDay(CallbackInfoReturnable<Boolean> callback) {
+	public void hordes$shouldBurnInDay(CallbackInfoReturnable<Boolean> callback) {
 		callback.setReturnValue(CommonConfigHandler.zombiesBurn);
 		callback.cancel();
 	}

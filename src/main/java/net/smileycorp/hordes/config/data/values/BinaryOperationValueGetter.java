@@ -1,14 +1,12 @@
 package net.smileycorp.hordes.config.data.values;
 
 import com.google.gson.JsonObject;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.world.World;
 import net.smileycorp.atlas.api.data.BinaryOperation;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
-
-import java.util.Random;
+import net.smileycorp.hordes.common.event.HordePlayerEvent;
+import net.smileycorp.hordes.config.data.HordesParsingException;
+import net.smileycorp.hordes.config.data.hordeevent.HordeContext;
 
 public class BinaryOperationValueGetter<T extends Number & Comparable<T>> implements ValueGetter<T> {
     
@@ -20,20 +18,26 @@ public class BinaryOperationValueGetter<T extends Number & Comparable<T>> implem
         this.value1 = value1;
         this.value2 = value2;
     }
-    
+
     @Override
-    public T get(World level, EntityLivingBase entity, EntityPlayerMP player, Random rand) {
-        return (T) operation.apply(value1.get(level, entity, player, rand), value2.get(level, entity, player, rand));
+    public T get(HordeContext<? extends HordePlayerEvent> ctx) {
+        return (T) operation.apply(value1.get(ctx), value2.get(ctx));
     }
     
     public static <T extends Number & Comparable<T>> BinaryOperationValueGetter deserialize(BinaryOperation operation, DataType<T> type, JsonObject element) {
-        ValueGetter<T> getter1 = ValueGetter.readValue(type, element.get("value1"));
-        ValueGetter<T> getter2 = ValueGetter.readValue(type, element.get("value2"));
-        if (getter1 == null || getter2 == null |! type.isNumber()) {
-            HordesLogger.logError("invalid values for hordes:" + operation.getName(), new NullPointerException());
+        try {
+            ValueGetter<T> getter1 = ValueGetter.readValue(type, element.get("value1"));
+            ValueGetter<T> getter2 = ValueGetter.readValue(type, element.get("value2"));
+            if (getter1 == null || getter2 == null |! type.isNumber()) {
+                HordesLogger.logError("invalid values for hordes:" + operation.getName(), new HordesParsingException(
+                        "value1: " + element.get("value1") + ", value2: " + element.get("value2")));
+                return null;
+            }
+            return new BinaryOperationValueGetter(operation, getter1, getter2);
+        } catch (Exception e) {
+            HordesLogger.logError("invalid values for hordes:" + operation.getName(), new HordesParsingException("missing values"));
             return null;
         }
-        return new BinaryOperationValueGetter(operation, getter1, getter2);
     }
     
 }

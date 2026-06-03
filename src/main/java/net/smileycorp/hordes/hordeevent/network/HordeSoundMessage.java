@@ -1,48 +1,44 @@
 package net.smileycorp.hordes.hordeevent.network;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
+import net.smileycorp.hordes.hordeevent.client.HordeClientHandler;
 
 public class HordeSoundMessage implements IMessage {
 
-	protected Vec3d direction;
+	protected float dirX, dirZ;
 	protected ResourceLocation sound;
 
 	public HordeSoundMessage() {}
 
-	public HordeSoundMessage(Vec3d direction, ResourceLocation sound) {
-		this.direction=direction;
-		this.sound=sound;
+	public HordeSoundMessage(float dirX, float dirZ, ResourceLocation sound) {
+		this.dirX = dirX;
+		this.dirZ = dirZ;
+		this.sound = sound;
 	}
 
 	@Override
 	public void fromBytes(ByteBuf buf) {
-		double x = buf.readDouble();
-		double z = buf.readDouble();
-		direction = new Vec3d(x, 0, z);
+		dirX = buf.readFloat();
+		dirZ = buf.readFloat();
 		sound = new ResourceLocation(ByteBufUtils.readUTF8String(buf));
 	}
 
 	@Override
 	public void toBytes(ByteBuf buf) {
-		if (direction!=null) {
-			buf.writeDouble(direction.x);
-			buf.writeDouble(direction.z);
-		}
-		if (sound!=null) {
-			ByteBufUtils.writeUTF8String(buf, sound.toString());
-		}
+		buf.writeFloat(dirX);
+		buf.writeFloat(dirZ);
+		if (sound != null) ByteBufUtils.writeUTF8String(buf, sound.toString());
 	}
 
-
-	public Vec3d getDirection() {
-		return direction;
+	public IMessage process(MessageContext ctx) {
+		if (ctx.side == Side.CLIENT) Minecraft.getMinecraft().addScheduledTask(() -> HordeClientHandler.INSTANCE.playHordeSound(dirX, dirZ, sound));
+		return null;
 	}
 
-	public ResourceLocation getSound() {
-		return sound;
-	}
 }

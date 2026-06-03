@@ -3,15 +3,13 @@ package net.smileycorp.hordes.config.data.values;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.world.World;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.atlas.api.recipe.WeightedOutputs;
 import net.smileycorp.hordes.common.HordesLogger;
+import net.smileycorp.hordes.common.event.HordePlayerEvent;
+import net.smileycorp.hordes.config.data.hordeevent.HordeContext;
 
 import java.util.Map;
-import java.util.Random;
 
 public class WeightedRandomValueGetter<T extends Comparable<T>> implements ValueGetter<T> {
     
@@ -20,13 +18,13 @@ public class WeightedRandomValueGetter<T extends Comparable<T>> implements Value
     public WeightedRandomValueGetter(WeightedOutputs<ValueGetter<T>> outputs) {
         this.outputs = outputs;
     }
-    
+
     @Override
-    public T get(World level, EntityLivingBase entity, EntityPlayerMP player, Random rand) {
-        return outputs.getResult(rand).get(level, entity, player, rand);
+    public T get(HordeContext<? extends HordePlayerEvent> ctx) {
+        return outputs.getResult(ctx.getRandom()).get(ctx);
     }
     
-    public static <T extends Number & Comparable<T>> WeightedRandomValueGetter deserialize(JsonObject json, DataType<T> type) {
+    public static <T extends Number & Comparable<T>> WeightedRandomValueGetter<T> deserialize(JsonObject json, DataType<T> type) {
         Map<ValueGetter<T>, Integer> values = Maps.newHashMap();
         for (JsonElement element : json.get("value").getAsJsonArray()) {
             try {
@@ -37,7 +35,7 @@ public class WeightedRandomValueGetter<T extends Comparable<T>> implements Value
                 HordesLogger.logError("invalid entry for " + element + " for hordes:weighted_random", e);
             }
         }
-        return new WeightedRandomValueGetter(new WeightedOutputs(values));
+        return new WeightedRandomValueGetter<>(new WeightedOutputs<>(values));
     }
     
 }

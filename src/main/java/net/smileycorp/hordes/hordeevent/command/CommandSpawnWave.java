@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.world.WorldServer;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.hordeevent.capability.WorldDataHordes;
 
@@ -38,7 +39,7 @@ public class CommandSpawnWave extends CommandBase {
 			if (sender.getCommandSenderEntity() instanceof EntityPlayer) {
 				server.addScheduledTask(() -> {
 					EntityPlayer player = (EntityPlayer) sender.getCommandSenderEntity();
-					WorldDataHordes data = WorldDataHordes.getData(sender.getEntityWorld());
+					WorldDataHordes data = WorldDataHordes.getData((WorldServer) sender.getEntityWorld());
 					data.getEvent((EntityPlayerMP) player).spawnWave((EntityPlayerMP) player, count);
 				});
 			}

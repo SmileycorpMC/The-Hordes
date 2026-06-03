@@ -35,7 +35,6 @@ public interface Infection {
 			this.count = count;
 		}
 
-
 	}
 
 	class Storage implements IStorage<Infection> {
@@ -49,7 +48,6 @@ public interface Infection {
 		public void readNBT(Capability<Infection> capability, Infection instance, EnumFacing side, NBTBase nbt) {
 			if (nbt instanceof NBTTagInt) instance.setInfectionCount(((NBTTagInt) nbt).getInt());
 		}
-
 
 	}
 

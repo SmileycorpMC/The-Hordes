@@ -35,7 +35,7 @@ public class HordeSpawnTable {
     }
 
     public WeightedOutputs<HordeSpawnEntry> getSpawnTable(int day) {
-        List<Map.Entry<HordeSpawnEntry, Integer>> spawnmap = new ArrayList<>();
+        List<Map.Entry<HordeSpawnEntry, Integer>> spawnmap = Lists.newArrayList();
         for(HordeSpawnEntry entry : spawns) if (entry.getMinDay() <= day && (entry.getMaxDay() == 0 || entry.getMaxDay() >= day)) {
             spawnmap.add(new AbstractMap.SimpleEntry<>(entry, entry.getWeight()));
             HordesLogger.logInfo("Adding entry " + entry + " to hordespawn on day " + day);

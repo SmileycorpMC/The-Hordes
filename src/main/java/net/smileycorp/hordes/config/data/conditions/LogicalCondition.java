@@ -2,15 +2,13 @@ package net.smileycorp.hordes.config.data.conditions;
 
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.world.World;
 import net.smileycorp.atlas.api.data.LogicalOperation;
 import net.smileycorp.hordes.common.HordesLogger;
+import net.smileycorp.hordes.common.event.HordePlayerEvent;
 import net.smileycorp.hordes.config.data.DataRegistry;
+import net.smileycorp.hordes.config.data.hordeevent.HordeContext;
 
 import java.util.List;
-import java.util.Random;
 
 public class LogicalCondition implements Condition {
 
@@ -23,9 +21,9 @@ public class LogicalCondition implements Condition {
 	}
 
 	@Override
-	public boolean apply(World level, EntityLivingBase entity, EntityPlayerMP player, Random rand) {
+	public boolean apply(HordeContext<? extends HordePlayerEvent> ctx) {
 		boolean result = false;
-		for (Condition condition : conditions) result = operation.apply(result, condition.apply(level, entity, player, rand));
+		for (Condition condition : conditions) result = operation.apply(result, condition.apply(ctx));
 		return result;
 	}
 
@@ -49,9 +47,9 @@ public class LogicalCondition implements Condition {
 					HordesLogger.logError("Failed to read condition of logical " + element, e);
 				}
 			}
-			return new LogicalCondition(operation, conditions.toArray(new Condition[]{}));
+			return new LogicalCondition(operation, conditions.toArray(new Condition[conditions.size()]));
 		} catch(Exception e) {
-			HordesLogger.logError("Incorrect parameters for condition hordes:"+operation.getName(), e);
+			HordesLogger.logError("Incorrect parameters for condition hordes:" + operation.getName(), e);
 		}
 		return null;
 	}

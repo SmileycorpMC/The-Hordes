@@ -19,7 +19,7 @@ public abstract class MixinEntityZombieVillager extends EntityZombie {
 	}
 
 	@Inject(at=@At("HEAD"), method = "processInteract(Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/EnumHand;)Z", cancellable = true)
-	public void processInteract(EntityPlayer player, EnumHand hand, CallbackInfoReturnable<Boolean> callback) {
+	public void horde$processInteract(EntityPlayer player, EnumHand hand, CallbackInfoReturnable<Boolean> callback) {
 		if (!CommonConfigHandler.zombieVillagersCanBeCured) callback.setReturnValue(super.processInteract(player, hand));
 	}
 

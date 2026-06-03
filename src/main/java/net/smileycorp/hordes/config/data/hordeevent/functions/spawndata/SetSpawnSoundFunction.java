@@ -5,6 +5,7 @@ import net.minecraft.util.ResourceLocation;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.HordeBuildSpawnDataEvent;
+import net.smileycorp.hordes.config.data.hordeevent.HordeContext;
 import net.smileycorp.hordes.config.data.hordeevent.functions.HordeFunction;
 import net.smileycorp.hordes.config.data.values.ValueGetter;
 
@@ -17,8 +18,8 @@ public class SetSpawnSoundFunction implements HordeFunction<HordeBuildSpawnDataE
     }
 
     @Override
-    public void apply(HordeBuildSpawnDataEvent event) {
-        event.getSpawnData().setSpawnSound(new ResourceLocation(getter.get(event)));
+    public void apply(HordeContext<HordeBuildSpawnDataEvent> ctx) {
+        ctx.getSpawnData().setSpawnSound(new ResourceLocation(getter.get(ctx)));
     }
 
     public static SetSpawnSoundFunction deserialize(JsonElement json) {

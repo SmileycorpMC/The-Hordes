@@ -16,7 +16,11 @@ commands.hordes.HordeClean.success=Cleared all existing horde world data
 message.hordes.EventStart=You hear the howls of a nearby horde
 message.hordes.EventEnd=The air is quiet, the horde has stopped
 message.hordes.TrySleep=A feeling of impending dread prevents you from sleeping
+message.hordes.OtherPlayerTrySleep=%1$s is restless, it seems this night will be eventful
 message.hordes.title=The Hordes
+
+message.hordes.DataError=Errors exist in currently loaded data, please check the file %1$s for more information.
+message.hordes.DataErrorScripts=Errors exist in loaded scripts %1$s, please check the file %2$s for more information.
 
 message.hordes.DeathMessage=%1$s succumbed to their infection.
 message.hordes.DeathMessageFighting=%1$s succumbed to their infection while fighting %2$s.
@@ -28,7 +32,12 @@ hordes.subtitle.infected=Player Infected
 hordes.subtitle.immune=Player Infection Blocked
 
 entity.hordes.ZombiePlayer.chat=%1$s's Zombie
+entity.hordes.DrownedPlayer.chat=Drowned %1$s
+entity.hordes.HuskPlayer.chat=%1$s's Husk
+
 entity.hordes.ZombiePlayer.name=Player Zombie
+entity.hordes.DrownedPlayer.name=Drowned Player
+entity.hordes.HuskPlayer.name=Player Husk
 
 effect.hordes.Infected=Infection
 effect.hordes.Immunity=Infection Immunity

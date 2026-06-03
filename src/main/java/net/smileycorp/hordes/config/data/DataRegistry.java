@@ -24,8 +24,8 @@ import java.util.function.Function;
 
 public class DataRegistry {
 
-	private static Map<ResourceLocation, BiFunction<JsonObject, DataType, ValueGetter>> VALUE_GETTERS = Maps.newHashMap();
-	private static Map<ResourceLocation, Function<JsonElement, Condition>> CONDITION_DESERIALIZERS = Maps.newHashMap();
+	private static final Map<ResourceLocation, BiFunction<JsonObject, DataType, ValueGetter>> VALUE_GETTERS = Maps.newHashMap();
+	private static final Map<ResourceLocation, Function<JsonElement, Condition>> CONDITION_DESERIALIZERS = Maps.newHashMap();
 
 	public static void init() {
 		registerValueGetters();
@@ -44,6 +44,9 @@ public class DataRegistry {
 		registerValueGetter(Constants.loc("player_pos"), PlayerPosGetter::deserialize);
 		registerValueGetter(Constants.loc("entity_nbt"), EntityNBTGetter::deserialize);
 		registerValueGetter(Constants.loc("entity_pos"), EntityPosGetter::deserialize);
+		registerValueGetter(Constants.loc("day"), EventDayGetter::deserialize);
+		registerValueGetter(Constants.loc("spawn_table"), SpawnTableGetter::deserialize);
+		registerValueGetter(Constants.loc("get_variable"), VariableGetter::deserialize);
 	}
 
 	public static void registerConditionDeserializers() {
@@ -51,16 +54,17 @@ public class DataRegistry {
 			registerConditionDeserializer(Constants.loc(operation.getName()), e -> LogicalCondition.deserialize(operation, e));
 		registerConditionDeserializer(Constants.loc("not"), NotCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("comparison"), ComparisonCondition::deserialize);
-		registerConditionDeserializer(Constants.loc("random"), RandomCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("biome"), BiomeCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("day"), DayCondition::deserialize);
-		registerConditionDeserializer(Constants.loc("player_day"), PlayerDayCondition::deserialize);
+		registerConditionDeserializer(Constants.loc("player_day"), DayCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("local_difficulty"), LocalDifficultyCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("game_difficulty"), GameDifficultyCondition::deserialize);
+		registerConditionDeserializer(Constants.loc("random"), RandomCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("advancement"), AdvancementCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("entity_type"), EntityTypeCondition::deserialize);
-		if (Loader.isModLoaded("gamestages"))
-			registerConditionDeserializer(new ResourceLocation("gamestages:gamestage"), GameStagesCondition::deserialize);
+		registerConditionDeserializer(Constants.loc("is_called"), IsCalledCondition::deserialize);
+		if (Loader.isModLoaded("gamestages")) registerConditionDeserializer(
+				new ResourceLocation("gamestages:gamestage"), GameStagesCondition::deserialize);
 	}
 
 	public static ValueGetter readValue(DataType type, JsonObject json) {

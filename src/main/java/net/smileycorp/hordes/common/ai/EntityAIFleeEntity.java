@@ -40,6 +40,11 @@ public class EntityAIFleeEntity extends EntityAIBase {
 		return !getEntities().isEmpty();
 	}
 
+	private List<EntityLivingBase> getEntities() {
+		return world.getEntitiesWithinAABB(EntityLivingBase.class, new AxisAlignedBB(entity.posX - range, entity.posY - range, entity.posZ - range,
+				entity.posX + range, entity.posY + range, entity.posZ + range), predicate);
+	}
+
 	@Override
 	public void startExecuting() {
 		waterCost = entity.getPathPriority(PathNodeType.WATER);
@@ -53,16 +58,15 @@ public class EntityAIFleeEntity extends EntityAIBase {
 	@Override
 	public void resetTask() {
 		pather.clearPath();
-		entity.setPathPriority(PathNodeType.WATER, this.waterCost);
+		entity.setPathPriority(PathNodeType.WATER, waterCost);
 	}
 
 	@Override
 	public void updateTask() {
-		if (--timeToRecalcPath <= 0)  {
-			timeToRecalcPath = 5;
-			BlockPos pos = findSafePos();
-			pather.tryMoveToXYZ(pos.getX(), pos.getY(), pos.getZ(), speed);
-		}
+		if (timeToRecalcPath-- > 0) return;
+		timeToRecalcPath = 5;
+		BlockPos pos = findSafePos();
+		pather.tryMoveToXYZ(pos.getX(), pos.getY(), pos.getZ(), speed);
 	}
 
 	private BlockPos findSafePos() {
@@ -70,14 +74,9 @@ public class EntityAIFleeEntity extends EntityAIBase {
 		Vec3d resultDir = new Vec3d(0, 0, 0);
 		for (EntityLivingBase entity : getEntities()) {
 			Vec3d dir = DirectionUtils.getDirectionVecXZ(this.entity, entity);
-			resultDir = new Vec3d((dir.x + resultDir.x)/2, (dir.y + resultDir.y)/2, (dir.z + resultDir.z)/2);
+			resultDir = new Vec3d((dir.x + resultDir.x) * 0.5, (dir.y + resultDir.y) * 0.5, (dir.z + resultDir.z) * 0.5);
 		}
-		return new BlockPos(pos.add(resultDir));
-	}
-
-	private List<EntityLivingBase> getEntities() {
-		return world.getEntitiesWithinAABB(EntityLivingBase.class, new AxisAlignedBB(entity.posX - range, entity.posY - range, entity.posZ - range,
-				entity.posX + range, entity.posY + range, entity.posZ + range), predicate);
+		return world.getHeight(new BlockPos(pos.add(resultDir)));
 	}
 
 }

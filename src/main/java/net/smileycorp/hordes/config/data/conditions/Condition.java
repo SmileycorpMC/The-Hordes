@@ -1,13 +1,10 @@
 package net.smileycorp.hordes.config.data.conditions;
 
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.world.World;
-
-import java.util.Random;
+import net.smileycorp.hordes.common.event.HordePlayerEvent;
+import net.smileycorp.hordes.config.data.hordeevent.HordeContext;
 
 public interface Condition {
 	
-	boolean apply(World level, EntityLivingBase entity, EntityPlayerMP player, Random rand);
+	boolean apply(HordeContext<? extends HordePlayerEvent> ctx);
 
 }

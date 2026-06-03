@@ -2,14 +2,11 @@ package net.smileycorp.hordes.config.data.values;
 
 import com.google.gson.JsonObject;
 import net.minecraft.command.CommandBase;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.World;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
-
-import java.util.Random;
+import net.smileycorp.hordes.common.event.HordePlayerEvent;
+import net.smileycorp.hordes.config.data.hordeevent.HordeContext;
 
 public class PlayerNBTGetter<T extends Comparable<T>> extends NBTGetter<T> {
 
@@ -18,13 +15,13 @@ public class PlayerNBTGetter<T extends Comparable<T>> extends NBTGetter<T> {
 	}
 
 	@Override
-	protected NBTTagCompound getNBT(World level, EntityLivingBase entity, EntityPlayerMP player, Random rand) {
-		return CommandBase.entityToNBT(player);
+	protected NBTTagCompound getNBT(HordeContext<? extends HordePlayerEvent> ctx) {
+		return CommandBase.entityToNBT(ctx.getPlayer());
 	}
 	
-	public static <T extends Comparable<T>> ValueGetter deserialize(JsonObject object, DataType<T> type) {
+	public static <T extends Comparable<T>> PlayerNBTGetter<T> deserialize(JsonObject object, DataType<T> type) {
 		try {
-			if (object.has("value")) return new PlayerNBTGetter<T>(ValueGetter.readValue(DataType.STRING, object.get("value")), type);
+			if (object.has("value")) return new PlayerNBTGetter<>(ValueGetter.readValue(DataType.STRING, object.get("value")), type);
 		} catch (Exception e) {
 			HordesLogger.logError("invalid value for hordes:player_nbt", e);
 		}

@@ -1,9 +1,12 @@
 package net.smileycorp.hordes.hordeevent.network;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.smileycorp.hordes.client.ClientHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
 import net.smileycorp.hordes.config.HordeEventConfig;
+import net.smileycorp.hordes.hordeevent.client.HordeClientHandler;
 
 public class UpdateClientHordeMessage implements IMessage {
 	
@@ -28,9 +31,10 @@ public class UpdateClientHordeMessage implements IMessage {
 		buf.writeBoolean(horde_day);
 		buf.writeInt(day_length);
 	}
-	
-	public void process() {
-		ClientHandler.setHordeDay(horde_day, day_length);
+
+	public IMessage process(MessageContext ctx) {
+		if (ctx.side == Side.CLIENT) Minecraft.getMinecraft().addScheduledTask(() -> HordeClientHandler.INSTANCE.setHordeDay(horde_day, day_length));
+		return null;
 	}
 	
 }

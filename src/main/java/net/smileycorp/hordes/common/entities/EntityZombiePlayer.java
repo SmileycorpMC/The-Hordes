@@ -18,17 +18,20 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.smileycorp.hordes.config.ZombiePlayersConfig;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.UUID;
 
 
-public class EntityZombiePlayer extends EntityZombie {
+public class EntityZombiePlayer extends EntityZombie implements PlayerZombie<EntityZombiePlayer> {
 
-	protected static final DataParameter<Optional<UUID>> PLAYER_UUID = EntityDataManager.createKey(EntityZombiePlayer.class, DataSerializers.OPTIONAL_UNIQUE_ID);
+	public static final Type<EntityZombiePlayer> TYPE = new Type<>("zombie", EntityZombiePlayer.class);
+
+	protected static final DataParameter<Optional<UUID>> PLAYER = EntityDataManager.createKey(EntityZombiePlayer.class, DataSerializers.OPTIONAL_UNIQUE_ID);
 	protected static final DataParameter<Boolean> SHOW_CAPE = EntityDataManager.createKey(EntityZombiePlayer.class, DataSerializers.BOOLEAN);
 
 	protected NonNullList<ItemStack> playerItems = NonNullList.<ItemStack>create();
@@ -44,16 +47,10 @@ public class EntityZombiePlayer extends EntityZombie {
 		super(world);
 	}
 
-	public EntityZombiePlayer(EntityPlayer player) {
-		this(player.world);
-		setPlayer(player);
-	}
-
-
 	@Override
 	protected void entityInit() {
 		super.entityInit();
-		dataManager.register(PLAYER_UUID, Optional.of(UUID.fromString("1512ce82-00e5-441a-9774-f46d9b7badfb")));
+		dataManager.register(PLAYER, Optional.absent());
 		dataManager.register(SHOW_CAPE, true);
 	}
 
@@ -66,31 +63,47 @@ public class EntityZombiePlayer extends EntityZombie {
 		setPlayer(player.getGameProfile());
 	}
 
+	@Override
 	public void setPlayer(String username) {
 		setPlayer(FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerProfileCache().getGameProfileForUsername(username));
 	}
 
+	@Override
 	public void setPlayer(UUID uuid) {
 		setPlayer(FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerProfileCache().getProfileByUUID(uuid));
 	}
 
+	@Override
 	public void setPlayer(GameProfile profile) {
-		UUID uuid = profile.getId();
-		setCustomNameTag(profile.getName());
-		dataManager.set(PLAYER_UUID, Optional.of(uuid));
+		if (profile == null) return;
+		if (profile.getName() != null) setCustomNameTag(profile.getName());
+		dataManager.set(PLAYER, Optional.of(profile.getId()));
 	}
 
-	public UUID getPlayerUUID() {
-		return dataManager.get(PLAYER_UUID).get();
+	@Override
+	public Optional<UUID> getPlayerUUID() {
+		return dataManager.get(PLAYER);
 	}
 
-	public void setInventory(List<EntityItem> list) {
+	@Override
+	public void storeDrops(Collection<EntityItem> drops) {
 		playerItems.clear();
-		for (EntityItem item : list) {
+		for (EntityItem item : drops) {
 			ItemStack stack = item.getItem();
 			item.setDead();
 			if (stack != null) playerItems.add(stack.copy());
 		}
+	}
+
+	@Override
+	public void setInventory(NonNullList<ItemStack> list) {
+		playerItems.clear();
+		playerItems.addAll(list);
+	}
+
+	@Override
+	public NonNullList<ItemStack> getInventory() {
+		return playerItems;
 	}
 
 	@Override
@@ -102,18 +115,18 @@ public class EntityZombiePlayer extends EntityZombie {
 	
 	@Override
 	public void onRemovedFromWorld() {
-		dropEquipment(false, 0);
+		if (world.getDifficulty() == EnumDifficulty.PEACEFUL  && canDespawn()) dropEquipment(false, 0);
 		super.onRemovedFromWorld();
-	}
-
-	@Override
-	public boolean isImmuneToFire() {
-		return ZombiePlayersConfig.zombiePlayersFireImmune ? true : super.isImmuneToFire();
 	}
 
 	@Override
 	public boolean shouldBurnInDay() {
 		return ZombiePlayersConfig.zombiePlayersBurn;
+	}
+
+	@Override
+	public boolean isImmuneToFire() {
+		return ZombiePlayersConfig.zombiePlayersFireImmune ? true : super.isImmuneToFire();
 	}
 
 	@Override
@@ -125,8 +138,8 @@ public class EntityZombiePlayer extends EntityZombie {
 	@Override
 	public void writeEntityToNBT(NBTTagCompound compound) {
 		super.writeEntityToNBT(compound);
-		UUID uuid = getPlayerUUID();
-		if (uuid != null) compound.setString("player", uuid.toString());
+		Optional<UUID> uuid = getPlayerUUID();
+		if (uuid.isPresent()) compound.setString("player", uuid.toString());
 		ItemStackHelper.saveAllItems(compound, playerItems);
 	}
 
@@ -151,52 +164,87 @@ public class EntityZombiePlayer extends EntityZombie {
 	@Override
 	public void onUpdate() {
 		super.onUpdate();
-		xCloakO = xCloak;
-		yCloakO = yCloak;
-		zCloakO = zCloak;
-		double d0 = posX - xCloak;
-		double d1 = posY - yCloak;
-		double d2 = posZ - zCloak;
-		if (d0 > 10.0D) {
-			xCloak = posX;
-			xCloakO = xCloak;
-		}
-		if (d2 > 10.0D) {
-			zCloak = posZ;
-			zCloakO = zCloak;
-		}
-		if (d1 > 10.0D) {
-			yCloak = posY;
-			yCloakO = yCloak;
-		}
-		if (d0 < -10.0D) {
-			xCloak = posX;
-			xCloakO = xCloak;
-		}
-		if (d2 < -10.0D) {
-			zCloak = posZ;
-			zCloakO = zCloak;
-		}
-		if (d1 < -10.0D) {
-			yCloak = posY;
-			yCloakO = yCloak;
-		}
-		xCloak += (d0 * 0.25D);
-		yCloak += (d1 * 0.25D);
-		zCloak += (d2 * 0.25D);
+		moveCloak();
 	}
 	
 	@Override
 	protected boolean canDespawn() {
-		return playerItems.isEmpty() |! ZombiePlayersConfig.zombiePlayersDespawnPeaceful ? super.canDespawn() : false;
+		return playerItems.isEmpty() | !ZombiePlayersConfig.zombiePlayersDespawnPeaceful && super.canDespawn();
 	}
-	
+
+	@Override
 	public void setDisplayCape(boolean display) {
 		dataManager.set(SHOW_CAPE, display);
 	}
-	
+
+	@Override
 	public boolean displayCape() {
 		return dataManager.get(SHOW_CAPE);
 	}
-	
+
+	@Override
+	public double getXCloakO() {
+		return xCloakO;
+	}
+
+	@Override
+	public double getYCloakO() {
+		return yCloakO;
+	}
+
+	@Override
+	public double getZCloakO() {
+		return zCloakO;
+	}
+
+	@Override
+	public double getXCloak() {
+		return xCloak;
+	}
+
+	@Override
+	public double getYCloak() {
+		return yCloak;
+	}
+
+	@Override
+	public double getZCloak() {
+		return zCloak;
+	}
+
+	@Override
+	public void setXCloakO(double value) {
+		xCloakO = value;
+	}
+
+	@Override
+	public void setYCloakO(double value) {
+		yCloakO = value;
+	}
+
+	@Override
+	public void setZCloakO(double value) {
+		zCloakO = value;
+	}
+
+	@Override
+	public void setXCloak(double value) {
+		xCloak = value;
+	}
+
+	@Override
+	public void setYCloak(double value) {
+		yCloak = value;
+	}
+
+	@Override
+	public void setZCloak(double value) {
+		zCloak = value;
+	}
+
+	@Override
+	public Type<EntityZombiePlayer> getType() {
+		return TYPE;
+	}
+
 }

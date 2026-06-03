@@ -18,11 +18,8 @@ public abstract class MixinEntityAnimal extends EntityAgeable {
 	}
 
 	@Inject(at=@At("TAIL"), method = "canDespawn()Z", cancellable = true)
-	protected void canDespawn(CallbackInfoReturnable<Boolean> callback) {
-		if (((EntityAgeable)this) instanceof EntityZombieHorse && CommonConfigHandler.aggressiveZombieHorses) {
-			callback.setReturnValue(true);
-			callback.cancel();
-		}
+	protected void hordes$canDespawn(CallbackInfoReturnable<Boolean> callback) {
+		if (((EntityAgeable)this) instanceof EntityZombieHorse && CommonConfigHandler.aggressiveZombieHorses) callback.setReturnValue(true);
 	}
 
 }

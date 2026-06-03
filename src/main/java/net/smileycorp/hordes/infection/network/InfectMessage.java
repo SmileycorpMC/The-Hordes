@@ -5,7 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
-import net.smileycorp.hordes.client.ClientHandler;
+import net.smileycorp.hordes.infection.client.InfectionClientHandler;
 
 public class InfectMessage implements IMessage {
     
@@ -28,7 +28,7 @@ public class InfectMessage implements IMessage {
     }
     
     public IMessage process(MessageContext ctx) {
-        if (ctx.side == Side.CLIENT) Minecraft.getMinecraft().addScheduledTask(() -> ClientHandler.onInfect(prevented));
+        if (ctx.side == Side.CLIENT) Minecraft.getMinecraft().addScheduledTask(() -> InfectionClientHandler.INSTANCE.onInfect(prevented));
         return null;
     }
     

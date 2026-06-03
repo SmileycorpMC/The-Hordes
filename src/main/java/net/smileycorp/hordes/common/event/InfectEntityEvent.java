@@ -9,18 +9,18 @@ import net.minecraftforge.fml.common.eventhandler.Cancelable;
 @Cancelable
 public class InfectEntityEvent extends LivingEvent {
 
-    private final EntityLiving attacker;
+    private final EntityLivingBase attacker;
     private final DamageSource source;
     private final float amount;
 
-    public InfectEntityEvent(EntityLivingBase entity, EntityLiving attacker, DamageSource source, float amount) {
+    public InfectEntityEvent(EntityLivingBase entity, EntityLivingBase attacker, DamageSource source, float amount) {
         super(entity);
         this.attacker = attacker;
         this.source = source;
         this.amount = amount;
     }
 
-    public EntityLiving getAttacker() {
+    public EntityLivingBase getAttacker() {
         return attacker;
     }
 
