@@ -30,15 +30,17 @@ public class Constants {
 	}
 
 	public static String name(String modid, String name) {
-		return modid + "." + name.replace("_", "");
+		return modid + "." + name;
 	}
 
 	public static ResourceLocation loc(String name) {
 		return new ResourceLocation(MODID, name.toLowerCase(Locale.US));
 	}
 
-	public static String locStr(String string) {
-		return loc(string).toString();
+	public static String locStr(String... strings) {
+		StringBuilder builder = new StringBuilder(MODID);
+		for (String string : strings) builder.append(".").append(string);
+		return builder.toString();
 	}
 
 	private static SoundEvent sound(ResourceLocation loc) {

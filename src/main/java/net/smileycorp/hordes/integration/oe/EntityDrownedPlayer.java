@@ -157,7 +157,7 @@ public class EntityDrownedPlayer extends EntityDrowned implements PlayerZombie<E
 	@Override
 	public ITextComponent getDisplayName() {
 		despawnEntity();
-		TextComponentTranslation textcomponentstring = new TextComponentTranslation(ScorePlayerTeam.formatPlayerName(getTeam(), "entity.hordes.ZombiePlayer.chat"), ScorePlayerTeam.formatPlayerName(getTeam(), getName()));
+		TextComponentTranslation textcomponentstring = new TextComponentTranslation(ScorePlayerTeam.formatPlayerName(getTeam(), "entity.hordes.drowned_player.chat"), ScorePlayerTeam.formatPlayerName(getTeam(), getName()));
 		textcomponentstring.getStyle().setHoverEvent(getHoverEvent());
 		textcomponentstring.getStyle().setInsertion(getCachedUniqueIdString());
 		return textcomponentstring;

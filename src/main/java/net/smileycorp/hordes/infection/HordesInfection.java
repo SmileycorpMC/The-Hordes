@@ -13,7 +13,7 @@ import net.smileycorp.hordes.common.Constants;
 public class HordesInfection {
 	
 	public static final Potion INFECTED = new PotionInfected();
-	public static final Potion IMMUNITY = new PotionHordes("Immunity",  false, 0x00923A89);
+	public static final Potion IMMUNITY = new PotionHordes("immunity",  false, 0x00923A89);
 
 	public static final IAttribute INFECTIVITY = new RangedAttribute(null, Constants.name("infectivity"), 0, 0, 1);
 	public static final IAttribute INFECTION_RESISTANCE = new RangedAttribute(null, Constants.name("infection_resistance"), 0, 0, 1);
