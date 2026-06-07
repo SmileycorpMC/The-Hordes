@@ -7,7 +7,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
-import net.smileycorp.atlas.api.util.Func;
 import net.smileycorp.hordes.config.data.infection.InfectionData;
 import net.smileycorp.hordes.infection.HordesInfection;
 import net.smileycorp.hordes.infection.network.CureEntityMessage;

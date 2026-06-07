@@ -4,7 +4,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderGlobal;
-import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.config.ClientConfigHandler;
 import net.smileycorp.hordes.hordeevent.client.HordeClientHandler;
 import org.spongepowered.asm.mixin.Mixin;

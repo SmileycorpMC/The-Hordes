@@ -5,8 +5,6 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Tuple;
-import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -14,7 +12,6 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.smileycorp.atlas.api.data.Pair;
 import net.smileycorp.hordes.config.data.infection.InfectionData;
-import net.smileycorp.hordes.infection.client.InfectionClientHandler;
 
 import java.util.List;
 import java.util.Map;

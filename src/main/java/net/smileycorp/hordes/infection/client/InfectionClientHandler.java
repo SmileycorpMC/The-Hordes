@@ -1,7 +1,5 @@
 package net.smileycorp.hordes.infection.client;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.Gui;
@@ -10,7 +8,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
@@ -25,24 +22,17 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
-import net.smileycorp.atlas.api.data.Pair;
-import net.smileycorp.atlas.api.util.RecipeUtils;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.config.ClientConfigHandler;
-import net.smileycorp.hordes.config.data.infection.InfectionConversionEntry;
 import net.smileycorp.hordes.config.data.infection.InfectionData;
 import net.smileycorp.hordes.infection.HordesInfection;
-import net.smileycorp.hordes.infection.jei.JEIPluginInfection;
 import net.smileycorp.hordes.infection.network.CureEntityMessage;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 public class InfectionClientHandler {

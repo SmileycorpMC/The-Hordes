@@ -13,7 +13,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.config.data.infection.InfectionData;
-import net.smileycorp.hordes.infection.client.InfectionClientHandler;
 
 import java.util.List;
 

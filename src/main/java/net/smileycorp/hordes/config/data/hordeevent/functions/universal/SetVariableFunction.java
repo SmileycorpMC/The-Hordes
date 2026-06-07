@@ -3,17 +3,11 @@ package net.smileycorp.hordes.config.data.hordeevent.functions.universal;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.smileycorp.atlas.api.data.DataType;
-import net.smileycorp.atlas.api.data.Pair;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
-import net.smileycorp.hordes.config.data.conditions.Condition;
 import net.smileycorp.hordes.config.data.hordeevent.HordeContext;
 import net.smileycorp.hordes.config.data.hordeevent.functions.HordeFunction;
 import net.smileycorp.hordes.config.data.values.ValueGetter;
-
-import java.util.AbstractMap;
-import java.util.List;
-import java.util.Map;
 
 public class SetVariableFunction implements HordeFunction<HordePlayerEvent> {
 

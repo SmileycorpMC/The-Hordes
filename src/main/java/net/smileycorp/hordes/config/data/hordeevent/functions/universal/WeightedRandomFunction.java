@@ -3,8 +3,6 @@ package net.smileycorp.hordes.config.data.hordeevent.functions.universal;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.block.BlockSlab;
-import net.minecraft.block.BlockStairs;
 import net.smileycorp.atlas.api.data.Pair;
 import net.smileycorp.atlas.api.recipe.WeightedOutputs;
 import net.smileycorp.hordes.common.HordesLogger;

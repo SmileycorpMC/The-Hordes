@@ -1,8 +1,6 @@
 package net.smileycorp.hordes.config.data.values;
 
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.atlas.api.data.NBTExplorer;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
