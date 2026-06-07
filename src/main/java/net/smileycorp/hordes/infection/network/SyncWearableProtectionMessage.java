@@ -13,6 +13,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.smileycorp.atlas.api.data.Pair;
+import net.smileycorp.hordes.config.data.infection.InfectionData;
 import net.smileycorp.hordes.infection.client.InfectionClientHandler;
 
 import java.util.List;
@@ -47,7 +48,7 @@ public class SyncWearableProtectionMessage implements IMessage {
 	}
 	
 	public IMessage process(MessageContext ctx) {
-		if (ctx.side == Side.CLIENT) Minecraft.getMinecraft().addScheduledTask(() -> InfectionClientHandler.INSTANCE.readWearableProtection(data));
+		if (ctx.side == Side.CLIENT) Minecraft.getMinecraft().addScheduledTask(() -> InfectionData.INSTANCE.readWearableProtection(data));
 		return null;
 	}
 

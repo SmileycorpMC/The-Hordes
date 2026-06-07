@@ -11,6 +11,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.smileycorp.hordes.common.HordesLogger;
+import net.smileycorp.hordes.config.data.infection.InfectionData;
 import net.smileycorp.hordes.infection.client.InfectionClientHandler;
 
 import java.util.AbstractMap;
@@ -49,7 +50,7 @@ public class SyncImmunityItemsMessage implements IMessage {
 	}
 	
 	public IMessage process(MessageContext ctx) {
-		if (ctx.side == Side.CLIENT) Minecraft.getMinecraft().addScheduledTask(() -> InfectionClientHandler.INSTANCE.readImmunityItems(data));
+		if (ctx.side == Side.CLIENT) Minecraft.getMinecraft().addScheduledTask(() -> InfectionData.INSTANCE.readImmunityItems(data));
 		return null;
 	}
 

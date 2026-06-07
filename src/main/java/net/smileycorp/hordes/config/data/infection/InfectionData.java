@@ -21,6 +21,7 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.registry.EntityEntry;
@@ -36,6 +37,7 @@ import net.smileycorp.hordes.config.data.HordesJsonLoader;
 import net.smileycorp.hordes.config.data.HordesParsingException;
 import net.smileycorp.hordes.infection.HordesInfection;
 import net.smileycorp.hordes.infection.PotionInfected;
+import net.smileycorp.hordes.infection.jei.JEIPluginInfection;
 import net.smileycorp.hordes.infection.network.*;
 
 import javax.annotation.Nullable;
@@ -71,11 +73,20 @@ public class InfectionData extends HordesJsonLoader {
 
     @Override
     protected void readData(Map<ResourceLocation, JsonElement> data) {
+        loadInfectionCures(data);
+        loadConversionTable(data);
+        loadImmunityItems(data);
+        loadWearablesProtection(data);
+        loadEntityInfectionChances(data);
+    }
+    private void loadInfectionCures(Map<ResourceLocation, JsonElement> data) {
+        JsonElement json = data.get(Constants.loc("infection_cures"));
+        if (json == null) return;
         HordesLogger.blankLine();
         HordesLogger.heading("LOADING INFECTION CURES");
         cures.clear();
         try {
-            for (JsonElement element : data.get(Constants.loc("infection_cures")).getAsJsonArray()) {
+            for (JsonElement element : json.getAsJsonArray()) {
                 try {
                     ItemStack stack = parseStack(element);
                     if (stack != null) {
@@ -89,11 +100,15 @@ public class InfectionData extends HordesJsonLoader {
         } catch (Exception e) {
             HordesLogger.logError("Failed to load infection cures", e);
         }
+    }
+
+    private void loadConversionTable(Map<ResourceLocation, JsonElement> data) {
+        JsonElement json = data.get(Constants.loc("infection_conversions"));
+        if (json == null) return;
         HordesLogger.blankLine();
         HordesLogger.heading("LOADING CONVERSION TABLE");
         try {
             HordesLogger.blankLine();
-            JsonElement json = data.get(Constants.loc("infection_conversions"));
             for (JsonElement element : json.getAsJsonArray()) try {
                 InfectionConversionEntry entry = InfectionConversionEntry.deserialize(element.getAsJsonObject());
                 conversionTable.put((Class<? extends EntityLivingBase>) entry.getEntity().getEntityClass(), entry);
@@ -103,10 +118,15 @@ public class InfectionData extends HordesJsonLoader {
         } catch (Exception e) {
             HordesLogger.logError("Failed to load conversion table" + e.getMessage(), e);
         }
+    }
+
+    private void loadImmunityItems(Map<ResourceLocation, JsonElement> data) {
+        JsonElement json = data.get(Constants.loc("immunity_items"));
+        if (json == null) return;
         HordesLogger.blankLine();
         HordesLogger.heading("LOADING IMMUNITY ITEMS");
         try {
-            for (JsonElement element : data.get(Constants.loc("immunity_items")).getAsJsonArray()) try {
+            for (JsonElement element : json.getAsJsonArray()) try {
                 JsonObject obj = element.getAsJsonObject();
                 ResourceLocation name = new ResourceLocation(obj.get("item").getAsString());
                 ItemStack stack = parseStack(obj.get("item"));
@@ -119,10 +139,15 @@ public class InfectionData extends HordesJsonLoader {
         } catch (Exception e) {
             HordesLogger.logError("Failed to load immunity item list", e);
         }
+    }
+
+    private void loadWearablesProtection(Map<ResourceLocation, JsonElement> data) {
+        JsonElement json = data.get(Constants.loc("wearables_protection"));
+        if (json == null) return;
         HordesLogger.blankLine();
         HordesLogger.heading("LOADING WEARABLE PROTECTION LIST");
         try {
-            for (JsonElement element : data.get(Constants.loc("wearables_protection")).getAsJsonArray()) try {
+            for (JsonElement element : json.getAsJsonArray()) try {
                 JsonObject obj = element.getAsJsonObject();
                 ResourceLocation name = new ResourceLocation(obj.get("item").getAsString());
                 Item item = ForgeRegistries.ITEMS.getValue(name);
@@ -136,10 +161,15 @@ public class InfectionData extends HordesJsonLoader {
         } catch (Exception e) {
             HordesLogger.logError("Failed to load wearable protection list", e);
         }
+    }
+
+    private void loadEntityInfectionChances(Map<ResourceLocation, JsonElement> data) {
+        JsonElement json = data.get(Constants.loc("infection_entities"));
+        if (json == null) return;
         HordesLogger.blankLine();
         HordesLogger.heading("LOADING ENTITY INFECTION CHANCES");
         try {
-            for (JsonElement element : data.get(Constants.loc("infection_entities")).getAsJsonArray()) try {
+            for (JsonElement element : json.getAsJsonArray()) try {
                 JsonObject obj = element.getAsJsonObject();
                 ResourceLocation name = new ResourceLocation(obj.get("entity").getAsString());
                 EntityEntry entity = ForgeRegistries.ENTITIES.getValue(name);
@@ -244,7 +274,9 @@ public class InfectionData extends HordesJsonLoader {
     }
 
     public int getImmunityLength(ItemStack stack) {
-        return immunityItems.getOrDefault(stack.getItem(), 0);
+        for (Map.Entry<ItemStack, Integer> entry : immunityItems.entrySet())
+            if (RecipeUtils.compareItemStacks(stack, entry.getKey(), true)) return entry.getValue();
+        return 0;
     }
 
     public boolean applyImmunity(EntityLivingBase entity, ItemStack stack) {
@@ -272,8 +304,7 @@ public class InfectionData extends HordesJsonLoader {
     @Nullable
     public Pair<Float, Byte> getProtection(ItemStack stack) {
         if (stack.isEmpty()) return null;
-        Item item = stack.getItem();
-        return wearablesProtection.containsKey(item) ? wearablesProtection.get(item) : null;
+        return wearablesProtection.getOrDefault(stack.getItem(), null);
     }
 
     @Deprecated
@@ -297,6 +328,22 @@ public class InfectionData extends HordesJsonLoader {
         InfectionPacketHandler.sendTo(new SyncCuresMessage(cures), player);
         InfectionPacketHandler.sendTo(new SyncImmunityItemsMessage(immunityItems), player);
         InfectionPacketHandler.sendTo(new SyncWearableProtectionMessage(wearablesProtection), player);
+    }
+
+    public void readCures(List<ItemStack> data) {
+        cures.clear();
+        cures.addAll(data);
+        if (Loader.isModLoaded("jei")) JEIPluginInfection.setRecipes(cures);
+    }
+
+    public void readImmunityItems(List<Map.Entry<ItemStack, Integer>> data) {
+        immunityItems.clear();
+        data.forEach(entry -> immunityItems.put(entry.getKey(), entry.getValue()));
+    }
+
+    public void readWearableProtection(List<Pair<Item, Pair<Float, Byte>>> data) {
+        wearablesProtection.clear();
+        data.forEach(pair -> wearablesProtection.put(pair.getFirst(), pair.getSecond()));
     }
 
 }

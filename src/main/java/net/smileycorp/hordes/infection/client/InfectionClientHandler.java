@@ -49,10 +49,6 @@ public class InfectionClientHandler {
 
 	public static final InfectionClientHandler INSTANCE = new InfectionClientHandler();
 
-	private final List<ItemStack> cures = Lists.newArrayList();
-	private final Map<ItemStack, Integer> immunityItems = Maps.newHashMap();
-	private final Map<Item, Pair<Float, Byte>> wearablesProtection = Maps.newHashMap();
-
 	@SubscribeEvent
 	public void renderOverlay(RenderGameOverlayEvent.Post event){
 		if (!ClientConfigHandler.playerInfectionVisuals) return;
@@ -106,34 +102,9 @@ public class InfectionClientHandler {
 			tooltips.add(new TextComponentTranslation("tooltip.hordes.cure").getFormattedText());
 		if (ClientConfigHandler.immunityTooltip) {
 			int immunity = InfectionData.INSTANCE.getImmunityLength(stack);
-			if (immunity > 0) tooltips.add(TextFormatting.BLUE + I18n.translateToLocal("effect.hordes.Immunity") + " (" +
+			if (immunity > 0) tooltips.add(TextFormatting.BLUE + I18n.translateToLocal("effect.hordes.immunity") + " (" +
 						Potion.getPotionDurationString(new PotionEffect(HordesInfection.IMMUNITY, immunity * 20), 1) + ")");
 		}
-	}
-	
-	@SubscribeEvent
-	public void logOut(PlayerEvent.PlayerLoggedOutEvent event) {
-		cures.clear();
-		immunityItems.clear();
-		wearablesProtection.clear();
-	}
-
-	public boolean isCure(ItemStack stack) {
-		for (ItemStack cure : cures) if (RecipeUtils.compareItemStacks(stack, cure, cure.getTagCompound() != null)) return true;
-		return false;
-	}
-
-	public void readCures(List<ItemStack> data) {
-		cures.addAll(data);
-		if (Loader.isModLoaded("jei")) JEIPluginInfection.setRecipes(cures);
-	}
-
-	public void readImmunityItems(List<Map.Entry<ItemStack, Integer>> data) {
-		data.forEach(e -> immunityItems.put(e.getKey(), e.getValue()));
-	}
-
-	public void readWearableProtection(List<Pair<Item, Pair<Float, Byte>>> data) {
-		data.forEach(e -> wearablesProtection.put(e.getFirst(), e.getSecond()));
 	}
 
 	public void onInfect(boolean prevented) {
