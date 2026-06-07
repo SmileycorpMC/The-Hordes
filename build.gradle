@@ -59,6 +59,8 @@ minecraft {
     }
 }
 
+sourceSets { main { output.resourcesDir = output.classesDir } }
+
 mixin {
     add sourceSets.main, "mixins.hordes.refmap.json"
 }
@@ -77,10 +79,10 @@ dependencies {
 	implementation "org.spongepowered:mixin:0.8"
 	
 	implementation "curse.maven:atlas-463826:8206890"
-	implementation "curse.maven:jei-238222:4393461"
-	implementation "curse.maven:mpr-285012:2823889"
-    implementation "curse.maven:gamestages-268655:2951840"
-    implementation fg.deobf("curse.maven:oe-840576:7009970")
+	compileOnly "curse.maven:jei-238222:4393461"
+	compileOnly "curse.maven:mpr-285012:2823889"
+    compileOnly "curse.maven:gamestages-268655:2951840"
+    compileOnly fg.deobf("curse.maven:oe-840576:7009970")
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
