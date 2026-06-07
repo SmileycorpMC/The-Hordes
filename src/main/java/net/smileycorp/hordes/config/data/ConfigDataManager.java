@@ -73,7 +73,7 @@ public class ConfigDataManager {
             return flag;
         } catch (Exception e) {
             HordesLogger.logError("Failed data version check", e);
-            return false;
+            return true;
         }
     }
     
