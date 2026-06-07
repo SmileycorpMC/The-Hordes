@@ -76,7 +76,7 @@ dependencies {
     minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2860'
 	implementation "org.spongepowered:mixin:0.8"
 	
-	implementation "curse.maven:atlas-463826:7845224"
+	implementation "curse.maven:atlas-463826:8206890"
 	implementation "curse.maven:jei-238222:4393461"
 	implementation "curse.maven:mpr-285012:2823889"
     implementation "curse.maven:gamestages-268655:2951840"
