@@ -15,6 +15,8 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -89,6 +91,9 @@ public class ConfigDataManager {
 
     public static void reload() {
         HordesLogger.clearLog(false);
+        HordesLogger.blankLine();
+        HordesLogger.logInfo("[" + LocalTime.now() + "] reloaded hordes configs");
+        HordesLogger.blankLine();
         for (HordesJsonLoader loader : jsonLoaders) {
             loader.clearData();
             loader.loadData();

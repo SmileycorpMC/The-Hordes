@@ -12,6 +12,7 @@ commands.hordes.HordeDebug.usage=/debugHorde
 commands.hordes.HordeDebug.success=Output horde log to %1$s
 commands.hordes.HordeClean.usage=/clearHordeData
 commands.hordes.HordeClean.success=Cleared all existing horde world data
+commands.hordes.Reload.success=Reloaded hordes configs
 
 message.hordes.EventStart=You hear the howls of a nearby horde
 message.hordes.EventEnd=The air is quiet, the horde has stopped
