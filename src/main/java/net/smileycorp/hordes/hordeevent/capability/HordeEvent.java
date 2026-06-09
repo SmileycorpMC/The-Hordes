@@ -298,7 +298,7 @@ public class HordeEvent {
 		spawnData.setTable(table);
 	}
 
-	public HordeSpawnTable getSpawntable() {
+	public HordeSpawnTable getSpawnTable() {
 		return spawnData == null ? null : spawnData.getTable();
 	}
 

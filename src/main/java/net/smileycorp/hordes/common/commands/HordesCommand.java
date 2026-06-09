@@ -30,8 +30,8 @@ public class HordesCommand extends CommandBase {
 
     @Override
     public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos pos) {
-        if (args.length <= 1) return Lists.newArrayList(sub_commands.keySet());
-        if (sub_commands.containsKey(args[0])) sub_commands.get(args[0]).getTabCompletions(server, ArrayUtils.remove(args, 0), pos);
+        if (args.length <= 1) return CommandBase.getListOfStringsMatchingLastWord(args, sub_commands.keySet());
+        if (sub_commands.containsKey(args[0])) return sub_commands.get(args[0]).getTabCompletions(server, ArrayUtils.remove(args, 0), pos);
         return Lists.newArrayList();
     }
 
@@ -45,7 +45,7 @@ public class HordesCommand extends CommandBase {
         throw new CommandNotFoundException();
     }
 
-    public void register(String name, SubCommand subcommand) {
+    public void registerSubCommand(String name, SubCommand subcommand) {
         sub_commands.put(name, subcommand);
     }
 

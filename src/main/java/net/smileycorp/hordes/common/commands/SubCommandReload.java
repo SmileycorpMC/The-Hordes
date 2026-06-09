@@ -8,6 +8,8 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.config.data.ConfigDataManager;
 
+import java.time.LocalTime;
+
 public class SubCommandReload implements HordesCommand.SubCommand {
 
     @Override
@@ -15,7 +17,7 @@ public class SubCommandReload implements HordesCommand.SubCommand {
         ConfigDataManager.reload();
         Entity entity = iCommandSender.getCommandSenderEntity();
         if (entity == null) return;
-        entity.sendMessage(new TextComponentTranslation("commands.hordes.Reload.success", HordesLogger.getFiletext()));
+        entity.sendMessage(new TextComponentTranslation("commands.hordes.Reload.success", "[" + LocalTime.now() + "]"));
     }
 
 }

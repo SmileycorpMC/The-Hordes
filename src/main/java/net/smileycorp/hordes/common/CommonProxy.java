@@ -26,10 +26,10 @@ import net.smileycorp.hordes.config.data.hordeevent.HordeTableLoader;
 import net.smileycorp.hordes.config.data.infection.InfectionData;
 import net.smileycorp.hordes.hordeevent.HordeEventHandler;
 import net.smileycorp.hordes.hordeevent.capability.HordeSpawn;
-import net.smileycorp.hordes.hordeevent.command.CommandDebugHordeEvent;
-import net.smileycorp.hordes.hordeevent.command.CommandSpawnWave;
-import net.smileycorp.hordes.hordeevent.command.CommandStartHordeEvent;
-import net.smileycorp.hordes.hordeevent.command.CommandStopHordeEvent;
+import net.smileycorp.hordes.hordeevent.command.SubcommandDebugHordeEvent;
+import net.smileycorp.hordes.hordeevent.command.SubcommandStartHordeEvent;
+import net.smileycorp.hordes.hordeevent.command.SubCommandStopHordeEvent;
+import net.smileycorp.hordes.hordeevent.command.SubCommandSpawnWave;
 import net.smileycorp.hordes.hordeevent.network.HordeEventPacketHandler;
 import net.smileycorp.hordes.infection.InfectionEventHandler;
 import net.smileycorp.hordes.infection.capability.Infection;
@@ -73,14 +73,14 @@ public class CommonProxy {
 
 	public void serverStart(FMLServerStartingEvent event) {
 		HordesCommand command = new HordesCommand();
-		command.register("reload", new SubCommandReload());
-		command.register("listEntities", new SubCommandListEntities());
-		command.register("spawnZombie", new SubCommandSpawnZombie());
+		command.registerSubCommand("reload", new SubCommandReload());
+		command.registerSubCommand("listEntities", new SubCommandListEntities());
+		command.registerSubCommand("spawnZombie", new SubCommandSpawnZombie());
 		if (HordeEventConfig.enableHordeEvent) {
-			event.registerServerCommand(new CommandSpawnWave());
-			event.registerServerCommand(new CommandStartHordeEvent());
-			event.registerServerCommand(new CommandStopHordeEvent());
-			event.registerServerCommand(new CommandDebugHordeEvent());
+			command.registerSubCommand("spawnWave", new SubCommandSpawnWave());
+			command.registerSubCommand("start", new SubcommandStartHordeEvent());
+			command.registerSubCommand("stop", new SubCommandStopHordeEvent());
+			command.registerSubCommand("debug", new SubcommandDebugHordeEvent());
 		}
 		event.registerServerCommand(command);
 	}

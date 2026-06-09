@@ -14,7 +14,9 @@ import net.smileycorp.hordes.hordeevent.HordeSpawnEntry;
 import net.smileycorp.hordes.hordeevent.HordeSpawnTable;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class HordeTableLoader extends HordesJsonLoader {
 
@@ -75,5 +77,9 @@ public class HordeTableLoader extends HordesJsonLoader {
         if (table == null) HordesLogger.logInfo("Failed loading table " + loc + ", loading fallback table hordes:fallback");
         return table == null ? getFallbackTable() : table;
     }
-    
+
+    public List<String> getSuggestions() {
+        return SPAWN_TABLES.keySet().stream().map(ResourceLocation::toString).collect(Collectors.toList());
+    }
+
 }

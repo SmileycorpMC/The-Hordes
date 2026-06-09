@@ -76,7 +76,7 @@ public class HordesLogger {
         return writeToFile(Lists.newArrayList(String.valueOf(message)));
     }
 
-    private static boolean writeToFile(List<String> out) {
+    public static boolean writeToFile(List<String> out) {
         try {
             if (!is_volatile) persistent_data.addAll(out);
             Files.write(log_file, out, StandardCharsets.UTF_8, StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
