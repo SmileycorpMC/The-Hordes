@@ -11,22 +11,22 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.InputStreamReader;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.*;
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 
 public class ConfigDataManager {
 
-    private static Path CONFIG_FOLDER;
+    public static Path CONFIG_FOLDER;
     private static List<HordesJsonLoader> jsonLoaders = Lists.newArrayList();
     
-    public static void init(FMLPreInitializationEvent event) {
-        CONFIG_FOLDER = event.getModConfigurationDirectory().toPath().resolve("hordes");
-        if (shouldGenerateFiles(event.getModConfigurationDirectory().toPath())) generateData();
+    public static void init() {
+        HordesLogger.blankLine();
+        HordesLogger.heading("CHECKING CONFIG DATA");
+        HordesLogger.blankLine();
+        CONFIG_FOLDER = Paths.get(new File("config/hordes").getAbsolutePath());
+        if (shouldGenerateFiles(CONFIG_FOLDER.getParent())) generateData();
         else HordesLogger.logInfo("Config data files are up to date, skipping data/asset generation");
     }
 

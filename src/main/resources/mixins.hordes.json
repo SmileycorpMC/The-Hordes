@@ -16,6 +16,7 @@
     "MixinItemStack"
   ],
   "client": [
+    "MixinMinecraft",
     "MixinRenderGlobal"
   ],
   "server": []

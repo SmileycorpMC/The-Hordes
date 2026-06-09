@@ -1,52 +1,26 @@
-commands.hordes.SpawnHordeWave.usage=/spawnHordeWave <number of mobs to spawn>
-commands.hordes.SpawnHordeWave.success=Succesfully summoned horde wave
+commands.hordes.SpawnHordeWave.usage=/hordes spawnWave <player> <number of mobs to spawn> <option:table>
+commands.hordes.SpawnHordeWave.success=Succesfully summoned horde wave;
 commands.hordes.SpawnHordeWave.invalidValue=%1$s is not a valid argument for <number of mobs to spawn>
 commands.hordes.SpawnHordeWave.wrongArgCount=Wrong number of arguments supplied for /spawnHordeWave
-commands.hordes.StartHorde.usage=/startHordeEvent <length of event>
+commands.hordes.StartHorde.usage=/hordes start <player> <length of event> <option:table>
 commands.hordes.StartHorde.success=Succesfully started horde event for %1$s ticks
-commands.hordes.StartHorde.invalidValue=%1$s is not a valid argument for <length of event>
+commands.hordes.StartHorde.invalidValue=%1$s is not a valid argument for <length of event>;
 commands.hordes.StartHorde.wrongArgCount=Wrong number of arguments supplied for /startHordeEvent
-commands.hordes.StopHorde.usage=/stopHordeEvent
+commands.hordes.StopHorde.usage=/hordes stop
 commands.hordes.StopHorde.success=Stopped active horde event
-commands.hordes.HordeDebug.usage=/debugHorde 
+commands.hordes.HordeDebug.usage=/hordes debug
 commands.hordes.HordeDebug.success=Output horde log to %1$s
 commands.hordes.HordeClean.usage=/clearHordeData
 commands.hordes.HordeClean.success=Cleared all existing horde world data
+commands.hordes.HordeReset.usage=/hordes reset <optional: player>
+commands.hordes.HordeReset.success=Reset all horde data for player %1$s
+commands.hordes.ListEntities.usage=/hordes listEntities
+commands.hordes.ListEntities.success=Output a list of all entities to %1$s
 commands.hordes.Reload.success=%1$s Reloaded hordes configs
-
-message.hordes.EventStart=You hear the howls of a nearby horde
-message.hordes.EventEnd=The air is quiet, the horde has stopped
-message.hordes.TrySleep=A feeling of impending dread prevents you from sleeping
-message.hordes.OtherPlayerTrySleep=%1$s is restless, it seems this night will be eventful
-message.hordes.title=The Hordes
-
+	
+commands.hordes.SpawnZombie.usage=/hordes spawnZombie <username> <pos> <type>
+	
 message.hordes.DataError=Errors exist in currently loaded data, please check the file %1$s for more information.
 message.hordes.DataErrorScripts=Errors exist in loaded scripts %1$s, please check the file %2$s for more information.
-
-message.hordes.DeathMessage=%1$s succumbed to their infection.
-message.hordes.DeathMessageFighting=%1$s succumbed to their infection while fighting %2$s.
-message.hordes.DeathMessageOther=%1$s while infected.
-death.attack.infection.zombified=%1$s was zombified.
-
-hordes.subtitle.hordeHowls=Zombie Howls
-hordes.subtitle.infected=Player Infected
-hordes.subtitle.immune=Player Infection Blocked
-
-entity.hordes.zombie_player.chat=%1$s's Zombie
-entity.hordes.drowned_player.chat=Drowned %1$s
-entity.hordes.husk_player.chat=%1$s's Husk
-
-entity.hordes.zombie_player.name=Player Zombie
-entity.hordes.drowned_player.name=Drowned Player
-entity.hordes.husk_player.name=Player Husk
-
-effect.hordes.infected=Infection
-effect.hordes.immunity=Infection Immunity
-
-attribute.name.hordes.infection_resistance=Infection Resistance
-attribute.name.hordes.infectivity=Infectivity
-
-tooltip.hordes.cure=Cures infection
-tooltip.hordes.wearableProtection=%1$s protection against infection
 
 jei.category.hordes.InfectionCures=Infection Cures

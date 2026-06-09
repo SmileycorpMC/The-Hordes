@@ -44,10 +44,6 @@ public class CommonProxy {
 		CommonConfigHandler.syncConfig(new Configuration(event.getSuggestedConfigurationFile()));
 		DataRegistry.init();
 		//generate data files
-		HordesLogger.blankLine();
-		HordesLogger.heading("CHECKING CONFIG DATA");
-		HordesLogger.blankLine();
-		ConfigDataManager.init(event);
 		ConfigDataManager.registerJsonLoader(new HordeTableLoader(event));
 		ConfigDataManager.registerJsonLoader(new HordeScriptLoader(event));
 		ConfigDataManager.registerJsonLoader(new InfectionData(event));
