@@ -17,7 +17,6 @@ import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.commands.HordesCommand;
 import net.smileycorp.hordes.config.data.hordeevent.HordeTableLoader;
-import net.smileycorp.hordes.hordeevent.HordeSpawnTable;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 import net.smileycorp.hordes.hordeevent.capability.WorldDataHordes;
 

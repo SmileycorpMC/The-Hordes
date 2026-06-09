@@ -5,7 +5,6 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentTranslation;
-import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.config.data.ConfigDataManager;
 
 import java.time.LocalTime;
