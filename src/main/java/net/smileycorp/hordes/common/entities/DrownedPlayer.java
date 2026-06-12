@@ -169,8 +169,9 @@ public class DrownedPlayer extends Drowned implements PlayerZombie<DrownedPlayer
 	
 	@Override
 	public MutableComponent getDisplayName() {
+		Optional<Component> name = Optional.ofNullable(getCustomName());
 		MutableComponent component = PlayerTeam.formatNameForTeam(getTeam(),
-				Component.translatable("entity.hordes.DrownedPlayer.chat", getCustomName()));
+				Component.translatable("entity.hordes.DrownedPlayer.chat", name.orElseGet(this::getName)));
 		component.getStyle().withHoverEvent(createHoverEvent());
 		component.getStyle().withInsertion(getEncodeId());
 		return component;

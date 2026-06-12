@@ -184,8 +184,9 @@ public class HuskPlayer extends Husk implements PlayerZombie<HuskPlayer> {
 	
 	@Override
 	public MutableComponent getDisplayName() {
+		Optional<Component> name = Optional.ofNullable(getCustomName());
 		MutableComponent component = PlayerTeam.formatNameForTeam(getTeam(),
-				Component.translatable("entity.hordes.HuskPlayer.chat", getCustomName()));
+				Component.translatable("entity.hordes.HuskPlayer.chat", name.orElseGet(this::getName)));
 		component.getStyle().withHoverEvent(createHoverEvent());
 		component.getStyle().withInsertion(getEncodeId());
 		return component;
