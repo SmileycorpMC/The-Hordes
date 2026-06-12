@@ -188,8 +188,9 @@ public class ZombiePlayer extends Zombie implements PlayerZombie<ZombiePlayer> {
 	
 	@Override
 	public MutableComponent getDisplayName() {
+		Optional<Component> name = Optional.ofNullable(getCustomName());
 		MutableComponent component = PlayerTeam.formatNameForTeam(getTeam(),
-				Component.translatable("entity.hordes.ZombiePlayer.chat", getCustomName()));
+				Component.translatable("entity.hordes.ZombiePlayer.chat", name.orElseGet(this::getName)));
 		component.getStyle().withHoverEvent(createHoverEvent());
 		component.getStyle().withInsertion(getEncodeId());
 		return component;
