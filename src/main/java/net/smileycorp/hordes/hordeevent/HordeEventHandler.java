@@ -126,7 +126,7 @@ public class HordeEventHandler {
 		Optional<ServerPlayer> optional = data.getPlayersWithHorde().findAny();
 		if (optional.isEmpty()) return;
 		event.setProblem(BedSleepingProblem.OTHER_PROBLEM);
-		player.displayClientMessage(Component.translatable(Constants.otherPlayerTrySleep, optional.get()), true);
+		player.displayClientMessage(Component.translatable(Constants.otherPlayerTrySleep, optional.get().getDisplayName()), true);
 	}
 
 }
