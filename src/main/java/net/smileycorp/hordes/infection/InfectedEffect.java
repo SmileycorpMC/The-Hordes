@@ -53,7 +53,7 @@ public class InfectedEffect extends MobEffect {
 		AttributeInstance attribute = map.getInstance(Attributes.MOVEMENT_SPEED);
 		if (attribute == null) return;
 		attribute.removeModifier(SPEED_MOD_UUID);
-		attribute.addPermanentModifier(new AttributeModifier(SPEED_MOD_NAME,
+		attribute.addPermanentModifier(new AttributeModifier(SPEED_MOD_UUID, SPEED_MOD_NAME,
 				SPEED_MOD_AMOUNT * amplifier, AttributeModifier.Operation.MULTIPLY_TOTAL));
 	}
 
