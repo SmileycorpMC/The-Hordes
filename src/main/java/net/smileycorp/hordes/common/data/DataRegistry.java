@@ -24,8 +24,8 @@ import java.util.function.Function;
 
 public class DataRegistry {
 
-	private static Map<ResourceLocation, BiFunction<JsonObject, DataType, ValueGetter>> VALUE_GETTERS = Maps.newHashMap();
-	private static Map<ResourceLocation, Function<JsonElement, Condition>> CONDITION_DESERIALIZERS = Maps.newHashMap();
+	private static final Map<ResourceLocation, BiFunction<JsonObject, DataType, ValueGetter>> VALUE_GETTERS = Maps.newHashMap();
+	private static final Map<ResourceLocation, Function<JsonElement, Condition>> CONDITION_DESERIALIZERS = Maps.newHashMap();
 
 	public static void init() {
 		registerValueGetters();
@@ -63,7 +63,8 @@ public class DataRegistry {
 		registerConditionDeserializer(Constants.loc("advancement"), AdvancementCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("entity_type"), EntityTypeCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("is_called"), IsCalledCondition::deserialize);
-		if (ModList.get().isLoaded("gamestages")) registerConditionDeserializer(new ResourceLocation("gamestages:gamestage"), GameStagesCondition::deserialize);
+		if (ModList.get().isLoaded("gamestages")) registerConditionDeserializer(
+				new ResourceLocation("gamestages:gamestage"), GameStagesCondition::deserialize);
 	}
 
 	public static ValueGetter readValue(DataType type, JsonObject json) {

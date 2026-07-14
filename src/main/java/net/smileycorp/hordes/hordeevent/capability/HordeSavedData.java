@@ -26,7 +26,7 @@ public class HordeSavedData extends SavedData {
 	private int next_day = 0;
 	protected ServerLevel level = null;
 
-	private Map<UUID, HordeEvent> events = Maps.newHashMap();
+	private final Map<UUID, HordeEvent> events = Maps.newHashMap();
 
 	public void load(CompoundTag nbt) {
 		if (nbt.contains("next_day")) {

@@ -221,10 +221,9 @@ public class HordeEvent {
 	private void cleanSpawns() {
 		List<Mob> toRemove = Lists.newArrayList();
 		for (Mob entity : entitiesSpawned) {
-			if (entity.isAlive() |! entity.isRemoved()) continue;
-			LazyOptional<HordeSpawn> optional = entity.getCapability(HordesCapabilities.HORDESPAWN, null);
+			if (entity.isAlive() &! entity.isRemoved()) continue;
 			toRemove.add(entity);
-			optional.ifPresent(cap -> cap.setPlayerUUID(""));
+			entity.getCapability(HordesCapabilities.HORDESPAWN, null).ifPresent(cap -> cap.setPlayerUUID(""));
 		}
 		entitiesSpawned.removeAll(toRemove);
 	}

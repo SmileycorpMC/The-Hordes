@@ -30,11 +30,6 @@ public class SetVariableFunction implements HordeFunction<HordePlayerEvent> {
         ctx.setValue(variable.get(ctx), value.get(ctx));
     }
 
-    private static <T extends HordePlayerEvent> Map.Entry<Integer, HordeFunction<T>> mapEntry(Pair<List<Condition>, Pair<Integer, HordeFunction<T>>> pair) {
-        Pair<Integer, HordeFunction<T>> subpair = pair.getSecond();
-        return new AbstractMap.SimpleEntry<>(subpair.getFirst(), subpair.getSecond());
-    }
-
     public static SetVariableFunction deserialize(JsonElement json) {
         try {
             JsonObject obj = (JsonObject) json;

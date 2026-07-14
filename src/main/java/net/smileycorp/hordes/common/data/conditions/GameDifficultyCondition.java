@@ -18,13 +18,13 @@ public class GameDifficultyCondition implements Condition {
 
 	@Override
 	public boolean apply(HordeContext<? extends HordePlayerEvent> ctx) {
-		Comparable value = difficulty.get(ctx);
+		Comparable<?> value = difficulty.get(ctx);
 		return ctx.getWorld().getDifficulty() == (value instanceof String ? Difficulty.byName((String) value) : Difficulty.byId((Integer) value));
 	}
 
 	public static GameDifficultyCondition deserialize(JsonElement json) {
 		try {
-			ValueGetter getter;
+			ValueGetter<?> getter;
 			try {
 				getter = ValueGetter.readValue(DataType.STRING, json);
 			} catch (Exception e) {
