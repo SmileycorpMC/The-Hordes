@@ -14,6 +14,7 @@ import net.smileycorp.atlas.api.data.UnaryOperation;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.data.conditions.*;
+import net.smileycorp.hordes.common.data.conditions.astages.PlayerStageCondition;
 import net.smileycorp.hordes.common.data.conditions.gamestages.GameStageCondition;
 import net.smileycorp.hordes.common.data.values.*;
 import net.smileycorp.hordes.config.HordeEventConfig;
@@ -64,8 +65,11 @@ public class DataRegistry {
 		registerConditionDeserializer(Constants.loc("advancement"), AdvancementCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("entity_type"), EntityTypeCondition::deserialize);
 		registerConditionDeserializer(Constants.loc("is_called"), IsCalledCondition::deserialize);
-		if (ModList.get().isLoaded("gamestages")) registerConditionDeserializer(
+		ModList mods = ModList.get();
+		if (mods.isLoaded("gamestages")) registerConditionDeserializer(
 				new ResourceLocation("gamestages:gamestage"), GameStageCondition::deserialize);
+		if (mods.isLoaded("astages")) registerConditionDeserializer(
+				new ResourceLocation("astages:player_stage"), PlayerStageCondition::deserialize);
 	}
 
 	public static ValueGetter readValue(DataType type, JsonObject json) {
