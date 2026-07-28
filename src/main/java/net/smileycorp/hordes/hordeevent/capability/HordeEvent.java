@@ -38,6 +38,7 @@ import net.smileycorp.hordes.config.HordeEventConfig;
 import net.smileycorp.hordes.hordeevent.HordeSpawnData;
 import net.smileycorp.hordes.hordeevent.HordeSpawnEntry;
 import net.smileycorp.hordes.hordeevent.HordeSpawnTable;
+import net.smileycorp.hordes.hordeevent.Playtime;
 import net.smileycorp.hordes.hordeevent.data.HordeScriptLoader;
 import net.smileycorp.hordes.hordeevent.data.HordeTableLoader;
 import net.smileycorp.hordes.hordeevent.network.HordeEventPacketHandler;
@@ -66,8 +67,7 @@ public class HordeEvent {
 
 	HordeEvent(HordeSavedData data) {
 		this.data = data;
-		nextDay = HordeEventConfig.hordeEventByPlayerTime.get() ? HordeEventConfig.spawnFirstDay.get() ? 0 : HordeEventConfig.hordeSpawnDays.get()
-				: data.getNextDay();
+		nextDay = HordeEventConfig.spawnFirstDay.get() ? 0 : HordeEventConfig.hordeSpawnDays.get();
 	}
 
 	public void readFromNBT(CompoundTag nbt) {
@@ -98,6 +98,7 @@ public class HordeEvent {
 		if (spawnData == null) return;
 		if (timer % spawnData.getSpawnInterval() == 0) spawnWave(player, getMobCount(player, level));
 		timer--;
+		data.setDirty();
 		if (timer == 0) stopEvent(player, false);
 	}
 
@@ -239,7 +240,10 @@ public class HordeEvent {
 	public boolean isHordeDay(ServerPlayer player) {
 		ServerLevel level = player.serverLevel();
 		if (level.dimension() != Level.OVERWORLD) return false;
-		return isActive() || getCurrentDay(player) >= nextDay;
+		long time = getCurrentTime(player);
+		long next = (long) nextDay * (long) HordeEventConfig.dayLength.get() - HordeEventConfig.hordeStartTime.get();
+		return isActive() || (time >= next && time <= next - HordeEventConfig.hordeStartBuffer.get())
+				|| time >= (long) (nextDay + 1) * HordeEventConfig.dayLength.get();
 	}
 
 	public boolean isActive() {
@@ -370,14 +374,17 @@ public class HordeEvent {
 		setNextDay(player);
 		spawnData = null;
 		timer = 0;
+		data.setDirty();
 	}
 	
 	private void setNextDay(ServerPlayer player) {
 		if (!HordeEventConfig.hordeEventByPlayerTime.get()) {
-			nextDay = data.getNextDay();
+			nextDay = data.getNextDay(day);
 			return;
 		}
-		int expectedDay = HordeEventConfig.hordeSpawnDays.get() * ((getCurrentDay(player) / HordeEventConfig.hordeSpawnDays.get()) + 1);
+		int currentDay = getCurrentDay(player);
+		int expectedDay = HordeEventConfig.spawnFirstDay.get() && currentDay == 0 &! isActive() ? 0 :
+				HordeEventConfig.hordeSpawnDays.get() * ((currentDay / HordeEventConfig.hordeSpawnDays.get()) + 1);
 		if (nextDay <= getCurrentDay(player) || Math.abs(nextDay - expectedDay) > HordeEventConfig.hordeSpawnDays.get()
 				+ HordeEventConfig.hordeSpawnVariation.get()) {
 			if (HordeEventConfig.hordeSpawnVariation.get() > 0) {
@@ -399,6 +406,10 @@ public class HordeEvent {
 	
 	public int getDay() {
 		return day;
+	}
+
+	public long getCurrentTime(ServerPlayer player) {
+		return HordeEventConfig.hordeEventByPlayerTime.get() ? ((Playtime)player).getPlaytime() : player.level().getDayTime();
 	}
 
 	public int getCurrentDay(ServerPlayer player) {

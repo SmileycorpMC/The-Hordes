@@ -50,6 +50,7 @@ public class ZombiePlayer extends Zombie implements PlayerZombie<ZombiePlayer> {
 
 	public ZombiePlayer(EntityType<? extends ZombiePlayer> type, Level level) {
 		super(type, level);
+		setPlayer("smileycorp");
 	}
 
 	public ZombiePlayer(Level level) {
@@ -189,7 +190,7 @@ public class ZombiePlayer extends Zombie implements PlayerZombie<ZombiePlayer> {
 	@Override
 	public MutableComponent getDisplayName() {
 		MutableComponent component = PlayerTeam.formatNameForTeam(getTeam(),
-				Component.translatable("entity.hordes.ZombiePlayer.chat", getCustomName()));
+				Component.translatable("entity.hordes.ZombiePlayer.chat", getName()));
 		component.getStyle().withHoverEvent(createHoverEvent());
 		component.getStyle().withInsertion(getEncodeId());
 		return component;

@@ -49,6 +49,7 @@ public class DrownedPlayer extends Drowned implements PlayerZombie<DrownedPlayer
 	
 	public DrownedPlayer(EntityType<? extends DrownedPlayer> type, Level level) {
 		super(type, level);
+		setPlayer("smileycorp");
 	}
 	
 	public DrownedPlayer(Level level) {
@@ -170,7 +171,7 @@ public class DrownedPlayer extends Drowned implements PlayerZombie<DrownedPlayer
 	@Override
 	public MutableComponent getDisplayName() {
 		MutableComponent component = PlayerTeam.formatNameForTeam(getTeam(),
-				Component.translatable("entity.hordes.DrownedPlayer.chat", getCustomName()));
+				Component.translatable("entity.hordes.DrownedPlayer.chat", getName()));
 		component.getStyle().withHoverEvent(createHoverEvent());
 		component.getStyle().withInsertion(getEncodeId());
 		return component;
