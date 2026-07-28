@@ -3,7 +3,6 @@ package net.smileycorp.hordes.config.data;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.smileycorp.hordes.common.HordesLogger;
 import org.apache.commons.io.FileUtils;
 
