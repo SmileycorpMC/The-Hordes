@@ -8,7 +8,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.stats.Stats;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -34,13 +33,17 @@ import net.smileycorp.hordes.config.HordeEventConfig;
 import net.smileycorp.hordes.hordeevent.HordeSpawnData;
 import net.smileycorp.hordes.hordeevent.HordeSpawnEntry;
 import net.smileycorp.hordes.hordeevent.HordeSpawnTable;
+import net.smileycorp.hordes.hordeevent.Playtime;
 import net.smileycorp.hordes.hordeevent.data.HordeScriptLoader;
 import net.smileycorp.hordes.hordeevent.data.HordeTableLoader;
 import net.smileycorp.hordes.hordeevent.network.HordeEventPacketHandler;
 import net.smileycorp.hordes.hordeevent.network.HordeSoundMessage;
 import net.smileycorp.hordes.hordeevent.network.UpdateClientHordeMessage;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
@@ -59,8 +62,7 @@ public class HordeEvent {
 
 	HordeEvent(HordeSavedData data) {
 		this.data = data;
-		nextDay = HordeEventConfig.hordeEventByPlayerTime.get() ? HordeEventConfig.spawnFirstDay.get() ? 0 : HordeEventConfig.hordeSpawnDays.get()
-				: data.getNextDay();
+		nextDay = HordeEventConfig.spawnFirstDay.get() ? 0 : HordeEventConfig.hordeSpawnDays.get();
 	}
 
 	public void readFromNBT(CompoundTag nbt) {
@@ -91,6 +93,7 @@ public class HordeEvent {
 		if (spawnData == null) return;
 		if (timer % spawnData.getSpawnInterval() == 0) spawnWave(player, getMobCount(player, level));
 		timer--;
+		data.setDirty();
 		if (timer == 0) stopEvent(player, false);
 	}
 
@@ -271,6 +274,7 @@ public class HordeEvent {
 			if (postEvent(event)) return;
 			spawnData = event.getSpawnData();
 		}
+		data.setDirty();
 		if (spawnData == null || spawnData.getTable() == null || spawnData.getTable().getSpawnTable(day).isEmpty()) {
 			spawnData = null;
 			logInfo("Spawntable is empty, canceling event start.");
@@ -291,6 +295,7 @@ public class HordeEvent {
 		}
 		if (spawnData == null) spawnData = new HordeSpawnData(this);
 		spawnData.setTable(table);
+		data.setDirty();
 	}
 
 	public HordeSpawnTable getSpawnTable() {
@@ -334,6 +339,7 @@ public class HordeEvent {
 			entity.getAttribute(Attributes.FOLLOW_RANGE).removeModifier(FOLLOW_RANGE_MODIFIER);
 		}
 		rand = null;
+		data.setDirty();
 	}
 
 	public void removeEntity(Mob entity) {
@@ -361,14 +367,17 @@ public class HordeEvent {
 		setNextDay(player);
 		spawnData = null;
 		timer = 0;
+		data.setDirty();
 	}
 	
 	private void setNextDay(ServerPlayer player) {
 		if (!HordeEventConfig.hordeEventByPlayerTime.get()) {
-			nextDay = data.getNextDay();
+			nextDay = data.getNextDay(day);
 			return;
 		}
-		int expectedDay = HordeEventConfig.hordeSpawnDays.get() * ((getCurrentDay(player) / HordeEventConfig.hordeSpawnDays.get()) + 1);
+		int currentDay = getCurrentDay(player);
+		int expectedDay = HordeEventConfig.spawnFirstDay.get() && currentDay == 0 &! isActive() ? 0 :
+				HordeEventConfig.hordeSpawnDays.get() * ((currentDay / HordeEventConfig.hordeSpawnDays.get()) + 1);
 		if (nextDay <= getCurrentDay(player) || Math.abs(nextDay - expectedDay) > HordeEventConfig.hordeSpawnDays.get()
 				+ HordeEventConfig.hordeSpawnVariation.get()) {
 			if (HordeEventConfig.hordeSpawnVariation.get() > 0) {
@@ -393,7 +402,7 @@ public class HordeEvent {
 	}
 
 	public int getCurrentDay(ServerPlayer player) {
-		return (int) Math.floor((HordeEventConfig.hordeEventByPlayerTime.get() ? player.getStats().getValue(Stats.CUSTOM.get(Stats.PLAY_TIME))
+		return (int) Math.floor((HordeEventConfig.hordeEventByPlayerTime.get() ? ((Playtime)player).getPlaytime()
 				: player.level().getDayTime()) / HordeEventConfig.dayLength.get());
 	}
 

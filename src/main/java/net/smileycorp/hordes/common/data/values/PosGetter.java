@@ -1,10 +1,8 @@
 package net.smileycorp.hordes.common.data.values;
 
-import com.google.gson.JsonObject;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.entity.LivingEntity;
 import net.smileycorp.atlas.api.data.DataType;
-import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
 import net.smileycorp.hordes.hordeevent.data.HordeContext;
 

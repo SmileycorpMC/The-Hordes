@@ -23,16 +23,11 @@ import java.util.stream.Stream;
 public class HordeSavedData extends SavedData {
 
 	public static final String DATA = "hordes";
-	private int next_day = 0;
 	protected ServerLevel level = null;
 
 	private final Map<UUID, HordeEvent> events = Maps.newHashMap();
 
 	public void load(CompoundTag nbt) {
-		if (nbt.contains("next_day")) {
-			int next = nbt.getInt("next_day");
-			if (next > next_day) next_day = next;
-		}
 		if (nbt.contains("events")) {
 			CompoundTag events = nbt.getCompound("events");
 			for (String uuid : events.getAllKeys()) {
@@ -46,7 +41,6 @@ public class HordeSavedData extends SavedData {
 
 	@Override
 	public CompoundTag save(CompoundTag nbt) {
-		nbt.putInt("next_day", next_day);
 		CompoundTag events = new CompoundTag();
 		for (Entry<UUID, HordeEvent> entry : this.events.entrySet()) {
 			UUID uuid = entry.getKey();
@@ -57,17 +51,8 @@ public class HordeSavedData extends SavedData {
 		return nbt;
 	}
 
-	public int getNextDay() {
-		return next_day;
-	}
-
-	public void setNextDay(int next_day) {
-		this.next_day = next_day;
-	}
-
-	public void save() {
-		setDirty();
-		if (level instanceof ServerLevel) level.getChunkSource().getDataStorage().set(DATA, this);
+	public int getNextDay(int day) {
+		return day + HordeEventConfig.hordeSpawnDays.get() + getRandom(day).nextInt(HordeEventConfig.hordeSpawnVariation.get() + 1);
 	}
 
 	public HordeEvent getEvent(ServerPlayer player) {
@@ -104,7 +89,7 @@ public class HordeSavedData extends SavedData {
 	@Override
 	public String toString() {
 		return super.toString() + "[current_day: " + (int)Math.floor((float)level.getDayTime() / (float) HordeEventConfig.dayLength.get()) +
-				", current_time: " + level.getDayTime() % HordeEventConfig.dayLength.get() + ", next_day="+ next_day +"]";
+				", current_time: " + level.getDayTime() % HordeEventConfig.dayLength.get();
 	}
 
 	public List<String> getDebugText() {
@@ -135,12 +120,6 @@ public class HordeSavedData extends SavedData {
 	public static HordeSavedData getCleanData(ServerLevel level) {
 		HordeSavedData data = new HordeSavedData();
 		data.level = level;
-		int day = Math.round(level.getDayTime()/ HordeEventConfig.dayLength.get());
-		double multiplier = Math.ceil(day / HordeEventConfig.hordeSpawnDays.get());
-		if (!(HordeEventConfig.spawnFirstDay.get() && day == 0)) multiplier += 1;
-		int nextDay = (int) Math.floor(((multiplier* HordeEventConfig.hordeSpawnDays.get())
-				+ level.random.nextInt(HordeEventConfig.hordeSpawnVariation.get() + 1)));
-		data.setNextDay(nextDay);
 		return data;
 	}
 

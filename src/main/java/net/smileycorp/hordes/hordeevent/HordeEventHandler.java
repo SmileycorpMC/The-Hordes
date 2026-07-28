@@ -1,7 +1,6 @@
 package net.smileycorp.hordes.hordeevent;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -18,14 +17,15 @@ import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
-import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
 import net.minecraftforge.event.entity.living.MobSpawnEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
+import net.minecraftforge.event.level.SleepFinishedTimeEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.config.HordeEventConfig;
@@ -53,25 +53,12 @@ public class HordeEventHandler {
 		event.addListener(HordeScriptLoader.INSTANCE);
 	}
 
-	//update the next day in the horde level data
-	@SubscribeEvent
-	public void serverTick(ServerTickEvent event) {
-		if (event.phase != Phase.START || HordeEventConfig.hordesCommandOnly.get()) return;
-		MinecraftServer server = event.getServer();
-		ServerLevel level = server.overworld();
-		if (HordeEventConfig.pauseEventServer.get() && level.players().isEmpty()) return;
-		int day = (int) Math.floor((double) level.getDayTime() / HordeEventConfig.dayLength.get());
-		HordeSavedData data = HordeSavedData.getData(level);
-		if (day < data.getNextDay()) return;
-		data.setNextDay(level.random.nextInt(HordeEventConfig.hordeSpawnVariation.get() + 1)
-				+ HordeEventConfig.hordeSpawnDays.get() + data.getNextDay());
-		data.save();
-	}
-
 	//spawn the horde at the correct time
 	@SubscribeEvent
 	public void playerTick(PlayerTickEvent event) {
 		if (event.phase != Phase.END || !(event.player instanceof ServerPlayer player) || event.player instanceof FakePlayer) return;
+		Playtime pt = (Playtime) player;
+		pt.setPlaytime(pt.getPlaytime() + 1);
         ServerLevel level = player.serverLevel();
 		if (level.dimension() != Level.OVERWORLD) return;
 		HordeEvent horde = HordeSavedData.getData(level).getEvent(player);
@@ -139,6 +126,15 @@ public class HordeEventHandler {
 		if (optional.isEmpty()) return;
 		event.setResult(BedSleepingProblem.OTHER_PROBLEM);
 		player.displayClientMessage(Component.translatable(Constants.otherPlayerTrySleep, optional.get().getName()), true);
+	}
+
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public void finishSleeping(SleepFinishedTimeEvent event) {
+		long timePassed = event.getNewTime() - event.getLevel().dayTime();
+		for (ServerPlayer player : ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers()) {
+			Playtime pt = (Playtime) player;
+			pt.setPlaytime(pt.getPlaytime() + timePassed);
+		}
 	}
 
 }
