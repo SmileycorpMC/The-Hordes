@@ -279,6 +279,7 @@ public class InfectionData extends HordesJsonLoader {
 
     public boolean applyImmunity(EntityLivingBase entity, ItemStack stack) {
         for (Map.Entry<ItemStack, Integer> entry : immunityItems.entrySet()) if (RecipeUtils.compareItemStacks(stack, entry.getKey(), true)) {
+            if (entity.isPotionActive(HordesInfection.INFECTED)) entity.removePotionEffect(HordesInfection.IMMUNITY);
             entity.addPotionEffect(new PotionEffect(HordesInfection.IMMUNITY, entry.getValue() * 20));
             return true;
         }

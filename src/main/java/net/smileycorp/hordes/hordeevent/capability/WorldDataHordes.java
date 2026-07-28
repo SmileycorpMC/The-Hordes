@@ -38,10 +38,6 @@ public class WorldDataHordes extends WorldSavedData {
 
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
-		if (nbt.hasKey("nextDay")) {
-			int next = nbt.getInteger("nextDay");
-			if (next > next_day) next_day = next;
-		}
 		if (nbt.hasKey("events")) {
 			NBTTagCompound events = nbt.getCompoundTag("events");
 			for (String uuid : events.getKeySet()) {
@@ -55,7 +51,6 @@ public class WorldDataHordes extends WorldSavedData {
 
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
-		nbt.setInteger("nextDay", next_day);
 		NBTTagCompound events = new NBTTagCompound();
 		for (Entry<UUID, HordeEvent> entry : this.events.entrySet()) {
 			UUID uuid = entry.getKey();
@@ -66,12 +61,8 @@ public class WorldDataHordes extends WorldSavedData {
 		return nbt;
 	}
 
-	public int getNextDay() {
-		return next_day;
-	}
-
-	public void setNextDay(int next_day) {
-		this.next_day = next_day;
+	public int getNextDay(int day) {
+		return day + HordeEventConfig.hordeSpawnDays + getRandom(day).nextInt(HordeEventConfig.hordeSpawnVariation + 1);
 	}
 	
 	public void save() {
@@ -103,7 +94,7 @@ public class WorldDataHordes extends WorldSavedData {
 	}
 
 	public Stream<EntityPlayerMP> getPlayersWithHorde() {
-		return world.getPlayers(EntityPlayerMP.class, Func::True).stream().filter(this::isHordeNight);
+		return world.getPlayers(EntityPlayerMP.class, this::isHordeNight).stream();
 	}
 
 	public Random getRandom(int day) {
@@ -139,12 +130,6 @@ public class WorldDataHordes extends WorldSavedData {
 	public static WorldDataHordes getCleanData(WorldServer world) {
 		WorldDataHordes data = new WorldDataHordes();
 		data.world = world;
-		int day = Math.round(world.getWorldTime()/ HordeEventConfig.dayLength);
-		double multiplier = Math.ceil(day / HordeEventConfig.hordeSpawnDays);
-		if (!(HordeEventConfig.spawnFirstDay && day == 0)) multiplier += 1;
-		int nextDay = (int) Math.floor(((multiplier* HordeEventConfig.hordeSpawnDays)
-				+ world.rand.nextInt(HordeEventConfig.hordeSpawnVariation + 1)));
-		data.setNextDay(nextDay);
 		return data;
 	}
 

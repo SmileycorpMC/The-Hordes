@@ -29,6 +29,8 @@ import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 import net.smileycorp.hordes.hordeevent.capability.HordeSpawn;
 import net.smileycorp.hordes.hordeevent.capability.WorldDataHordes;
 
+import java.util.Optional;
+
 public class HordeEventHandler {
 	
 	//attach required entity capabilities for event to function
@@ -39,25 +41,13 @@ public class HordeEventHandler {
 			event.addCapability(Constants.loc("HordeSpawn"), new HordeSpawn.Provider());
 	}
 	
-	//update the next day in the horde world data
-	@SubscribeEvent
-	public void serverTick(TickEvent.ServerTickEvent event) {
-		if (event.phase != TickEvent.Phase.START || HordeEventConfig.hordesCommandOnly) return;
-		MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
-		WorldServer world = server.getWorld(0);
-		if (HordeEventConfig.pauseEventServer && world.playerEntities.isEmpty()) return;
-		int day = (int) Math.floor(world.getWorldTime() / HordeEventConfig.dayLength);
-		WorldDataHordes data = WorldDataHordes.getData(world);
-		if (day >= data.getNextDay()) data.setNextDay(world.rand.nextInt(HordeEventConfig.hordeSpawnVariation + 1)
-				+ HordeEventConfig.hordeSpawnDays + data.getNextDay());
-		data.save();
-	}
-	
 	//spawn the horde at the correct time
 	@SubscribeEvent
 	public void playerTick(TickEvent.PlayerTickEvent event) {
 		if (event.phase != TickEvent.Phase.END || !(event.player instanceof EntityPlayerMP) || event.player instanceof FakePlayer) return;
 		EntityPlayerMP player = (EntityPlayerMP) event.player;
+		Playtime pt = (Playtime) player;
+		pt.setPlaytime(pt.getPlaytime() + 1);
 		WorldServer world = FMLCommonHandler.instance().getMinecraftServerInstance().getWorld(0);
 		if (HordeEventConfig.pauseEventServer && world.playerEntities.isEmpty()) return;
 		HordeEvent horde = WorldDataHordes.getData(world).getEvent(player);
@@ -70,9 +60,8 @@ public class HordeEventHandler {
 			return;
 		}
 		if (time >= HordeEventConfig.hordeStartTime && time <= HordeEventConfig.hordeStartTime + HordeEventConfig.hordeStartBuffer
-				&& day >= horde.getNextDay() && (day > 0 || HordeEventConfig.spawnFirstDay)) {
+				&& day >= horde.getNextDay() && (day > 0 || HordeEventConfig.spawnFirstDay))
 			horde.tryStartEvent(player, -1, false);
-		}
 	}
 	
 	@SubscribeEvent
@@ -116,11 +105,16 @@ public class HordeEventHandler {
 		if (HordeEventConfig.canSleepDuringHorde || !(event.getEntity() instanceof EntityPlayerMP)) return;
 		EntityPlayerMP player = (EntityPlayerMP) event.getEntity();
 		WorldServer world = player.getServerWorld();
-		HordeEvent horde = WorldDataHordes.getData(world).getEvent(player);
-		if (horde == null) return;
-		if (world.isDaytime() |! (world.provider.getDimension() == 0 && (horde.isHordeDay(player) || horde.isActive()))) return;
+		if (world.isDaytime() |! world.provider.canRespawnHere()) return;
+		WorldDataHordes data = WorldDataHordes.getData(world);
+		if (data.isHordeNight(player)) {
+			event.setResult(EntityPlayer.SleepResult.OTHER_PROBLEM);
+			player.sendMessage(new TextComponentTranslation(Constants.hordeTrySleep));
+		}
+		Optional<EntityPlayerMP> optional = data.getPlayersWithHorde().findAny();
+		if (!optional.isPresent()) return;
 		event.setResult(EntityPlayer.SleepResult.OTHER_PROBLEM);
-		player.sendMessage(new TextComponentTranslation(Constants.hordeTrySleep));
+		player.sendMessage(new TextComponentTranslation(Constants.otherPlayerTrySleep, optional.get().getName()));
 	}
 	
 }

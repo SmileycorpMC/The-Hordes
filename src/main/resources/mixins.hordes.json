@@ -3,17 +3,18 @@
   "package": "net.smileycorp.hordes.mixin",
   "refmap": "mixins.hordes.refmap.json",
   "mixins": [
-	"MixinAbstractHorse",
-	"MixinAbstractSkeleton",
+    "MixinAbstractHorse",
+    "MixinAbstractSkeleton",
     "MixinEntity",
-	"MixinEntityAnimal",
+    "MixinEntityAnimal",
     "MixinEntityLiving",
-	"MixinEntityLivingBase",
+    "MixinEntityLivingBase",
     "MixinEntityPlayerMP",
-	"MixinEntityZombie",
-	"MixinEntityZombieHorse",
-	"MixinEntityZombieVillager",
-    "MixinItemStack"
+    "MixinEntityZombie",
+    "MixinEntityZombieHorse",
+    "MixinEntityZombieVillager",
+    "MixinItemStack",
+    "MixinWorldServer"
   ],
   "client": [
     "MixinMinecraft",
