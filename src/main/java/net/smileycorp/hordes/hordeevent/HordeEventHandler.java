@@ -53,25 +53,12 @@ public class HordeEventHandler {
 		event.addListener(HordeScriptLoader.INSTANCE);
 	}
 
-	//update the next day in the horde level data
-	@SubscribeEvent
-	public void serverTick(ServerTickEvent event) {
-		if (event.phase != Phase.START || HordeEventConfig.hordesCommandOnly.get()) return;
-		MinecraftServer server = event.getServer();
-		ServerLevel level = server.overworld();
-		if (HordeEventConfig.pauseEventServer.get() && level.players().isEmpty()) return;
-		int day = (int) Math.floor((double) level.getDayTime() / HordeEventConfig.dayLength.get());
-		HordeSavedData data = HordeSavedData.getData(level);
-		if (day < data.getNextDay()) return;
-		data.setNextDay(level.random.nextInt(HordeEventConfig.hordeSpawnVariation.get() + 1)
-				+ HordeEventConfig.hordeSpawnDays.get() + data.getNextDay());
-		data.save();
-	}
-
 	//spawn the horde at the correct time
 	@SubscribeEvent
 	public void playerTick(PlayerTickEvent event) {
 		if (event.phase != Phase.END || !(event.player instanceof ServerPlayer player) || event.player instanceof FakePlayer) return;
+		Playtime pt = (Playtime) player;
+		pt.setPlaytime(pt.getPlaytime() + 1);
         ServerLevel level = player.serverLevel();
 		if (level.dimension() != Level.OVERWORLD) return;
 		HordeEvent horde = HordeSavedData.getData(level).getEvent(player);
