@@ -25,7 +25,7 @@ public class AddRewardCommandFunction implements HordeFunction<HordeBuildSpawnDa
         try {
             return new AddRewardCommandFunction(ValueGetter.readValue(DataType.STRING, json));
         } catch(Exception e) {
-            HordesLogger.logError("Incorrect parameters for function hordes:set_end_message", e);
+            HordesLogger.logError("Incorrect parameters for function hordes:add_reward_command", e);
         }
         return null;
     }

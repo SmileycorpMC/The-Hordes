@@ -25,11 +25,11 @@ public class CommandSpawnWave {
 		command.then(Commands.literal("spawnWave")
 				.requires((commandSource) -> commandSource.hasPermission(1)).then(Commands.argument("count", IntegerArgumentType.integer())
 						.executes(ctx -> execute(ctx, IntegerArgumentType.getInteger(ctx, "count"), null))
-						.then(Commands.argument("table", ResourceLocationArgument.id()).suggests(HordeTableLoader::getSuggestions)
+						.then(Commands.argument("table", ResourceLocationArgument.id()).suggests(HordeTableLoader.INSTANCE::getSuggestions)
 								.executes(ctx -> execute(ctx,IntegerArgumentType.getInteger(ctx, "count"), ResourceLocationArgument.getId(ctx, "table")))))
 				.then(Commands.argument("player", EntityArgument.players()).then(Commands.argument("count", IntegerArgumentType.integer())
 						.executes(ctx -> execute(ctx, IntegerArgumentType.getInteger(ctx, "count"), EntityArgument.getPlayers(ctx, "player"), null))
-						.then(Commands.argument("table", ResourceLocationArgument.id()).suggests(HordeTableLoader::getSuggestions)
+						.then(Commands.argument("table", ResourceLocationArgument.id()).suggests(HordeTableLoader.INSTANCE::getSuggestions)
 								.executes(ctx -> execute(ctx,IntegerArgumentType.getInteger(ctx, "count"),
 										EntityArgument.getPlayers(ctx, "player"), ResourceLocationArgument.getId(ctx, "table")))))));
 	}

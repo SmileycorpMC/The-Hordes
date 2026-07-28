@@ -47,9 +47,9 @@ public class LogicalCondition implements Condition {
 					HordesLogger.logError("Failed to read condition of logical " + element, e);
 				}
 			}
-			return new LogicalCondition(operation, conditions.toArray(new Condition[]{}));
+			return new LogicalCondition(operation, conditions.toArray(new Condition[conditions.size()]));
 		} catch(Exception e) {
-			HordesLogger.logError("Incorrect parameters for condition hordes:"+operation.getName(), e);
+			HordesLogger.logError("Incorrect parameters for condition hordes:" + operation.getName(), e);
 		}
 		return null;
 	}

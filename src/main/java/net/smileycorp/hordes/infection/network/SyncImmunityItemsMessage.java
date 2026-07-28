@@ -10,7 +10,6 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.smileycorp.atlas.api.network.AbstractMessage;
-import net.smileycorp.hordes.infection.client.InfectionClientHandler;
 import net.smileycorp.hordes.infection.data.InfectionData;
 
 import java.util.AbstractMap;

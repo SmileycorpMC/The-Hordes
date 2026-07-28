@@ -29,8 +29,6 @@ public class CommonConfigHandler {
 	//load config properties
 	static {
 		HordesLogger.logInfo("Trying to load common config");
-		HordeEventConfig.build(builder);
-		InfectionConfig.build(builder);
 		builder.push("Misc");
 		zombiesBurn = builder.comment("Whether zombies and drowned burn in sunlight.").define("zombiesBurn", false);
 		skeletonsBurn = builder.comment("Whether skeletons and strays burn in sunlight.").define("skeletonsBurn", false);
@@ -44,10 +42,12 @@ public class CommonConfigHandler {
 		piglinsHuntZombies = builder.comment("Whether piglins kill zombie mobs").define("piglinsHuntZombies", true);
 		piglinsCureThemself = builder.comment("Whether piglins use cures they find and keep in their inventory to heal infection.").define("piglinsCureThemself", true);
 		illagersHuntZombies = builder.comment("Whether illagers kill zombie mobs").define("illagersHuntZombies", true);
-		zoglinsAttackUndead = builder.comment("Whether zoglins are agressive towards other undead mobs").define("zoglinsAttackUndead", false);
-		zoglinsAttackMobs = builder.comment("Whether zoglins are agressive towards non-undead monsters").define("zoglinsAttackMobs", true);
-		ZombiePlayersConfig.build(builder);
+		zoglinsAttackUndead = builder.comment("Whether zoglins are aggressive towards other undead mobs").define("zoglinsAttackUndead", false);
+		zoglinsAttackMobs = builder.comment("Whether zoglins are aggressive towards non-undead monsters").define("zoglinsAttackMobs", true);
 		builder.pop();
+		HordeEventConfig.build(builder);
+		InfectionConfig.build(builder);
+		ZombiePlayersConfig.build(builder);
 		config = builder.build();
 	}
 

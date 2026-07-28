@@ -7,7 +7,6 @@ import net.minecraft.world.entity.monster.Ravager;
 import net.minecraft.world.entity.raid.Raider;
 import net.minecraft.world.level.Level;
 import net.smileycorp.hordes.config.CommonConfigHandler;
-import net.smileycorp.hordes.infection.HordesInfection;
 import net.smileycorp.hordes.infection.data.InfectionData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

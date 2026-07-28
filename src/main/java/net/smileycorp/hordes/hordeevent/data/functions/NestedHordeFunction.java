@@ -1,5 +1,6 @@
 package net.smileycorp.hordes.hordeevent.data.functions;
 
+import com.google.gson.JsonElement;
 import net.smileycorp.hordes.common.data.conditions.Condition;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
 import net.smileycorp.hordes.hordeevent.data.HordeContext;
@@ -13,6 +14,12 @@ public interface NestedHordeFunction<T extends HordePlayerEvent> extends HordeFu
     default boolean canApply(List<Condition> conditions, HordeContext<T> ctx) {
         for (Condition condition : conditions) if (!condition.apply(ctx)) return false;
         return true;
+    }
+
+    interface Deserializer<T extends HordePlayerEvent> extends HordeFunction.Deserializer<T> {
+
+        NestedHordeFunction<T> apply(JsonElement element);
+
     }
 
 }

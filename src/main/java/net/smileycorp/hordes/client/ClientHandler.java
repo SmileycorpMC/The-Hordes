@@ -21,7 +21,7 @@ import net.smileycorp.hordes.infection.client.InfectionClientHandler;
 public class ClientHandler {
 
 	@SubscribeEvent
-	public static void clientSetup(FMLClientSetupEvent event){
+	public static void clientSetup(FMLClientSetupEvent event) {
 		MinecraftForge.EVENT_BUS.register(new ClientHandler());
 		MinecraftForge.EVENT_BUS.register(HordeClientHandler.INSTANCE);
 		MinecraftForge.EVENT_BUS.register(InfectionClientHandler.INSTANCE);

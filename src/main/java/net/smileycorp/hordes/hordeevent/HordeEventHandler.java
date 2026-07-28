@@ -10,7 +10,6 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.monster.ZombifiedPiglin;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Player.BedSleepingProblem;
 import net.minecraft.world.level.Level;
@@ -29,13 +28,14 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
-import net.smileycorp.hordes.config.CommonConfigHandler;
 import net.smileycorp.hordes.config.HordeEventConfig;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
 import net.smileycorp.hordes.hordeevent.capability.HordeSavedData;
 import net.smileycorp.hordes.hordeevent.capability.HordeSpawn;
 import net.smileycorp.hordes.hordeevent.data.HordeScriptLoader;
 import net.smileycorp.hordes.hordeevent.data.HordeTableLoader;
+
+import java.util.Optional;
 
 public class HordeEventHandler {
 
@@ -79,12 +79,12 @@ public class HordeEventHandler {
 		int time = Math.round(level.getDayTime() % HordeEventConfig.dayLength.get());
 		int day = horde.getCurrentDay(player);
 		if (!horde.hasSynced(day)) horde.sync(player, day);
-		if (horde.isActive(player)) {
+		if (horde.isActive()) {
 			horde.update(player);
 			return;
 		}
 		if (time >= HordeEventConfig.hordeStartTime.get() && time <= HordeEventConfig.hordeStartTime.get() + HordeEventConfig.hordeStartBuffer.get()
-				&& (day >= horde.getNextDay() && day > 0) || (HordeEventConfig.spawnFirstDay.get() && day == 0))
+				&& day >= horde.getNextDay() && (day > 0 || HordeEventConfig.spawnFirstDay.get()))
 			horde.tryStartEvent(player, -1, false);
 	}
 	
@@ -96,15 +96,13 @@ public class HordeEventHandler {
 		if (horde != null) horde.setPlayer(player);
 	}
 	
-	
-	
 	//prevent despawning of entities in an active horde
 	@SubscribeEvent
 	public void tryDespawn(MobSpawnEvent.AllowDespawn event) {
 		ServerPlayer player = HordeSpawn.getHordePlayer(event.getEntity());
 		if (player == null) return;
 		HordeEvent horde = HordeSavedData.getData((ServerLevel) player.level()).getEvent(player);
-		if (horde != null && horde.isActive(player)) event.setResult(Result.DENY);
+		if (horde != null && horde.isActive()) event.setResult(Result.DENY);
 	}
 
 	//sync entity capabilities when added to level
@@ -117,9 +115,9 @@ public class HordeEventHandler {
 		Mob entity = (Mob) event.getEntity();
 		entity.targetSelector.getRunningGoals().forEach(WrappedGoal::stop);
 		if (entity instanceof PathfinderMob) entity.targetSelector.addGoal(1, new HurtByTargetGoal((PathfinderMob) entity));
-		if (!(entity instanceof ZombifiedPiglin && CommonConfigHandler.aggressiveZombiePiglins.get())) entity.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(entity, Player.class, true));
+		entity.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(entity, Player.class, true));
 		HordeEvent horde = HordeSavedData.getData((ServerLevel) player.level()).getEvent(player);
-		if (horde != null) if (horde.isActive(player)) horde.registerEntity(entity, player);
+		if (horde != null) if (horde.isActive()) horde.registerEntity(entity, player);
 		cap.setSynced();
 	}
 
@@ -129,10 +127,18 @@ public class HordeEventHandler {
 		if (HordeEventConfig.canSleepDuringHorde.get() || !(event.getEntity() instanceof ServerPlayer)) return;
 		ServerPlayer player = (ServerPlayer) event.getEntity();
 		ServerLevel level = player.serverLevel();
+		if (level.isDay() |! level.dimensionType().bedWorks()) return;
 		HordeSavedData data = HordeSavedData.getData((ServerLevel) player.level());
-		if (level.isDay() |! (level.dimensionType().bedWorks() && data.isHordeNight(player))) return;
+		if (data.isHordeNight(player)) {
+			event.setResult(BedSleepingProblem.OTHER_PROBLEM);
+			player.displayClientMessage(Component.translatable(Constants.hordeTrySleep), true);
+			return;
+		}
+		if (!HordeEventConfig.hordePreventsOtherPlayersSleeping.get()) return;
+		Optional<ServerPlayer> optional = data.getPlayersWithHorde().findAny();
+		if (optional.isEmpty()) return;
 		event.setResult(BedSleepingProblem.OTHER_PROBLEM);
-		player.displayClientMessage(Component.translatable(Constants.hordeTrySleep), true);
+		player.displayClientMessage(Component.translatable(Constants.otherPlayerTrySleep, optional.get()), true);
 	}
 
 }

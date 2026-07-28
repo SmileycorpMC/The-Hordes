@@ -12,8 +12,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.item.ElytraItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.smileycorp.atlas.api.client.PlayerTextureRenderer;
 import net.smileycorp.hordes.common.entities.PlayerZombie;
 
@@ -27,7 +27,7 @@ public class ZombiePlayerCapeLayer<T extends Zombie & PlayerZombie> extends Rend
 	public void render(PoseStack poseStack, MultiBufferSource buffer, int size, T entity, float p_225628_5_, float p_225628_6_, float p_225628_7_, float p_225628_8_, float p_225628_9_, float p_225628_10_) {
 		if (!entity.displayCape()) return;
 		ItemStack itemstack = entity.getItemBySlot(EquipmentSlot.CHEST);
-		if (itemstack.getItem() == Items.ELYTRA) return;
+		if (itemstack.getItem() instanceof ElytraItem) return;
 		ResourceLocation loc = PlayerTextureRenderer.getTexture(entity.getPlayerUUID(), Type.CAPE);
 		if (loc == null) return;
 		poseStack.pushPose();

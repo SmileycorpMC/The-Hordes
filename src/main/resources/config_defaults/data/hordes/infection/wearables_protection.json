@@ -143,10 +143,5 @@
 		"item": "minecraft:diamond_horse_armor",
 		"protection": 0.5,
 		"operation": "add_multiplied_total"
-	},
-	{
-		"item": "minecraft:wolf_armor",
-		"protection": 1,
-		"operation": "add_value"
 	}
 ]

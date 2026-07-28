@@ -6,7 +6,6 @@ import net.minecraft.util.RandomSource;
 import net.smileycorp.atlas.api.util.WeightedOutputs;
 
 import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -19,9 +18,10 @@ public class WeightedSpawnTable extends WeightedOutputs<HordeSpawnEntry> {
     public WeightedSpawnTable(List<Entry<HordeSpawnEntry, Integer>> spawnmap) {
         super(1, spawnmap);
     }
-    
+
+    @Override
     public List<HordeSpawnEntry> getResults(RandomSource rand, int tries) {
-        List<HordeSpawnEntry> list = new ArrayList<>();
+        List<HordeSpawnEntry> list = Lists.newArrayList();
         List<Entry<HordeSpawnEntry, Integer>> mappedEntries = Lists.newArrayList();
         int maxWeight = 0;
         int max = 0;
@@ -33,18 +33,18 @@ public class WeightedSpawnTable extends WeightedOutputs<HordeSpawnEntry> {
             for (int i = 0; i < spawnEntry.minSpawns; i++) {
                 list.add(spawnEntry);
                 tries--;
-                spawned ++;
+                spawned++;
             }
             timesSpawned.put(spawnEntry, spawned);
             mappedEntries.add(new SimpleEntry<>(spawnEntry, maxWeight));
             maxWeight += entry.getValue();
         }
+        if (max > -1) tries = max - list.size();
         if (tries > 0 && maxWeight > 0) {
             Collections.reverse(mappedEntries);
             for (int i = 0; i < tries; i++) {
-                if (tries > max) break;
                 HordeSpawnEntry spawnEntry = getEntry(rand, mappedEntries, maxWeight);
-                if (spawnEntry != null)list.add(spawnEntry);
+                if (spawnEntry != null) list.add(spawnEntry);
             }
         }
         return list;

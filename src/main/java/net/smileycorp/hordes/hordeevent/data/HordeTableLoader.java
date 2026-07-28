@@ -58,8 +58,8 @@ public class HordeTableLoader extends HordesJsonLoader {
         return table == null ? getFallbackTable() : table;
     }
 
-    public static CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
-        return SharedSuggestionProvider.suggestResource(INSTANCE.SPAWN_TABLES.keySet(), builder);
+    public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
+        return SharedSuggestionProvider.suggestResource(SPAWN_TABLES.keySet(), builder);
     }
     
 }

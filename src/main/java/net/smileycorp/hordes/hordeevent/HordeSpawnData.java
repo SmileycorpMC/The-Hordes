@@ -2,6 +2,8 @@ package net.smileycorp.hordes.hordeevent;
 
 import com.google.common.collect.Lists;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.smileycorp.hordes.common.Constants;
@@ -22,10 +24,9 @@ public class HordeSpawnData {
     private int spawnDuration = HordeEventConfig.hordeSpawnDuration.get();
     private int spawnInterval = HordeEventConfig.hordeSpawnInterval.get();
     private int spawnAmount;
+    private double entitySpeed = HordeEventConfig.hordeEntitySpeed.get();
     private final List<String> commands = Lists.newArrayList();
 
-    private double entitySpeed = HordeEventConfig.hordeEntitySpeed.get();
-    
     public HordeSpawnData(HordeEvent horde) {
         spawnAmount = (int) (HordeEventConfig.hordeSpawnAmount.get() * (1 + (horde.getDay() / HordeEventConfig.hordeSpawnDays.get())
                 * (HordeEventConfig.hordeSpawnMultiplier.get() - 1)));
@@ -56,6 +57,11 @@ public class HordeSpawnData {
         tag.putInt("spawnInterval", spawnInterval);
         tag.putInt("spawnAmount", spawnAmount);
         tag.putDouble("entitySpeed", entitySpeed);
+        if (!commands.isEmpty()) {
+            ListTag commands = new ListTag();
+            for (String command : this.commands) commands.add(StringTag.valueOf(command));
+            tag.put("commands", commands);
+        }
         return tag;
     }
     

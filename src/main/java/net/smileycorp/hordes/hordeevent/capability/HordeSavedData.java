@@ -1,5 +1,6 @@
 package net.smileycorp.hordes.hordeevent.capability;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.nbt.CompoundTag;
@@ -12,8 +13,12 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.hordes.config.HordeEventConfig;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Stream;
 
 public class HordeSavedData extends SavedData {
 
@@ -21,7 +26,7 @@ public class HordeSavedData extends SavedData {
 	private int next_day = 0;
 	protected ServerLevel level = null;
 
-	private Map<UUID, HordeEvent> events = Maps.newHashMap();
+	private final Map<UUID, HordeEvent> events = Maps.newHashMap();
 
 	public void load(CompoundTag nbt) {
 		if (nbt.contains("next_day")) {
@@ -62,7 +67,7 @@ public class HordeSavedData extends SavedData {
 
 	public void save() {
 		setDirty();
-		if (level instanceof ServerLevel) ((ServerLevel)level).getChunkSource().getDataStorage().set(DATA, this);
+		if (level instanceof ServerLevel) level.getChunkSource().getDataStorage().set(DATA, this);
 	}
 
 	public HordeEvent getEvent(ServerPlayer player) {
@@ -84,15 +89,12 @@ public class HordeSavedData extends SavedData {
 	}
 
 	public boolean isHordeNight(ServerPlayer player) {
-		if (HordeEventConfig.hordePreventsOtherPlayersSleeping.get()) {
-			for (Player player1 : level.players()) {
-				HordeEvent horde = getEvent(player1.getUUID());
-				if (horde.isHordeDay(player)) return true;
-			}
-			return false;
-		}
 		HordeEvent horde = getEvent(player);
 		return horde != null && horde.isHordeDay(player);
+	}
+
+	public Stream<ServerPlayer> getPlayersWithHorde() {
+		return level.players().stream().filter(this::isHordeNight);
 	}
 
 	public RandomSource getRandom(int day) {
@@ -106,7 +108,7 @@ public class HordeSavedData extends SavedData {
 	}
 
 	public List<String> getDebugText() {
-		List<String> out = new ArrayList<>();
+		List<String> out = Lists.newArrayList();
 		out.add(toString());
 		out.add("Existing events: {");
 		for (Entry<UUID, HordeEvent> entry : events.entrySet()) {
@@ -141,5 +143,5 @@ public class HordeSavedData extends SavedData {
 		data.setNextDay(nextDay);
 		return data;
 	}
-	
+
 }

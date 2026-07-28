@@ -23,6 +23,16 @@ public class HordeStartEvent extends HordePlayerEvent {
 		return pos;
 	}
 
+	//get the translation key for the start message
+	public String getMessage() {
+		return message;
+	}
+
+	//set the translation key for the start message
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
 	//Whether the event was started with a command
 	public boolean wasCommand() {
 		return wasCommand;

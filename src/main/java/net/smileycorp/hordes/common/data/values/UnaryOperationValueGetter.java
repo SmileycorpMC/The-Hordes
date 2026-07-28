@@ -25,7 +25,7 @@ public class UnaryOperationValueGetter<T extends Number & Comparable<T>> impleme
     
     public static <T extends Number & Comparable<T>> UnaryOperationValueGetter deserialize(UnaryOperation operation, DataType<T> type, JsonObject element) {
         try {
-            ValueGetter getter = ValueGetter.readValue(type, element.get("value"));
+            ValueGetter<T> getter = ValueGetter.readValue(type, element.get("value"));
             if (getter == null |! type.isNumber()) {
                 HordesLogger.logError("invalid value for hordes:" + operation.getName(), new HordesParsingException(element.get("value").toString()));
                 return null;

@@ -1,33 +1,24 @@
 package net.smileycorp.hordes.common.data.values;
 
 import com.google.gson.JsonObject;
-import net.minecraft.core.Direction.Axis;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
 import net.smileycorp.hordes.hordeevent.data.HordeContext;
 
-public class PlayerPosGetter<T extends Comparable<T>, Number> implements ValueGetter<T> {
-	
-	private final ValueGetter<String> value;
-	private final DataType<T> type;
-	
+public class PlayerPosGetter<T extends Comparable<T>> extends PosGetter<T> {
+
 	private PlayerPosGetter(ValueGetter<String> value, DataType<T> type) {
-		this.value = value;
-		this.type = type;
+		super(value, type);
 	}
 
 	@Override
-	public T get(HordeContext<? extends HordePlayerEvent> ctx) {
-		if (!type.isNumber()) return null;
-		Axis axis = Axis.byName(value.get(ctx));
-		ServerPlayer player = ctx.getPlayer();
-		if (type == DataType.INT || type == DataType.LONG) return type.cast(player.blockPosition().get(axis));
-		return type.cast(player.position().get(axis));
+	protected LivingEntity getEntity(HordeContext<? extends HordePlayerEvent> ctx) {
+		return ctx.getPlayer();
 	}
 	
-	public static <T extends Comparable<T>> ValueGetter deserialize(JsonObject object, DataType<T> type) {
+	public static <T extends Number & Comparable<T>> ValueGetter deserialize(JsonObject object, DataType<T> type) {
 		try {
 			if (object.has("value")) return new PlayerPosGetter(ValueGetter.readValue(DataType.STRING, object.get("value")), type);
 		} catch (Exception e) {

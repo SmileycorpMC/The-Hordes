@@ -12,7 +12,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.network.NetworkDirection;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.config.InfectionConfig;
@@ -54,7 +53,7 @@ public class InfectedEffect extends MobEffect {
 		AttributeInstance attribute = map.getInstance(Attributes.MOVEMENT_SPEED);
 		if (attribute == null) return;
 		attribute.removeModifier(SPEED_MOD_UUID);
-		attribute.addPermanentModifier(new AttributeModifier(SPEED_MOD_NAME,
+		attribute.addPermanentModifier(new AttributeModifier(SPEED_MOD_UUID, SPEED_MOD_NAME,
 				SPEED_MOD_AMOUNT * amplifier, AttributeModifier.Operation.MULTIPLY_TOTAL));
 	}
 
