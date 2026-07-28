@@ -49,10 +49,11 @@ public class HuskPlayer extends Husk implements PlayerZombie<HuskPlayer> {
 
 	public HuskPlayer(EntityType<? extends HuskPlayer> type, Level level) {
 		super(type, level);
+		setPlayer("smileycorp");
 	}
 
 	public HuskPlayer(Level level) {
-		this(HordesEntities.HUSK_PLAYER.get() ,level);
+		this(HordesEntities.HUSK_PLAYER.get(), level);
 	}
 
 	public HuskPlayer(Player player) {
@@ -170,11 +171,11 @@ public class HuskPlayer extends Husk implements PlayerZombie<HuskPlayer> {
 
 	@Override
 	public MutableComponent getDisplayName() {
-		MutableComponent textcomponentstring = PlayerTeam.formatNameForTeam(getTeam(),
-				Component.translatable("entity.hordes.HuskPlayer.chat", getCustomName()));
-		textcomponentstring.getStyle().withHoverEvent(createHoverEvent());
-		textcomponentstring.getStyle().withInsertion(getEncodeId());
-		return textcomponentstring;
+		MutableComponent component = PlayerTeam.formatNameForTeam(getTeam(),
+				Component.translatable("entity.hordes.HuskPlayer.chat", getName()));
+		component.getStyle().withHoverEvent(createHoverEvent());
+		component.getStyle().withInsertion(getEncodeId());
+		return component;
 	}
 
 	@Override
