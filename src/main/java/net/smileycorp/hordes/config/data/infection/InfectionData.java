@@ -2,14 +2,17 @@ package net.smileycorp.hordes.config.data.infection;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
@@ -41,6 +44,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 public class InfectionData extends HordesJsonLoader {
 
@@ -338,6 +342,13 @@ public class InfectionData extends HordesJsonLoader {
     public void readWearableProtection(List<Pair<Item, Pair<Float, Byte>>> data) {
         wearablesProtection.clear();
         data.forEach(pair -> wearablesProtection.put(pair.getFirst(), pair.getSecond()));
+    }
+
+    public void applyAttribute(ItemStack stack, EntityEquipmentSlot slot, Multimap<String, AttributeModifier> map) {
+        Pair<Float, Byte> pair = InfectionData.INSTANCE.getProtection(stack);
+        if (pair == null) return;
+        String name = Constants.locStr("infection_resistance", slot.getName());
+        map.put(HordesInfection.INFECTION_RESISTANCE.getName(), new AttributeModifier(UUID.nameUUIDFromBytes(name.getBytes()), name, pair.getFirst(), pair.getSecond()));
     }
 
 }

@@ -29,12 +29,7 @@ public class MixinItemStack {
     public Multimap<String, AttributeModifier> hordes$getAttributeModifiers$getAttributeModifiers(Item instance, EntityEquipmentSlot slot, ItemStack stack, Operation<Multimap<String, AttributeModifier>> original) {
         Multimap<String, AttributeModifier> map = original.call(instance, slot, stack);
         if (InfectionData.INSTANCE == null || item == null) return map;
-        if (InfectionConfig.enableMobInfection && slot == EntityLiving.getSlotForItemStack(stack)) {
-            Pair<Float, Byte> pair = InfectionData.INSTANCE.getProtection(stack);
-            if (pair == null) return map;
-            String name = Constants.locStr("infection_resistance", slot.getName());
-            map.put(HordesInfection.INFECTION_RESISTANCE.getName(), new AttributeModifier(UUID.nameUUIDFromBytes(name.getBytes()), name, pair.getFirst(), pair.getSecond()));
-        }
+        if (InfectionConfig.enableMobInfection && slot == EntityLiving.getSlotForItemStack(stack)) InfectionData.INSTANCE.applyAttribute(stack, slot, map);
         return map;
     }
 
