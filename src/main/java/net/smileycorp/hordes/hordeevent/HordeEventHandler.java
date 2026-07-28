@@ -4,6 +4,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
@@ -23,9 +24,11 @@ import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
 import net.minecraftforge.event.entity.living.MobSpawnEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
+import net.minecraftforge.event.level.SleepFinishedTimeEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.config.HordeEventConfig;
@@ -126,6 +129,15 @@ public class HordeEventHandler {
 		if (optional.isEmpty()) return;
 		event.setResult(BedSleepingProblem.OTHER_PROBLEM);
 		player.displayClientMessage(Component.translatable(Constants.otherPlayerTrySleep, optional.get()), true);
+	}
+
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public void finishSleeping(SleepFinishedTimeEvent event) {
+		long timePassed = event.getNewTime() - event.getLevel().dayTime();
+		for (ServerPlayer player : ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers()) {
+			Playtime pt = (Playtime) player;
+			pt.setPlaytime(pt.getPlaytime() + timePassed);
+		}
 	}
 
 }

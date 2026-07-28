@@ -28,10 +28,6 @@ public class HordeSavedData extends SavedData {
 	private final Map<UUID, HordeEvent> events = Maps.newHashMap();
 
 	public void load(CompoundTag nbt) {
-		/*if (nbt.contains("next_day")) {
-			int next = nbt.getInt("next_day");
-			if (next > next_day) next_day = next;
-		}*/
 		if (nbt.contains("events")) {
 			CompoundTag events = nbt.getCompound("events");
 			for (String uuid : events.getAllKeys()) {
@@ -45,7 +41,6 @@ public class HordeSavedData extends SavedData {
 
 	@Override
 	public CompoundTag save(CompoundTag nbt) {
-		//nbt.putInt("next_day", next_day);
 		CompoundTag events = new CompoundTag();
 		for (Entry<UUID, HordeEvent> entry : this.events.entrySet()) {
 			UUID uuid = entry.getKey();
@@ -58,11 +53,6 @@ public class HordeSavedData extends SavedData {
 
 	public int getNextDay(int day) {
 		return day + HordeEventConfig.hordeSpawnDays.get() + getRandom(day).nextInt(HordeEventConfig.hordeSpawnVariation.get() + 1);
-	}
-
-	public void save() {
-		setDirty();
-		if (level instanceof ServerLevel) level.getChunkSource().getDataStorage().set(DATA, this);
 	}
 
 	public HordeEvent getEvent(ServerPlayer player) {

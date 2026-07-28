@@ -2,6 +2,7 @@ package net.smileycorp.hordes.mixin;
 
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.LongTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -22,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinServerPlayer implements Playtime {
 
 	@Unique
-	private int playtime = 0;
+	private long playtime = 0;
 
 	@Shadow public abstract ServerStatsCounter getStats();
 	
@@ -30,23 +31,23 @@ public abstract class MixinServerPlayer implements Playtime {
 
 	@Inject(at = @At("HEAD"), method = "addAdditionalSaveData")
 	public void hordes$addAdditionalSaveData(CompoundTag nbt, CallbackInfo callback) {
-		nbt.putInt("playtime", playtime == -1 ? getStats().getValue(Stats.CUSTOM.get(Stats.PLAY_TIME)) : playtime);
+		nbt.putLong("playtime", playtime == -1 ? getStats().getValue(Stats.CUSTOM.get(Stats.PLAY_TIME)) : playtime);
 		HordeEvent event = HordeSavedData.getData(serverLevel()).getEvent((ServerPlayer) (Object)this);
 		if (event != null) nbt.putInt("next_horde_day", event.getNextDay());
 	}
 
 	@Inject(at = @At("HEAD"), method = "readAdditionalSaveData")
 	public void hordes$readAdditionalSaveData(CompoundTag nbt, CallbackInfo callback) {
-		playtime = nbt.contains("playtime") ? nbt.getInt("playtime") : getStats().getValue(Stats.CUSTOM.get(Stats.PLAY_TIME));
+		playtime = nbt.contains("playtime") ? nbt.getLong("playtime") : getStats().getValue(Stats.CUSTOM.get(Stats.PLAY_TIME));
 	}
 
 	@Override
-	public int getPlaytime() {
+	public long getPlaytime() {
 		return playtime;
 	}
 
 	@Override
-	public void setPlaytime(int playtime) {
+	public void setPlaytime(long playtime) {
 		this.playtime = playtime;
 	}
 	

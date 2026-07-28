@@ -2,8 +2,8 @@ package net.smileycorp.hordes.hordeevent;
 
 public interface Playtime {
 
-    int getPlaytime();
+    long getPlaytime();
 
-    void setPlaytime(int playtime);
+    void setPlaytime(long playtime);
 
 }
