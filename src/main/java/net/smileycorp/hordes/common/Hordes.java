@@ -58,6 +58,7 @@ public class Hordes {
 	public static void constructMod(FMLConstructModEvent event) {
 		MinecraftForge.EVENT_BUS.register(new MiscEventHandler());
 		HordesInfection.EFFECTS.register(FMLJavaModLoadingContext.get().getModEventBus());
+		HordesInfection.ATTRIBUTES.register(FMLJavaModLoadingContext.get().getModEventBus());
 		HordesEntities.ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
 		InfectionPacketHandler.initPackets();
 		HordeEventPacketHandler.initPackets();

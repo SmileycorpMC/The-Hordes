@@ -1,12 +1,9 @@
 package net.smileycorp.hordes.infection.client;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Either;
-import com.mojang.datafixers.util.Pair;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.particles.ParticleTypes;
@@ -19,7 +16,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.level.Level;
@@ -37,7 +33,6 @@ import net.smileycorp.hordes.infection.network.CureEntityMessage;
 
 import java.awt.*;
 import java.util.List;
-import java.util.Map;
 
 public class InfectionClientHandler {
 
@@ -52,7 +47,7 @@ public class InfectionClientHandler {
 		if (!player.hasEffect(HordesInfection.INFECTED.get())) return;
 		int a = player.getEffect(HordesInfection.INFECTED.get()).getAmplifier();
 		if (a == 0) return;
-		Color colour = new Color(0.4745f, 0.6117f, 0.3961f, Math.min(0.05f * a, 0.5f));
+		Color colour = new Color(0.4745f, 0.6117f, 0.3961f, Math.min(0.005f * a, 0.1f));
 		Window window = mc.getWindow();
 		event.getGuiGraphics().fill(0, 0, window.getGuiScaledWidth(), window.getGuiScaledHeight(), colour.getRGB());
 	}
@@ -84,7 +79,6 @@ public class InfectionClientHandler {
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public void tooltip(RenderTooltipEvent.GatherComponents event) {
 		ItemStack stack = event.getItemStack();
-		Item item = stack.getItem();
 		List<Component> components = Lists.newArrayList();
 		if (ClientConfigHandler.cureTooltip.get() && stack.is(HordesInfection.INFECTION_CURES_TAG))
 			components.add(Component.translatable("tooltip.hordes.cure"));
@@ -93,7 +87,6 @@ public class InfectionClientHandler {
 			if (immunity > 0) PotionUtils.addPotionTooltip(Lists.newArrayList(
 					new MobEffectInstance(HordesInfection.IMMUNITY.get(), immunity * 20)), components, 1);
 		}
-
 		components.forEach(c -> event.getTooltipElements().add(Either.left(c)));
 	}
 	

@@ -5,7 +5,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -67,7 +66,7 @@ public class HordeSpawnTable {
     }
 
     private void testEntries() {
-        List<HordeSpawnEntry> toRemove = new ArrayList<>();
+        List<HordeSpawnEntry> toRemove = Lists.newArrayList();
         for (HordeSpawnEntry entry : spawns) {
             try {
                 if (!(entry.getEntity().create(ServerLifecycleHooks.getCurrentServer().overworld()) instanceof Mob)) toRemove.add(entry);

@@ -6,7 +6,6 @@ import net.minecraft.client.model.AnimationUtils;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
@@ -16,31 +15,24 @@ import net.minecraft.world.item.Items;
 import net.smileycorp.hordes.common.entities.PlayerZombie;
 
 import java.awt.*;
-import java.util.Optional;
-import java.util.UUID;
 
 public class ZombiePlayerModel<T extends Zombie & PlayerZombie> extends PlayerModel<T> {
-	protected boolean fixedArms = false;
+
 	protected final Color colour;
 	protected final boolean isDrowned;
 
 	public ZombiePlayerModel(ModelPart part) {
-		this(part, Color.WHITE, false);
+		this(part, Color.WHITE, false, false);
 	}
 
-	public ZombiePlayerModel(ModelPart part, Color colour, boolean isDrowned) {
-		super(part, false);
+	public ZombiePlayerModel(ModelPart part, Color colour, boolean isDrowned, boolean slim) {
+		super(part, slim);
 		this.colour = colour;
 		this.isDrowned = isDrowned;
 	}
 
 	@Override
 	public void prepareMobModel(T entity, float f1, float f2, float f3) {
-		if (!fixedArms) {
-			Optional<UUID> optional = entity.getPlayerUUID();
-			if (optional.isPresent()) if (DefaultPlayerSkin.getSkinModelName(optional.get()).equals("slim")) slim = true;
-			fixedArms = true;
-		}
 		if (isDrowned) {
 			rightArmPose = HumanoidModel.ArmPose.EMPTY;
 			leftArmPose = HumanoidModel.ArmPose.EMPTY;

@@ -4,24 +4,22 @@ import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.Connection;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.StringRepresentable;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.data.HordesJsonLoader;
@@ -30,6 +28,7 @@ import net.smileycorp.hordes.common.event.InfectEntityEvent;
 import net.smileycorp.hordes.config.InfectionConfig;
 import net.smileycorp.hordes.infection.HordesInfection;
 import net.smileycorp.hordes.infection.InfectedEffect;
+import net.smileycorp.hordes.infection.network.InfectMessage;
 import net.smileycorp.hordes.infection.network.InfectionPacketHandler;
 import net.smileycorp.hordes.infection.network.SyncImmunityItemsMessage;
 import net.smileycorp.hordes.infection.network.SyncWearableProtectionMessage;
@@ -68,10 +67,10 @@ public class InfectionData extends HordesJsonLoader {
                    InfectionConversionEntry entry = InfectionConversionEntry.deserialize(element.getAsJsonObject());
                    conversionTable.put(entry.getEntity(), entry);
                 } catch (Exception e) {
-                   HordesLogger.logError("Failed to load conversion entry " + element.getAsString(), e);
+                   HordesLogger.logError("Failed to load conversion entry " + element.toString(), e);
                 }
             } catch (Exception e) {
-                HordesLogger.logError("Failed to load conversion table " + loc, e);
+                HordesLogger.logError("Failed to load conversion table " + loc + " " + e.getMessage(), e);
             }
         }
         HordesLogger.blankLine();
@@ -92,7 +91,7 @@ public class InfectionData extends HordesJsonLoader {
                     immunityItems.put(item, duration);
                     HordesLogger.logInfo("Loaded immunity item " + name + " with duration " + duration);
                 } catch (Exception e) {
-                    HordesLogger.logError("Failed to load immunity item " + element.getAsString(), e);
+                    HordesLogger.logError("Failed to load immunity item " + element.toString(), e);
                 }
             } catch (Exception e) {
                 HordesLogger.logError("Failed to load immunity item list " + loc, e);
@@ -102,7 +101,7 @@ public class InfectionData extends HordesJsonLoader {
         HordesLogger.heading("LOADING WEARABLE PROTECTION LIST");
         wearablesProtection.clear();
         for (String id : manager.getNamespaces()) {
-            ResourceLocation loc = new ResourceLocation(id, "immune_wearables");
+            ResourceLocation loc = new ResourceLocation(id, "wearables_protection");
             JsonElement json = map.get(loc);
             if (json == null) continue;
             try {
@@ -120,7 +119,7 @@ public class InfectionData extends HordesJsonLoader {
                             AttributeModifier.Operation.MULTIPLY_TOTAL : operation));
                     HordesLogger.logInfo("Loaded wearable protection " + name + " with modifier " + modifier);
                 } catch (Exception e) {
-                    HordesLogger.logError("Failed to load wearable protection " + element.getAsString(), e);
+                    HordesLogger.logError("Failed to load wearable protection " + element.toString(), e);
                 }
             } catch (Exception e) {
                 HordesLogger.logError("Failed to load wearable protection list " + loc, e);
@@ -138,12 +137,12 @@ public class InfectionData extends HordesJsonLoader {
                 for (JsonElement element : json.getAsJsonArray()) try {
                     JsonObject obj = element.getAsJsonObject();
                     ResourceLocation name = ResourceLocation.tryParse(obj.get("entity").getAsString());
-                    EntityType entity = BuiltInRegistries.ENTITY_TYPE.get(name);
+                    EntityType<?> entity = ForgeRegistries.ENTITY_TYPES.getValue(name);
                     float chance = obj.get("chance").getAsFloat();
                     entityInfectChance.put(entity, chance);
                     HordesLogger.logInfo("Loaded infection entity " + name + " with infect chance " + chance);
                 } catch (Exception e) {
-                    HordesLogger.logError("Failed to infection entity " + element.getAsString(), e);
+                    HordesLogger.logError("Failed to infection entity " + element.toString(), e);
                 }
             } catch (Exception e) {
                 HordesLogger.logError("Failed to load entity infection list " + loc, e);
@@ -151,7 +150,7 @@ public class InfectionData extends HordesJsonLoader {
         }
     }
 
-    //converts 1.21 modifier names used by teh data files to their corresponding 1.20 operations
+    //converts 1.21 modifier names used by the data files to their corresponding 1.20 operations
     private AttributeModifier.Operation getOperation(String operation) {
         return switch (operation.toLowerCase(Locale.US)) {
             case "add_value" -> AttributeModifier.Operation.ADDITION;
@@ -163,11 +162,13 @@ public class InfectionData extends HordesJsonLoader {
 
     public void tryToInfect(LivingEntity entity, LivingEntity attacker, DamageSource source, float amount) {
         if (MinecraftForge.EVENT_BUS.post(new InfectEntityEvent(entity, attacker, source, amount))) return;
-        if ((entity instanceof Player && InfectionConfig.infectPlayers.get()))
-            if (entity.getRandom().nextFloat() <= getInfectionChance(entity, attacker))
-                InfectedEffect.apply(entity);
-        InfectionConversionEntry entry = conversionTable.get(entity.getType());
-        if (entry != null && entry.shouldInfect(entity, attacker)) InfectedEffect.apply(entity);
+        if (!canCauseInfection(attacker) |! canBeInfected(entity)) return;
+        float r = attacker.getRandom().nextFloat();
+        if (r <= getInfectionChance(entity, attacker)) InfectedEffect.apply(entity);
+        //if the entity is a player would the infection have succeeded if the player didn't have infection resistance?
+        //if so send a protection sound message
+        else if (entity instanceof ServerPlayer && r <= attacker.getAttribute(HordesInfection.INFECTIVITY.get()).getValue())
+            InfectionPacketHandler.sendTo(new InfectMessage(true), (ServerPlayer) entity);
     }
 
     public boolean infectedTarget(Entity entity) {
@@ -227,7 +228,7 @@ public class InfectionData extends HordesJsonLoader {
         return entityInfectChance.containsKey(entity);
     }
 
-    public boolean hasInfectGoal(Entity entity) {
+    public boolean hasInfectAttribute(Entity entity) {
         return entity instanceof LivingEntity && entityInfectChance.containsKey(entity.getType());
     }
 

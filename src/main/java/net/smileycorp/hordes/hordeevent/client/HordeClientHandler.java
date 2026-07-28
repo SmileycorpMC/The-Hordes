@@ -29,13 +29,12 @@ public class HordeClientHandler {
         if (!ClientConfigHandler.hordeEventTintsSky.get()) return;
         Minecraft mc = Minecraft.getInstance();
         ClientLevel level = mc.level;
-        if (isHordeNight(level)) {
-            float d = level.getSkyDarken((float)event.getPartialTick()) * 1.4f;
-            Color rgb = ClientConfigHandler.getHordeSkyColour();
-            event.setRed((1f - d) * (float)rgb.getRed() / 255f + d * event.getRed());
-            event.setGreen((1f - d) * (float)rgb.getGreen() / 255f + d * event.getGreen());
-            event.setBlue((1f - d) * (float)rgb.getBlue() / 255f + d * event.getBlue());
-        }
+        if (!isHordeNight(level)) return;
+        float d = level.getSkyDarken((float)event.getPartialTick()) * 1.4f;
+        Color rgb = ClientConfigHandler.getHordeSkyColour();
+        event.setRed((1f - d) * (float)rgb.getRed() / 255f + d * event.getRed());
+        event.setGreen((1f - d) * (float)rgb.getGreen() / 255f + d * event.getGreen());
+        event.setBlue((1f - d) * (float)rgb.getBlue() / 255f + d * event.getBlue());
     }
     
     public void playHordeSound(float dirX, float dirZ, ResourceLocation sound) {

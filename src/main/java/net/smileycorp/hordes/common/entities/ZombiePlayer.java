@@ -16,7 +16,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
@@ -185,21 +184,9 @@ public class ZombiePlayer extends Zombie implements PlayerZombie<ZombiePlayer> {
 	}
 
 	@Override
-	public void copyFrom(PlayerZombie entity) {
-		Optional<UUID> optional = entity.getPlayerUUID();
-		if(optional.isPresent()) setPlayer(optional.get());
-		setInventory(entity.getInventory());
-		for (EquipmentSlot slot : EquipmentSlot.values()) {
-			ItemStack stack = ((Mob) entity).getItemBySlot(slot);
-			setItemSlot(slot, stack);
-		}
-		entityData.set(SHOW_CAPE, entity.displayCape());
-	}
-
-	@Override
 	public void tick() {
 		super.tick();
-		moveCloak(this);
+		moveCloak();
 	}
 
 	@Override

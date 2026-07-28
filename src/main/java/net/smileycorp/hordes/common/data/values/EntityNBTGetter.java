@@ -19,9 +19,9 @@ public class EntityNBTGetter<T extends Comparable<T>> extends NBTGetter<T> {
 		return NbtPredicate.getEntityTagToCompare(ctx.getEntity());
 	}
 	
-	public static <T extends Comparable<T>> ValueGetter deserialize(JsonObject object, DataType<T> type) {
+	public static <T extends Comparable<T>> EntityNBTGetter<T> deserialize(JsonObject object, DataType<T> type) {
 		try {
-			if (object.has("value")) return new EntityNBTGetter<T>(ValueGetter.readValue(DataType.STRING, object.get("value")), type);
+			if (object.has("value")) return new EntityNBTGetter<>(ValueGetter.readValue(DataType.STRING, object.get("value")), type);
 		} catch (Exception e) {
 			HordesLogger.logError("invalid value for hordes:entity_nbt", e);
 		}

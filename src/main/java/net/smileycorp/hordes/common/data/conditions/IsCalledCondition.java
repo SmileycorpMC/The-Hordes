@@ -24,7 +24,7 @@ public class IsCalledCondition implements Condition {
 		try {
 			return new IsCalledCondition(ValueGetter.readValue(DataType.BOOLEAN, json));
 		} catch(Exception e) {
-			HordesLogger.logError("Incorrect parameters for condition hordes:random", e);
+			HordesLogger.logError("Incorrect parameters for condition hordes:is_called", e);
 		}
 		return null;
 	}

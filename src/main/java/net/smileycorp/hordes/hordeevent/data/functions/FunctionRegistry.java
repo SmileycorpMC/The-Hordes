@@ -1,7 +1,6 @@
 package net.smileycorp.hordes.hordeevent.data.functions;
 
 import com.google.common.collect.Maps;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
@@ -17,11 +16,10 @@ import net.smileycorp.hordes.hordeevent.data.functions.spawnentity.*;
 import net.smileycorp.hordes.hordeevent.data.functions.universal.*;
 
 import java.util.Map;
-import java.util.function.Function;
 
 public class FunctionRegistry {
 
-    private static Map<ResourceLocation, Pair<Class<? extends HordePlayerEvent>, Function<JsonElement, HordeFunction<? extends HordePlayerEvent>>>> DESERIALIZERS = Maps.newHashMap();
+    private static Map<ResourceLocation, Pair<Class<? extends HordePlayerEvent>, HordeFunction.Deserializer<? extends HordePlayerEvent>>> DESERIALIZERS = Maps.newHashMap();
 
     public static void registerFunctionSerializers() {
         //universal functions
@@ -58,7 +56,7 @@ public class FunctionRegistry {
     public static <T extends HordePlayerEvent> Pair<Class<T>, HordeFunction<T>> readFunction(JsonObject json) throws Exception {
         if (!(json.has("function"))) return Pair.of(null, null);
         ResourceLocation loc = new ResourceLocation(json.get("function").getAsString());
-        Pair<Class<? extends HordePlayerEvent>, Function<JsonElement, HordeFunction<? extends HordePlayerEvent>>> pair
+        Pair<Class<? extends HordePlayerEvent>,HordeFunction.Deserializer<? extends HordePlayerEvent>> pair
                 = DESERIALIZERS.get(loc);
         if (pair == null) throw new HordesParsingException("function " + loc + " is not registered");
         HordeFunction<T> function = (HordeFunction<T>) pair.getSecond().apply(json.has("value") ?
@@ -67,17 +65,17 @@ public class FunctionRegistry {
                 : (Class<T>) pair.getFirst(), function);
     }
 
-    public static void registerNestedFunction(ResourceLocation name, Function<JsonElement, NestedHordeFunction> serializer) {
-        DESERIALIZERS.put(name, new Pair(null, serializer));
+    public static void registerNestedFunction(ResourceLocation name, NestedHordeFunction.Deserializer<?> serializer) {
+        DESERIALIZERS.put(name, Pair.of(null, serializer));
     }
 
     public static <T extends HordePlayerEvent> void registerInstructionFunction(ResourceLocation name, HordeFunction<HordePlayerEvent> function) {
-        DESERIALIZERS.put(name, new Pair<>(HordePlayerEvent.class, json -> function));
+        DESERIALIZERS.put(name, Pair.of(HordePlayerEvent.class, json -> function));
     }
 
-    public static <T extends HordePlayerEvent> void registerFunction(ResourceLocation name, Class<T> clazz, Function<JsonElement, HordeFunction<T>> serializer) {
+    public static <T extends HordePlayerEvent> void registerFunction(ResourceLocation name, Class<T> clazz, HordeFunction.Deserializer<T> serializer) {
         if (clazz == null) return;
-        DESERIALIZERS.put(name, new Pair(clazz, serializer));
+        DESERIALIZERS.put(name, Pair.of(clazz, serializer));
     }
 
 }

@@ -20,7 +20,6 @@
       "MixinHoglin",
       "MixinLivingEntity",
       "MixinMob",
-      "MixinMobEffectInstance",
       "MixinPiglin",
       "MixinPiglinAi",
       "MixinPiglinBrute",

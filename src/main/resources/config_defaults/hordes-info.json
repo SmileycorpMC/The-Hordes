@@ -6,9 +6,10 @@
 		"(keep an eye on base changes, in case they are needed for your pack when updating)"
 	],
 	"minecraft_version": "1.20.1",
-	"mod_version": "1.6.3",
-	"data_version": 10,
+	"mod_version": "1.6.3f",
+	"data_version": 12,
 	"changes": [
-		"changed the format of wearables_protection to add a better example for the new option in it"
+		"removed wolf armour from wearables_protection file, as it doesn't exist in 1.20.1",
+		"added a different message if another player's horde is preventing you from sleeping"
 	]
 }

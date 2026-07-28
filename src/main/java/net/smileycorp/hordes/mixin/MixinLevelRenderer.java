@@ -6,8 +6,6 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraftforge.common.util.LazyOptional;
-import net.smileycorp.hordes.common.capability.HordesCapabilities;
 import net.smileycorp.hordes.config.ClientConfigHandler;
 import net.smileycorp.hordes.hordeevent.client.HordeClientHandler;
 import org.joml.Matrix4f;

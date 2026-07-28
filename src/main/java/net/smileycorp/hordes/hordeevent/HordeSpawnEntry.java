@@ -58,7 +58,7 @@ public class HordeSpawnEntry {
 	}
 
 	public void setNBT(CompoundTag nbt) {
-		this.nbt=nbt;
+		this.nbt = nbt;
 	}
 
 	@Override

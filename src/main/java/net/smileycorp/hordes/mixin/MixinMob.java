@@ -18,7 +18,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.smileycorp.atlas.api.util.DataUtils;
 import net.smileycorp.atlas.api.util.Func;
@@ -120,7 +119,7 @@ public abstract class MixinMob extends LivingEntity {
 			if (player == null) return;
 			HordeEvent horde = HordeSavedData.getData((ServerLevel)level()).getEvent(player);
 			if (horde == null) return;
-			if (!horde.isActive(player)) return;
+			if (!horde.isActive()) return;
 			horde.registerEntity((Mob)(LivingEntity)this, player);
 		}
 	}

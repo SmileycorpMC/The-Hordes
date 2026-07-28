@@ -25,11 +25,11 @@ public class CommandStartHordeEvent {
 		command.then(Commands.literal("start")
 				.requires((commandSource) -> commandSource.hasPermission(1)).then(Commands.argument("length", IntegerArgumentType.integer())
 						.executes(ctx -> execute(ctx, IntegerArgumentType.getInteger(ctx, "length"), null))
-				.then(Commands.argument("table", ResourceLocationArgument.id()).suggests(HordeTableLoader::getSuggestions)
+				.then(Commands.argument("table", ResourceLocationArgument.id()).suggests(HordeTableLoader.INSTANCE::getSuggestions)
 				.executes(ctx -> execute(ctx,IntegerArgumentType.getInteger(ctx, "length"), ResourceLocationArgument.getId(ctx, "table")))))
 				.then(Commands.argument("player", EntityArgument.players()).then(Commands.argument("length", IntegerArgumentType.integer())
 				.executes(ctx -> execute(ctx, IntegerArgumentType.getInteger(ctx, "length"), EntityArgument.getPlayers(ctx, "player"), null))
-				.then(Commands.argument("table", ResourceLocationArgument.id()).suggests(HordeTableLoader::getSuggestions)
+				.then(Commands.argument("table", ResourceLocationArgument.id()).suggests(HordeTableLoader.INSTANCE::getSuggestions)
 				.executes(ctx -> execute(ctx,IntegerArgumentType.getInteger(ctx, "length"),
 						EntityArgument.getPlayers(ctx, "player"), ResourceLocationArgument.getId(ctx, "table")))))));
 	}

@@ -24,20 +24,20 @@ public interface ZombifyPlayer {
 	class Impl implements ZombifyPlayer {
 
 		private final Player player;
-		private PlayerZombie zombie = null;
+		private PlayerZombie<?> zombie = null;
 
 		public Impl(Player player) {
 			this.player = player;
 		}
 
 		@Override
-		public PlayerZombie createZombie() {
-			HordesEntities.ZOMBIE_PLAYER.get();
+		public PlayerZombie<?> createZombie() {
 			SpawnZombiePlayerEvent event = new SpawnZombiePlayerEvent(player, HordesEntities.ZOMBIE_PLAYER.get());
 			MinecraftForge.EVENT_BUS.post(event);
 			if (event.isCanceled()) return null;
-			EntityType<? extends PlayerZombie> type = event.getEntityType();
+			EntityType<? extends PlayerZombie<?>> type = event.getEntityType();
 			zombie = type.create(player.level());
+			if (zombie == null) return null;
 			zombie.setPlayer(player);
 			zombie.asEntity().setPos(player.getX(), player.getY(), player.getZ());
 			zombie.asEntity().yBodyRotO = player.yBodyRotO;

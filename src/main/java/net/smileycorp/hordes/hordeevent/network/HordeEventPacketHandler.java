@@ -1,6 +1,5 @@
 package net.smileycorp.hordes.hordeevent.network;
 
-import net.minecraft.network.Connection;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -11,7 +10,6 @@ import net.minecraftforge.network.simple.SimpleChannel;
 import net.smileycorp.atlas.api.network.AbstractMessage;
 import net.smileycorp.atlas.api.network.GenericStringMessage;
 import net.smileycorp.atlas.api.network.NetworkUtils;
-import net.smileycorp.hordes.client.ClientHandler;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.config.HordeEventConfig;
 import net.smileycorp.hordes.hordeevent.client.HordeClientHandler;
