@@ -1,0 +1,30 @@
+commands.hordes.SpawnHordeWave.usage=/spawnHordeWave <生成多少僵尸>
+commands.hordes.SpawnHordeWave.success=成功召唤了尸潮。
+commands.hordes.SpawnHordeWave.invalidValue=对于 <生成多少僵尸> 来说，%1$s 不是一个有效的量。
+commands.hordes.SpawnHordeWave.wrongArgCount=为 /spawnHordeWave 输入的参数是错误的。
+commands.hordes.StartHorde.usage=/startHordeEvent <有效时长>
+commands.hordes.StartHorde.success=已成功召唤一个时长为 %1$s 游戏刻的尸潮。
+commands.hordes.StartHorde.invalidValue=对于 <持续时间> 来说，%1$s 不是一个有效的量。
+commands.hordes.StartHorde.wrongArgCount=对于 /startHordeEvent 来说，这不是一个有效的量。
+commands.hordes.StopHorde.usage=/stopHordeEvent
+commands.hordes.StopHorde.success=成功停止了尸潮。
+commands.hordes.HordeDebug.usage=/debugHorde 
+commands.hordes.HordeDebug.success=输出 The Hordes 模组的日志到 %1$s
+commands.hordes.HordeClean.usage=/clearHordeData
+commands.hordes.HordeClean.success=已清除该世界中所有 The Hordes 模组的数据。
+message.hordes.EventStart=他们来了……
+message.hordes.EventEnd=空气平静了下来，尸潮停止了。
+message.hordes.TrySleep=你感到了恐惧，你无法入睡
+message.hordes.title=The Hordes
+message.hordes.DeathMessage=%1$s 死于僵尸感染。
+message.hordes.DeathMessageFighting=%1$s 在抵抗堕落的 %2$s 时被感染而死。
+message.hordes.DeathMessageOther=%1$s 已变异。
+hordes.subtitle.hordeHowls=僵尸的吼叫
+
+entity.hordes.ZombiePlayer.chat=%1$s 的变异体
+entity.hordes.ZombiePlayer.name=玩家僵尸
+
+effect.hordes.Infected=病毒感染
+death.attack.infection=%1$s 死于僵尸感染。
+
+jei.category.hordes.InfectionCures=治愈感染
