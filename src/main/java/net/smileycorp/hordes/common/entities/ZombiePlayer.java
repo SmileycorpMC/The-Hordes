@@ -9,6 +9,7 @@ import net.minecraft.network.chat.contents.PlainTextContents;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.Difficulty;
@@ -82,13 +83,19 @@ public class ZombiePlayer extends Zombie implements PlayerZombie<ZombiePlayer> {
 	
 	@Override
 	public void setPlayer(String username) {
-		Optional<GameProfile> optional = ServerLifecycleHooks.getCurrentServer().getProfileCache().get(username);
+		if (level().isClientSide) return;
+		MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+		if (server == null) return;
+		Optional<GameProfile> optional = server.getProfileCache().get(username);
 		if (optional.isPresent()) setPlayer(optional.get());
 	}
 	
 	@Override
 	public void setPlayer(UUID uuid) {
-		Optional<GameProfile> optional = ServerLifecycleHooks.getCurrentServer().getProfileCache().get(uuid);
+		if (level().isClientSide) return;
+		MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+		if (server == null) return;
+		Optional<GameProfile> optional = server.getProfileCache().get(uuid);
 		if (optional.isPresent()) setPlayer(optional.get());
 	}
 	
