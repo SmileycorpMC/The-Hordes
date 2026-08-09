@@ -36,7 +36,7 @@ public class WeightedRandomFunction<T extends HordePlayerEvent> implements Neste
                 filter(pair -> canApply(pair.getFirst(), ctx))
                 .map(WeightedRandomFunction::mapEntry).collect(Collectors.toList()));
         if (functions.isEmpty()) return;
-        functions.getResults(ctx.getRandom()).forEach(func -> apply(ctx));
+        functions.getResults(ctx.getRandom()).forEach(func -> func.apply(ctx));
     }
 
     private static <T extends HordePlayerEvent> Map.Entry<HordeFunction<T>, Integer> mapEntry(Pair<List<Condition>, Pair<HordeFunction<T>, Integer>> pair) {
