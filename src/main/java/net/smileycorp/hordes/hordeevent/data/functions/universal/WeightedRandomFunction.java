@@ -21,9 +21,9 @@ import java.util.Map;
 public class WeightedRandomFunction<T extends HordePlayerEvent> implements NestedHordeFunction<T> {
 
     private final Class<T> clazz;
-    private final List<Pair<List<Condition>, Pair<Integer, HordeFunction<T>>>> functions;
+    private final List<Pair<List<Condition>, Pair<HordeFunction<T>, Integer>>> functions;
 
-    public WeightedRandomFunction(Class<T> clazz, List<Pair<List<Condition>, Pair<Integer, HordeFunction<T>>>> functions) {
+    public WeightedRandomFunction(Class<T> clazz, List<Pair<List<Condition>, Pair<HordeFunction<T>, Integer>>> functions) {
         this.clazz = clazz;
         this.functions = functions;
     }
@@ -31,15 +31,15 @@ public class WeightedRandomFunction<T extends HordePlayerEvent> implements Neste
     @Override
     public void apply(HordeContext<T> ctx) {
         if (ctx.getEventClass() != clazz) return;
-        WeightedOutputs<HordeFunction<T>> functions = new WeightedOutputs(1, this.functions.stream().
+        WeightedOutputs<HordeFunction<T>> functions = new WeightedOutputs<>(1, this.functions.stream().
                 filter(pair -> canApply(pair.getFirst(), ctx))
                 .map(WeightedRandomFunction::mapEntry).toList());
         if (functions.isEmpty()) return;
-        functions.getResults(ctx.getRandom()).forEach(func -> apply(ctx));
+        functions.getResults(ctx.getRandom()).forEach(func -> func.apply(ctx));
     }
 
-    private static <T extends HordePlayerEvent> Map.Entry<Integer, HordeFunction<T>> mapEntry(Pair<List<Condition>, Pair<Integer, HordeFunction<T>>> pair) {
-        Pair<Integer, HordeFunction<T>> subpair = pair.getSecond();
+    private static <T extends HordePlayerEvent> Map.Entry<HordeFunction<T>, Integer> mapEntry(Pair<List<Condition>, Pair<HordeFunction<T>, Integer>> pair) {
+        Pair<HordeFunction<T>, Integer> subpair = pair.getSecond();
         return new AbstractMap.SimpleEntry<>(subpair.getFirst(), subpair.getSecond());
     }
 
@@ -61,7 +61,7 @@ public class WeightedRandomFunction<T extends HordePlayerEvent> implements Neste
     public static <T extends HordePlayerEvent> WeightedRandomFunction<T> deserialize(JsonElement json) {
         try {
             Class<T> clazz = null;
-            List<Pair<List<Condition>, Pair<Integer, HordeFunction<T>>>> functions = Lists.newArrayList();
+            List<Pair<List<Condition>, Pair<HordeFunction<T>, Integer>>> functions = Lists.newArrayList();
             for (JsonElement element : json.getAsJsonArray()) {
                 JsonObject obj = element.getAsJsonObject();
                 Pair<Class<T>, HordeFunction<T>> pair = FunctionRegistry.readFunction(obj);
@@ -70,13 +70,13 @@ public class WeightedRandomFunction<T extends HordePlayerEvent> implements Neste
                     if (obj.has("conditions")) obj.get("conditions").getAsJsonArray().forEach(condition ->
                             conditions.add(DataRegistry.readCondition(condition.getAsJsonObject())));
                     clazz = pair.getFirst();
-                    functions.add(Pair.of(conditions, Pair.of(obj.has("weight") ? obj.get("weight").getAsInt() : 0, pair.getSecond())));
+                    functions.add(Pair.of(conditions, Pair.of(pair.getSecond(), obj.has("weight") ? obj.get("weight").getAsInt() : 0)));
                 }
                 else if (pair.getFirst() != null && clazz != null && pair.getFirst().isAssignableFrom(clazz)) {
                     List<Condition> conditions = Lists.newArrayList();
                     if (obj.has("conditions")) obj.get("conditions").getAsJsonArray().forEach(condition ->
                             conditions.add(DataRegistry.readCondition(condition.getAsJsonObject())));
-                    functions.add(Pair.of(conditions, Pair.of(obj.has("weight") ? obj.get("weight").getAsInt() : 0, pair.getSecond())));
+                    functions.add(Pair.of(conditions, Pair.of(pair.getSecond(), obj.has("weight") ? obj.get("weight").getAsInt() : 0)));
                 }
             }
             return new WeightedRandomFunction(clazz, functions);

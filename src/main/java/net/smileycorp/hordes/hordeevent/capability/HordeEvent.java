@@ -234,7 +234,10 @@ public class HordeEvent {
 	public boolean isHordeDay(ServerPlayer player) {
 		ServerLevel level = player.serverLevel();
 		if (level.dimension() != Level.OVERWORLD) return false;
-		return isActive() || getCurrentDay(player) >= nextDay;
+		long time = getCurrentTime(player);
+		long next = (long) nextDay * (long) HordeEventConfig.dayLength.get() - HordeEventConfig.hordeStartTime.get();
+		return isActive() || (time >= next && time <= next - HordeEventConfig.hordeStartBuffer.get())
+				|| time >= (long) (nextDay + 1) * HordeEventConfig.dayLength.get();
 	}
 
 	public boolean isActive() {
@@ -399,6 +402,10 @@ public class HordeEvent {
 	
 	public int getDay() {
 		return day;
+	}
+
+	public long getCurrentTime(ServerPlayer player) {
+		return HordeEventConfig.hordeEventByPlayerTime.get() ? ((Playtime)player).getPlaytime() : player.level().getDayTime();
 	}
 
 	public int getCurrentDay(ServerPlayer player) {

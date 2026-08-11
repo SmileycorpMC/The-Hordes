@@ -51,6 +51,7 @@ public class DrownedPlayer extends Drowned implements PlayerZombie<DrownedPlayer
 
 	public DrownedPlayer(Level level) {
 		this(HordesEntities.DROWNED_PLAYER.get() ,level);
+		setPlayer("smileycorp");
 	}
 
 	public DrownedPlayer(Player player) {
@@ -161,11 +162,11 @@ public class DrownedPlayer extends Drowned implements PlayerZombie<DrownedPlayer
 
 	@Override
 	public MutableComponent getDisplayName() {
-		MutableComponent textcomponentstring = PlayerTeam.formatNameForTeam(getTeam(),
-				Component.translatable("entity.hordes.DrownedPlayer.chat", getCustomName()));
-		textcomponentstring.getStyle().withHoverEvent(this.createHoverEvent());
-		textcomponentstring.getStyle().withInsertion(this.getEncodeId());
-		return textcomponentstring;
+		MutableComponent component = PlayerTeam.formatNameForTeam(getTeam(),
+				Component.translatable("entity.hordes.DrownedPlayer.chat", getName()));
+		component.getStyle().withHoverEvent(this.createHoverEvent());
+		component.getStyle().withInsertion(this.getEncodeId());
+		return component;
 	}
 
 	@Override

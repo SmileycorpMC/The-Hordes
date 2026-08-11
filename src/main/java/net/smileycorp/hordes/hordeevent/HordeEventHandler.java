@@ -125,7 +125,7 @@ public class HordeEventHandler {
 		Optional<ServerPlayer> optional = data.getPlayersWithHorde().findAny();
 		if (optional.isEmpty()) return;
 		event.setResult(BedSleepingProblem.OTHER_PROBLEM);
-		player.displayClientMessage(Component.translatable(Constants.otherPlayerTrySleep, optional.get()), true);
+		player.displayClientMessage(Component.translatable(Constants.otherPlayerTrySleep, optional.get().getName()), true);
 	}
 
 	@SubscribeEvent(priority = EventPriority.LOWEST)

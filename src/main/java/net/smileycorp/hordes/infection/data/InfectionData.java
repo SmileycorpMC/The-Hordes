@@ -193,6 +193,7 @@ public class InfectionData extends HordesJsonLoader {
 
     public boolean applyImmunity(LivingEntity entity, Item item) {
         if (!immunityItems.containsKey(item)) return false;
+        if (entity.hasEffect(HordesInfection.INFECTED.get())) entity.removeEffect(HordesInfection.INFECTED.get());
         entity.addEffect(new MobEffectInstance(HordesInfection.IMMUNITY.get(), immunityItems.get(item) * 20));
         return true;
     }
