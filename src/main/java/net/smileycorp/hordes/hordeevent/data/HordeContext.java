@@ -73,6 +73,7 @@ public class HordeContext<T extends HordePlayerEvent> {
     }
 
     public void breakScript() {
+        HordesLogger.logInfo("break");
         if (state == State.ACTIVE) state = State.BROKEN;
     }
 

@@ -15,14 +15,12 @@ public class HordePlayerEvent extends Event {
 	protected final HordeEvent horde;
 	protected final int day;
 	private final ServerPlayer player;
-	private final RandomSource rand;
 	
 	public HordePlayerEvent(ServerPlayer player, HordeEvent horde) {
 		level = player.level();
 		this.horde = horde;
-		day = horde.getDay();
+		day = (int) Math.floor(level.getDayTime() / HordeEventConfig.dayLength.get());
 		this.player = player;
-		this.rand = horde.getRandom().fork();
 	}
 
 	public Level getEntityWorld() {
@@ -38,7 +36,7 @@ public class HordePlayerEvent extends Event {
 	}
 	
 	public RandomSource getRandom() {
-		return rand;
+		return horde.getRandom();
 	}
 	
 	public ServerPlayer getPlayer() {
