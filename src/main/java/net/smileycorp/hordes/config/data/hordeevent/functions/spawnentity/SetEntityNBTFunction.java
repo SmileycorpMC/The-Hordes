@@ -1,16 +1,17 @@
-package net.smileycorp.hordes.config.data.hordeevent.functions.universal;
+package net.smileycorp.hordes.config.data.hordeevent.functions.spawnentity;
 
 import com.google.gson.JsonElement;
 import net.minecraft.nbt.NBTTagCompound;
 import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
+import net.smileycorp.hordes.common.event.HordeSpawnEntityEvent;
 import net.smileycorp.hordes.config.data.DataRegistry;
 import net.smileycorp.hordes.config.data.hordeevent.HordeContext;
 import net.smileycorp.hordes.config.data.hordeevent.functions.HordeFunction;
 import net.smileycorp.hordes.config.data.values.ValueGetter;
 
-public class SetEntityNBTFunction implements HordeFunction<HordePlayerEvent> {
+public class SetEntityNBTFunction implements HordeFunction<HordeSpawnEntityEvent> {
     
     private final ValueGetter<String> getter;
     
@@ -19,7 +20,7 @@ public class SetEntityNBTFunction implements HordeFunction<HordePlayerEvent> {
     }
     
     @Override
-    public void apply(HordeContext<HordePlayerEvent> ctx) {
+    public void apply(HordeContext<HordeSpawnEntityEvent> ctx) {
         String str = getter.get(ctx);
         try {
             NBTTagCompound nbt = DataRegistry.parseNBT(ctx.getEntity().toString(), str);
