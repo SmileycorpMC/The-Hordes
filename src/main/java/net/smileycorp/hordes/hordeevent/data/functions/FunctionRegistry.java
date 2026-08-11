@@ -26,7 +26,6 @@ public class FunctionRegistry {
         registerNestedFunction(Constants.loc("multiple"), MultipleFunction::deserialize);
         registerNestedFunction(Constants.loc("random"), RandomFunction::deserialize);
         registerNestedFunction(Constants.loc("weighted_random"), WeightedRandomFunction::deserialize);
-        registerFunction(Constants.loc("set_entity_nbt"), HordePlayerEvent.class, SetEntityNBTFunction::deserialize);
         registerFunction(Constants.loc("set_player_nbt"), HordePlayerEvent.class, SetPlayerNBTFunction::deserialize);
         registerFunction(Constants.loc("set_variable"), HordePlayerEvent.class, SetVariableFunction::deserialize);
         registerFunction(Constants.loc("call_script"), HordePlayerEvent.class, CallScriptFunction::deserialize);
@@ -45,8 +44,10 @@ public class FunctionRegistry {
         registerFunction(Constants.loc("set_spawn_amount"), HordeBuildSpawnDataEvent.class, SetSpawnAmountFunction::deserialize);
         registerFunction(Constants.loc("set_entity_speed"), HordeBuildSpawnDataEvent.class, SetEntitySpeedFunction::deserialize);
         registerFunction(Constants.loc("add_reward_command"), HordeBuildSpawnDataEvent.class, AddRewardCommandFunction::deserialize);
+
         //spawn entity functions
         registerFunction(Constants.loc("set_entity_type"), HordeSpawnEntityEvent.class, SetEntityTypeFunction::deserialize);
+        registerFunction(Constants.loc("set_entity_nbt"), HordeSpawnEntityEvent.class, SetEntityNBTFunction::deserialize);
         registerFunction(Constants.loc("set_entity_x"), HordeSpawnEntityEvent.class, SetEntityXFunction::deserialize);
         registerFunction(Constants.loc("set_entity_y"), HordeSpawnEntityEvent.class, SetEntityYFunction::deserialize);
         registerFunction(Constants.loc("set_entity_z"), HordeSpawnEntityEvent.class, SetEntityZFunction::deserialize);
