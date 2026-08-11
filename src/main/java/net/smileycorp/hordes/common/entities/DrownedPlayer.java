@@ -51,7 +51,6 @@ public class DrownedPlayer extends Drowned implements PlayerZombie<DrownedPlayer
 
 	public DrownedPlayer(Level level) {
 		this(HordesEntities.DROWNED_PLAYER.get() ,level);
-		setPlayer("smileycorp");
 	}
 
 	public DrownedPlayer(Player player) {
@@ -60,9 +59,9 @@ public class DrownedPlayer extends Drowned implements PlayerZombie<DrownedPlayer
 	}
 
 	@Override
-	protected void defineSynchedData(){
+	protected void defineSynchedData() {
 		super.defineSynchedData();
-		entityData.define(PLAYER, Optional.empty());
+		entityData.define(PLAYER, DEFAULT_PLAYER);
 		entityData.define(SHOW_CAPE, true);
 	}
 

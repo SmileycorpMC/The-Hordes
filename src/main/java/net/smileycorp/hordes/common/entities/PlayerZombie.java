@@ -1,6 +1,7 @@
 package net.smileycorp.hordes.common.entities;
 
 import com.mojang.authlib.GameProfile;
+import net.minecraft.Util;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
@@ -13,6 +14,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface PlayerZombie<T extends Mob & PlayerZombie<T>> {
+
+	Optional<UUID> DEFAULT_PLAYER = Optional.of(Util.NIL_UUID);
 
 	void setPlayer(Player player);
 

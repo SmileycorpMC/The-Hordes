@@ -48,7 +48,6 @@ public class ZombiePlayer extends Zombie implements PlayerZombie<ZombiePlayer> {
 
 	public ZombiePlayer(EntityType<? extends ZombiePlayer> type, Level level) {
 		super(type, level);
-		setPlayer("smileycorp");
 	}
 
 	public ZombiePlayer(Level level) {
@@ -57,13 +56,12 @@ public class ZombiePlayer extends Zombie implements PlayerZombie<ZombiePlayer> {
 
 	public ZombiePlayer(Player player) {
 		this(player.level());
-		setPlayer(player);
 	}
 
 	@Override
-	protected void defineSynchedData(){
+	protected void defineSynchedData() {
 		super.defineSynchedData();
-		entityData.define(PLAYER, Optional.empty());
+		entityData.define(PLAYER, DEFAULT_PLAYER);
 		entityData.define(SHOW_CAPE, true);
 	}
 
