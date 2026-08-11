@@ -6,7 +6,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.eventbus.api.Event;
-import net.smileycorp.hordes.common.HordesLogger;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
 import net.smileycorp.hordes.hordeevent.HordeSpawnData;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
@@ -73,7 +72,6 @@ public class HordeContext<T extends HordePlayerEvent> {
     }
 
     public void breakScript() {
-        HordesLogger.logInfo("break");
         if (state == State.ACTIVE) state = State.BROKEN;
     }
 
