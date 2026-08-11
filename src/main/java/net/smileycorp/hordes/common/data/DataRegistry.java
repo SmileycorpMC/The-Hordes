@@ -49,6 +49,7 @@ public class DataRegistry {
 		registerValueGetter(Constants.loc("day"), EventDayGetter::deserialize);
 		registerValueGetter(Constants.loc("spawn_table"), SpawnTableGetter::deserialize);
 		registerValueGetter(Constants.loc("get_variable"), VariableGetter::deserialize);
+		registerValueGetter(Constants.loc("get_global"), GlobalGetter::deserialize);
 	}
 
 	public static void registerConditionDeserializers() {

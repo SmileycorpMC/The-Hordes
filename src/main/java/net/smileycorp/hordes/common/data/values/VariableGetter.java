@@ -16,7 +16,7 @@ public class VariableGetter<T extends Comparable<T>> implements ValueGetter<T> {
 
 	@Override
 	public T get(HordeContext<? extends HordePlayerEvent> ctx) {
-		return (T) ctx.getValue(variable.get(ctx));
+		return ctx.getValue(variable.get(ctx));
 	}
 
 	public static <T extends Comparable<T>> VariableGetter<T> deserialize(JsonObject object, DataType<T> type) {

@@ -6,6 +6,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
+import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.Constants;
 import net.smileycorp.hordes.config.HordeEventConfig;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
@@ -26,6 +27,7 @@ public class HordeSpawnData {
     private int spawnAmount;
     private double entitySpeed = HordeEventConfig.hordeEntitySpeed.get();
     private final List<String> commands = Lists.newArrayList();
+    private CompoundTag globalVariables = new CompoundTag();
 
     public HordeSpawnData(HordeEvent horde) {
         spawnAmount = (int) (HordeEventConfig.hordeSpawnAmount.get() * (1 + (horde.getDay() / HordeEventConfig.hordeSpawnDays.get())
@@ -44,6 +46,7 @@ public class HordeSpawnData {
         if (tag.contains("spawnAmount")) spawnAmount = tag.getInt("spawnAmount");
         if (tag.contains("entitySpeed")) entitySpeed = tag.getDouble("entitySpeed");
         if (tag.contains("commands")) for (Tag command : tag.getList("commands", 8)) commands.add(command.getAsString());
+        if (tag.contains("globalVariables")) globalVariables = tag.getCompound("globalVariables");
     }
     
     public CompoundTag save() {
@@ -62,6 +65,7 @@ public class HordeSpawnData {
             for (String command : this.commands) commands.add(StringTag.valueOf(command));
             tag.put("commands", commands);
         }
+        tag.put("globalVariables", globalVariables);
         return tag;
     }
     
@@ -145,6 +149,14 @@ public class HordeSpawnData {
         return Lists.newArrayList(commands);
     }
 
+    public <T extends Comparable<T>> void setGlobal(String key, T value) {
+        DataType.of(value).writeToNBT(globalVariables, key, value);
+    }
+
+    public <T extends Comparable<T>> T getGlobal(String key, DataType<T> type) {
+       return type.readFromNBT(globalVariables, key);
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder(getClass().getSimpleName()+"[");
@@ -159,5 +171,5 @@ public class HordeSpawnData {
         builder.append("entitySpeed=" + entitySpeed + "]");
         return builder.toString();
     }
-    
+
 }

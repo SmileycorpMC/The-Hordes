@@ -6,7 +6,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.eventbus.api.Event;
-import net.smileycorp.hordes.common.HordesLogger;
+import net.smileycorp.atlas.api.data.DataType;
 import net.smileycorp.hordes.common.event.HordePlayerEvent;
 import net.smileycorp.hordes.hordeevent.HordeSpawnData;
 import net.smileycorp.hordes.hordeevent.capability.HordeEvent;
@@ -90,12 +90,20 @@ public class HordeContext<T extends HordePlayerEvent> {
         if (event.hasResult()) event.setResult(Event.Result.DENY);
     }
 
-    public void setValue(String key, Comparable<?> value) {
+    public <U extends Comparable<U>> void setValue(String key, U value) {
         variables.put(key, value);
     }
 
-    public Comparable<?> getValue(String key) {
-        return variables.get(key);
+    public <U extends Comparable<U>> U getValue(String key) {
+        return (U) variables.get(key);
+    }
+
+    public <U extends Comparable<U>> void setGlobal(String key, U value) {
+        event.getSpawnData().setGlobal(key, value);
+    }
+
+    public <U extends Comparable<U>> U getGlobal(String key, DataType<U> type) {
+        return event.getSpawnData().getGlobal(key, type);
     }
 
     private enum State {
