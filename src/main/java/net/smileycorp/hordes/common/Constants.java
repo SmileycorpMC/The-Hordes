@@ -10,7 +10,7 @@ public class Constants {
 	public static final String MODID = "hordes";
 	public static final String NAME = "The Hordes";
 
-	public static final String VERSION = "1.6.3b";
+	public static final String VERSION = "1.6.3d";
 	public static final String DEPENDENCIES = "required-after:atlaslib@[1.1.11,);after:baubles;after:galacticraft;before:deathchest;before:corpse;before:jei";
 
 	private static final String PACKAGE = "net.smileycorp.hordes.";
