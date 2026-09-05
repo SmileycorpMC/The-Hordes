@@ -49,7 +49,6 @@ public class DrownedPlayer extends Drowned implements PlayerZombie<DrownedPlayer
 	
 	public DrownedPlayer(EntityType<? extends DrownedPlayer> type, Level level) {
 		super(type, level);
-		setPlayer("smileycorp");
 	}
 	
 	public DrownedPlayer(Level level) {
@@ -64,7 +63,7 @@ public class DrownedPlayer extends Drowned implements PlayerZombie<DrownedPlayer
 	@Override
 	protected void defineSynchedData(SynchedEntityData.Builder builder) {
 		super.defineSynchedData(builder);
-		builder.define(PLAYER, Optional.empty());
+		builder.define(PLAYER, DEFAULT_PLAYER);
 		builder.define(SHOW_CAPE, true);
 	}
 	

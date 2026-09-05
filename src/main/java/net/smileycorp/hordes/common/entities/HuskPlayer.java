@@ -51,7 +51,6 @@ public class HuskPlayer extends Husk implements PlayerZombie<HuskPlayer> {
 
 	public HuskPlayer(EntityType<? extends HuskPlayer> type, Level level) {
 		super(type, level);
-		setPlayer("smileycorp");
 	}
 
 	public HuskPlayer(Level level) {
@@ -66,7 +65,7 @@ public class HuskPlayer extends Husk implements PlayerZombie<HuskPlayer> {
 	@Override
 	protected void defineSynchedData(SynchedEntityData.Builder builder) {
 		super.defineSynchedData(builder);
-		builder.define(PLAYER, Optional.empty());
+		builder.define(PLAYER, DEFAULT_PLAYER);
 		builder.define(SHOW_CAPE, true);
 	}
 	

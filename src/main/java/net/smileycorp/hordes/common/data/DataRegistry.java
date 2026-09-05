@@ -68,15 +68,13 @@ public class DataRegistry {
 	}
 
 	public static ValueGetter readValue(DataType type, JsonObject json) {
-		if (json.has("name") && json.has("value")) {
-			try {
-				ResourceLocation loc = ResourceLocation.tryParse(json.get("name").getAsString());
-				BiFunction<JsonObject, DataType, ValueGetter> getter = VALUE_GETTERS.get(loc);
-				if (getter == null) throw new NullPointerException("value getter " + loc + " is not registered");
-				return getter.apply(json, type);
-			} catch (Exception e) {
-				HordesLogger.logError("Failed to read value " + json, e);
-			}
+		try {
+			ResourceLocation loc = ResourceLocation.tryParse(json.get("name").getAsString());
+			BiFunction<JsonObject, DataType, ValueGetter> getter = VALUE_GETTERS.get(loc);
+			if (getter == null) throw new NullPointerException("value getter " + loc + " is not registered");
+			return getter.apply(json, type);
+		} catch (Exception e) {
+			HordesLogger.logError("Failed to read value " + json, e);
 		}
 		return null;
 	}

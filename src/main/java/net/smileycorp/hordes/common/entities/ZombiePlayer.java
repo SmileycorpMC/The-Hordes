@@ -50,7 +50,6 @@ public class ZombiePlayer extends Zombie implements PlayerZombie<ZombiePlayer> {
 
 	public ZombiePlayer(EntityType<? extends ZombiePlayer> type, Level level) {
 		super(type, level);
-		setPlayer("smileycorp");
 	}
 
 	public ZombiePlayer(Level level) {
@@ -65,7 +64,7 @@ public class ZombiePlayer extends Zombie implements PlayerZombie<ZombiePlayer> {
 	@Override
 	protected void defineSynchedData(SynchedEntityData.Builder builder) {
 		super.defineSynchedData(builder);
-		builder.define(PLAYER, Optional.empty());
+		builder.define(PLAYER, DEFAULT_PLAYER);
 		builder.define(SHOW_CAPE, true);
 	}
 	
