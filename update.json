@@ -21,10 +21,11 @@
 		"1.6.3d": "fix crash on servers caused by incorrect import",
 		"1.6.3e": "fixed issue with hordes:weighted_random function deserialization",
 		"1.6.3f": "fixed config, and logging issues, issues with infection protection and the default datapack, as well as adding a unique message if another player's horde is preventing sleep",
-		"1.6.3g": "fixed issues with other players sleeping, or zombie players causing kicks as well issues with spawnFirstDay and the hordes:weighted_random function"
+		"1.6.3g": "fixed issues with other players sleeping, or zombie players causing kicks as well issues with spawnFirstDay and the hordes:weighted_random function",
+		"1.6.3h": "fixed zombie player render issues, and some hordescript errors, reverted hordes:set_entity_nbt to being a spawn entity function"
     },
     "promos": {
-        "1.20.1-latest": "1.6.3g",
-        "1.20.1-recommended": "1.6.3g"
+        "1.20.1-latest": "1.6.3h",
+        "1.20.1-recommended": "1.6.3h"
     }
 }
