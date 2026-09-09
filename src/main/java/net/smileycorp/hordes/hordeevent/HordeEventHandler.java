@@ -125,4 +125,11 @@ public class HordeEventHandler {
 		}
 	}
 
+	@SubscribeEvent
+	public void clone (PlayerEvent.Clone event) {
+		Player original = event.getOriginal();
+		Player player = event.getEntity();
+		((Playtime) player).setPlaytime(((Playtime) original).getPlaytime());
+	}
+
 }
