@@ -11,10 +11,11 @@
 		"1.6.3b": "fixed issue with hordes:weighted_random function deserialization",
 		"1.6.3c": "fixed capability, zombie players and logging issues, issues with infection protection and the default datapack, as well as adding a unique message if another player's horde is preventing sleep, update to neo version 21.1.230",
 		"1.6.3d": "fixed issues with other players sleeping, or zombie players causing kicks as well issues with spawnFirstDay and the hordes:weighted_random function",
-		"1.6.3e": "fixed zombie player render issues, and some hordescript errors, reverted hordes:set_entity_nbt to being a spawn entity function"
+		"1.6.3e": "fixed zombie player render issues, and some hordescript errors, reverted hordes:set_entity_nbt to being a spawn entity function",
+		"1.6.3f": "fixed playtime being rest on death"
 	},
     "promos": {
-		"1.21.1-latest": "1.6.3e",
-        "1.21.1-recommended": "1.6.3e"
+		"1.21.1-latest": "1.6.3f",
+        "1.21.1-recommended": "1.6.3f"
     }
 }
