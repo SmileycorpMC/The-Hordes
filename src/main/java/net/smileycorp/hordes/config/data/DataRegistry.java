@@ -108,7 +108,6 @@ public class DataRegistry {
             if (parsed != null) nbt = parsed;
             else throw new NullPointerException("Parsed NBT is null.");
         } catch (Exception e) {
-            HordesLogger.logError("Failed to read config, " + e.getCause() + " " + e.getMessage(), e);
             HordesLogger.logError("Error parsing nbt for entity " + name + " " + e.getMessage(), e);
         }
         return nbt;

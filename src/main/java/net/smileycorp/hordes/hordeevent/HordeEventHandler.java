@@ -115,5 +115,12 @@ public class HordeEventHandler {
 		event.setResult(EntityPlayer.SleepResult.OTHER_PROBLEM);
 		player.sendMessage(new TextComponentTranslation(Constants.otherPlayerTrySleep, optional.get().getName()));
 	}
+
+	@SubscribeEvent
+	public void clone(net.minecraftforge.event.entity.player.PlayerEvent.Clone event) {
+		EntityPlayer original = event.getOriginal();
+		EntityPlayer player = event.getEntityPlayer();
+		((Playtime) player).setPlaytime(((Playtime) original).getPlaytime());
+	}
 	
 }
