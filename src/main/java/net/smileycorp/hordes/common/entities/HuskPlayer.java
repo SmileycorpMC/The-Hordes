@@ -136,7 +136,7 @@ public class HuskPlayer extends Husk implements PlayerZombie<HuskPlayer> {
 
 	@Override
 	protected void doUnderWaterConversion() {
-		Zombie zombie = convertTo(HordesEntities.ZOMBIE_PLAYER.get(), true);
+		Zombie zombie = convertTo(HordesEntities.ZOMBIE_PLAYER.get(), false);
 		if (zombie != null) {
 			zombie.handleAttributes(zombie.level().getCurrentDifficultyAt(zombie.blockPosition()).getSpecialMultiplier());
 			zombie.setCanBreakDoors(zombie.supportsBreakDoorGoal() && this.canBreakDoors());
