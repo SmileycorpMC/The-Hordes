@@ -71,7 +71,7 @@ public class ZombiePlayer extends Zombie implements PlayerZombie<ZombiePlayer> {
 		for (EquipmentSlot slot : EquipmentSlot.values()) {
 			ItemStack stack = slot.getType() == EquipmentSlot.Type.ARMOR ? player.getInventory().armor.get(slot.getIndex()) :
 				slot == EquipmentSlot.MAINHAND ? player.getMainHandItem() : player.getOffhandItem();
-			setItemSlot(slot, stack);
+			setItemSlot(slot, stack.copy());
 		}
 		setPlayer(player.getGameProfile());
 	}

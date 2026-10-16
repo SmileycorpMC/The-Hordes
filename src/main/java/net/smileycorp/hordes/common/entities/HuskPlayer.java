@@ -73,7 +73,7 @@ public class HuskPlayer extends Husk implements PlayerZombie<HuskPlayer> {
 		for (EquipmentSlot slot : EquipmentSlot.values()) {
 			ItemStack stack = slot.getType() == EquipmentSlot.Type.ARMOR ? player.getInventory().armor.get(slot.getIndex()) :
 				slot == EquipmentSlot.MAINHAND ? player.getMainHandItem() : player.getOffhandItem();
-			setItemSlot(slot, stack);
+			setItemSlot(slot, stack.copy());
 		}
 		setPlayer(player.getGameProfile());
 	}
