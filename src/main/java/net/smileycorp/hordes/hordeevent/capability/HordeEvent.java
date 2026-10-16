@@ -410,7 +410,7 @@ public class HordeEvent {
 
 	public int getCurrentDay(ServerPlayer player) {
 		return (int) Math.floor((HordeEventConfig.hordeEventByPlayerTime.get() ? ((Playtime)player).getPlaytime()
-				: player.level().getDayTime()) / HordeEventConfig.dayLength.get());
+				: player.level().getDayTime()) / (double) HordeEventConfig.dayLength.get());
 	}
 
 	private void logInfo(Object message) {
