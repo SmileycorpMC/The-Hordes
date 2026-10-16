@@ -119,6 +119,7 @@ public class HordeEventHandler {
 		if (data.isHordeNight(player)) {
 			event.setResult(BedSleepingProblem.OTHER_PROBLEM);
 			player.displayClientMessage(Component.translatable(Constants.hordeTrySleep), true);
+			player.setRespawnPosition(level.dimension(), event.getPos(), player.getYRot(), false, true);
 			return;
 		}
 		if (!HordeEventConfig.hordePreventsOtherPlayersSleeping.get()) return;
@@ -126,6 +127,7 @@ public class HordeEventHandler {
 		if (optional.isEmpty()) return;
 		event.setResult(BedSleepingProblem.OTHER_PROBLEM);
 		player.displayClientMessage(Component.translatable(Constants.otherPlayerTrySleep, optional.get().getName()), true);
+		player.setRespawnPosition(level.dimension(), event.getPos(), player.getYRot(), false, true);
 	}
 
 	@SubscribeEvent(priority = EventPriority.LOWEST)
