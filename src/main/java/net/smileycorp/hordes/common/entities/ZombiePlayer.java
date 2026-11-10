@@ -135,12 +135,12 @@ public class ZombiePlayer extends Zombie implements PlayerZombie<ZombiePlayer> {
 	@Override
 	protected void doUnderWaterConversion() {
 		if (ZombiePlayersConfig.drownedPlayers.get()) {
-			Zombie drowned = convertTo(HordesEntities.DROWNED_PLAYER.get(), false);
+			DrownedPlayer drowned = convertTo(HordesEntities.DROWNED_PLAYER.get(), false);
 			if (drowned != null) {
 				drowned.handleAttributes(drowned.level().getCurrentDifficultyAt(drowned.blockPosition()).getSpecialMultiplier());
 				drowned.setCanBreakDoors(drowned.supportsBreakDoorGoal() && this.canBreakDoors());
 				ForgeEventFactory.onLivingConvert(this, drowned);
-				if (drowned instanceof PlayerZombie) ((PlayerZombie) drowned).copyFrom(this);
+                drowned.copyFrom(this);
 			}
 			if (!this.isSilent()) level().levelEvent(null, 1040, this.blockPosition(), 0);
 		}
